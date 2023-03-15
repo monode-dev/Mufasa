@@ -1,4 +1,4 @@
-package us.tke.ninety_percent;
+package us.tke.ninetypercent;
 
 import com.getcapacitor.BridgeActivity;
 
