@@ -8,7 +8,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: us.tke.hello-native
+        bundle_identifier: us.tke.ninetypercent
       vars:
         XCODE_WORKSPACE: "App.xcworkspace"
         XCODE_SCHEME: "App"
