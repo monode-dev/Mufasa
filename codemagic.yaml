@@ -12,7 +12,7 @@ workflows:
       vars:
         XCODE_WORKSPACE: "App.xcworkspace"
         XCODE_SCHEME: "App"
-        APP_ID: 6446294098
+        APP_ID: 6446333792
     scripts:
       - name: Install npm dependencies for Ionic Capacitor project
         script: |
