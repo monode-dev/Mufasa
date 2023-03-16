@@ -41,8 +41,9 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
-          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+          agvtool new-version -all 1.1
+        # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
+        # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme
       #   script: |
       #     cd ios/App
@@ -83,8 +84,8 @@ workflows:
 
         # Specify the names of beta tester groups that will get access to the build
         # once it has passed beta review.
-        # beta_groups:
-        #   - group name 1
+        beta_groups:
+          - Devs
         #   - group name 2
 
         # Configuration related to App Store (optional)
