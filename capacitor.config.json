@@ -1,0 +1,11 @@
+{
+  "appId": "us.tke.ninetypercent",
+  "appName": "90%",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+		"CapacitorUpdater": {
+			"updateUrl": "https://us-central1-tke-ota.cloudfunctions.net/checkLatestOtaPatch"
+		}
+  }
+}

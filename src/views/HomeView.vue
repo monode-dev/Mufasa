@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div style="font-size: 1rem;">
+  <div>
     This is your app
   </div>
 </template>

@@ -1,6 +1,6 @@
 {
   "name": "ninety_percent",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -15,6 +15,7 @@
     "@capacitor/cli": "^4.7.0",
     "@capacitor/core": "^4.7.0",
     "@capacitor/ios": "^4.7.0",
+    "@capgo/capacitor-updater": "^4.17.46",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
