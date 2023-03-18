@@ -3,6 +3,6 @@
 
 <template>
   <div>
-    This is your app.
+    This is your app. It's not much yet, but it'll get there.
   </div>
 </template>
