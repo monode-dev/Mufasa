@@ -1,16 +1,14 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+      "strict": true,
+      "target": "es2022",
+      "moduleResolution": "node",
+      "baseUrl": ".",
+      "allowJs": true,
+      "types": ["vite/client"],
+      "paths": {
+          "@/*": ["src/*"]
+      }
   },
-
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+  "include": ["env.d.ts", "src/**/*.vue", "src/**/*.ts"]
 }
