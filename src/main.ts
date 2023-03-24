@@ -3,6 +3,8 @@ import App from "./App.vue";
 import router from "./router";
 import "./assets/main.css";
 import { ScreenOrientation, OrientationType } from '@capawesome/capacitor-screen-orientation';
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+CapacitorUpdater.notifyAppReady();
 
 const app = createApp(App);
 
