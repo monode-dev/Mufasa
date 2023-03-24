@@ -1,6 +1,6 @@
 {
   "name": "ninety_percent",
-  "version": "1.3.17",
+  "version": "1.4.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -15,8 +15,8 @@
     "@capacitor/cli": "^4.7.0",
     "@capacitor/core": "^4.7.0",
     "@capacitor/ios": "^4.7.0",
+    "@capawesome/capacitor-screen-orientation": "^2.0.2",
     "@capgo/capacitor-updater": "^4.17.46",
-    "cordova-plugin-screen-orientation": "^3.0.3",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
     "vue3-mobile-detection": "^1.0.5"

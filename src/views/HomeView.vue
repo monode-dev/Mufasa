@@ -4,6 +4,8 @@ import B, { Sty, Axis, Align,mdColors } from './utils/B.vue';
 const appBarSty: Partial<Sty> = {
   width: `1f`,
   background: mdColors.green,
+  shadowSize: 1.25,
+  shadowDirection: Align.bottomCenter,
   align: Align.center,
   padding: 1,
   textColor: mdColors.white,
@@ -35,8 +37,8 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
       background: mdColors.green,
     }"/>
     <B :sty="appBarSty">
-      App Bar
+      Page Title
     </B>
-    <B :sty="pageBody">Under Construction</B>
+    <B :sty="pageBody">Coming Soon</B>
   </B>
 </template>

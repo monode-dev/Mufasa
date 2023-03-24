@@ -10,7 +10,7 @@ export interface Sty {
   outlineSize: number;
   background: string;
   shadowSize: number;
-  shadowDirection: string;
+  shadowDirection: Align;
   padding: string | number;
   align: Align;
   axis: Axis;
@@ -178,6 +178,19 @@ export default defineComponent({
         size: height,
         isMainAxis: true,
       });
+      const shadowDirection = (() => {
+        switch(this.sty.shadowDirection ?? Align.bottomRight) {
+          case Align.topLeft: return { x: -1, y: 1 };
+          case Align.topCenter: return { x: 0, y: 1 };
+          case Align.topRight: return { x: 1, y: 1 };
+          case Align.centerLeft: return { x: -1, y: 0 };
+          case Align.center: return { x: 0, y: 0 };
+          case Align.centerRight: return { x: 1, y: 0 };
+          case Align.bottomLeft: return { x: -1, y: -1 };
+          case Align.bottomCenter: return { x: 0, y: -1 };
+          case Align.bottomRight: return { x: 1, y: -1 };
+        }
+      })();
       return {
         // Sizing
         display: `flex`,
@@ -216,7 +229,15 @@ export default defineComponent({
           : undefined,
         backgroundColor: this.sty.background,
         // Add background images
-        // Add shadow
+        boxShadow: isDefined(this.sty.shadowSize)
+        ? `${
+            sizeToCss(0.12 * this.sty.shadowSize * shadowDirection.x)
+          } ${
+            sizeToCss(-0.12 * this.sty.shadowSize * shadowDirection.y)
+          } ${
+            sizeToCss(0.225 * this.sty.shadowSize)
+          } 0 ${mdColors.grey.substring(0, 7)}cc`
+        : undefined,
 
         // Padding
         padding: isNum(this.sty.padding)
