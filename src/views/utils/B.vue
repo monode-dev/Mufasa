@@ -95,7 +95,7 @@ export const mdColors = {
 const fontSizeToHtmlUnit = 0.825;
 function sizeToCss(num: number | string) {
   return isNum(num)
-    ? `${num * (1 / fontSizeToHtmlUnit)}rem`
+    ? `${num * (1.125 / fontSizeToHtmlUnit)}rem`
     : num;
 }
 function numToFontSize(num: number) {
@@ -121,16 +121,22 @@ function computeSizeInfo(
         ? size
         : size !== -1 && !sizeIsFlex
           ? sizeToCss(size)
-          : `fit-content`;
+          : sizeIsFlex
+            ? undefined
+            : `fit-content`;
   const minSize = sizeIsFlex
     ? size.min === -1
       ? `fit-content`
-      : sizeToCss(size.min)
+      : size.min === Infinity
+        ? exactSize
+        : sizeToCss(size.min)
     : exactSize;
   const maxSize = sizeIsFlex
     ? size.max === -1
       ? `fit-content`
-      : sizeToCss(size.max)
+      : size.max === Infinity
+        ? exactSize
+        : sizeToCss(size.max)
     : exactSize;
   return [exactSize, minSize, maxSize, sizeIsFlex] as const;
 }
