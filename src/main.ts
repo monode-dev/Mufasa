@@ -7,6 +7,6 @@ const app = createApp(App);
 
 app.use(router);
 
-window.screen.orientation.lock('portrait');
+//window.screen.orientation.lock('portrait');
 
 app.mount("#app");
