@@ -8,6 +8,11 @@ const app = createApp(App);
 
 app.use(router);
 
-ScreenOrientation.lock({ type: OrientationType.PORTRAIT });
+(async () => {
+  try {
+    await ScreenOrientation.lock({ type: OrientationType.PORTRAIT });
+  } catch (e) {
+  }
+})();
 
 app.mount("#app");
