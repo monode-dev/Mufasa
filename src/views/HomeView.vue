@@ -129,6 +129,7 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
           align: Align.center,
           spacing: Spacing.spaceAround,
         }">
+          <!-- The inkwells for these aren't quite right. -->
           <div ref="tab0Ref">
             <B :sty="tabButtonSty"
               @click="selectTab(0)">
