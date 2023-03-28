@@ -5,6 +5,7 @@
   "bundledWebRuntime": false,
   "plugins": {
 		"CapacitorUpdater": {
+      "autoUpdate": false,
 			"updateUrl": "https://us-central1-tke-ota.cloudfunctions.net/checkLatestOtaPatch"
 		}
   }

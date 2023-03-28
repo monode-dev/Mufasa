@@ -53,7 +53,7 @@ function selectTab(newTab: number) {
 
 const appBarSty: Partial<Sty> = {
   width: `1f`,
-  background: mdColors.green,
+  background: mdColors.blue,//mdColors.green,
   shadowSize: 1.25,
   shadowDirection: Align.bottomCenter,
   align: Align.bottomCenter,

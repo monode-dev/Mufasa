@@ -21,4 +21,5 @@ body {
   color: #333333;
   font-size: 1rem;
   margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
