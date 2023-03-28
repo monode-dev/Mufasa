@@ -4,7 +4,7 @@ import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import logo from '@/assets/logo.png';
 import router from '@/router';
-const logoWidth = 8;
+const logoWidth = 5;
 const logoHeight = logoWidth * 618 / 755;
 
 const textSize = 1.5;
