@@ -2,13 +2,13 @@
 import { onMounted, Ref, ref } from 'vue';
 import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
-import type { BundleInfo } from '@capgo/capacitor-updater';
 import logo from '@/assets/logo.png';
 import router from '@/router';
 const logoWidth = 8;
 const logoHeight = logoWidth * 618 / 755;
 
-const shouldShowUpdatingText = ref(false);
+const textSize = 1.5;
+const updatingText = ref("");
 getAndApplyPatch();
 async function getAndApplyPatch() {
   // Check if there is a patch available
@@ -16,7 +16,7 @@ async function getAndApplyPatch() {
 
   // If there is a patch available, download and apply it
   if (latest.url) {
-    shouldShowUpdatingText.value = true;
+    updatingText.value = "Updating...";
 
     // Download the latest patch
     const patchData = await CapacitorUpdater.download({
@@ -41,19 +41,21 @@ async function getAndApplyPatch() {
     align: Align.center,
     spacing: 1,
   }">
+  <B :sty="{height: textSize}"></B>
     <B :sty="{
       width: logoWidth,
       height: logoHeight,
     }">
       <img style="width: 100%; height: 100%" :src="logo" alt="90% Logo" />
     </B>
-    <B v-if="shouldShowUpdatingText"
+    <B
       :sty="{
-        textSize: 1.5,
+        height: textSize,
+        textSize: textSize,
         textColor: mdColors.white,
       }"
     >
-      Updating...
+    {{updatingText}}
     </B>
   </B>
 </template>

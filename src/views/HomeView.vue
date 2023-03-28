@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { onMounted, Ref, ref } from 'vue';
 import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import {gsap} from "gsap";
@@ -53,7 +54,7 @@ function selectTab(newTab: number) {
 
 const appBarSty: Partial<Sty> = {
   width: `1f`,
-  background: mdColors.blue,//mdColors.green,
+  background: mdColors.green,
   shadowSize: 1.25,
   shadowDirection: Align.bottomCenter,
   align: Align.bottomCenter,
@@ -81,6 +82,13 @@ const pageBodySty: Partial<Sty> = {
   padding: 1,
 };
 const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
+
+const versionNumText = ref('0.0.0');
+updateVersionNumText();
+async function updateVersionNumText() {
+  const currentVersionInfo = await CapacitorUpdater.current();
+  versionNumText.value = currentVersionInfo.bundle.version;
+}
 </script>
 
 <template>
@@ -161,7 +169,7 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
 
     <!-- Body -->
     <B :sty="pageBodySty">
-      Coming Soon
+      Version: {{ versionNumText }}
     </B>
   </B>
 </template>
