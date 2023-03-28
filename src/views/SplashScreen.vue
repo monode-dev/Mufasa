@@ -7,7 +7,7 @@ import router from '@/router';
 const logoWidth = 5;
 const logoHeight = logoWidth * 618 / 755;
 
-const textSize = 1.5;
+const textSize = 1.25;
 const updatingText = ref("");
 getAndApplyPatch();
 async function getAndApplyPatch() {
@@ -39,9 +39,9 @@ async function getAndApplyPatch() {
     height: `100%`,
     background: mdColors.green,
     align: Align.center,
-    spacing: 1,
+    spacing: 0.5,
   }">
-  <B :sty="{height: textSize}"></B>
+    <!--<B :sty="{height: textSize}"></B>-->
     <B :sty="{
       width: logoWidth,
       height: logoHeight,
@@ -57,5 +57,6 @@ async function getAndApplyPatch() {
     >
     {{updatingText}}
     </B>
+    <B :sty="{height: textSize}"></B>
   </B>
 </template>
