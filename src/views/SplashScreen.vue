@@ -4,7 +4,7 @@ import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { SplashScreen } from '@capacitor/splash-screen';
 import Viewport from './components/Page.vue';
-import updatingIcon from '@/assets/cloud_download_FILL1_wght400_GRAD0_opsz48.svg';
+import updatingIcon from '@/assets/download_FILL1_wght400_GRAD0_opsz48.svg';
 import router from '@/router';
 const logoWidth = 4;
 
@@ -31,7 +31,7 @@ async function getAndApplyPatch() {
   }
 
   // Start the app
-  router.push('/home');
+  //router.push('/home');
 }
 </script>
 
