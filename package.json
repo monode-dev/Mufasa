@@ -1,12 +1,12 @@
 {
   "name": "ninety_percent",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npx cap sync",
+    "build": "vite build && npm run icons && npx cap sync",
     "ios-icons": "capacitor-resources -o ./ios/app -p ios",
-    "icons": "npx @capacitor/assets generate --iconBackgroundColor \"#4caf50\" --splashBackgroundColor \"#4caf5\"",
+    "icons": "npx @capacitor/assets generate --iconBackgroundColor \"#4caf50\" --splashBackgroundColor \"#4caf50\" --splashBackgroundColorDark \"#4caf50\" --logoSplashScale 0.3",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit"
