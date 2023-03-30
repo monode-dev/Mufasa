@@ -30,9 +30,8 @@ async function getAndApplyPatch() {
     await CapacitorUpdater.set({ id: patchData.id });
   }
 
-  await SplashScreen.hide();
   // Start the app
-  //router.push('/home');
+  router.push('/home');
 }
 </script>
 
@@ -61,7 +60,7 @@ async function getAndApplyPatch() {
           >
           {{updatingText}}
           </B>
-          <B :sty="{height: textSize}"></B>
+          <B :sty="{height: 2 * textSize}"></B>
       </B>
     </div>
   </Page>
