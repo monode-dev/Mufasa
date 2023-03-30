@@ -2,6 +2,7 @@
 import { onMounted, Ref, ref } from 'vue';
 import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { SplashScreen } from '@capacitor/splash-screen';
 import Viewport from './components/Page.vue';
 import logo from '@/assets/logo.png';
 import router from '@/router';
@@ -9,11 +10,12 @@ const logoWidth = 5;
 const logoHeight = logoWidth * 618 / 755;
 
 const textSize = 1.25;
-const updatingText = ref("");
+const updatingText = ref("Updating...");
 getAndApplyPatch();
 async function getAndApplyPatch() {
   // Check if there is a patch available
   const latest = await CapacitorUpdater.getLatest();
+  await SplashScreen.hide();
 
   // If there is a patch available, download and apply it
   if (latest.url) {
