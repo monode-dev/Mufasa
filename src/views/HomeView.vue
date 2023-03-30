@@ -6,7 +6,8 @@ import Page from './components/Page.vue';
 import router from '@/router';
 import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
-
+import { SplashScreen } from '@capacitor/splash-screen';
+SplashScreen.hide();
 
 const tab0Ref = ref<HTMLElement | null>(null);
 const tab1Ref = ref<HTMLElement | null>(null);

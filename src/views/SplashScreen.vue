@@ -4,10 +4,9 @@ import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { SplashScreen } from '@capacitor/splash-screen';
 import Viewport from './components/Page.vue';
-import logo from '@/assets/logo.png';
+import updatingIcon from '@/assets/cloud_download_FILL1_wght400_GRAD0_opsz48.svg';
 import router from '@/router';
-const logoWidth = 5;
-const logoHeight = logoWidth * 618 / 755;
+const logoWidth = 4;
 
 const textSize = 1.25;
 const updatingText = ref("Updating...");
@@ -15,10 +14,10 @@ getAndApplyPatch();
 async function getAndApplyPatch() {
   // Check if there is a patch available
   const latest = await CapacitorUpdater.getLatest();
-  await SplashScreen.hide();
 
   // If there is a patch available, download and apply it
   if (latest.url) {
+    await SplashScreen.hide();
     updatingText.value = "Updating...";
 
     // Download the latest patch
@@ -49,9 +48,9 @@ async function getAndApplyPatch() {
         <!--<B :sty="{height: textSize}"></B>-->
         <B :sty="{
           width: logoWidth,
-          height: logoHeight,
+          height: logoWidth,
         }">
-          <img style="width: 100%; height: 100%" :src="logo" alt="90% Logo" />
+          <img style="width: 100%; height: 100%" :src="updatingIcon" alt="Updating Icon" />
         </B>
         <B
           :sty="{
