@@ -2,6 +2,7 @@
 import { onMounted, Ref, ref } from 'vue';
 import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import Viewport from './components/Page.vue';
 import logo from '@/assets/logo.png';
 import router from '@/router';
 const logoWidth = 5;
@@ -34,29 +35,33 @@ async function getAndApplyPatch() {
 </script>
 
 <template>
-  <B :sty="{
-    width: `100%`,
-    height: `100%`,
-    background: mdColors.green,
-    align: Align.center,
-    spacing: 0.5,
-  }">
-    <!--<B :sty="{height: textSize}"></B>-->
+  <Viewport>
     <B :sty="{
-      width: logoWidth,
-      height: logoHeight,
+      width: `1f`,
+      height: `1f`,
+      background: mdColors.green,
+      align: Align.center,
+      spacing: 0.5,
     }">
-      <img style="width: 100%; height: 100%" :src="logo" alt="90% Logo" />
+      <div class="prevent-select">
+        <!--<B :sty="{height: textSize}"></B>-->
+        <B :sty="{
+          width: logoWidth,
+          height: logoHeight,
+        }">
+          <img style="width: 100%; height: 100%" :src="logo" alt="90% Logo" />
+        </B>
+        <B
+          :sty="{
+            height: textSize,
+            textSize: textSize,
+            textColor: mdColors.white,
+          }"
+        >
+        {{updatingText}}
+        </B>
+        <B :sty="{height: textSize}"></B>
+      </div>
     </B>
-    <B
-      :sty="{
-        height: textSize,
-        textSize: textSize,
-        textColor: mdColors.white,
-      }"
-    >
-    {{updatingText}}
-    </B>
-    <B :sty="{height: textSize}"></B>
-  </B>
+  </Viewport>
 </template>
