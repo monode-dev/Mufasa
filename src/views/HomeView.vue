@@ -10,6 +10,8 @@ import ClientEntry from './clients/ClientEntry.vue';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
 import Icon from '@/views/miwi-vue/Icon.vue';
+/* We do this here instead of at the end of AutoUpdateLoadingScreen
+ * so that we never accidentally see the loading splash screen. */
 await SplashScreen.hide();
 
 const tab0Ref = ref<HTMLElement | null>(null);
