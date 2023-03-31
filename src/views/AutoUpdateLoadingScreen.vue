@@ -30,22 +30,26 @@ async function getAndApplyPatch() {
   }
 
   // Start the app
-  router.push('/home');
+  //router.push('/home');
 }
 </script>
 
 <template>
   <Page :sty="{background: mdColors.green}">
     <div class="prevent-select">
-      <Icon :size="4" :color="mdColors.white" :icon="updatingIcon" alt="Updating Icon"/>
-      <B
-        :sty="{
-          height: textSize,
-          textSize: textSize,
-          textColor: mdColors.white,
-        }"
-      >Updating...</B>
-      <B :sty="{height: 2 * textSize}"></B>
+      <B :sty="{
+        align: Align.center,
+      }">
+        <Icon :size="4" :color="mdColors.white" :icon="updatingIcon" alt="Updating Icon"/>
+        <B
+          :sty="{
+            height: textSize,
+            textSize: textSize,
+            textColor: mdColors.white,
+          }"
+        >Updating...</B>
+        <B :sty="{height: 2 * textSize}"></B>
+      </B>
     </div>
   </Page>
 </template>
