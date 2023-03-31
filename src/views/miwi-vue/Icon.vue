@@ -29,12 +29,15 @@ const props = defineProps({
     width: props.size,
     height: props.size,
   }">
-    <svg :fill="props.color">
-      <InlineSvg 
-        width="100%"
-        height="100%"
-        :src="props.icon"
-        :alt="props.alt"></InlineSvg>
+    <svg 
+      width="100%"
+      height="100%"
+      :fill="props.color"
+      :alt="props.alt">
+      <InlineSvg
+      width="100%"
+      height="100%"
+      :src="props.icon"></InlineSvg>
     </svg>
   </B>
 </template>

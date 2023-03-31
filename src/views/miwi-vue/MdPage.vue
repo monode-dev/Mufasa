@@ -18,11 +18,14 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
     background: `#f9fafdff`,
     ...props.sty,
   }">
+    <!-- Notch Spacer -->
     <B :sty="{
       width: `1f`,
       height: notchHeight,
       background: mdColors.green,
     }"/>
+
+    <!-- Content -->
     <B :sty="{
       width: `1f`,
       height: `1f`,

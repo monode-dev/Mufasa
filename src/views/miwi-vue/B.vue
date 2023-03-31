@@ -127,7 +127,7 @@ function computeSizeInfo(
             : `fit-content`;
   const minSize = sizeIsFlex
     ? size.min === -1
-      ? `fit-content`
+      ? `0` //`fit-content`
       : size.min === Infinity
         ? exactSize
         : sizeToCss(size.min)

@@ -107,7 +107,14 @@ const tabUnderlineSty: Partial<Sty> = {
     </MdAppBar>
 
     <!-- Body -->
-    <ClientsTab />
+    <B :sty="{
+      width: `1f`,
+      height: `1f`,
+      // overflowY: Overflow.crop,
+      align: Align.topCenter,
+    }">
+      <ClientsTab />
+    </B>
     <!--<B :sty="{
       width: `300%`,
       height: `1f`,
