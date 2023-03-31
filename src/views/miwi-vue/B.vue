@@ -127,7 +127,7 @@ function computeSizeInfo(
             : `fit-content`;
   const minSize = sizeIsFlex
     ? size.min === -1
-      ? `0` //`fit-content`
+      ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
       : size.min === Infinity
         ? exactSize
         : sizeToCss(size.min)
