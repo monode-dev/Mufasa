@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { SplashScreen } from '@capacitor/splash-screen';
+// import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing } from '@/views/miwi-vue/B.vue';
 import Page from '@/views/miwi-vue/MdPage.vue';
 import router from '@/router';
@@ -12,7 +12,6 @@ import MdBody from '@/views/miwi-vue/MdBody.vue';
 import Icon from '@/views/miwi-vue/Icon.vue';
 /* We do this here instead of at the end of AutoUpdateLoadingScreen
  * so that we never accidentally see the loading splash screen. */
-SplashScreen.hide();
 
 const tab0Ref = ref<HTMLElement | null>(null);
 const tab1Ref = ref<HTMLElement | null>(null);
