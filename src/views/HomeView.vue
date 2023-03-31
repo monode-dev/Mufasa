@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CapacitorUpdater } from '@capgo/capacitor-updater';
-import { onMounted, Ref, ref } from 'vue';
+import { ref } from 'vue';
+import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing } from '@/views/miwi-vue/B.vue';
 import Page from '@/views/miwi-vue/MdPage.vue';
 import router from '@/router';
@@ -10,6 +10,7 @@ import ClientEntry from './clients/ClientEntry.vue';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
 import Icon from '@/views/miwi-vue/Icon.vue';
+await SplashScreen.hide();
 
 const tab0Ref = ref<HTMLElement | null>(null);
 const tab1Ref = ref<HTMLElement | null>(null);
