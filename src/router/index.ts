@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Transitioner from '@/views/components/Transitioner.vue';
 import AutoUpdateLoadingScreen from '@/views/AutoUpdateLoadingScreen.vue';
-import HomeView from '../views/HomeView.vue';
+import HomeView from '@/views/HomeView.vue';
 import Settings from '@/views/Settings.vue';
 
 const router = createRouter({
@@ -9,7 +8,6 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: Transitioner,
       children: [
         {
           path: '',
@@ -18,7 +16,6 @@ const router = createRouter({
         },
         {
           path: 'home',
-          component: Transitioner,
           children: [
             {
               path: '',
@@ -27,7 +24,6 @@ const router = createRouter({
             },
             {
               path: 'settings',
-              component: Transitioner,
               children: [
                 {
                   path: '',

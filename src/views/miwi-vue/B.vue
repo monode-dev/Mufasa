@@ -1,6 +1,6 @@
 <script lang="ts">
 import { CSSProperties, defineComponent, getCurrentInstance, PropType } from 'vue';
-import { isDefined, isNum, isString } from '../../utils';
+import { isDefined, isNum, isString } from './utils';
 
 export interface Sty {
   width: number | string | FlexSize;

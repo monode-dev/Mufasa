@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
-import B, { FlexSize, mdColors, Axis, Spacing } from '@/views/components/B.vue.js';
+import B, { FlexSize, mdColors, Axis, Spacing } from '@/views/miwi-vue/B.vue';
 import optionsSvg from '@/assets/more_vert_FILL1_wght400_GRAD0_opsz48.svg';
-import Icon from '@/views/components/Icon.vue.js';
+import Icon from '@/views/miwi-vue/Icon.vue';
 
 // Create a prop called size
 const props = defineProps({

@@ -2,12 +2,12 @@
 import { ref } from 'vue';
 import router from '@/router';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
-import B, { Sty, Axis, Align,mdColors, Spacing } from './components/B.vue';
-import Page from './components/Page.vue';
+import B, { Sty, Axis, Align,mdColors, Spacing } from '@/views/miwi-vue/B.vue';
+import Page from '@/views/miwi-vue/MdPage.vue';
 import backSvg from '@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg';
-import MdAppBar from '@/views/components/MdAppBar.vue';
-import MdBody from './components/MdBody.vue';
-import Icon from './components/Icon.vue';
+import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
+import MdBody from '@/views/miwi-vue/MdBody.vue';
+import Icon from '@/views/miwi-vue/Icon.vue';
 
 const versionNumText = ref('0.0.0');
 updateVersionNumText();

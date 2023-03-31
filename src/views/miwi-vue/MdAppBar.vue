@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
-import B, { Align, mdColors, Axis, Sty } from '@/views/components/B.vue.js';
+import B, { Align, mdColors, Axis, Sty } from './B.vue';
 
 // Allow overriding of the default sty
 const props = defineProps({
