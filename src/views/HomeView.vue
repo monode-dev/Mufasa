@@ -8,9 +8,8 @@ import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
 import ClientEntry from './clients/ClientEntry.vue';
 import MdAppBar from '@/views/components/MdAppBar.vue';
-import { SplashScreen } from '@capacitor/splash-screen';
+import MdBody from './components/MdBody.vue';
 import Icon from './utils/Icon.vue';
-SplashScreen.hide();
 
 const tab0Ref = ref<HTMLElement | null>(null);
 const tab1Ref = ref<HTMLElement | null>(null);
@@ -59,99 +58,80 @@ const tabUnderlineSty: Partial<Sty> = {
 
 <template>
   <Page>
-    <B :sty="{
-      width: `1f`,
-      height: `1f`,
-      axis: Axis.column,
-      align: Align.topCenter,
-      background: `#f9fafdff`,
-    }">
-      <!-- App Bar -->
-      <!--@click="router.push('/home/settings')"-->
-      <MdAppBar>
-        <template #title>
-          Fuel Calculator
-        </template>
-        <template #right>
-          <Icon @click="router.push(`/home/settings`)" :size="1.25" :icon="settingsSvg" alt="Settings Icon"/>
-        </template>
-        <template #bottom>
-          <B :sty="{
-            width: `1f`,
-            axis: Axis.row,
-            align: Align.center,
-            spacing: Spacing.spaceAround,
-          }">
-            <div ref="tab0Ref">
-              <B :sty="tabButtonSty"
-                @click="selectTab(0)">
-                Clients
-              </B>
-            </div>
-            <div ref="tab1Ref">
-              <B :sty="tabButtonSty"
-                @click="selectTab(1)">
-                Deliveries
-              </B>
-            </div>
-            <div ref="tab2Ref">
-              <B :sty="tabButtonSty"
-                @click="selectTab(2)">
-                Calculator
-              </B>
-            </div>
-          </B>
-          <B :sty="tabUnderlineRegionSty">
-            <B :sty="tabUnderlineFillerSty" />
-            <div ref="tabUnderline">
-              <B :sty="tabUnderlineSty" />
-            </div>
-            <B :sty="tabUnderlineFillerSty" />
-          </B>
-        </template>
-      </MdAppBar>
+    <!-- App Bar -->
+    <MdAppBar>
+      <template #title>
+        Fuel Calculator
+      </template>
+      <template #right>
+        <Icon @click="router.push(`/home/settings`)" :size="1.25" :icon="settingsSvg" alt="Settings Icon"/>
+      </template>
+      <template #bottom>
+        <B :sty="{
+          width: `1f`,
+          axis: Axis.row,
+          align: Align.center,
+          spacing: Spacing.spaceAround,
+        }">
+          <div ref="tab0Ref">
+            <B :sty="tabButtonSty"
+              @click="selectTab(0)">
+              Clients
+            </B>
+          </div>
+          <div ref="tab1Ref">
+            <B :sty="tabButtonSty"
+              @click="selectTab(1)">
+              Deliveries
+            </B>
+          </div>
+          <div ref="tab2Ref">
+            <B :sty="tabButtonSty"
+              @click="selectTab(2)">
+              Calculator
+            </B>
+          </div>
+        </B>
+        <B :sty="tabUnderlineRegionSty">
+          <B :sty="tabUnderlineFillerSty" />
+          <div ref="tabUnderline">
+            <B :sty="tabUnderlineSty" />
+          </div>
+          <B :sty="tabUnderlineFillerSty" />
+        </B>
+      </template>
+    </MdAppBar>
 
-      <!-- Body -->
-      <B :sty="{
-        width: `1f`,
-        height: `1f`,
-        axis: Axis.column,
-        align: Align.topCenter,
-        textColor: mdColors.black,
-        textSize: 1,
-        padding: 1,
-        spacing: 1,
-        overflowY: `scroll`,
-      }">
-        <ClientEntry name="A&P Logging"></ClientEntry>
-        <ClientEntry name="Aaron Hohman"></ClientEntry>
-        <ClientEntry name="Abigail Rodgers"></ClientEntry>
-        <ClientEntry name="Advanced Tree Service"></ClientEntry>
-        <ClientEntry name="Affordable Lawn Care"></ClientEntry>
-        <ClientEntry name="Airport Fire Station"></ClientEntry>
-        <ClientEntry name="Alan Battenfield"></ClientEntry>
-        <ClientEntry name="Alanna Keneshiro"></ClientEntry>
-        <ClientEntry name="Alice Conner"></ClientEntry>
-        <ClientEntry name="All Creatures Animal Hospital"></ClientEntry>
-        <ClientEntry name="All In One Rental"></ClientEntry>
-        <ClientEntry name="Alyshia Peck"></ClientEntry>
-        <ClientEntry name="Amy's Kitchen"></ClientEntry>
-        <ClientEntry name="Ancheta Holdings"></ClientEntry>
-        <ClientEntry name="Andrew Barnes"></ClientEntry>
-        <ClientEntry name="Andrew Watson"></ClientEntry>
-        <ClientEntry name="Andy Pollack"></ClientEntry>
-        <ClientEntry name="Anthony Molle"></ClientEntry>
-        <ClientEntry name="Applegate Store"></ClientEntry>
-        <ClientEntry name="Art of Plumbing"></ClientEntry>
-        <ClientEntry name="Asante"></ClientEntry>
-        <ClientEntry name="Ashland Bus Shop"></ClientEntry>
-        <ClientEntry name="Ashland Parks & Recreation"></ClientEntry>
-        <ClientEntry name="Aurupa Spring Ranch"></ClientEntry>
-        <ClientEntry name="Bart Cunningham"></ClientEntry>
-        <ClientEntry name="Bart Masciarelli"></ClientEntry>
-        <ClientEntry name="BBMD-Medford, Boise Phoenix"></ClientEntry>
-        <ClientEntry name="Bear Creek Orchard"></ClientEntry>
-      </B>
-    </B>
+    <!-- Body -->
+    <MdBody>
+      <ClientEntry name="A&P Logging"></ClientEntry>
+      <ClientEntry name="Aaron Hohman"></ClientEntry>
+      <ClientEntry name="Abigail Rodgers"></ClientEntry>
+      <ClientEntry name="Advanced Tree Service"></ClientEntry>
+      <ClientEntry name="Affordable Lawn Care"></ClientEntry>
+      <ClientEntry name="Airport Fire Station"></ClientEntry>
+      <ClientEntry name="Alan Battenfield"></ClientEntry>
+      <ClientEntry name="Alanna Keneshiro"></ClientEntry>
+      <ClientEntry name="Alice Conner"></ClientEntry>
+      <ClientEntry name="All Creatures Animal Hospital"></ClientEntry>
+      <ClientEntry name="All In One Rental"></ClientEntry>
+      <ClientEntry name="Alyshia Peck"></ClientEntry>
+      <ClientEntry name="Amy's Kitchen"></ClientEntry>
+      <ClientEntry name="Ancheta Holdings"></ClientEntry>
+      <ClientEntry name="Andrew Barnes"></ClientEntry>
+      <ClientEntry name="Andrew Watson"></ClientEntry>
+      <ClientEntry name="Andy Pollack"></ClientEntry>
+      <ClientEntry name="Anthony Molle"></ClientEntry>
+      <ClientEntry name="Applegate Store"></ClientEntry>
+      <ClientEntry name="Art of Plumbing"></ClientEntry>
+      <ClientEntry name="Asante"></ClientEntry>
+      <ClientEntry name="Ashland Bus Shop"></ClientEntry>
+      <ClientEntry name="Ashland Parks & Recreation"></ClientEntry>
+      <ClientEntry name="Aurupa Spring Ranch"></ClientEntry>
+      <ClientEntry name="Bart Cunningham"></ClientEntry>
+      <ClientEntry name="Bart Masciarelli"></ClientEntry>
+      <ClientEntry name="BBMD-Medford, Boise Phoenix"></ClientEntry>
+      <ClientEntry name="Bear Creek Orchard"></ClientEntry>
+    </MdBody>
   </Page>
 </template>

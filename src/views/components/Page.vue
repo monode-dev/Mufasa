@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import B, { Align,mdColors } from '@/views/utils/B.vue';
+import { defineProps, PropType } from 'vue';
+import B, { Sty, Align, mdColors } from '@/views/utils/B.vue';
+// Allow overriding of the default sty
+const props = defineProps({
+  sty: {
+    type: Object as PropType<Partial<Sty>>,
+    default: {},
+  },
+});
 const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
 </script>
 
@@ -7,12 +15,20 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
   <B :sty="{
     width: `100%`,
     height: `100%`,
+    background: `#f9fafdff`,
+    ...props.sty,
   }">
     <B :sty="{
       width: `1f`,
       height: notchHeight,
       background: mdColors.green,
     }"/>
-    <slot />
+    <B :sty="{
+      width: `1f`,
+      height: `1f`,
+      align: Align.center,
+    }">
+      <slot />
+    </B>
   </B>
 </template>

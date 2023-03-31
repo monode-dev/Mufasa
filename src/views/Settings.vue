@@ -6,6 +6,7 @@ import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import Page from './components/Page.vue';
 import backSvg from '@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg';
 import MdAppBar from '@/views/components/MdAppBar.vue';
+import MdBody from './components/MdBody.vue';
 import Icon from './utils/Icon.vue';
 
 const versionNumText = ref('0.0.0');
@@ -18,41 +19,23 @@ async function updateVersionNumText() {
 
 <template>
   <Page>
-    <B :sty="{
-      width: `1f`,
-      height: `1f`,
-      axis: Axis.column,
-      align: Align.topCenter,
-      background: `#f9fafdff`,
-    }">
-      <!-- App Bar -->
-      <MdAppBar>
-        <template #left>
-          <Icon @click="router.push(`/home`)" :size="1.25" :icon="backSvg" alt="Back Icon"/>
-        </template>
-        <template #title>
-          Settings
-        </template>
-      </MdAppBar>
-      
+    <!-- App Bar -->
+    <MdAppBar>
+      <template #left>
+        <Icon @click="router.push(`/home`)" :size="1.25" :icon="backSvg" alt="Back Icon"/>
+      </template>
+      <template #title>
+        Settings
+      </template>
+    </MdAppBar>
+    
 
-      <!-- Body -->
-      <B :sty="{
-        width: `1f`,
-        height: `1f`,
-        axis: Axis.column,
-        align: Align.topCenter,
-        padding: 1,
-        spacing: 1,
-      }">
-        <!-- Version Number -->
-        <B :sty="{
-          textColor: mdColors.grey,
-          textSize: 1,
-        }">
-          Version: {{ versionNumText }}
-        </B>
+    <!-- Body -->
+    <MdBody>
+      <!-- Version Number -->
+      <B :sty="{textColor: mdColors.grey}">
+        Version: {{ versionNumText }}
       </B>
-    </B>
+    </MdBody>
   </Page>
 </template>
