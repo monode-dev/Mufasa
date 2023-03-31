@@ -38,7 +38,7 @@ const props = defineProps({
 
       <!-- Title / Center -->
       <B :sty="{
-        width: `2f`,
+        width: `3f`,
         align: Align.center,
         textIsBold: true,
       }">

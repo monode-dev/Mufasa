@@ -300,12 +300,12 @@ export default defineComponent({
           ? `auto` // Used to be `overlay` // Scroll when nesscary, and float above contents
           : this.sty.overflowX === Overflow.crop
             ? `hidden`
-            : undefined, //`hidden`,
+            : `visible`, //`hidden`,
         overflowY: this.sty.overflowY === Overflow.scroll
           ? `auto` // Scroll when nesscary, and float above contents
           : this.sty.overflowY === Overflow.crop
             ? `hidden`
-            : undefined, //`hidden`,
+            : `visible`, //`hidden`,
         scrollbarWidth: [this.sty.overflowX, this.sty.overflowY].includes(Overflow.scroll)
           ? `thin`
           : undefined,
