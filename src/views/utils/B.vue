@@ -101,7 +101,7 @@ function sizeToCss(num: number | string) {
 function numToFontSize(num: number) {
   return sizeToCss(fontSizeToHtmlUnit * num);
 }
-interface FlexSize {
+export interface FlexSize {
   flex: number;
   min: number;
   max: number;

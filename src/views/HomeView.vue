@@ -6,6 +6,7 @@ import Page from './components/Page.vue';
 import router from '@/router';
 import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
+import ClientEntry from './clients/ClientEntry.vue';
 import { SplashScreen } from '@capacitor/splash-screen';
 SplashScreen.hide();
 
@@ -79,10 +80,12 @@ const pageBodySty: Partial<Sty> = {
   width: `1f`,
   height: `1f`,
   axis: Axis.column,
-  align: Align.center,
+  align: Align.topCenter,
   textColor: mdColors.black,
   textSize: 1,
   padding: 1,
+  spacing: 1,
+  overflowY: `scroll`,
 };
 
 const versionNumText = ref('0.0.0');
@@ -169,7 +172,27 @@ async function updateVersionNumText() {
 
       <!-- Body -->
       <B :sty="pageBodySty">
-        Version: {{ versionNumText }}
+        <ClientEntry name="A&P Logging"></ClientEntry>
+        <ClientEntry name="Aaron Hohman"></ClientEntry>
+        <ClientEntry name="Abigail Rodgers"></ClientEntry>
+        <ClientEntry name="Advanced Tree Service"></ClientEntry>
+        <ClientEntry name="Affordable Lawn Care"></ClientEntry>
+        <ClientEntry name="Airport Fire Station"></ClientEntry>
+        <ClientEntry name="Alan Battenfield"></ClientEntry>
+        <ClientEntry name="Alanna Keneshiro"></ClientEntry>
+        <ClientEntry name="Alice Conner"></ClientEntry>
+        <ClientEntry name="All Creatures Animal Hospital"></ClientEntry>
+        <ClientEntry name="All In One Rental"></ClientEntry>
+        <ClientEntry name="Alyshia Peck"></ClientEntry>
+        <ClientEntry name="Amy's Kitchen"></ClientEntry>
+        <ClientEntry name="Ancheta Holdings"></ClientEntry>
+        <ClientEntry name="Andrew Barnes"></ClientEntry>
+        <ClientEntry name="Andrew Watson"></ClientEntry>
+        <ClientEntry name="Andy Pollack"></ClientEntry>
+        <ClientEntry name="Anthony Molle"></ClientEntry>
+        <ClientEntry name="Applegate Store"></ClientEntry>
+        <ClientEntry name="Art of Plumbing"></ClientEntry>
+        <ClientEntry name="Asante"></ClientEntry>
       </B>
     </B>
   </Page>
