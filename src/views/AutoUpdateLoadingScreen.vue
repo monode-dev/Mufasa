@@ -31,7 +31,6 @@ async function getAndApplyPatch() {
 
   // Start the app
   router.push('/home');
-  SplashScreen.hide();
 }
 </script>
 
