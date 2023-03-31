@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
-import B, { FlexSize, mdColors } from '@/views/utils/B.vue';
+import B, { FlexSize, mdColors } from '@/views/components/B.vue.js';
 import InlineSvg from 'vue-inline-svg';
 
 // Create a prop called size

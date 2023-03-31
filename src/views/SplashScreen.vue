@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, Ref, ref } from 'vue';
-import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
+import B, { Sty, Axis, Align,mdColors, Spacing } from './components/B.vue';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { SplashScreen } from '@capacitor/splash-screen';
 import Page from './components/Page.vue';
 import updatingIcon from '@/assets/download_FILL1_wght400_GRAD0_opsz48.svg';
-import Icon from './utils/Icon.vue';
+import Icon from './components/Icon.vue';
 import router from '@/router';
 const textSize = 1.25;
 

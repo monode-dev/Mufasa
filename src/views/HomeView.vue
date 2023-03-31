@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { onMounted, Ref, ref } from 'vue';
-import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
+import B, { Sty, Axis, Align,mdColors, Spacing } from './components/B.vue';
 import Page from './components/Page.vue';
 import router from '@/router';
 import {gsap} from "gsap";
@@ -9,7 +9,7 @@ import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
 import ClientEntry from './clients/ClientEntry.vue';
 import MdAppBar from '@/views/components/MdAppBar.vue';
 import MdBody from './components/MdBody.vue';
-import Icon from './utils/Icon.vue';
+import Icon from './components/Icon.vue';
 
 const tab0Ref = ref<HTMLElement | null>(null);
 const tab1Ref = ref<HTMLElement | null>(null);
