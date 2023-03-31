@@ -135,7 +135,7 @@ function computeSizeInfo(
     ? size.max === -1
       ? `fit-content`
       : size.max === Infinity
-        ? exactSize
+        ? exactSize ?? `100%`
         : sizeToCss(size.max)
     : exactSize;
   return [exactSize, minSize, maxSize, sizeIsFlex] as const;
@@ -297,10 +297,14 @@ export default defineComponent({
             : undefined,
         overflowX: this.sty.overflowX === Overflow.scroll
           ? `auto` // Used to be `overlay` // Scroll when nesscary, and float above contents
-          : undefined, //`hidden`,
+          : this.sty.overflowX === Overflow.crop
+            ? `hidden`
+            : undefined, //`hidden`,
         overflowY: this.sty.overflowY === Overflow.scroll
           ? `auto` // Scroll when nesscary, and float above contents
-          : undefined, //`hidden`,
+          : this.sty.overflowY === Overflow.crop
+            ? `hidden`
+            : undefined, //`hidden`,
         scrollbarWidth: [this.sty.overflowX, this.sty.overflowY].includes(Overflow.scroll)
           ? `thin`
           : undefined,

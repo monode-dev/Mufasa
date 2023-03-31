@@ -76,17 +76,6 @@ const settingsBoxSty: Partial<Sty> = {
   padding: 0.25,
 };
 // const bodyRef = ref(null);
-const pageBodySty: Partial<Sty> = {
-  width: `1f`,
-  height: `1f`,
-  axis: Axis.column,
-  align: Align.topCenter,
-  textColor: mdColors.black,
-  textSize: 1,
-  padding: 1,
-  spacing: 1,
-  overflowY: `scroll`,
-};
 
 const versionNumText = ref('0.0.0');
 updateVersionNumText();
@@ -171,7 +160,17 @@ async function updateVersionNumText() {
       </B>
 
       <!-- Body -->
-      <B :sty="pageBodySty">
+      <B :sty="{
+        width: `1f`,
+        height: `1f`,
+        axis: Axis.column,
+        align: Align.topCenter,
+        textColor: mdColors.black,
+        textSize: 1,
+        padding: 1,
+        spacing: 1,
+        overflowY: `scroll`,
+      }">
         <ClientEntry name="A&P Logging"></ClientEntry>
         <ClientEntry name="Aaron Hohman"></ClientEntry>
         <ClientEntry name="Abigail Rodgers"></ClientEntry>
@@ -193,6 +192,13 @@ async function updateVersionNumText() {
         <ClientEntry name="Applegate Store"></ClientEntry>
         <ClientEntry name="Art of Plumbing"></ClientEntry>
         <ClientEntry name="Asante"></ClientEntry>
+        <ClientEntry name="Ashland Bus Shop"></ClientEntry>
+        <ClientEntry name="Ashland Parks & Recreation"></ClientEntry>
+        <ClientEntry name="Aurupa Spring Ranch"></ClientEntry>
+        <ClientEntry name="Bart Cunningham"></ClientEntry>
+        <ClientEntry name="Bart Masciarelli"></ClientEntry>
+        <ClientEntry name="BBMD-Medford, Boise Phoenix"></ClientEntry>
+        <ClientEntry name="Bear Creek Orchard"></ClientEntry>
       </B>
     </B>
   </Page>
