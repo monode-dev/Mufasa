@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
 import B, { FlexSize, mdColors } from '@/views/utils/B.vue';
+import InlineSvg from 'vue-inline-svg';
 
 // Create a prop called size
 const props = defineProps({
@@ -14,7 +15,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: mdColors.black,
+    default: mdColors.sameAsText,
   },
   size: {
     type: [Number, String, Object] as PropType<number | string | FlexSize>,
@@ -28,6 +29,12 @@ const props = defineProps({
     width: props.size,
     height: props.size,
   }">
-    <img style="width: 100%; height: 100%" :src="props.icon" :alt="props.alt">
+    <svg :fill="props.color">
+      <InlineSvg 
+        width="100%"
+        height="100%"
+        :src="props.icon"
+        :alt="props.alt"></InlineSvg>
+    </svg>
   </B>
 </template>

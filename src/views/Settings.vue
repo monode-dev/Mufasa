@@ -6,11 +6,7 @@ import B, { Sty, Axis, Align,mdColors, Spacing } from './utils/B.vue';
 import Page from './components/Page.vue';
 import backSvg from '@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg';
 import MdAppBar from '@/views/components/MdAppBar.vue';
-
-const settingsBoxSty = {
-  width: 1.25,
-  height: 1.25,
-};
+import Icon from './utils/Icon.vue';
 
 const versionNumText = ref('0.0.0');
 updateVersionNumText();
@@ -32,11 +28,7 @@ async function updateVersionNumText() {
       <!-- App Bar -->
       <MdAppBar>
         <template #left>
-          <router-link to="/home">
-              <B :sty="settingsBoxSty">
-                <img style="width: 100%; height: 100%" :src="backSvg" alt="Settings Button" />
-              </B>
-            </router-link>
+          <Icon @click="router.push(`/home`)" :size="1.25" :icon="backSvg" alt="Back Icon"/>
         </template>
         <template #title>
           Settings

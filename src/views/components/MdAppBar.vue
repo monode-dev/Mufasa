@@ -19,43 +19,45 @@ const props = defineProps({
     shadowDirection: Align.bottomCenter,
     align: Align.bottomCenter,
     textColor: mdColors.white,
-    textSize: 1,
     ...props.sty,
   }">
+    <!-- Main Row -->
     <B :sty="{
       width: `1f`,
       axis: Axis.row,
       padding: 0.5,
+      textSize: 1.5,
     }">
+      <!-- Left -->
       <B :sty="{
         width: `1f`,
-        axis: Axis.row,
+        align: Align.centerLeft,
       }">
-        <B :sty="{
-          width: `1f`,
-          align: Align.centerLeft,
-        }">
-          <slot name="left"></slot>
-        </B>
-        <B :sty="{
-          width: `2f`,
-          align: Align.center,
-          textColor: mdColors.white,
-          textSize: 1.5,
-          textIsBold: true,
-        }">
-          <slot name="title"></slot>
-        </B>
-        <B :sty="{
-          width: `1f`,
-          align: Align.centerRight,
-        }">
-          <slot name="right"></slot>
-        </B>
+        <slot name="left"></slot>
+      </B>
+
+      <!-- Title / Center -->
+      <B :sty="{
+        width: `2f`,
+        align: Align.center,
+        textIsBold: true,
+      }">
+        <slot name="title"></slot>
+      </B>
+      
+      <!-- Right -->
+      <B :sty="{
+        width: `1f`,
+        align: Align.centerRight,
+      }">
+        <slot name="right"></slot>
       </B>
     </B>
+
+    <!-- Bottom Row -->
     <B :sty="{
       width: `1f`,
+      textSize: 1,
     }">
       <slot name="bottom"></slot>
     </B>

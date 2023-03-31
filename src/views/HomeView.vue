@@ -9,6 +9,7 @@ import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
 import ClientEntry from './clients/ClientEntry.vue';
 import MdAppBar from '@/views/components/MdAppBar.vue';
 import { SplashScreen } from '@capacitor/splash-screen';
+import Icon from './utils/Icon.vue';
 SplashScreen.hide();
 
 const tab0Ref = ref<HTMLElement | null>(null);
@@ -16,10 +17,24 @@ const tab1Ref = ref<HTMLElement | null>(null);
 const tab2Ref = ref<HTMLElement | null>(null);
 const tabUnderline = ref<HTMLElement | null>(null);
 const selectedTab = ref(1);
-const tabPaddingSty: Partial<Sty> = {
-  height: 0.375,
-  align: Align.bottomCenter,
-};
+function selectTab(newTab: number) {
+  if (newTab === selectedTab.value) return;
+  console.log(`selectTab(${newTab})`);
+  selectedTab.value = newTab;
+  const newUnderlinePosition = newTab === 0
+    ? tab1Ref.value!.offsetLeft - tab2Ref.value!.offsetLeft
+    : newTab === 1
+      ? 0
+      : tab2Ref.value!.offsetLeft - tab1Ref.value!.offsetLeft;
+  console.log(tab1Ref.value);
+  gsap.to(tabUnderline.value, {
+    duration: 0.15,
+    x: newUnderlinePosition,
+    ease: 'power1.out',
+  })
+}
+
+// Sty
 const tabButtonWidth = 4.75;
 const tabButtonSty: Partial<Sty> = {
   width: tabButtonWidth,
@@ -38,52 +53,8 @@ const tabUnderlineFillerSty: Partial<Sty> = {
 const tabUnderlineSty: Partial<Sty> = {
   width: tabButtonWidth,
   height: 0.125,
-  background: mdColors.white,
+  background: mdColors.sameAsText,
 };
-function selectTab(newTab: number) {
-  if (newTab === selectedTab.value) return;
-  console.log(`selectTab(${newTab})`);
-  selectedTab.value = newTab;
-  const newUnderlinePosition = newTab === 0
-    ? tab1Ref.value!.offsetLeft - tab2Ref.value!.offsetLeft
-    : newTab === 1
-      ? 0
-      : tab2Ref.value!.offsetLeft - tab1Ref.value!.offsetLeft;
-  console.log(tab1Ref.value);
-  gsap.to(tabUnderline.value, {
-    duration: 0.15,
-    x: newUnderlinePosition,
-    ease: 'power1.out',
-  })
-}
-
-const appBarSty: Partial<Sty> = {
-  width: `1f`,
-  background: mdColors.green,
-  shadowSize: 1.25,
-  shadowDirection: Align.bottomCenter,
-  align: Align.bottomCenter,
-  padding: 0,
-  spacing: 0.21875,
-  textColor: mdColors.white,
-  textSize: 1,
-}
-const tabsRegionSty: Partial<Sty> = {
-  width: `1f`,
-};
-const settingsBoxSty: Partial<Sty> = {
-  width: 1.75,
-  height: 1.75,
-  padding: 0.25,
-};
-// const bodyRef = ref(null);
-
-const versionNumText = ref('0.0.0');
-updateVersionNumText();
-async function updateVersionNumText() {
-  const currentVersionInfo = await CapacitorUpdater.current();
-  versionNumText.value = currentVersionInfo.bundle.version;
-}
 </script>
 
 <template>
@@ -102,11 +73,7 @@ async function updateVersionNumText() {
           Fuel Calculator
         </template>
         <template #right>
-          <router-link to="/home/settings">
-            <B :sty="settingsBoxSty">
-              <img style="width: 100%; height: 100%" :src="settingsSvg" alt="Settings Button" />
-            </B>
-          </router-link>
+          <Icon @click="router.push(`/home/settings`)" :size="1.25" :icon="settingsSvg" alt="Settings Icon"/>
         </template>
         <template #bottom>
           <B :sty="{

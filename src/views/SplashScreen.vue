@@ -5,11 +5,11 @@ import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { SplashScreen } from '@capacitor/splash-screen';
 import Page from './components/Page.vue';
 import updatingIcon from '@/assets/download_FILL1_wght400_GRAD0_opsz48.svg';
+import Icon from './utils/Icon.vue';
 import router from '@/router';
-const logoWidth = 4;
-
 const textSize = 1.25;
-const updatingText = ref("Updating...");
+
+// Check for updates
 getAndApplyPatch();
 async function getAndApplyPatch() {
   // Check if there is a patch available
@@ -18,7 +18,6 @@ async function getAndApplyPatch() {
   // If there is a patch available, download and apply it
   if (latest.url) {
     await SplashScreen.hide();
-    updatingText.value = "Updating...";
 
     // Download the latest patch
     const patchData = await CapacitorUpdater.download({
@@ -44,22 +43,14 @@ async function getAndApplyPatch() {
         background: mdColors.green,
         align: Align.center,
       }">
-          <!--<B :sty="{height: textSize}"></B>-->
-          <B :sty="{
-            width: logoWidth,
-            height: logoWidth,
-          }">
-            <img style="width: 100%; height: 100%" :src="updatingIcon" alt="Updating Icon" />
-          </B>
+          <Icon :size="4" :icon="updatingIcon" alt="Updating Icon"/>
           <B
             :sty="{
               height: textSize,
               textSize: textSize,
               textColor: mdColors.white,
             }"
-          >
-          {{updatingText}}
-          </B>
+          >Updating...</B>
           <B :sty="{height: 2 * textSize}"></B>
       </B>
     </div>

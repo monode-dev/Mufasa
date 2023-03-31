@@ -91,6 +91,7 @@ export const mdColors = {
   grey: `#9e9e9eff`,
   black: `#000000ff`,
   transparent: `#ffffff00`,
+  sameAsText: `currentColor`,
 } as const;
 const fontSizeToHtmlUnit = 0.825;
 function sizeToCss(num: number | string) {
