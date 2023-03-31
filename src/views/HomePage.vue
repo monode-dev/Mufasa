@@ -107,7 +107,8 @@ const tabUnderlineSty: Partial<Sty> = {
     </MdAppBar>
 
     <!-- Body -->
-    <B :sty="{
+    <ClientsTab />
+    <!--<B :sty="{
       width: `300%`,
       height: `1f`,
       axis: Axis.row,
@@ -117,6 +118,6 @@ const tabUnderlineSty: Partial<Sty> = {
       <MdBody></MdBody>
       <ClientsTab />
       <MdBody></MdBody>
-    </B>
+    </B>-->
   </MdPage>
 </template>
