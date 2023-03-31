@@ -7,6 +7,7 @@ import router from '@/router';
 import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
 import ClientEntry from './clients/ClientEntry.vue';
+import MdAppBar from '@/views/components/MdAppBar.vue';
 import { SplashScreen } from '@capacitor/splash-screen';
 SplashScreen.hide();
 
@@ -95,41 +96,25 @@ async function updateVersionNumText() {
       background: `#f9fafdff`,
     }">
       <!-- App Bar -->
-      <B :sty="appBarSty">
-        <B />
-        <B :sty="{
-            width: `1f`,
-            axis: Axis.row,
-        }">
-          <B :sty="{width: 0.5}"/>
-          <B :sty="{
-            width: `1f`,
-            spacing: Spacing.spaceBetween,
-            axis: Axis.row,
-          }">
-            <B :sty="settingsBoxSty" />
-            <B :sty="{
-              align: Align.center,
-              textColor: mdColors.white,
-              textSize: 1.5,
-              textIsBold: true,
-            }">Fuel Calculator</B>
-            <router-link to="/home/settings">
-              <B :sty="settingsBoxSty"><!--@click="router.push('/home/settings')"-->
-                <img style="width: 100%; height: 100%" :src="settingsSvg" alt="Settings Button" />
-              </B>
-            </router-link>
-          </B>
-          <B :sty="{width: 0.5}"/>
-        </B>
-        <B :sty="tabsRegionSty">
+      <!--@click="router.push('/home/settings')"-->
+      <MdAppBar>
+        <template #title>
+          Fuel Calculator
+        </template>
+        <template #right>
+          <router-link to="/home/settings">
+            <B :sty="settingsBoxSty">
+              <img style="width: 100%; height: 100%" :src="settingsSvg" alt="Settings Button" />
+            </B>
+          </router-link>
+        </template>
+        <template #bottom>
           <B :sty="{
             width: `1f`,
             axis: Axis.row,
             align: Align.center,
             spacing: Spacing.spaceAround,
           }">
-            <!-- The inkwells for these aren't quite right. -->
             <div ref="tab0Ref">
               <B :sty="tabButtonSty"
                 @click="selectTab(0)">
@@ -156,8 +141,8 @@ async function updateVersionNumText() {
             </div>
             <B :sty="tabUnderlineFillerSty" />
           </B>
-        </B>
-      </B>
+        </template>
+      </MdAppBar>
 
       <!-- Body -->
       <B :sty="{
