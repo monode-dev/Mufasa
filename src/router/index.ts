@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Transitioner from '@/views/components/Transitioner.vue';
-import SplashScreen from '@/views/SplashScreen.vue';
+import AutoUpdateLoadingScreen from '@/views/AutoUpdateLoadingScreen.vue';
 import HomeView from '../views/HomeView.vue';
 import Settings from '@/views/Settings.vue';
 
@@ -13,8 +13,8 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'splash',
-          component: SplashScreen,
+          name: 'autoUpdateLoadingScreen',
+          component: AutoUpdateLoadingScreen,
         },
         {
           path: 'home',
