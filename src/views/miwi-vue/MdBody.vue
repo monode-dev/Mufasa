@@ -14,6 +14,7 @@ const props = defineProps({
 <template>
   <B :sty="{
     width: `1f`,
+    height: `1f`,
     axis: Axis.column,
     align: Align.topCenter,
     textColor: mdColors.black,

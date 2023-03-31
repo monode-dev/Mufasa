@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import router from '@/router';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import B, { Sty, Axis, Align,mdColors, Spacing } from '@/views/miwi-vue/B.vue';
-import Page from '@/views/miwi-vue/MdPage.vue';
+import MdPage from '@/views/miwi-vue/MdPage.vue';
 import backSvg from '@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
@@ -18,7 +18,7 @@ async function updateVersionNumText() {
 </script>
 
 <template>
-  <Page>
+  <MdPage>
     <!-- App Bar -->
     <MdAppBar>
       <template #left>
@@ -37,5 +37,5 @@ async function updateVersionNumText() {
         Version: {{ versionNumText }}
       </B>
     </MdBody>
-  </Page>
+  </MdPage>
 </template>
