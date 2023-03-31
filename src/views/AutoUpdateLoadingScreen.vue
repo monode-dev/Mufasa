@@ -30,7 +30,7 @@ async function getAndApplyPatch() {
   }
 
   // Start the app
-  //router.push('/home');
+  router.push('/home');
 }
 </script>
 
