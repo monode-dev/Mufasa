@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Component, ComponentInternalInstance, ComponentPublicInstance, ref } from 'vue';
+import { Component, ComponentInternalInstance, ComponentPublicInstance, onMounted, ref } from 'vue';
 import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing, Overflow } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
@@ -45,6 +45,41 @@ function selectTab(newTab: number) {
     ease: 'power1.out',
   })
 }
+
+// Swipe gesture
+onMounted(() => {
+  let swipeStartTime = 0;
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  let lastSwipeX = 0;
+  let lastSwipeY = 0;
+  tabBodiesParent.value?.$el.addEventListener('touchstart', (e: TouchEvent) => {
+    const touch = e.touches[0];
+    swipeStartX = touch.clientX;
+    swipeStartY = touch.clientY;
+    swipeStartTime = Date.now();
+  });
+  tabBodiesParent.value?.$el.addEventListener('touchmove', (e: TouchEvent) => {
+    const touch = e.touches[0];
+    lastSwipeX = touch.clientX;
+    lastSwipeY = touch.clientY;
+  });
+  tabBodiesParent.value?.$el.addEventListener('touchend', (e: TouchEvent) => {
+    const deltaX = lastSwipeX - swipeStartX;
+    const deltaY = lastSwipeY - swipeStartY;
+    const deltaTime = Date.now() - swipeStartTime;
+    const velocityX = deltaX / deltaTime;
+    console.log({deltaX, deltaY, deltaTime, velocityX});
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 25 && Math.abs(velocityX) > 0.2) {
+      // e.preventDefault();
+      if (deltaX > 0) {
+        selectTab(Math.max(0, selectedTab.value - 1));
+      } else {
+        selectTab(Math.min(2, selectedTab.value + 1));
+      }
+    }
+  });
+});
 
 // Sty
 const tabButtonWidth = 4.75;
