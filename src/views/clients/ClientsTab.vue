@@ -4,9 +4,7 @@ import MdBody from '@/views/miwi-vue/MdBody.vue';
 </script>
 
 <template>
-  <MdBody :sty="{
-    height: -1,
-  }">
+  <MdBody>
     <ClientEntry name="A&P Logging"></ClientEntry>
     <ClientEntry name="Aaron Hohman"></ClientEntry>
     <ClientEntry name="Abigail Rodgers"></ClientEntry>

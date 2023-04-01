@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { Component, ComponentInternalInstance, ComponentPublicInstance, ref } from 'vue';
 import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing, Overflow } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
@@ -15,24 +15,33 @@ import Icon from '@/views/miwi-vue/Icon.vue';
  * so that we never accidentally see the loading splash screen. */
 SplashScreen.hide();
 
-const tab0Ref = ref<HTMLElement | null>(null);
-const tab1Ref = ref<HTMLElement | null>(null);
-const tab2Ref = ref<HTMLElement | null>(null);
-const tabUnderline = ref<HTMLElement | null>(null);
+const tab0Ref = ref<ComponentPublicInstance | null>(null);
+const tab1Ref = ref<ComponentPublicInstance | null>(null);
+const tab2Ref = ref<ComponentPublicInstance | null>(null);
+const tabUnderline = ref<ComponentPublicInstance | null>(null);
+const tabBodiesParent = ref<ComponentPublicInstance | null>(null);
 const selectedTab = ref(1);
 function selectTab(newTab: number) {
   if (newTab === selectedTab.value) return;
-  console.log(`selectTab(${newTab})`);
   selectedTab.value = newTab;
   const newUnderlinePosition = newTab === 0
-    ? tab1Ref.value!.offsetLeft - tab2Ref.value!.offsetLeft
+    ? tab1Ref.value!.$el.offsetLeft - tab2Ref.value!.$el.offsetLeft
     : newTab === 1
       ? 0
-      : tab2Ref.value!.offsetLeft - tab1Ref.value!.offsetLeft;
-  console.log(tab1Ref.value);
-  gsap.to(tabUnderline.value, {
+      : tab2Ref.value!.$el.offsetLeft - tab1Ref.value!.$el.offsetLeft;
+  const newTabPosition = newTab === 0
+    ? `100vw`
+    : newTab === 1
+      ? 0
+      : `-100vw`;
+  gsap.to(tabUnderline.value!.$el, {
     duration: 0.15,
     x: newUnderlinePosition,
+    ease: 'power1.out',
+  })
+  gsap.to(tabBodiesParent.value!.$el, {
+    duration: 0.15,
+    x: newTabPosition,
     ease: 'power1.out',
   })
 }
@@ -77,54 +86,45 @@ const tabUnderlineSty: Partial<Sty> = {
           align: Align.center,
           spacing: Spacing.spaceAround,
         }">
-          <div ref="tab0Ref">
-            <B :sty="tabButtonSty"
-              @click="selectTab(0)">
-              Clients
-            </B>
-          </div>
-          <div ref="tab1Ref">
-            <B :sty="tabButtonSty"
-              @click="selectTab(1)">
-              Deliveries
-            </B>
-          </div>
-          <div ref="tab2Ref">
-            <B :sty="tabButtonSty"
-              @click="selectTab(2)">
-              Calculator
-            </B>
-          </div>
+          <B :sty="tabButtonSty"
+            class="tab0"
+            ref="tab0Ref"
+            @click="selectTab(0)">
+            Clients
+          </B>
+          <B :sty="tabButtonSty"
+            class="tab1"
+            ref="tab1Ref"
+            @click="selectTab(1)">
+            Deliveries
+          </B>
+          <B :sty="tabButtonSty"
+            class="tab2"
+            ref="tab2Ref"
+            @click="selectTab(2)">
+            Calculator
+          </B>
         </B>
         <B :sty="tabUnderlineRegionSty">
           <B :sty="tabUnderlineFillerSty" />
-          <div ref="tabUnderline">
-            <B :sty="tabUnderlineSty" />
-          </div>
+          <B :sty="tabUnderlineSty" ref="tabUnderline"/>
           <B :sty="tabUnderlineFillerSty" />
         </B>
       </template>
     </MdAppBar>
 
     <!-- Body -->
-    <B :sty="{
-      width: `1f`,
-      height: `1f`,
-      // overflowY: Overflow.crop,
-      align: Align.topCenter,
-    }">
+    <B ref="tabBodiesParent"
+      :sty="{
+        width: `300%`,
+        height: `1f`,
+        axis: Axis.row,
+        align: Align.topCenter,
+        overflowX: Overflow.crop,
+      }">
       <ClientsTab />
+      <MdBody :sty="{align: Align.center}">Deliveries Tab Comming Soon...</MdBody>
+      <MdBody :sty="{align: Align.center}">Calculator Tab Comming Soon...</MdBody>
     </B>
-    <!--<B :sty="{
-      width: `300%`,
-      height: `1f`,
-      axis: Axis.row,
-      align: Align.topCenter,
-      overflowX: Overflow.crop,
-    }">
-      <MdBody></MdBody>
-      <ClientsTab />
-      <MdBody></MdBody>
-    </B>-->
   </MdPage>
 </template>

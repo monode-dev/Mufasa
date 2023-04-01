@@ -1,5 +1,5 @@
 <script lang="ts">
-import { CSSProperties, defineComponent, getCurrentInstance, PropType } from 'vue';
+import { ComponentInternalInstance, CSSProperties, defineComponent, getCurrentInstance, PropType } from 'vue';
 import { isDefined, isNum, isString } from './utils';
 
 export interface Sty {
@@ -21,7 +21,7 @@ export interface Sty {
   textColor: string;
   textIsBold: boolean;
   textIsItalic: boolean;
-  textIsUnderlined: boolean
+  textIsUnderlined: boolean;
 }
 export type Axis = typeof Axis[keyof typeof Axis];
 export const Axis = {
@@ -111,8 +111,8 @@ function isFlexSize(size: any): size is FlexSize {
   return isDefined(size?.flex);
 }
 function computeSizeInfo(
-  { size, isMainAxis }:
-  { size: number | string | FlexSize; isMainAxis: boolean }
+  { size, isMainAxis, }:
+  { size: number | string | FlexSize; isMainAxis: boolean, }
 ) {
   const sizeIsFlex = isFlexSize(size);
   const exactSize =
@@ -155,6 +155,7 @@ export default defineComponent({
     return {
       childCount: 0,
       parentAxis: Axis.column as Axis,
+      _isBBox: true,
     }
   },
   computed: {
@@ -171,7 +172,7 @@ export default defineComponent({
       }
       const [exactWidth, wMin, wMax, widthGrows] = computeSizeInfo({
         size: width,
-        isMainAxis: false,
+        isMainAxis: this.parentAxis === Axis.row,
       });
       let height = this.sty.height ?? -1;
       if (isString(height) && height.endsWith(`f`)) {
@@ -183,7 +184,7 @@ export default defineComponent({
       }
       const [exactHeight, hMin, hMax, heightGrows] = computeSizeInfo({
         size: height,
-        isMainAxis: true,
+        isMainAxis: this.parentAxis === Axis.column,
       });
       const shadowDirection = (() => {
         switch(this.sty.shadowDirection ?? Align.bottomRight) {
@@ -355,7 +356,26 @@ export default defineComponent({
     updateStats() {
       const instance = getCurrentInstance();
       this.childCount = this.$slots?.default?.()?.length ?? 0;
-      this.parentAxis = (instance?.parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
+      /* This is janky, but it circumvents the issue of the parent being a custom Vue
+       * component insead of a `B` component, which are the only components with
+       * "substance". */
+      const parent = (() => {
+        let lastCheckedParentUid = -1;
+        function findParent(node: ComponentInternalInstance | null | undefined): ComponentInternalInstance | null | undefined {
+          if (node === null || node === undefined) return undefined;
+          if (node?.parent?.data?._isBBox ?? false) {
+            return node.parent;
+          }
+          if (lastCheckedParentUid === node.uid) {
+            return undefined;
+          } else {
+            lastCheckedParentUid = node.uid;
+          return findParent(instance?.parent ?? undefined);
+          }
+        }
+        return findParent(instance);
+      })();
+      this.parentAxis = (parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
     }
   },
   updated() {

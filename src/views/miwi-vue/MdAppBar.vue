@@ -41,6 +41,7 @@ const props = defineProps({
         width: `3f`,
         align: Align.center,
         textIsBold: true,
+        // shouldLog: true,
       }">
         <slot name="title"></slot>
       </B>
