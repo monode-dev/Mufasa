@@ -10,7 +10,7 @@ const { currentPage } = usePageStore();
 function settingsEnter(el: HTMLElement, done: () => void) {
   // Fadin and slide up
   gsap.from(el, {
-    duration: 0.2,
+    duration: 0.15,
     opacity: 0,
     y: `50vh`,
     ease: 'power1.out',
