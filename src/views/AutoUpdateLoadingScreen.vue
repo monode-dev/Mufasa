@@ -6,7 +6,9 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import Page from '@/views/miwi-vue/MdPage.vue';
 import updatingIcon from '@/assets/download_FILL1_wght400_GRAD0_opsz48.svg';
 import Icon from '@/views/miwi-vue/Icon.vue';
-import router from '@/router';
+// import router from '@/router';
+import { usePageStore, pages } from '@/PageStore';
+const { pushPage } = usePageStore();
 const textSize = 1.25;
 
 // Check for updates
@@ -30,7 +32,8 @@ async function getAndApplyPatch() {
   }
 
   // Start the app
-  router.push('/home');
+  pushPage(pages.home);
+  // router.push('/home');
 }
 </script>
 

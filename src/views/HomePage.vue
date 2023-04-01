@@ -3,7 +3,8 @@ import { Component, ComponentInternalInstance, ComponentPublicInstance, onMounte
 import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing, Overflow } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
-import router from '@/router';
+// import router from '@/router';
+import { usePageStore, pages } from '@/PageStore';
 import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
 import ClientEntry from './clients/ClientEntry.vue';
@@ -14,6 +15,8 @@ import Icon from '@/views/miwi-vue/Icon.vue';
 /* We do this here instead of at the end of AutoUpdateLoadingScreen
  * so that we never accidentally see the loading splash screen. */
 SplashScreen.hide();
+
+const { pushPage } = usePageStore();
 
 const tab0Ref = ref<ComponentPublicInstance | null>(null);
 const tab1Ref = ref<ComponentPublicInstance | null>(null);
@@ -69,7 +72,6 @@ onMounted(() => {
     const deltaY = lastSwipeY - swipeStartY;
     const deltaTime = Date.now() - swipeStartTime;
     const velocityX = deltaX / deltaTime;
-    console.log({deltaX, deltaY, deltaTime, velocityX});
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 25 && Math.abs(velocityX) > 0.2) {
       // e.preventDefault();
       if (deltaX > 0) {
@@ -102,6 +104,11 @@ const tabUnderlineSty: Partial<Sty> = {
   height: 0.125,
   background: mdColors.sameAsText,
 };
+
+const temp = ref(false);
+function toggleTemp() {
+  temp.value = !temp.value;
+}
 </script>
 
 <template>
@@ -112,7 +119,7 @@ const tabUnderlineSty: Partial<Sty> = {
         Fuel Calculator
       </template>
       <template #right>
-        <Icon @click="router.push(`/home/settings`)" :size="1.25" :icon="settingsSvg" alt="Settings Icon"/>
+        <Icon @click="pushPage(pages.settings)" :size="1.25" :icon="settingsSvg" alt="Settings Icon"/>
       </template>
       <template #bottom>
         <B :sty="{
@@ -158,7 +165,15 @@ const tabUnderlineSty: Partial<Sty> = {
         overflowX: Overflow.crop,
       }">
       <ClientsTab />
-      <MdBody :sty="{align: Align.center}">Deliveries Tab Comming Soon...</MdBody>
+      <MdBody :sty="{align: Align.center}">
+        Deliveries Tab Comming Soon...
+        <B @click="toggleTemp" :sty="{
+          padding: 0.5,
+          textColor: mdColors.white,
+          cornerRadius: 0.25,
+          background: mdColors.green,
+        }">Button</B>
+      </MdBody>
       <MdBody :sty="{align: Align.center}">Calculator Tab Comming Soon...</MdBody>
     </B>
   </MdPage>

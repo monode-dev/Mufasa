@@ -19,6 +19,7 @@
     "@capawesome/capacitor-screen-orientation": "^2.0.2",
     "@capgo/capacitor-updater": "^4.17.46",
     "gsap": "^3.11.5",
+    "pinia": "^2.0.33",
     "vue": "^3.2.47",
     "vue-inline-svg": "^3.1.2",
     "vue-router": "^4.1.6",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import router from '@/router';
+// import router from '@/router';
+import { pages, usePageStore } from '@/PageStore';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import B, { Sty, Axis, Align,mdColors, Spacing } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
@@ -8,6 +9,8 @@ import backSvg from '@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
 import Icon from '@/views/miwi-vue/Icon.vue';
+
+const { pushPage } = usePageStore();
 
 const versionNumText = ref('0.0.0');
 updateVersionNumText();
@@ -22,7 +25,7 @@ async function updateVersionNumText() {
     <!-- App Bar -->
     <MdAppBar>
       <template #left>
-        <Icon @click="router.push(`/home`)" :size="1.25" :icon="backSvg" alt="Back Icon"/>
+        <Icon @click="pushPage(pages.home)" :size="1.25" :icon="backSvg" alt="Back Icon"/>
       </template>
       <template #title>
         Settings
