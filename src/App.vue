@@ -27,8 +27,6 @@ function settingsLeave(el: HTMLElement, done: () => void) {
     onComplete: done,
   });
 }
-const notchHeight = getComputedStyle(document.documentElement).paddingTop;
-console.log(`notchHeight 2: `, notchHeight);
 </script>
 
 <template>

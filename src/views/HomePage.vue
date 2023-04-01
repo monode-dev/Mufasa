@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { Component, ComponentInternalInstance, ComponentPublicInstance, onMounted, ref } from 'vue';
+import { ComponentPublicInstance, onMounted, ref } from 'vue';
 import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing, Overflow } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
-// import router from '@/router';
 import { usePageStore, pages } from '@/PageStore';
 import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
-import ClientEntry from './clients/ClientEntry.vue';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
 import ClientsTab from './clients/ClientsTab.vue';
