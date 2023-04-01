@@ -9,6 +9,7 @@ const props = defineProps({
   },
 });
 const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
+console.log(`notchHeight 1: `, notchHeight);
 </script>
 
 <template>
@@ -19,11 +20,11 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
     ...props.sty,
   }">
     <!-- Notch Spacer -->
-    <!-- <B :sty="{
+    <B :sty="{
       width: `1f`,
       height: notchHeight,
       background: mdColors.green,
-    }"/> -->
+    }"/>
 
     <!-- Content -->
     <B :sty="{

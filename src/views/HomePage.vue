@@ -109,6 +109,7 @@ const temp = ref(false);
 function toggleTemp() {
   temp.value = !temp.value;
 }
+const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
 </script>
 
 <template>
@@ -167,12 +168,7 @@ function toggleTemp() {
       <ClientsTab />
       <MdBody :sty="{align: Align.center}">
         Deliveries Tab Comming Soon...
-        <B @click="toggleTemp" :sty="{
-          padding: 0.5,
-          textColor: mdColors.white,
-          cornerRadius: 0.25,
-          background: mdColors.green,
-        }">Button</B>
+        notchHeight: {{notchHeight}}
       </MdBody>
       <MdBody :sty="{align: Align.center}">Calculator Tab Comming Soon...</MdBody>
     </B>

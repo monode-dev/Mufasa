@@ -4,8 +4,6 @@ import AutoUpdateLoadingScreen from './views/AutoUpdateLoadingScreen.vue';
 import HomePage from './views/HomePage.vue';
 import SettingsPage from './views/SettingsPage.vue';
 import { gsap } from "gsap";
-import B, { mdColors } from './views/miwi-vue/B.vue';
-const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
 
 const { currentPage } = usePageStore();
 
@@ -29,16 +27,12 @@ function settingsLeave(el: HTMLElement, done: () => void) {
     onComplete: done,
   });
 }
+const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
+console.log(`notchHeight 2: `, notchHeight);
 </script>
 
 <template>
   <div style="width: 100%; height: 100%;">
-    <!-- Notch Spacer -->
-    <B :sty="{
-      width: `1f`,
-      height: notchHeight,
-      background: mdColors.green,
-    }"/>
     <Transition>
       <div v-if="currentPage === pages.autoUpdate" style="background: transparent; width: 100%; height: 100%; position: absolute; top: 0; right: 0; z-index: 10;">
         <AutoUpdateLoadingScreen />
