@@ -104,12 +104,6 @@ const tabUnderlineSty: Partial<Sty> = {
   height: 0.125,
   background: mdColors.sameAsText,
 };
-
-const temp = ref(false);
-function toggleTemp() {
-  temp.value = !temp.value;
-}
-const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
 </script>
 
 <template>
@@ -168,7 +162,6 @@ const notchHeight = getComputedStyle(document.documentElement).getPropertyValue(
       <ClientsTab />
       <MdBody :sty="{align: Align.center}">
         Deliveries Tab Comming Soon...
-        notchHeight: {{notchHeight}}
       </MdBody>
       <MdBody :sty="{align: Align.center}">Calculator Tab Comming Soon...</MdBody>
     </B>

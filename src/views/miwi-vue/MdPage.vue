@@ -8,8 +8,6 @@ const props = defineProps({
     default: {},
   },
 });
-const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
-console.log(`notchHeight 1: `, notchHeight);
 </script>
 
 <template>
@@ -19,13 +17,6 @@ console.log(`notchHeight 1: `, notchHeight);
     background: `#f9fafdff`,
     ...props.sty,
   }">
-    <!-- Notch Spacer -->
-    <B :sty="{
-      width: `1f`,
-      height: notchHeight,
-      background: mdColors.green,
-    }"/>
-
     <!-- Content -->
     <B :sty="{
       width: `1f`,

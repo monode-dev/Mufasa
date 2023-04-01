@@ -27,19 +27,31 @@ function settingsLeave(el: HTMLElement, done: () => void) {
     onComplete: done,
   });
 }
-const notchHeight = getComputedStyle(document.documentElement).getPropertyValue("--sat");
+const notchHeight = getComputedStyle(document.documentElement).paddingTop;
 console.log(`notchHeight 2: `, notchHeight);
 </script>
 
 <template>
   <div style="width: 100%; height: 100%;">
     <Transition>
-      <div v-if="currentPage === pages.autoUpdate" style="background: transparent; width: 100%; height: 100%; position: absolute; top: 0; right: 0; z-index: 10;">
+      <div v-if="currentPage === pages.autoUpdate" :style="{
+        background: `transparent`,
+        width: `100%`,
+        height: `100%`,
+        position: `absolute`,
+        zIndex: 8,
+      }">
         <AutoUpdateLoadingScreen />
       </div>
     </Transition>
     <Transition>
-      <div v-if="currentPage === pages.home || currentPage === pages.settings" style="background: transparent; width: 100%; height: 100%; position: absolute; top: 0; right: 0; z-index: 5;">
+      <div v-if="currentPage === pages.home || currentPage === pages.settings" :style="{
+        background: `transparent`,
+        width: `100%`,
+        height: `100%`,
+        position: `absolute`,
+        zIndex: 8,
+      }">
         <HomePage /> 
       </div>
     </Transition>
@@ -48,7 +60,13 @@ console.log(`notchHeight 2: `, notchHeight);
       @enter="settingsEnter"
       @leave="settingsLeave"
     >
-      <div v-if="currentPage === pages.settings" style="background: transparent; width: 100%; height: 100%; position: absolute; top: 100; right: 0; z-index: 8;">
+      <div v-if="currentPage === pages.settings" :style="{
+        background: `transparent`,
+        width: `100%`,
+        height: `100%`,
+        position: `absolute`,
+        zIndex: 8,
+      }">
         <SettingsPage />
       </div>
     </Transition>
