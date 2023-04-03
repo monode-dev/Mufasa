@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
   
-const deviceOptions = {
+const countFileDetails = {
   path: 'count.txt',
   directory: Directory.Data,
   encoding: Encoding.UTF8,
@@ -14,11 +14,11 @@ export const useCountStore = defineStore('countStore', () => {
   setUpCountFromDevice();
   async function setUpCountFromDevice() {
     try {
-      const countValueFromFile = Number((await Filesystem.readFile({
-        ...deviceOptions
-      })));
+      const countValueFromFile = Number((await Filesystem.readFile(countFileDetails)));
       if (!Number.isNaN(countValueFromFile)) {
         _count.value = countValueFromFile;
+      } else {
+        await Filesystem.deleteFile(countFileDetails);
       }
     } catch (e) {
       console.error('Unable to read file', e);
@@ -29,7 +29,7 @@ export const useCountStore = defineStore('countStore', () => {
     try {
       await Filesystem.writeFile({
         data: count.toString(),
-        ...deviceOptions,
+        ...countFileDetails,
       });
     } catch (e) {
       console.error('Unable to write file', e);
