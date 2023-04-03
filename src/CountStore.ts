@@ -14,7 +14,7 @@ export const useCountStore = defineStore('countStore', () => {
   setUpCountFromDevice();
   async function setUpCountFromDevice() {
     try {
-      const countValueFromFile = Number((await Filesystem.readFile(countFileDetails)));
+      const countValueFromFile = parseInt((await Filesystem.readFile(countFileDetails)).data);
       if (!Number.isNaN(countValueFromFile)) {
         _count.value = countValueFromFile;
       } else {
