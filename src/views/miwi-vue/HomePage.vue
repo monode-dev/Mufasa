@@ -4,20 +4,17 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing, Overflow } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
 import { usePageStore, pages } from '@/PageStore';
-import { useCountStore } from '@/CountStore';
 import {gsap} from "gsap";
 import settingsSvg from '@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
 import ClientsTab from './clients/ClientsTab.vue';
 import Icon from '@/views/miwi-vue/Icon.vue';
-import Button from './miwi-vue/Button.vue';
 /* We do this here instead of at the end of AutoUpdateLoadingScreen
  * so that we never accidentally see the loading splash screen. */
 SplashScreen.hide();
 
 const { pushPage } = usePageStore();
-const { count, incCount } = useCountStore();
 
 const tab0Ref = ref<ComponentPublicInstance | null>(null);
 const tab1Ref = ref<ComponentPublicInstance | null>(null);
@@ -163,7 +160,6 @@ const tabUnderlineSty: Partial<Sty> = {
       <ClientsTab />
       <MdBody :sty="{align: Align.center}">
         Deliveries Tab Comming Soon...
-        <Button @click="incCount">Count: {{count}}</Button>
       </MdBody>
       <MdBody :sty="{align: Align.center}">Calculator Tab Comming Soon...</MdBody>
     </B>
