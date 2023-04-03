@@ -14,9 +14,12 @@ export const useCountStore = defineStore('countStore', () => {
   setUpCountFromDevice();
   async function setUpCountFromDevice() {
     try {
-      _count.value = Number((await Filesystem.readFile({
+      const countValueFromFile = Number((await Filesystem.readFile({
         ...deviceOptions
       })));
+      if (!Number.isNaN(countValueFromFile)) {
+        _count.value = countValueFromFile;
+      }
     } catch (e) {
       console.error('Unable to read file', e);
     }
