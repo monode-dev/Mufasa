@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ComponentPublicInstance, onMounted, ref } from 'vue';
+import { ComponentPublicInstance, onMounted, ref, watchEffect } from 'vue';
 import { SplashScreen } from '@capacitor/splash-screen';
 import B, { Sty, Axis, Align,mdColors, Spacing, Overflow } from '@/views/miwi-vue/B.vue';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
@@ -109,13 +109,15 @@ const tabUnderlineSty: Partial<Sty> = {
 
 // Confetti
 const shouldShowConfetti = ref(false);
-async function explodeConfetti() {
-  // About to roll over
-  if (count.value % 10 !== 9) return;
+const confettiRunCount = ref(0);
+watchEffect(async () => {
+  confettiRunCount.value++;
+  if (count.value % 10 !== 0) return;
+  if (confettiRunCount.value < 3) return;
   shouldShowConfetti.value = true;
   await new Promise(resolve => setTimeout(resolve, 3000));
   shouldShowConfetti.value = false;
-}
+});
 </script>
 
 <template>
@@ -183,7 +185,7 @@ async function explodeConfetti() {
             :stageHeight="2000"
             :stageWidth="1500"/>
         </B>
-        <Button @click="() => { incCount(); explodeConfetti(); }">
+        <Button @click="incCount">
           Count: {{count}}
         </Button>
       </MdBody>
