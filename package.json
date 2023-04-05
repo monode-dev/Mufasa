@@ -19,9 +19,11 @@
     "@capacitor/splash-screen": "^4.2.0",
     "@capawesome/capacitor-screen-orientation": "^2.0.2",
     "@capgo/capacitor-updater": "^4.17.46",
+    "firebase": "^9.0.0",
     "gsap": "^3.11.5",
     "pinia": "^2.0.33",
     "vue": "^3.2.47",
+    "vue-confetti-explosion": "^1.0.2",
     "vue-inline-svg": "^3.1.2",
     "vue3-mobile-detection": "^1.0.5"
   },
