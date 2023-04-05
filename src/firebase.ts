@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { initializeFirestore, CACHE_SIZE_UNLIMITED, collection, onSnapshot, updateDoc, doc } from 'firebase/firestore';
+import { initializeFirestore, CACHE_SIZE_UNLIMITED, enableIndexedDbPersistence , onSnapshot, updateDoc, doc } from 'firebase/firestore';
 import { computed, ref } from 'vue';
 
 const firebaseConfig = {
@@ -13,8 +13,21 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const firebaseDb = initializeFirestore(app, { cacheSizeBytes: CACHE_SIZE_UNLIMITED, });
-const countDoc = doc(firebaseDb, `count`, `count`);
+enableIndexedDbPersistence(firebaseDb)
+  .then(() => {
+    // Offline persistence enabled successfully
+  })
+  .catch((err) => {
+    // Error enabling offline persistence
+  });
+// initializeDb() {
+//   this.indexedDB = new NgxIndexedDB(this.DB_NAME, this.DB_VERSION);
+//   return this.indexedDB.openDatabase(this.DB_VERSION, evt => {
+//      ...
+//   });
+// }
 
+const countDoc = doc(firebaseDb, `count`, `count`);
 const _count = ref(0);
 onSnapshot(countDoc, (querySnapshot) => {
   const newCount = querySnapshot?.data()?.count;

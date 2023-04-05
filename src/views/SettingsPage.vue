@@ -18,6 +18,8 @@ async function updateVersionNumText() {
   const currentVersionInfo = await CapacitorUpdater.current();
   versionNumText.value = currentVersionInfo.bundle.version;
 }
+
+
 </script>
 
 <template>

@@ -248,6 +248,7 @@ export default defineComponent({
         : undefined,
 
         // Padding
+        // TODO: Default could maybe be based off of font size.
         padding: isNum(this.sty.padding)
           ? sizeToCss(this.sty.padding)
           : this.sty.padding,
@@ -315,6 +316,7 @@ export default defineComponent({
           : undefined,
 
         // Spacing
+        // TODO: Default could maybe be based off of font size.
         rowGap: axis === Axis.column && isDefined(this.sty.spacing)
           ? sizeToCss(this.sty.spacing)
           : undefined,

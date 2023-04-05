@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { Network } from '@capacitor/network';
 
 export type Page = typeof pages[keyof typeof pages];
 export const pages = {
@@ -14,5 +15,11 @@ export const usePageStore = defineStore('pageStore', () => {
     _currentPage.value = newPage;
   }
 
-  return { currentPage, pushPage }
+  const _hasInternet = ref(true);
+  const hasInternet = computed(() => _hasInternet);
+  Network.addListener('networkStatusChange', status => {
+    _hasInternet.value = status.connected;
+  });
+
+  return { currentPage, pushPage, hasInternet }
 })

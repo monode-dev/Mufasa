@@ -1,6 +1,6 @@
 {
   "name": "ninety_percent",
-  "version": "1.12.7",
+  "version": "1.13.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -16,6 +16,7 @@
     "@capacitor/core": "^4.7.0",
     "@capacitor/filesystem": "^4.1.4",
     "@capacitor/ios": "^4.7.0",
+    "@capacitor/network": "^4.1.0",
     "@capacitor/splash-screen": "^4.2.0",
     "@capawesome/capacitor-screen-orientation": "^2.0.2",
     "@capgo/capacitor-updater": "^4.17.46",

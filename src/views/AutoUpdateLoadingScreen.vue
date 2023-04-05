@@ -14,26 +14,29 @@ const textSize = 1.25;
 // Check for updates
 getAndApplyPatch();
 async function getAndApplyPatch() {
-  // Check if there is a patch available
-  const latest = await CapacitorUpdater.getLatest();
+  try {
+    // Check if there is a patch available
+    const latest = await CapacitorUpdater.getLatest();
 
-  // If there is a patch available, download and apply it
-  if (latest.url) {
-    await SplashScreen.hide();
+    // If there is a patch available, download and apply it
+    if (latest.url) {
+      await SplashScreen.hide();
 
-    // Download the latest patch
-    const patchData = await CapacitorUpdater.download({
-      url: latest.url,
-      version: latest.version,
-    });
+      // Download the latest patch
+      const patchData = await CapacitorUpdater.download({
+        url: latest.url,
+        version: latest.version,
+      });
 
-    // Apply the patch
-    await CapacitorUpdater.set({ id: patchData.id });
+      // Apply the patch
+      await CapacitorUpdater.set({ id: patchData.id });
+    }
+  } catch (e) {
+    console.error(e);
   }
 
   // Start the app
   pushPage(pages.home);
-  // router.push('/home');
 }
 </script>
 
