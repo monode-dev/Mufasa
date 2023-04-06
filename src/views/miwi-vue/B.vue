@@ -94,7 +94,7 @@ export const mdColors = {
   sameAsText: `currentColor`,
 } as const;
 const fontSizeToHtmlUnit = 0.825;
-function sizeToCss(num: number | string) {
+export function sizeToCss(num: number | string) {
   return isNum(num)
     ? `${num * (1.125 / fontSizeToHtmlUnit)}rem`
     : num;

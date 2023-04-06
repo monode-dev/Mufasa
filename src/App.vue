@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { usePageStore, pages } from './PageStore';
 import AutoUpdateLoadingScreen from './views/AutoUpdateLoadingScreen.vue';
 import HomePage from './views/HomePage.vue';
 import SettingsPage from './views/SettingsPage.vue';
-import B, { Align, mdColors, Axis } from './views/miwi-vue/B.vue';
+import B, { Align, mdColors, Axis, sizeToCss } from './views/miwi-vue/B.vue';
 import { gsap } from "gsap";
 import Icon from '@/views/miwi-vue/Icon.vue';
 import nowWiFiSvg from '@/assets/wifi_off_FILL1_wght400_GRAD0_opsz48.svg';
@@ -23,9 +24,29 @@ function settingsEnter(el: HTMLElement, done: () => void) {
 function settingsLeave(el: HTMLElement, done: () => void) {
   // Fade out and slide down
   gsap.to(el, {
-    duration: 0.2,
+    duration: 0.15,
     opacity: 0,
     y: `50vh`,
+    ease: 'power1.out',
+    onComplete: done,
+  });
+}
+function offlineEnter(el: HTMLElement, done: () => void) {
+  // Slide up
+  gsap.from(el, {
+    duration: 0.15,
+    // opacity: 0,
+    y: sizeToCss(4),
+    ease: 'power1.out',
+    onComplete: done,
+  });
+}
+function offlineLeave(el: HTMLElement, done: () => void) {
+  // Slide down
+  gsap.to(el, {
+    duration: 0.15,
+    // opacity: 0,
+    y: sizeToCss(4),
     ease: 'power1.out',
     onComplete: done,
   });
@@ -73,13 +94,15 @@ function settingsLeave(el: HTMLElement, done: () => void) {
     </Transition>
     <Transition
       appear
-      @enter="settingsEnter"
-      @leave="settingsLeave"
+      @enter="offlineEnter"
+      @leave="offlineLeave"
     >
       <div v-if="!hasInternet" :style="{
         background: `transparent`,
         width: `100%`,
         height: `100%`,
+        bottom: 0,
+        left: 0,
         position: `absolute`,
         pointerEvents: `none`,
         zIndex: 17,
