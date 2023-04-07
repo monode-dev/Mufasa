@@ -67,41 +67,4 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
       </B>
     </B>
   </B>
-  <!-- <div style="width: 100%; height: 100%;">
-    <div :style="{
-      background: `transparent`,
-      width: `100%`,
-      height: `100%`,
-      position: `relative`,
-      pointerEvents: `none`,
-    }">
-    </div>
-    <div :style="{
-      background: `transparent`,
-      width: `100%`,
-      height: `100%`,
-      position: `absolute`,
-      pointerEvents: `none`,
-      zIndex: 1,
-    }">
-      <B :sty="{
-        width: `100%`,
-        height: `100%`,
-        padding: 1,
-        align: Align.bottomRight,
-      }">
-        <B :sty="{
-          width: 2,
-          height: 2,
-          background: mdColors.green,
-          cornerRadius: 1,
-          shadowDirection: Align.bottomRight,
-          shadowSize: 2,
-          textColor: mdColors.white,
-        }">
-          A
-        </B>
-      </B>
-    </div>
-  </div> -->
 </template>
