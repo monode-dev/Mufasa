@@ -1,49 +1,56 @@
-<script lang="ts">
-import { ComponentInternalInstance, CSSProperties, defineComponent, getCurrentInstance, PropType, RendererElement, RendererNode, VNode } from 'vue';
-import { isDefined, isNum, isString } from './utils';
+<script>
+import { defineComponent, getCurrentInstance } from 'vue';
 
-export interface Sty {
-  width: number | string | FlexSize;
-  height: number | string | FlexSize;
-  cornerRadius: number | string;
-  outlineColor: string;
+/*** @see sty: {
+  width: number | css-string | `2f`;
+  height: number | css-string | `2f`;
+  cornerRadius: number | css-string;
+  outlineColor: css-string;
   outlineSize: number;
-  background: string;
+  background: css-string;
   shadowSize: number;
   shadowDirection: Align;
-  padding: string | number;
+  padding: css-string | number;
   align: Align;
   axis: Axis;
   overflowX: Overflow;
   overflowY: Overflow;
-  spacing: Spacing;
-  textSize: number | string;
-  textColor: string;
+  spacing: Spacing | number;
+  fontFamily: css-string;
+  textSize: number | css-string;
+  textColor: css-string;
   textIsBold: boolean;
   textIsItalic: boolean;
   textIsUnderlined: boolean;
   isInteractable: boolean;
   zIndex: number;
+} **/
+
+export function isDefined(x) {
+  return x !== undefined && x !== null;
 }
-export type Axis = typeof Axis[keyof typeof Axis];
+export function isNum(x) {
+  return isDefined(x) && typeof x === `number`;
+}
+export function isString(x) {
+  return isDefined(x) && typeof x === `string`;
+}
+
 export const Axis = {
   row: `row`,
   column: `column`,
   stack: `stack`,
-} as const;
-export type Overflow = typeof Overflow[keyof typeof Overflow];
+};
 export const Overflow = {
   crop: `crop`,
   wrap: `wrap`,
   scroll: `scroll`,
-} as const;
-export type Spacing = number | typeof Spacing[keyof typeof Spacing];
+};
 export const Spacing = {
   spaceBetween: `space-between`,
   spaceAround: `space-around`,
   spaceEvenly: `space-evenly`,
-} as const;
-export type Align = typeof Align[keyof typeof Align];
+};
 export const Align = {
   topLeft: `topLeft`,
   topCenter: `topCenter`,
@@ -54,31 +61,31 @@ export const Align = {
   bottomLeft: `bottomLeft`,
   bottomCenter: `bottomCenter`,
   bottomRight: `bottomRight`,
-} as const;
-function isLeft(align: Align) {
-  const validAligns: Align[] = [Align.topLeft, Align.centerLeft, Align.bottomLeft];
+};
+function isLeft(align) {
+  const validAligns = [Align.topLeft, Align.centerLeft, Align.bottomLeft];
   return validAligns.includes(align);
 }
-function isCenterX(align: Align) {
-  const validAligns: Align[] = [Align.topCenter, Align.center, Align.bottomCenter];
+function isCenterX(align) {
+  const validAligns = [Align.topCenter, Align.center, Align.bottomCenter];
   return validAligns.includes(align);
 }
-function isRight(align: Align) {
-  const validAligns: Align[] = [Align.topRight, Align.centerRight, Align.bottomRight];
+// function isRight(align) {
+//   const validAligns = [Align.topRight, Align.centerRight, Align.bottomRight];
+//   return validAligns.includes(align);
+// }
+function isTop(align) {
+  const validAligns = [Align.topLeft, Align.topCenter, Align.topRight];
   return validAligns.includes(align);
 }
-function isTop(align: Align) {
-  const validAligns: Align[] = [Align.topLeft, Align.topCenter, Align.topRight];
+function isCenterY(align) {
+  const validAligns = [Align.centerLeft, Align.center, Align.centerRight];
   return validAligns.includes(align);
 }
-function isCenterY(align: Align) {
-  const validAligns: Align[] = [Align.centerLeft, Align.center, Align.centerRight];
-  return validAligns.includes(align);
-}
-function isBottom(align: Align) {
-  const validAligns: Align[] = [Align.bottomLeft, Align.bottomCenter, Align.bottomRight];
-  return validAligns.includes(align);
-}
+// function isBottom(align) {
+//   const validAligns = [Align.bottomLeft, Align.bottomCenter, Align.bottomRight];
+//   return validAligns.includes(align);
+// }
 export const mdColors = {
   white: `#ffffffff`,
   almostWhite: `#f9fafdff`,
@@ -95,28 +102,20 @@ export const mdColors = {
   black: `#000000ff`,
   transparent: `#ffffff00`,
   sameAsText: `currentColor`,
-} as const;
+};
 const fontSizeToHtmlUnit = 0.825;
-export function sizeToCss(num: number | string) {
+export function sizeToCss(num) {
   return isNum(num)
     ? `${num * (1.125 / fontSizeToHtmlUnit)}rem`
     : num;
 }
-function numToFontSize(num: number) {
+function numToFontSize(num) {
   return sizeToCss(fontSizeToHtmlUnit * num);
 }
-export interface FlexSize {
-  flex: number;
-  min: number;
-  max: number;
-}
-function isFlexSize(size: any): size is FlexSize {
+function isFlexSize(size) {
   return isDefined(size?.flex);
 }
-function computeSizeInfo(
-  { size, isMainAxis, }:
-  { size: number | string | FlexSize; isMainAxis: boolean, }
-) {
+function computeSizeInfo({ size, isMainAxis, }) {
   const isShrink = size === -1;
   const sizeIsFlex = isFlexSize(size);
   const exactSize =
@@ -143,29 +142,53 @@ function computeSizeInfo(
         ? exactSize ?? `100%`
         : sizeToCss(size.max)
     : exactSize;
-  return [exactSize, minSize, maxSize, sizeIsFlex] as const;
+  return [exactSize, minSize, maxSize, sizeIsFlex];
 }
 
+/*** @see sty: {
+  width: number | css-string | `2f` | -1;
+  height: number | css-string | `2f` | -1;
+  cornerRadius: number | css-string;
+  outlineColor: css-string;
+  outlineSize: number;
+  background: css-string;
+  shadowSize: number;
+  shadowDirection: Align;
+  padding: css-string | number;
+  align: Align;
+  axis: Axis;
+  overflowX: Overflow;
+  overflowY: Overflow;
+  spacing: Spacing | number;
+  fontFamily: css-string;
+  textSize: number | css-string;
+  textColor: css-string;
+  textIsBold: boolean;
+  textIsItalic: boolean;
+  textIsUnderlined: boolean;
+  isInteractable: boolean;
+  zIndex: number;
+} **/
 export default defineComponent({
-  name: "B",
+  name: "Box",
   props: {
     sty: {
-      type: Object as PropType<Partial<Sty>>,
-      default: {},
+      type: Object,
+      default: () => ({}),
       required: false,
     },
   },
   data() {
     return {
-      parentAxis: Axis.column as Axis,
-      _isBBox: true,
+      parentAxis: Axis.column,
+      isBBox: () => (true),
     }
   },
   computed: {
-    axis(): Axis {
+    axis() {
       return this.sty.axis ?? Axis.column;
     },
-    maxChildWidth(): number {
+    maxChildWidth() {
       if (this.axis === Axis.stack) {
         return this.children.reduce((tot, curr) => {
           return Math.max(tot, curr.el?.offsetWidth ?? 0)
@@ -174,7 +197,7 @@ export default defineComponent({
         return 0;
       }
     },
-    maxChildHeight(): number {
+    maxChildHeight() {
       if (this.axis === Axis.stack) {
         return this.children.reduce((tot, curr) => {
           return Math.max(tot, curr.el?.offsetHeight ?? 0)
@@ -183,7 +206,7 @@ export default defineComponent({
         return 0;
       }
     },
-    style(): CSSProperties {
+    style() {
       const align = this.sty.align ?? Align.center;
       let width = this.sty.width ?? -1;
       if (isString(width) && width.endsWith(`f`)) {
@@ -279,15 +302,15 @@ export default defineComponent({
           : this.sty.padding,
 
         // Align: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
-        position: (this.$parent as any)?.sty?.axis === Axis.stack ? `absolute` : `relative`,
+        position: (this.$parent)?.sty?.axis === Axis.stack ? `absolute` : `relative`,
         //margin: 0,
         justifyContent:
           // Exact spacing is handled through grid gap
-          Object.values(Spacing as any).includes(this.sty.spacing)
+          Object.values(Spacing).includes(this.sty.spacing)
             // For whatever reason, space-between with one item puts it at the start instead of centering it.
             ? this.sty.spacing === Spacing.spaceBetween && this.children.length == 1
               ? Spacing.spaceAround
-              : this.sty.spacing as typeof Spacing[keyof typeof Spacing]
+              : this.sty.spacing
             : this.axis === Axis.column
               ? isTop(align)
                 ? `flex-start`
@@ -350,7 +373,7 @@ export default defineComponent({
           : undefined,
 
         // Text Style
-        fontFamily: `Roboto`,
+        fontFamily: this.sty.fontFamily,
         fontSize: isNum(this.sty.textSize)
           ? numToFontSize(this.sty.textSize)
           : this.sty.textSize,
@@ -376,7 +399,7 @@ export default defineComponent({
               ? `center`
               : `right`,
         color: this.sty.textColor,
-        pointerEvents: this.sty.isInteractable ?? true ? undefined : `none`,
+        pointerEvents: this.sty.isInteractable === false ? `none` : undefined,
         zIndex: this.sty.zIndex,
       };
     },
@@ -392,9 +415,9 @@ export default defineComponent({
        * "substance". */
       const parent = (() => {
         let lastCheckedParentUid = -1;
-        function findParent(node: ComponentInternalInstance | null | undefined): ComponentInternalInstance | null | undefined {
+        function findParent(node) {
           if (node === null || node === undefined) return undefined;
-          if (node?.parent?.data?._isBBox ?? false) {
+          if (node?.parent?.data?.isBBox ?? false) {
             return node.parent;
           }
           if (lastCheckedParentUid === node.uid) {
@@ -406,7 +429,7 @@ export default defineComponent({
         }
         return findParent(instance);
       })();
-      this.parentAxis = (parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
+      this.parentAxis = (parent?.props?.sty)?.axis ?? Axis.column;
     }
   },
   updated() {

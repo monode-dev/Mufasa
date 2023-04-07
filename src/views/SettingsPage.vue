@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { pages, usePageStore } from '@/PageStore';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import B, { Sty, Axis, Align,mdColors, Spacing } from '@/views/miwi-vue/B.vue';
+import B00 from '@/views/miwi-vue/B00.vue.js';
 import MdPage from '@/views/miwi-vue/MdPage.vue';
 import backSvg from '@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg';
 import MdAppBar from '@/views/miwi-vue/MdAppBar.vue';
@@ -18,8 +19,6 @@ async function updateVersionNumText() {
   const currentVersionInfo = await CapacitorUpdater.current();
   versionNumText.value = currentVersionInfo.bundle.version;
 }
-
-
 </script>
 
 <template>
@@ -42,7 +41,7 @@ async function updateVersionNumText() {
         Version: {{ versionNumText }}
       </B>
       <B :sty="{
-        width: 10,
+        width: -1,
         height: 10,
         background: mdColors.grey,
         axis: Axis.stack,
