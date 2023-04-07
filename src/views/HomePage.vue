@@ -74,7 +74,7 @@ onMounted(() => {
     const deltaY = lastSwipeY - swipeStartY;
     const deltaTime = Date.now() - swipeStartTime;
     const velocityX = deltaX / deltaTime;
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50 && Math.abs(velocityX) > 0.2) {
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 200 && Math.abs(velocityX) > 0.2) {
       // e.preventDefault();
       if (deltaX > 0) {
         selectTab(Math.max(0, selectedTab.value - 1));
@@ -189,7 +189,15 @@ watchEffect(async () => {
           Count: {{count}}
         </Button>
       </MdBody>
-      <MdBody :sty="{align: Align.center}">Calculator Tab Comming Soon...</MdBody>
+      <MdBody :sty="{align: Align.center}">
+        <!--Calculator Tab Comming Soon...-->
+        <B :sty="{ width: `1f`, height: `1f`, background: `red` }"></B>
+        <B :sty="{ width: `1f`, height: `1f`, background: `blue` }"></B>
+        <B :sty="{ width: `1f`, height: `1f`, background: `green` }"></B>
+        <B :sty="{ width: `1f`, height: `1f`, background: `yellow` }"></B>
+        <B :sty="{ width: `1f`, height: `1f`, background: `purple` }"></B>
+        <B :sty="{ width: `1f`, height: `1f`, background: `orange` }"></B>
+      </MdBody>
     </B>
   </MdPage>
 </template>
