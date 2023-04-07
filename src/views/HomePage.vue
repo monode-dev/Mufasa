@@ -173,9 +173,7 @@ watchEffect(async () => {
         align: Align.topCenter,
         overflowX: Overflow.crop,
       }">
-      <MdBody>
-        <ClientsTab />
-      </MdBody>
+      <ClientsTab />
       <MdBody :sty="{align: Align.center}">
         <B>
           Deliveries Tab Comming Soon...

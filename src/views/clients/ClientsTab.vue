@@ -12,6 +12,7 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
     height: `1f`,
     axis: Axis.stack,
   }">
+    <!-- Body -->
     <MdBody>
       <ClientEntry name="A&P Logging"></ClientEntry>
       <ClientEntry name="Aaron Hohman"></ClientEntry>

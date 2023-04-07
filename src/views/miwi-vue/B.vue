@@ -222,6 +222,9 @@ export default defineComponent({
           case Align.bottomRight: return { x: 1, y: -1 };
         }
       })();
+      const cssPadding = isNum(this.sty.padding)
+        ? sizeToCss(this.sty.padding)
+        : this.sty.padding;
       return {
         // Sizing
         display: `flex`,
@@ -236,20 +239,20 @@ export default defineComponent({
         flexBasis:
           this.parentAxis === Axis.column
             ? isFlexSize(height)
-              ? `${height.flex * 100}%`
+              ? `calc(${height.flex * 100}% - (4 * ${cssPadding ?? `0px`}))`
               : heightGrows
-                ? `100%`
+                ? `calc(100% - (4 * ${cssPadding ?? `0px`}))`
                 : undefined
             : this.parentAxis === Axis.row
               ? isFlexSize(width)
-                ? `${width.flex * 100}%`
+                ? `calc(${width.flex * 100}% - (4 * ${cssPadding ?? `0px`}))`
                 : widthGrows
-                  ? `100%`
+                  ? `calc(100% - (4 * ${cssPadding ?? `0px`}))`
                   : undefined
               : undefined,
-        background: this.sty.background,
 
         // Box Style
+        background: this.sty.background,
         borderRadius: isDefined(this.sty.cornerRadius)
           ? sizeToCss(this.sty.cornerRadius)
           : undefined,
@@ -274,9 +277,7 @@ export default defineComponent({
 
         // Padding
         // TODO: Default could maybe be based off of font size.
-        padding: isNum(this.sty.padding)
-          ? sizeToCss(this.sty.padding)
-          : this.sty.padding,
+        padding: cssPadding,
 
         // Align: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
         position: (this.$parent as any)?.sty?.axis === Axis.stack ? `absolute` : `relative`,
