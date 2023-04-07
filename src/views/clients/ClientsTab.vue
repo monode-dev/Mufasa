@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ClientEntry from '@/views/clients/ClientEntry.vue';
 import MdBody from '@/views/miwi-vue/MdBody.vue';
+import B, { Sty, Axis, Align ,mdColors, Spacing, Overflow }  from '../miwi-vue/B.vue';
 </script>
 
 <template>
@@ -34,4 +35,41 @@ import MdBody from '@/views/miwi-vue/MdBody.vue';
     <ClientEntry name="BBMD-Medford, Boise Phoenix"></ClientEntry>
     <ClientEntry name="Bear Creek Orchard"></ClientEntry>
   </MdBody>
+  <!-- <div style="width: 100%; height: 100%;">
+    <div :style="{
+      background: `transparent`,
+      width: `100%`,
+      height: `100%`,
+      position: `relative`,
+      pointerEvents: `none`,
+    }">
+    </div>
+    <div :style="{
+      background: `transparent`,
+      width: `100%`,
+      height: `100%`,
+      position: `absolute`,
+      pointerEvents: `none`,
+      zIndex: 1,
+    }">
+      <B :sty="{
+        width: `100%`,
+        height: `100%`,
+        padding: 1,
+        align: Align.bottomRight,
+      }">
+        <B :sty="{
+          width: 2,
+          height: 2,
+          background: mdColors.green,
+          cornerRadius: 1,
+          shadowDirection: Align.bottomRight,
+          shadowSize: 2,
+          textColor: mdColors.white,
+        }">
+          A
+        </B>
+      </B>
+    </div>
+  </div> -->
 </template>

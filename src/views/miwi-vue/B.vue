@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ComponentInternalInstance, CSSProperties, defineComponent, getCurrentInstance, PropType } from 'vue';
+import { ComponentInternalInstance, CSSProperties, defineComponent, getCurrentInstance, PropType, RendererElement, RendererNode, VNode } from 'vue';
 import { isDefined, isNum, isString } from './utils';
 
 export interface Sty {
@@ -27,6 +27,7 @@ export type Axis = typeof Axis[keyof typeof Axis];
 export const Axis = {
   row: `row`,
   column: `column`,
+  stack: `stack`,
 } as const;
 export type Overflow = typeof Overflow[keyof typeof Overflow];
 export const Overflow = {
@@ -111,35 +112,46 @@ function isFlexSize(size: any): size is FlexSize {
   return isDefined(size?.flex);
 }
 function computeSizeInfo(
-  { size, isMainAxis, }:
-  { size: number | string | FlexSize; isMainAxis: boolean, }
+  { size, isWidth, isMainAxis, isStack, children, }:
+  { size: number | string | FlexSize; isWidth: boolean, isMainAxis: boolean, isStack: boolean, children: VNode<RendererNode, RendererElement, { [key: string]: any; }>[]; }
 ) {
+  const isShrink = size === -1;
   const sizeIsFlex = isFlexSize(size);
-  const exactSize =
-    !isMainAxis && sizeIsFlex
-      ? `100%`
-      : isString(size)
-        ? size
-        : size !== -1 && !sizeIsFlex
-          ? sizeToCss(size)
-          : sizeIsFlex
-            ? undefined
-            : `fit-content`;
-  const minSize = sizeIsFlex
-    ? size.min === -1
-      ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
-      : size.min === Infinity
-        ? exactSize
-        : sizeToCss(size.min)
-    : exactSize;
-  const maxSize = sizeIsFlex
-    ? size.max === -1
-      ? `fit-content`
-      : size.max === Infinity
-        ? exactSize ?? `100%`
-        : sizeToCss(size.max)
-    : exactSize;
-  return [exactSize, minSize, maxSize, sizeIsFlex] as const;
+  if (isShrink && isStack) {
+    const size = children.reduce(
+      (tot, curr) => {
+        const el = curr.el;
+        const offsetSize = isWidth ? el?.offsetWidth : el?.offsetHeight;
+        return Math.max(tot, offsetSize ?? 0)
+      }, 0) + `px`;
+    return [size, size, size, false] as const;
+  } else {
+    const exactSize =
+      !isMainAxis && sizeIsFlex
+        ? `100%`
+        : isString(size)
+          ? size
+          : !isShrink && !sizeIsFlex
+            ? sizeToCss(size)
+            : sizeIsFlex
+              ? undefined
+              : `fit-content`;
+    const minSize = sizeIsFlex
+      ? isShrink
+        ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
+        : size.min === Infinity
+          ? exactSize
+          : sizeToCss(size.min)
+      : exactSize;
+    const maxSize = sizeIsFlex
+      ? isShrink
+        ? `fit-content`
+        : size.max === Infinity
+          ? exactSize ?? `100%`
+          : sizeToCss(size.max)
+      : exactSize;
+    return [exactSize, minSize, maxSize, sizeIsFlex] as const;
+  }
 }
 
 export default defineComponent({
@@ -153,14 +165,15 @@ export default defineComponent({
   },
   data() {
     return {
-      childCount: 0,
       parentAxis: Axis.column as Axis,
       _isBBox: true,
     }
   },
   computed: {
+    axis(): Axis {
+      return this.sty.axis ?? Axis.column;
+    },
     style(): CSSProperties {
-      const axis = this.sty.axis ?? Axis.column;
       const align = this.sty.align ?? Align.center;
       let width = this.sty.width ?? -1;
       if (isString(width) && width.endsWith(`f`)) {
@@ -172,7 +185,10 @@ export default defineComponent({
       }
       const [exactWidth, wMin, wMax, widthGrows] = computeSizeInfo({
         size: width,
+        isWidth: true,
         isMainAxis: this.parentAxis === Axis.row,
+        isStack: this.axis === Axis.stack,
+        children: this.children,
       });
       let height = this.sty.height ?? -1;
       if (isString(height) && height.endsWith(`f`)) {
@@ -184,7 +200,10 @@ export default defineComponent({
       }
       const [exactHeight, hMin, hMax, heightGrows] = computeSizeInfo({
         size: height,
+        isWidth: false,
         isMainAxis: this.parentAxis === Axis.column,
+        isStack: this.axis === Axis.stack,
+        children: this.children,
       });
       const shadowDirection = (() => {
         switch(this.sty.shadowDirection ?? Align.bottomRight) {
@@ -254,16 +273,16 @@ export default defineComponent({
           : this.sty.padding,
 
         // Align: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
-        position: `relative`,
+        position: (this.$parent as any)?.sty?.axis === Axis.stack ? `absolute` : `relative`,
         //margin: 0,
         justifyContent:
           // Exact spacing is handled through grid gap
           Object.values(Spacing as any).includes(this.sty.spacing)
             // For whatever reason, space-between with one item puts it at the start instead of centering it.
-            ? this.sty.spacing === Spacing.spaceBetween && this.childCount == 1
+            ? this.sty.spacing === Spacing.spaceBetween && this.children.length == 1
               ? Spacing.spaceAround
               : this.sty.spacing as typeof Spacing[keyof typeof Spacing]
-            : axis === Axis.column
+            : this.axis === Axis.column
               ? isTop(align)
                 ? `flex-start`
                 : isCenterY(align)
@@ -275,7 +294,7 @@ export default defineComponent({
                   ? `safe center`
                   : `flex-end`,
         alignItems:
-          axis === Axis.column
+          this.axis === Axis.column
             ? isLeft(align)
               ? `flex-start`
               : isCenterX(align)
@@ -288,10 +307,10 @@ export default defineComponent({
                 : `flex-end`,
 
         // Axis
-        flexDirection: axis,
+        flexDirection: this.axis === Axis.stack ? undefined : this.axis,
 
         // Overflow
-        flexWrap: axis === Axis.row
+        flexWrap: this.axis === Axis.row
           ? this.sty.overflowX === Overflow.wrap
             ? `wrap`
             : undefined
@@ -317,10 +336,10 @@ export default defineComponent({
 
         // Spacing
         // TODO: Default could maybe be based off of font size.
-        rowGap: axis === Axis.column && isDefined(this.sty.spacing)
+        rowGap: this.axis === Axis.column && isDefined(this.sty.spacing)
           ? sizeToCss(this.sty.spacing)
           : undefined,
-        columnGap: axis === Axis.row && isDefined(this.sty.spacing)
+        columnGap: this.axis === Axis.row && isDefined(this.sty.spacing)
           ? sizeToCss(this.sty.spacing)
           : undefined,
 
@@ -353,11 +372,13 @@ export default defineComponent({
         color: this.sty.textColor,
       };
     },
+    children() {
+      return this.$slots?.default?.() ?? [];
+    },
   },
   methods: {
     updateStats() {
       const instance = getCurrentInstance();
-      this.childCount = this.$slots?.default?.()?.length ?? 0;
       /* This is janky, but it circumvents the issue of the parent being a custom Vue
        * component insead of a `B` component, which are the only components with
        * "substance". */
@@ -391,6 +412,6 @@ export default defineComponent({
 
 <template>
   <div :style="style">
-    <slot></slot>
+    <slot/>
   </div>
 </template>
