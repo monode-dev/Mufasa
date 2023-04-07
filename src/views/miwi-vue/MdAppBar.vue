@@ -14,7 +14,7 @@ const props = defineProps({
 <template>
   <B :sty="{
     width: `1f`,
-    background: mdColors.green,
+    background: mdColors.blue,
     shadowSize: 1.25,
     shadowDirection: Align.bottomCenter,
     align: Align.bottomCenter,
