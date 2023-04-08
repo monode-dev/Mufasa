@@ -182,7 +182,7 @@ watchEffect(async () => {
       }">
         <MdBody :sty="{align: Align.center}">
           <B>
-            Deliveries Tab Comming Soon...
+            Database Sync Test
             <component
               :is="ConfettiExplosion"
               v-if="shouldShowConfetti"
@@ -201,7 +201,7 @@ watchEffect(async () => {
         height: `1f`,
       }">
         <MdBody :sty="{align: Align.center}">
-          Calculator Tab Comming Soon...
+          Calculator Comming Soon...
         </MdBody>
       </B>
     </B>
