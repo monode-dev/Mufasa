@@ -74,7 +74,7 @@ onMounted(() => {
     const deltaY = lastSwipeY - swipeStartY;
     const deltaTime = Date.now() - swipeStartTime;
     const velocityX = deltaX / deltaTime;
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 200 && Math.abs(velocityX) > 0.2) {
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 75 && Math.abs(velocityX) > 0.2) {
       // e.preventDefault();
       if (deltaX > 0) {
         selectTab(Math.max(0, selectedTab.value - 1));
