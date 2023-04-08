@@ -200,7 +200,7 @@ watchEffect(async () => {
         width: `1f`,
         height: `1f`,
       }">
-        <MdBody :sty="{align: Align.center, te}">
+        <MdBody :sty="{align: Align.center, textColor: mdColors.grey, }">
           Calculator Comming Soon...
         </MdBody>
       </B>
