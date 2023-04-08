@@ -182,7 +182,7 @@ watchEffect(async () => {
       }">
         <MdBody :sty="{align: Align.center}">
           <B>
-            Database Sync Test
+            Database Sync Tester
             <component
               :is="ConfettiExplosion"
               v-if="shouldShowConfetti"
@@ -200,7 +200,7 @@ watchEffect(async () => {
         width: `1f`,
         height: `1f`,
       }">
-        <MdBody :sty="{align: Align.center}">
+        <MdBody :sty="{align: Align.center, te}">
           Calculator Comming Soon...
         </MdBody>
       </B>
