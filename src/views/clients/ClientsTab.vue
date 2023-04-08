@@ -14,17 +14,18 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
   }">
     <B :sty="{
       width: `1f`,
-      background: mdColors.green,
+      background: `#d9d9d9`, //mdColors.green,
       axis: Axis.row,
       padding: 0.5,
       shadowSize: 1.25,
       shadowDirection: Align.bottomCenter,
       spacing: 0.5,
+      // cornerRadius: [0, 0, 0.75, 0.75],
     }">
       <B :sty="{
         width: `1f`,
         padding: 0.25,
-        cornerRadius: 2,
+        cornerRadius: 0.75,
         align: Align.centerLeft,
         background: mdColors.white,
         textColor: mdColors.grey,

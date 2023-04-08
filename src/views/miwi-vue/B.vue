@@ -5,7 +5,7 @@ import { isDefined, isNum, isString } from './utils';
 export interface Sty {
   width: number | string | FlexSize;
   height: number | string | FlexSize;
-  cornerRadius: number | string;
+  cornerRadius: number | string | [number, number, number, number];
   outlineColor: string;
   outlineSize: number;
   background: string;
@@ -304,7 +304,9 @@ export default defineComponent({
         // Box Style
         background: this.sty.background,
         borderRadius: isDefined(this.sty.cornerRadius)
-          ? sizeToCss(this.sty.cornerRadius)
+          ? Array.isArray(this.sty.cornerRadius)
+            ? this.sty.cornerRadius.map(sizeToCss).join(` `)
+            : sizeToCss(this.sty.cornerRadius)
           : undefined,
         //border: `none`,
         outline: isDefined(this.sty.outlineSize)

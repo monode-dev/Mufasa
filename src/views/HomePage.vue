@@ -201,13 +201,7 @@ watchEffect(async () => {
         height: `1f`,
       }">
         <MdBody :sty="{align: Align.center}">
-          <!--Calculator Tab Comming Soon...-->
-          <B :sty="{ width: `1f`, height: `1f`, background: `red` }"></B>
-          <B :sty="{ width: `1f`, height: `1f`, background: `blue` }"></B>
-          <B :sty="{ width: `1f`, height: `1f`, background: `green` }"></B>
-          <B :sty="{ width: `1f`, height: `1f`, background: `yellow` }"></B>
-          <B :sty="{ width: `1f`, height: `1f`, background: `purple` }"></B>
-          <B :sty="{ width: `1f`, height: `1f`, background: `orange` }"></B>
+          Calculator Tab Comming Soon...
         </MdBody>
       </B>
     </B>
