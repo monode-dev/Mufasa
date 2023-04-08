@@ -40,7 +40,7 @@ async function updateVersionNumText() {
       <B :sty="{textColor: mdColors.grey}">
         Version: {{ versionNumText }}
       </B>
-      <B :sty="{
+      <!-- <B :sty="{
         width: -1,
         height: 10,
         background: mdColors.grey,
@@ -49,7 +49,7 @@ async function updateVersionNumText() {
       }">
         <B :sty="{ width: 4, height: 4, background: mdColors.blue }" />
         <B :sty="{ width: 2, height: 6, background: mdColors.red }" />
-      </B>
+      </B> -->
     </MdBody>
   </MdPage>
 </template>

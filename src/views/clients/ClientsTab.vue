@@ -10,8 +10,38 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
   <B :sty="{
     width: `1f`,
     height: `1f`,
-    axis: Axis.stack,
+    axis: Axis.column,
   }">
+    <B :sty="{
+      width: `1f`,
+      background: mdColors.green,
+      axis: Axis.row,
+      padding: 0.5,
+      shadowSize: 1.25,
+      shadowDirection: Align.bottomCenter,
+      spacing: 0.5,
+    }">
+      <B :sty="{
+        width: `1f`,
+        padding: 0.25,
+        cornerRadius: 2,
+        align: Align.centerLeft,
+        background: mdColors.white,
+        textColor: mdColors.grey,
+        axis: Axis.row,
+      }">
+        <B :sty="{ width: 0.25, }" />
+        Add New or Search
+        <B :sty="{ width: 0.25, }" />
+      </B>
+      <B :sty="{
+        align: Align.center,
+        textColor: mdColors.white,
+      }">
+        <Icon :size="1.5" :icon="addSvg" alt="Add Icon"/>
+      </B>
+    </B>
+
     <!-- Body -->
     <MdBody>
       <ClientEntry name="A&P Logging"></ClientEntry>
@@ -43,29 +73,5 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
       <ClientEntry name="BBMD-Medford, Boise Phoenix"></ClientEntry>
       <ClientEntry name="Bear Creek Orchard"></ClientEntry>
     </MdBody>
-
-    <!-- Add Button-->
-    <B :sty="{
-      width: `1f`,
-      height: `1f`,
-      isInteractable: false,
-      align: Align.bottomRight,
-      padding: 1,
-    }">
-      <B :sty="{
-        width: 3,
-        height: 3,
-        background: mdColors.green,
-        cornerRadius: 1.5,
-        shadowDirection: Align.bottomRight,
-        shadowSize: 2,
-        textSize: 2,
-        textColor: mdColors.white,
-        isInteractable: true,
-      }">
-        <!--@click="pushPage(pages.settings)"-->
-        <Icon :size="2" :icon="addSvg" alt="Add Icon"/>
-      </B>
-    </B>
   </B>
 </template>

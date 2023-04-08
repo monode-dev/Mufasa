@@ -176,30 +176,40 @@ watchEffect(async () => {
         overflowX: Overflow.crop,
       }">
       <ClientsTab />
-      <MdBody :sty="{align: Align.center}">
-        <B>
-          Deliveries Tab Comming Soon...
-          <component
-            :is="ConfettiExplosion"
-            v-if="shouldShowConfetti"
-            :force="0.75"
-            :duration="3000"
-            :stageHeight="2000"
-            :stageWidth="1500"/>
-        </B>
-        <Button @click="incCount">
-          Count: {{count}}
-        </Button>
-      </MdBody>
-      <MdBody :sty="{align: Align.center}">
-        <!--Calculator Tab Comming Soon...-->
-        <B :sty="{ width: `1f`, height: `1f`, background: `red` }"></B>
-        <B :sty="{ width: `1f`, height: `1f`, background: `blue` }"></B>
-        <B :sty="{ width: `1f`, height: `1f`, background: `green` }"></B>
-        <B :sty="{ width: `1f`, height: `1f`, background: `yellow` }"></B>
-        <B :sty="{ width: `1f`, height: `1f`, background: `purple` }"></B>
-        <B :sty="{ width: `1f`, height: `1f`, background: `orange` }"></B>
-      </MdBody>
+      <B :sty="{
+        width: `1f`,
+        height: `1f`,
+      }">
+        <MdBody :sty="{align: Align.center}">
+          <B>
+            Deliveries Tab Comming Soon...
+            <component
+              :is="ConfettiExplosion"
+              v-if="shouldShowConfetti"
+              :force="0.75"
+              :duration="3000"
+              :stageHeight="2000"
+              :stageWidth="1500"/>
+          </B>
+          <Button @click="incCount">
+            Count: {{count}}
+          </Button>
+        </MdBody>
+      </B>
+      <B :sty="{
+        width: `1f`,
+        height: `1f`,
+      }">
+        <MdBody :sty="{align: Align.center}">
+          <!--Calculator Tab Comming Soon...-->
+          <B :sty="{ width: `1f`, height: `1f`, background: `red` }"></B>
+          <B :sty="{ width: `1f`, height: `1f`, background: `blue` }"></B>
+          <B :sty="{ width: `1f`, height: `1f`, background: `green` }"></B>
+          <B :sty="{ width: `1f`, height: `1f`, background: `yellow` }"></B>
+          <B :sty="{ width: `1f`, height: `1f`, background: `purple` }"></B>
+          <B :sty="{ width: `1f`, height: `1f`, background: `orange` }"></B>
+        </MdBody>
+      </B>
     </B>
   </MdPage>
 </template>

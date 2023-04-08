@@ -90,6 +90,8 @@ function offlineLeave(el: HTMLElement, done: () => void) {
         background: `transparent`,
         width: `100%`,
         height: `100%`,
+        top: `0px`,
+        left: `0px`,
         position: `absolute`,
         zIndex: 15,
       }">
