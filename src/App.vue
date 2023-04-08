@@ -120,7 +120,7 @@ function offlineLeave(el: HTMLElement, done: () => void) {
           align: Align.bottomLeft,
         }">
           <B :sty="{
-            background: mdColors.red,
+            background: mdColors.orange,
             textColor: mdColors.white,
             cornerRadius: 1,
             shadowDirection: Align.center,
