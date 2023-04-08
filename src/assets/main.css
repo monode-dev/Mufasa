@@ -5,7 +5,8 @@
 }
 
 body {
-  padding: env(safe-area-inset-top) 0 0 0; /*env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); */
+  /* padding: 60px 0 0 0; */
+  padding: env(safe-area-inset-top) 0 0 0;
   box-sizing: border-box;
   background-color: #4caf50ff;
   min-height: 100vh;

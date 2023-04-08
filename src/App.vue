@@ -54,7 +54,10 @@ function offlineLeave(el: HTMLElement, done: () => void) {
 </script>
 
 <template>
-  <div style="width: 100%; height: 100%;">
+  <B :sty="{
+    width: `100%`,
+    height: `100%`,
+  }">
     <Transition>
       <div v-if="currentPage === pages.autoUpdate" :style="{
         background: `transparent`,
@@ -71,6 +74,7 @@ function offlineLeave(el: HTMLElement, done: () => void) {
         background: `transparent`,
         width: `100%`,
         height: `100%`,
+        boxSizing: `border-box`,
         position: `absolute`,
         zIndex: 10,
       }">
@@ -129,5 +133,5 @@ function offlineLeave(el: HTMLElement, done: () => void) {
         </B>
       </div>
     </Transition>
-  </div>
+  </B>
 </template>

@@ -230,12 +230,12 @@ export default defineComponent({
         display: `flex`,
         boxSizing: `border-box`,
         // Using minWidth and maxWidth tells css to not override the size of this element
-        width: this.axis === Axis.stack && width === -1 ? this.maxChildWidth : exactWidth,
-        minWidth: this.axis === Axis.stack && width === -1 ? this.maxChildWidth : wMin,
-        maxWidth: this.axis === Axis.stack && width === -1 ? this.maxChildWidth : wMax,
-        height: this.axis === Axis.stack && height === -1 ? this.maxChildWidth : exactHeight,
-        minHeight: this.axis === Axis.stack && height === -1 ? this.maxChildWidth : hMin,
-        maxHeight: this.axis === Axis.stack && height === -1 ? this.maxChildWidth : hMax,
+        width: `calc(${this.axis === Axis.stack && width === -1 ? this.maxChildWidth : exactWidth} - ${this.$parent?.$el?.paddingTop ?? `0px`} - ${this.$parent?.$el?.paddingBottom ?? `0px`})`,
+        minWidth: `calc(${this.axis === Axis.stack && width === -1 ? this.maxChildWidth : wMin} - ${this.$parent?.$el?.paddingTop ?? `0px`} - ${this.$parent?.$el?.paddingBottom ?? `0px`})`,
+        maxWidth: `calc(${this.axis === Axis.stack && width === -1 ? this.maxChildWidth : wMax} - ${this.$parent?.$el?.paddingTop ?? `0px`} - ${this.$parent?.$el?.paddingBottom ?? `0px`})`,
+        height: `calc(${this.axis === Axis.stack && height === -1 ? this.maxChildHeight : exactHeight} - ${this.$parent?.$el?.paddingTop ?? `0px`} - ${this.$parent?.$el?.paddingBottom ?? `0px`})`,
+        minHeight: `calc(${this.axis === Axis.stack && height === -1 ? this.maxChildHeight : hMin} - ${this.$parent?.$el?.paddingTop ?? `0px`} - ${this.$parent?.$el?.paddingBottom ?? `0px`})`,
+        maxHeight: `calc(${this.axis === Axis.stack && height === -1 ? this.maxChildHeight : hMax} - ${this.$parent?.$el?.paddingTop ?? `0px`} - ${this.$parent?.$el?.paddingBottom ?? `0px`})`,
         flexBasis:
           this.parentAxis === Axis.column
             ? isFlexSize(height)
