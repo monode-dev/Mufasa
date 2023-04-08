@@ -14,7 +14,7 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
   }">
     <B :sty="{
       width: `1f`,
-      background: `#d9d9d9`, //mdColors.green,
+      background: mdColors.green,
       axis: Axis.row,
       padding: 0.5,
       shadowSize: 1.25,
