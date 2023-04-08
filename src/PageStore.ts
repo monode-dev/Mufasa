@@ -17,6 +17,7 @@ export const usePageStore = defineStore('pageStore', () => {
 
   const _hasInternet = ref(true);
   const hasInternet = computed(() => _hasInternet);
+  Network.getStatus().then((status) => _hasInternet.value = status.connected);
   Network.addListener('networkStatusChange', status => {
     _hasInternet.value = status.connected;
   });
