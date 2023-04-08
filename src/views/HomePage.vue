@@ -52,6 +52,7 @@ function selectTab(newTab: number) {
 }
 
 // Swipe gesture
+const outDeltaX = ref(0);
 onMounted(() => {
   let swipeStartTime = 0;
   let swipeStartX = 0;
@@ -62,6 +63,8 @@ onMounted(() => {
     const touch = e.touches[0];
     swipeStartX = touch.clientX;
     swipeStartY = touch.clientY;
+    lastSwipeX = touch.clientX;
+    lastSwipeY = touch.clientY;
     swipeStartTime = Date.now();
   });
   tabBodiesParent.value?.$el.addEventListener('touchmove', (e: TouchEvent) => {
@@ -74,7 +77,8 @@ onMounted(() => {
     const deltaY = lastSwipeY - swipeStartY;
     const deltaTime = Date.now() - swipeStartTime;
     const velocityX = deltaX / deltaTime;
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 75 && Math.abs(velocityX) > 0.2) {
+    outDeltaX.value = deltaX;
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 60 && Math.abs(velocityX) > 0.2) {
       // e.preventDefault();
       if (deltaX > 0) {
         selectTab(Math.max(0, selectedTab.value - 1));
@@ -124,6 +128,9 @@ watchEffect(async () => {
   <MdPage>
     <!-- App Bar -->
     <MdAppBar>
+      <template #left>
+        {{outDeltaX}}
+      </template>
       <template #title>
         Fuel Calculator
       </template>
