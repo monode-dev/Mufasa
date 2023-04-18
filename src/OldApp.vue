@@ -2,8 +2,8 @@
 import { computed } from "vue";
 import { usePageStore, pages } from "./PageStore";
 import AutoUpdateLoadingScreen from "./views/AutoUpdateLoadingScreen.vue";
-import HomePage from "./views/HomePage.vue";
-import SettingsPage from "./views/SettingsPage.vue";
+import HomePage from "./views/Home.page.vue";
+import SettingsPage from "./views/Settings.page.vue";
 import B, { Align, mdColors, Axis, sizeToCss } from "./views/miwi-vue/B.vue";
 import { gsap } from "gsap";
 import Icon from "@/views/miwi-vue/Icon.vue";

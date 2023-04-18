@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { pageTransitions, useNav } from "./Nav";
+import { useNav } from "./Nav";
 import AutoUpdateLoadingScreen from "./views/AutoUpdateLoadingScreen.vue";
 import B, { Align, mdColors, Axis, sizeToCss } from "./views/miwi-vue/B.vue";
 import Icon from "@/views/miwi-vue/Icon.vue";
 import nowWiFiSvg from "@/assets/wifi_off_FILL1_wght400_GRAD0_opsz48.svg";
 import { Network } from "@capacitor/network";
+import { pageTransitions } from "./PageTransitions";
 
 const nav = useNav();
 const pageIdTag = `_miwi_page_`;
@@ -15,8 +16,8 @@ let nextPageLeaveTransition:
 function onPageEnter(el: Element, done: () => void) {
   const pageIndex = parseInt(el.id.substring(pageIdTag.length));
   const page = nav.openedPages[pageIndex];
-  nextPageLeaveTransition = page.transition.leave;
-  page.transition.enter(el, done);
+  nextPageLeaveTransition = page.transitions.leave;
+  page.transitions.enter(el, done);
 }
 function onPageLeave(el: Element, done: () => void) {
   nextPageLeaveTransition?.(el, done);
@@ -24,7 +25,7 @@ function onPageLeave(el: Element, done: () => void) {
     nav.openedPages.length > 0
       ? nav.openedPages[nav.openedPages.length - 1]
       : undefined;
-  nextPageLeaveTransition = page?.transition.leave;
+  nextPageLeaveTransition = page?.transitions.leave;
 }
 
 const hasInternet = ref(true);

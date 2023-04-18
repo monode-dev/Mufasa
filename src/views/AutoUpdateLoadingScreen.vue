@@ -39,7 +39,7 @@ async function getAndApplyPatch() {
 
   // Start the app
   // pushPage(pages.home);
-  nav.pushPage(allPages.home);
+  nav.pushPage(allPages.Home);
 }
 </script>
 

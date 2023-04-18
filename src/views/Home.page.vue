@@ -140,7 +140,7 @@ watchEffect(async () => {
       <template #right>
         <Icon
           @click="
-            nav.pushPage(allPages.settings)
+            nav.pushPage(allPages.Settings)
             //pushPage(pages.settings)
           "
           :size="1.25"
