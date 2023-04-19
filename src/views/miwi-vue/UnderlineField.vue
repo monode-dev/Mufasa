@@ -73,7 +73,7 @@ watchEffect(() => {
         axis: Axis.column,
       }"
     >
-      <B :sty="{ height: 0.125 }" />
+      <B :sty="{ height: 0.5 }" />
       <B
         :sty="{
           width: `1f`,
@@ -81,7 +81,7 @@ watchEffect(() => {
           axis: Axis.row,
         }"
       >
-        <B :sty="{ width: 0.5 }" />
+        <B :sty="{ width: 0.25 }" />
         <input
           :ref="inputRef"
           type="text"
@@ -96,7 +96,7 @@ watchEffect(() => {
             caretColor: mdColors.green,
           }"
         />
-        <B :sty="{ width: 0.125 }" />
+        <B :sty="{ width: 0.25 }" />
       </B>
     </B>
 

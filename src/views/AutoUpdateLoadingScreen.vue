@@ -34,7 +34,7 @@ async function getAndApplyPatch() {
       await CapacitorUpdater.set({ id: patchData.id });
 
       // Show the splash screen again
-      await SplashScreen.show();
+      // await SplashScreen.show();
     }
   } catch (e) {
     console.error(e);
