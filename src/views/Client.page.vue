@@ -52,31 +52,6 @@ export default {
       <UnderlineField hint="Phone" v-model:value="phone" />
       <UnderlineField hint="Address" v-model:value="address" />
       <UnderlineField hint="Notes" v-model:value="notes" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
-      <UnderlineField hint="Test" />
     </MdBody>
   </MdPage>
 </template>
