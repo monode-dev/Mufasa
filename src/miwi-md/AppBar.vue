@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import B, { Align, mdColors, Axis, Sty } from "./B.vue";
+import B, { Align, mdColors, Axis, Sty } from "@/miwi-md/B.vue";
 import { useNav } from "@/Nav";
-import Icon from "./Icon.vue";
+import Icon from "@/miwi-md/Icon.vue";
 import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
 
 const nav = useNav();

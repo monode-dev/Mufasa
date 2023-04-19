@@ -25,6 +25,7 @@ import Field from "./views/miwi-vue/Field.vue";
 import Icon from "./views/miwi-vue/Icon.vue";
 import Page from "./views/miwi-vue/Page.vue";
 import Text from "./views/miwi-vue/Text.vue";
+import Text from "./miwi-md/Text.vue";
 // End Generated Imports
 CapacitorUpdater.notifyAppReady();
 
@@ -48,6 +49,7 @@ vueApp.component("Button", Button);
 vueApp.component("Field", Field);
 vueApp.component("Icon", Icon);
 vueApp.component("Page", Page);
+vueApp.component("Text", Text);
 vueApp.component("Text", Text);
 // End Generated Components
 // vueApp.config.globalProperties.$align = Align;

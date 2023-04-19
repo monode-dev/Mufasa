@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { mdColors } from "./views/miwi-vue/B.vue";
+import { mdColors } from "./miwi-md/B.vue";
 
 export const colors = {
   white: `#ffffffff`,
