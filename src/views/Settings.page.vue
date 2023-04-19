@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { pageTransitions } from "@/Nav";
 import { appVersion } from "@/AppDetails";
-import Mufasa from "@/Mufasa";
+// import Mufasa from "@/Mufasa";
 </script>
 
 <script lang="ts">
@@ -13,6 +13,6 @@ export default {
 <template>
   <AppBar>Settings</AppBar>
   <Body>
-    <Text hint>Version: {{ Mufasa.appVersion }}</Text>
+    <Text hint>Version: {{ appVersion }}</Text>
   </Body>
 </template>

@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useNav } from "./Nav";
-import AutoUpdateLoadingScreen from "./views/AutoUpdateLoadingScreen.vue";
-import B, { Align, mdColors, Axis, sizeToCss } from "./views/miwi-vue/B.vue";
-import Icon from "@/views/miwi-vue/Icon.vue";
+import { Align, mdColors, Axis, sizeToCss } from "@/miwi-md/B.vue";
 import nowWiFiSvg from "@/assets/wifi_off_FILL1_wght400_GRAD0_opsz48.svg";
 import { Network } from "@capacitor/network";
 import { pageTransitions } from "@/Nav";
-import Page from "@/views/miwi-vue/Page.vue";
 
 const nav = useNav();
 const pageIdTag = `_miwi_page_`;

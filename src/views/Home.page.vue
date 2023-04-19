@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { ComponentPublicInstance, onMounted, ref, watchEffect } from "vue";
 import { SplashScreen } from "@capacitor/splash-screen";
-import {
-  Sty,
-  Axis,
-  Align,
-  mdColors,
-  Spacing,
-  Overflow,
-} from "@/views/miwi-vue/B.vue";
+import { Sty, Axis, Align, mdColors, Spacing, Overflow } from "@/miwi-md/B.vue";
 import { pushPage } from "@/Nav";
 import ConfettiExplosion from "vue-confetti-explosion";
 import { gsap } from "gsap";

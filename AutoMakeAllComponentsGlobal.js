@@ -12,19 +12,22 @@ export default function AutoMakeAllComponentsGlobal() {
     name: "vite-plugin-components-dts",
     async buildStart() {
       const vueFiles = await glob("**/*.vue", { ignore: "node_modules/**" });
-      updateComponentsDTS(vueFiles);
+      updateFiles(vueFiles);
 
-      watch("**/*.vue", {
-        ignored: "node_modules/**",
-        ignoreInitial: true,
-      })
-        .on("add", (path) => {
-          updateFiles([...vueFiles, path]);
+      // Check if Vite is in development mode
+      if (this.config.mode === "development") {
+        watch("**/*.vue", {
+          ignored: "node_modules/**",
+          ignoreInitial: true,
         })
-        .on("unlink", (path) => {
-          const updatedVueFiles = vueFiles.filter((file) => file !== path);
-          updateFiles(updatedVueFiles);
-        });
+          .on("add", (path) => {
+            updateFiles([...vueFiles, path]);
+          })
+          .on("unlink", (path) => {
+            const updatedVueFiles = vueFiles.filter((file) => file !== path);
+            updateFiles(updatedVueFiles);
+          });
+      }
     },
   };
 
@@ -99,7 +102,6 @@ declare module "@vue/runtime-core" {
         /\/\/ Begin Generated Components[\s\S]*?\/\/ End Generated Components/,
         `// Begin Generated Components\n${components}\n// End Generated Components`,
       );
-    console.log(updatedMainTS);
     writeFileSync(mainTSPath, updatedMainTS, "utf8");
   }
 
