@@ -63,7 +63,6 @@ watchEffect(() => {
       width: 10,
       height: 2,
       cornerRadius: 0.25,
-      background: mdColors.white,
       axis: Axis.column,
     }"
   >
@@ -76,20 +75,30 @@ watchEffect(() => {
       }"
     >
       <B :sty="{ height: 0.5 }" />
-      <input
-        :ref="inputRef"
-        type="text"
-        :value="value"
-        @input="handleInput"
-        @focus="handleFocus"
-        @blur="handleBlur"
-        :placeholder="hint"
-        class="field"
-        :style="{
-          [`--placeholder-color`]: hintColor,
-          caretColor: mdColors.green,
+      <B
+        :sty="{
+          width: `1f`,
+          height: `1f`,
+          axis: Axis.row,
         }"
-      />
+      >
+        <B :sty="{ width: 0.5 }" />
+        <input
+          :ref="inputRef"
+          type="text"
+          :value="value"
+          @input="handleInput"
+          @focus="handleFocus"
+          @blur="handleBlur"
+          :placeholder="hint"
+          class="field"
+          :style="{
+            [`--placeholder-color`]: hintColor,
+            caretColor: mdColors.green,
+          }"
+        />
+        <B :sty="{ width: 0.5 }" />
+      </B>
     </B>
 
     <!-- Underline -->
