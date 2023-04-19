@@ -11,7 +11,7 @@ import B, {
 } from "@/views/miwi-vue/B.vue";
 import MdPage from "@/views/miwi-vue/MdPage.vue";
 // import { usePageStore, pages } from "@/PageStore";
-import { useNav, allPages } from "@/Nav";
+import { pushPage } from "@/Nav";
 import ConfettiExplosion from "vue-confetti-explosion";
 import { gsap } from "gsap";
 import settingsSvg from "@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg";
@@ -21,12 +21,12 @@ import ClientsTab from "./clients/ClientsTab.vue";
 import Icon from "@/views/miwi-vue/Icon.vue";
 import Button from "./miwi-vue/Button.vue";
 import { count, incCount } from "@/firebase";
+import SettingsPage from "./Settings.page.vue";
 /* We do this here instead of at the end of AutoUpdateLoadingScreen
  * so that we never accidentally see the loading splash screen. */
 SplashScreen.hide();
 
 // const { pushPage } = usePageStore();
-const nav = useNav();
 // const { count, incCount } = useCountStore();
 
 const tab0Ref = ref<ComponentPublicInstance | null>(null);
@@ -140,7 +140,7 @@ watchEffect(async () => {
       <template #right>
         <Icon
           @click="
-            nav.pushPage(allPages.Settings)
+            pushPage(SettingsPage)
             //pushPage(pages.settings)
           "
           :size="1.25"

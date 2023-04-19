@@ -1,30 +1,66 @@
 import { defineStore } from "pinia";
 import { computed, reactive, Component } from "vue";
-import HomeVue from "@/views/Home.page.vue";
-import * as Home from "@/views/Home.page.vue";
-import SettingsVue from "@/views/Settings.page.vue";
-import * as Settings from "@/views/Settings.page.vue";
-import { PageTransition, pageTransitions } from "./PageTransitions";
+import { gsap } from "gsap";
 
-// Bank of all pages
+// Transitions
+export interface PageTransition {
+  enter: (el: Element, done: () => void) => void;
+  leave: (el: Element, done: () => void) => void;
+}
+function transitionFrom(options: gsap.TweenVars): PageTransition {
+  return {
+    enter(el, done) {
+      console.log(el);
+      gsap.from(el, {
+        ...options,
+        onComplete: done,
+      });
+    },
+    leave(el, done) {
+      console.log(`leave`);
+      gsap.to(el, {
+        ...options,
+        onComplete: done,
+      });
+    },
+  };
+}
+export const pageTransitions = {
+  from: transitionFrom,
+  slideUp: (options: gsap.TweenVars = {}) =>
+    transitionFrom({
+      duration: 0.15,
+      opacity: 0,
+      y: `50vh`,
+      ease: "power1.out",
+
+      // Allow overrides
+      ...options,
+    }),
+  fadeIn: (options: gsap.TweenVars = {}) =>
+    transitionFrom({
+      duration: 0.15,
+      opacity: 0,
+      ease: "power1.out",
+
+      // Allow overrides
+      ...options,
+    }),
+  none: {
+    enter(el, done) {
+      done();
+    },
+    leave(el, done) {
+      done();
+    },
+  } satisfies PageTransition,
+};
+
+// Nav Store
 export interface NavPage {
   component: Component;
   transitions: PageTransition;
 }
-export const allPages = {
-  Home: {
-    component: HomeVue,
-    transitions: (Home as any)?.transitions ?? pageTransitions.none,
-  },
-  Settings: {
-    component: SettingsVue,
-    transitions: (Settings as any)?.transitions ?? pageTransitions.none,
-  },
-} satisfies {
-  [key: string]: NavPage;
-};
-
-// Nav Store
 export const useNav = defineStore("navigator", () => {
   const openedPages = reactive<NavPage[]>([]);
 
@@ -39,3 +75,16 @@ export const useNav = defineStore("navigator", () => {
     currentPage: computed(() => openedPages[openedPages.length - 1]),
   };
 });
+
+export function pushPage(newPage: Component) {
+  const nav = useNav();
+  nav.pushPage({
+    component: newPage,
+    transitions: (newPage as any).transitions ?? pageTransitions.none,
+  });
+}
+
+export function popPage() {
+  const nav = useNav();
+  nav.popPage();
+}

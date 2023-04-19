@@ -9,8 +9,8 @@ import Icon from "@/views/miwi-vue/Icon.vue";
 // import router from '@/router';
 // import { usePageStore, pages } from '@/PageStore';
 // const { pushPage } = usePageStore();
-import { useNav, allPages } from "@/Nav";
-const nav = useNav();
+import { pushPage } from "@/Nav";
+import HomePage from "./Home.page.vue";
 const textSize = 1.25;
 
 // Check for updates
@@ -39,7 +39,7 @@ async function getAndApplyPatch() {
 
   // Start the app
   // pushPage(pages.home);
-  nav.pushPage(allPages.Home);
+  pushPage(HomePage);
 }
 </script>
 
