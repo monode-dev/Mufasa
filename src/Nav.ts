@@ -10,14 +10,12 @@ export interface PageTransition {
 function transitionFrom(options: gsap.TweenVars): PageTransition {
   return {
     enter(el, done) {
-      console.log(el);
       gsap.from(el, {
         ...options,
         onComplete: done,
       });
     },
     leave(el, done) {
-      console.log(`leave`);
       gsap.to(el, {
         ...options,
         onComplete: done,

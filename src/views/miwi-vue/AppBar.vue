@@ -2,6 +2,7 @@
 import { defineProps, PropType } from "vue";
 import B, { Align, mdColors, Axis, Sty } from "./B.vue";
 import { useNav } from "@/Nav";
+import Icon from "./Icon.vue";
 import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
 
 const nav = useNav();
@@ -43,14 +44,14 @@ const props = defineProps({
           align: Align.centerLeft,
         }"
       >
-        <Icon
-          v-if="!$slots.left && nav.openedPages.length > 1"
-          @click="nav.popPage()"
-          :size="1.25"
-          :icon="backSvg"
-          alt="Back Icon"
-        />
-        <slot name="left"></slot>
+        <slot name="left">
+          <Icon
+            v-if="nav.openedPages.length > 1"
+            @click="nav.popPage()"
+            :size="1.25"
+            :icon="backSvg"
+            alt="Back Icon"
+        /></slot>
       </B>
 
       <!-- Title / Center -->
@@ -59,6 +60,7 @@ const props = defineProps({
           width: `3f`,
           align: Align.center,
           textIsBold: true,
+          axis: Axis.row,
           // shouldLog: true,
         }"
       >
