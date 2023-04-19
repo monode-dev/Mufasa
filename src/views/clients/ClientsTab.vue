@@ -1,50 +1,63 @@
 <script setup lang="ts">
-import ClientEntry from '@/views/clients/ClientEntry.vue';
-import MdBody from '@/views/miwi-vue/Body.vue';
-import B, { Sty, Axis, Align ,mdColors, Spacing, Overflow }  from '../miwi-vue/B.vue';
-import Icon from '@/views/miwi-vue/Icon.vue';
-import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
+import ClientEntry from "@/views/clients/ClientEntry.vue";
+import {
+  Sty,
+  Axis,
+  Align,
+  mdColors,
+  Spacing,
+  Overflow,
+} from "../miwi-vue/B.vue";
+import addSvg from "@/assets/add_FILL1_wght400_GRAD0_opsz48.svg";
 </script>
 
 <template>
-  <B :sty="{
-    width: `1f`,
-    height: `1f`,
-    axis: Axis.column,
-  }">
-    <B :sty="{
+  <B
+    :sty="{
       width: `1f`,
-      background: mdColors.green,
-      axis: Axis.row,
-      padding: 0.5,
-      shadowSize: 1.25,
-      shadowDirection: Align.bottomCenter,
-      spacing: 0.5,
-      // cornerRadius: [0, 0, 0.75, 0.75],
-    }">
-      <B :sty="{
+      height: `1f`,
+      axis: Axis.column,
+    }"
+  >
+    <B
+      :sty="{
         width: `1f`,
-        padding: 0.25,
-        cornerRadius: 0.75,
-        align: Align.centerLeft,
-        background: mdColors.white,
-        textColor: mdColors.grey,
+        background: mdColors.green,
         axis: Axis.row,
-      }">
-        <B :sty="{ width: 0.25, }" />
+        padding: 0.5,
+        shadowSize: 1.25,
+        shadowDirection: Align.bottomCenter,
+        spacing: 0.5,
+        // cornerRadius: [0, 0, 0.75, 0.75],
+      }"
+    >
+      <B
+        :sty="{
+          width: `1f`,
+          padding: 0.25,
+          cornerRadius: 0.75,
+          align: Align.centerLeft,
+          background: mdColors.white,
+          textColor: mdColors.grey,
+          axis: Axis.row,
+        }"
+      >
+        <B :sty="{ width: 0.25 }" />
         Add New or Search
-        <B :sty="{ width: 0.25, }" />
+        <B :sty="{ width: 0.25 }" />
       </B>
-      <B :sty="{
-        align: Align.center,
-        textColor: mdColors.white,
-      }">
-        <Icon :size="1.5" :icon="addSvg" alt="Add Icon"/>
+      <B
+        :sty="{
+          align: Align.center,
+          textColor: mdColors.white,
+        }"
+      >
+        <Icon :size="1.5" :icon="addSvg" alt="Add Icon" />
       </B>
     </B>
 
     <!-- Body -->
-    <MdBody>
+    <Body>
       <ClientEntry name="A&P Logging"></ClientEntry>
       <ClientEntry name="Aaron Hohman"></ClientEntry>
       <ClientEntry name="Abigail Rodgers"></ClientEntry>
@@ -73,6 +86,6 @@ import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';
       <ClientEntry name="Bart Masciarelli"></ClientEntry>
       <ClientEntry name="BBMD-Medford, Boise Phoenix"></ClientEntry>
       <ClientEntry name="Bear Creek Orchard"></ClientEntry>
-    </MdBody>
+    </Body>
   </B>
 </template>

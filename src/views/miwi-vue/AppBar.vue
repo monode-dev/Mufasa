@@ -6,6 +6,9 @@ import Icon from "./Icon.vue";
 import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
 
 const nav = useNav();
+// We dont want this to be reactive since it should only change between loads.
+// There is probably a less hacky way to do this.
+const numOpenPages = nav.openedPages.length;
 
 // Allow overriding of the default sty
 const props = defineProps({
@@ -46,7 +49,7 @@ const props = defineProps({
       >
         <slot name="left">
           <Icon
-            v-if="nav.openedPages.length > 1"
+            v-if="numOpenPages > 1"
             @click="nav.popPage()"
             :size="1.25"
             :icon="backSvg"

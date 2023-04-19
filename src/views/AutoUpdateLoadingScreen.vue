@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { onMounted, Ref, ref } from "vue";
-import B, { Sty, Axis, Align, mdColors, Spacing } from "@/views/miwi-vue/B.vue";
+import { Sty, Axis, Align, mdColors, Spacing } from "@/views/miwi-vue/B.vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { SplashScreen } from "@capacitor/splash-screen";
-import Page from "@/views/miwi-vue/Page.vue";
 import updatingIcon from "@/assets/download_FILL1_wght400_GRAD0_opsz48.svg";
-import Icon from "@/views/miwi-vue/Icon.vue";
 // import router from '@/router';
 // import { usePageStore, pages } from '@/PageStore';
 // const { pushPage } = usePageStore();

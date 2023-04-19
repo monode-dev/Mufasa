@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ComponentPublicInstance, onMounted, ref, watchEffect } from "vue";
 import { SplashScreen } from "@capacitor/splash-screen";
-import B, {
+import {
   Sty,
   Axis,
   Align,
@@ -9,16 +9,10 @@ import B, {
   Spacing,
   Overflow,
 } from "@/views/miwi-vue/B.vue";
-import Page from "@/views/miwi-vue/Page.vue";
 import { pushPage } from "@/Nav";
 import ConfettiExplosion from "vue-confetti-explosion";
 import { gsap } from "gsap";
 import settingsSvg from "@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg";
-import AppBar from "@/views/miwi-vue/AppBar.vue";
-import Body from "@/views/miwi-vue/Body.vue";
-import ClientsTab from "./clients/ClientsTab.vue";
-import Icon from "@/views/miwi-vue/Icon.vue";
-import Button from "./miwi-vue/Button.vue";
 import { count, incCount } from "@/firebase";
 import SettingsPage from "./Settings.page.vue";
 /* We do this here instead of at the end of AutoUpdateLoadingScreen
@@ -132,105 +126,88 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <Page>
-    <AppBar>
-      Fuel Calculator
-      <template #right>
-        <Icon
-          @click="
-            pushPage(SettingsPage)
-            //pushPage(pages.settings)
-          "
-          :size="1.25"
-          :icon="settingsSvg"
-          alt="Settings Icon"
-        />
-      </template>
-      <template #bottom>
-        <B
-          :sty="{
-            width: `1f`,
-            axis: Axis.row,
-            align: Align.center,
-            spacing: Spacing.spaceAround,
-          }"
-        >
-          <B
-            :sty="tabButtonSty"
-            class="tab0"
-            ref="tab0Ref"
-            @click="selectTab(0)"
-          >
-            Clients
-          </B>
-          <B
-            :sty="tabButtonSty"
-            class="tab1"
-            ref="tab1Ref"
-            @click="selectTab(1)"
-          >
-            Deliveries
-          </B>
-          <B
-            :sty="tabButtonSty"
-            class="tab2"
-            ref="tab2Ref"
-            @click="selectTab(2)"
-          >
-            Calculator
-          </B>
+  <AppBar>
+    Fuel Calculator
+    <template #right>
+      <Icon
+        @click="
+          pushPage(SettingsPage)
+          //pushPage(pages.settings)
+        "
+        :size="1.25"
+        :icon="settingsSvg"
+        alt="Settings Icon"
+      />
+    </template>
+    <template #bottom>
+      <B
+        :sty="{
+          width: `1f`,
+          axis: Axis.row,
+          align: Align.center,
+          spacing: Spacing.spaceAround,
+        }"
+      >
+        <B :sty="tabButtonSty" class="tab0" ref="tab0Ref" @click="selectTab(0)">
+          Clients
         </B>
-        <B :sty="tabUnderlineRegionSty">
-          <B :sty="tabUnderlineFillerSty" />
-          <B :sty="tabUnderlineSty" ref="tabUnderline" />
-          <B :sty="tabUnderlineFillerSty" />
+        <B :sty="tabButtonSty" class="tab1" ref="tab1Ref" @click="selectTab(1)">
+          Deliveries
         </B>
-      </template>
-    </AppBar>
+        <B :sty="tabButtonSty" class="tab2" ref="tab2Ref" @click="selectTab(2)">
+          Calculator
+        </B>
+      </B>
+      <B :sty="tabUnderlineRegionSty">
+        <B :sty="tabUnderlineFillerSty" />
+        <B :sty="tabUnderlineSty" ref="tabUnderline" />
+        <B :sty="tabUnderlineFillerSty" />
+      </B>
+    </template>
+  </AppBar>
 
-    <!-- Body -->
+  <!-- Body -->
+  <B
+    ref="tabBodiesParent"
+    :sty="{
+      width: `300%`,
+      height: `1f`,
+      axis: Axis.row,
+      align: Align.topCenter,
+      overflowX: Overflow.crop,
+    }"
+  >
+    <ClientsTab />
     <B
-      ref="tabBodiesParent"
       :sty="{
-        width: `300%`,
+        width: `1f`,
         height: `1f`,
-        axis: Axis.row,
-        align: Align.topCenter,
-        overflowX: Overflow.crop,
       }"
     >
-      <ClientsTab />
-      <B
-        :sty="{
-          width: `1f`,
-          height: `1f`,
-        }"
-      >
-        <Body :sty="{ align: Align.center }">
-          <B>
-            Database Sync Tester
-            <component
-              :is="ConfettiExplosion"
-              v-if="shouldShowConfetti"
-              :force="0.75"
-              :duration="3000"
-              :stageHeight="2000"
-              :stageWidth="1500"
-            />
-          </B>
-          <Button @click="incCount"> Count: {{ count }} </Button>
-        </Body>
-      </B>
-      <B
-        :sty="{
-          width: `1f`,
-          height: `1f`,
-        }"
-      >
-        <Body :sty="{ align: Align.center, textColor: mdColors.grey }">
-          Calculator Comming Soon...
-        </Body>
-      </B>
+      <Body :sty="{ align: Align.center }">
+        <B>
+          Database Sync Tester
+          <component
+            :is="ConfettiExplosion"
+            v-if="shouldShowConfetti"
+            :force="0.75"
+            :duration="3000"
+            :stageHeight="2000"
+            :stageWidth="1500"
+          />
+        </B>
+        <Button @click="incCount"> Count: {{ count }} </Button>
+      </Body>
     </B>
-  </Page>
+    <B
+      :sty="{
+        width: `1f`,
+        height: `1f`,
+      }"
+    >
+      <Body :sty="{ align: Align.center, textColor: mdColors.grey }">
+        Calculator Comming Soon...
+      </Body>
+    </B>
+  </B>
 </template>
