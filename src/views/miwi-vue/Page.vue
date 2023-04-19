@@ -15,7 +15,7 @@ const props = defineProps({
     width: `100%`,
     height: `100%`,
     background: `#f9fafdff`,
-    ...props.sty,
+    ...sty,
   }">
     <!-- Content -->
     <B :sty="{

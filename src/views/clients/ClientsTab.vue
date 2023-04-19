@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ClientEntry from '@/views/clients/ClientEntry.vue';
-import MdBody from '@/views/miwi-vue/MdBody.vue';
+import MdBody from '@/views/miwi-vue/Body.vue';
 import B, { Sty, Axis, Align ,mdColors, Spacing, Overflow }  from '../miwi-vue/B.vue';
 import Icon from '@/views/miwi-vue/Icon.vue';
 import addSvg from '@/assets/add_FILL1_wght400_GRAD0_opsz48.svg';

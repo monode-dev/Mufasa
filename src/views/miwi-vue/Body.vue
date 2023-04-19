@@ -23,7 +23,7 @@ const props = defineProps({
     spacing: 1,
     overflowY: `scroll`,
     overflowX: `crop`,
-    ...props.sty,
+    ...sty,
   }">
     <slot />
   </B>

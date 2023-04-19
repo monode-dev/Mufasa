@@ -9,14 +9,13 @@ import B, {
   Spacing,
   Overflow,
 } from "@/views/miwi-vue/B.vue";
-import MdPage from "@/views/miwi-vue/MdPage.vue";
-// import { usePageStore, pages } from "@/PageStore";
+import Page from "@/views/miwi-vue/Page.vue";
 import { pushPage } from "@/Nav";
 import ConfettiExplosion from "vue-confetti-explosion";
 import { gsap } from "gsap";
 import settingsSvg from "@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg";
-import MdAppBar from "@/views/miwi-vue/MdAppBar.vue";
-import MdBody from "@/views/miwi-vue/MdBody.vue";
+import AppBar from "@/views/miwi-vue/AppBar.vue";
+import Body from "@/views/miwi-vue/Body.vue";
 import ClientsTab from "./clients/ClientsTab.vue";
 import Icon from "@/views/miwi-vue/Icon.vue";
 import Button from "./miwi-vue/Button.vue";
@@ -133,10 +132,9 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <MdPage>
-    <!-- App Bar -->
-    <MdAppBar>
-      <template #title> Fuel Calculator </template>
+  <Page>
+    <AppBar>
+      Fuel Calculator
       <template #right>
         <Icon
           @click="
@@ -188,7 +186,7 @@ watchEffect(async () => {
           <B :sty="tabUnderlineFillerSty" />
         </B>
       </template>
-    </MdAppBar>
+    </AppBar>
 
     <!-- Body -->
     <B
@@ -208,7 +206,7 @@ watchEffect(async () => {
           height: `1f`,
         }"
       >
-        <MdBody :sty="{ align: Align.center }">
+        <Body :sty="{ align: Align.center }">
           <B>
             Database Sync Tester
             <component
@@ -221,7 +219,7 @@ watchEffect(async () => {
             />
           </B>
           <Button @click="incCount"> Count: {{ count }} </Button>
-        </MdBody>
+        </Body>
       </B>
       <B
         :sty="{
@@ -229,10 +227,10 @@ watchEffect(async () => {
           height: `1f`,
         }"
       >
-        <MdBody :sty="{ align: Align.center, textColor: mdColors.grey }">
+        <Body :sty="{ align: Align.center, textColor: mdColors.grey }">
           Calculator Comming Soon...
-        </MdBody>
+        </Body>
       </B>
     </B>
-  </MdPage>
+  </Page>
 </template>

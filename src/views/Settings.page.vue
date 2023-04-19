@@ -1,20 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { popPage, pageTransitions } from "@/Nav";
-import { CapacitorUpdater } from "@capgo/capacitor-updater";
+import { pageTransitions } from "@/Nav";
 import B, { mdColors } from "@/views/miwi-vue/B.vue";
-import MdPage from "@/views/miwi-vue/MdPage.vue";
-import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
-import MdAppBar from "@/views/miwi-vue/MdAppBar.vue";
-import MdBody from "@/views/miwi-vue/MdBody.vue";
-import Icon from "@/views/miwi-vue/Icon.vue";
-
-const versionNumText = ref("0.0.0");
-updateVersionNumText();
-async function updateVersionNumText() {
-  const currentVersionInfo = await CapacitorUpdater.current();
-  versionNumText.value = currentVersionInfo.bundle.version;
-}
+import Page from "@/views/miwi-vue/Page.vue";
+import AppBar from "@/views/miwi-vue/AppBar.vue";
+import Body from "@/views/miwi-vue/Body.vue";
+import { appVersion } from "@/AppDetails";
 </script>
 
 <script lang="ts">
@@ -24,19 +14,11 @@ export default {
 </script>
 
 <template>
-  <MdPage>
-    <!-- App Bar -->
-    <MdAppBar>
-      <template #left>
-        <Icon @click="popPage()" :size="1.25" :icon="backSvg" alt="Back Icon" />
-      </template>
-      <template #title> Settings </template>
-    </MdAppBar>
-
-    <!-- Body -->
-    <MdBody>
-      <!-- Version Number -->
-      <B :sty="{ textColor: mdColors.grey }"> Version: {{ versionNumText }} </B>
-    </MdBody>
-  </MdPage>
+  <Page>
+    <AppBar>Settings</AppBar>
+    <Body>
+      <!-- <Text preset="hint">Version: {{ appVersion }}</Text> -->
+      <B :sty="{ textColor: mdColors.grey }"> Version: {{ appVersion }} </B>
+    </Body>
+  </Page>
 </template>
