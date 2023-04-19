@@ -30,6 +30,9 @@ async function getAndApplyPatch() {
         version: latest.version,
       });
 
+      // Show the splash screen again
+      await SplashScreen.show();
+
       // Apply the patch
       await CapacitorUpdater.set({ id: patchData.id });
     }

@@ -127,7 +127,7 @@ export const mdColors = {
 } as const;
 const fontSizeToHtmlUnit = 0.825;
 export function sizeToCss(num: number | string) {
-  return isNum(num) ? `calc(${num * (1.125 / fontSizeToHtmlUnit)}rem)` : num;
+  return isNum(num) ? `${num * (1.125 / fontSizeToHtmlUnit)}rem` : num;
 }
 function numToFontSize(num: number) {
   return sizeToCss(fontSizeToHtmlUnit * num);

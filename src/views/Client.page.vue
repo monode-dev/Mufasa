@@ -51,8 +51,6 @@ export default {
       <UnderlineField hint="Name" v-model:value="name" />
       <UnderlineField hint="Phone" v-model:value="phone" />
       <UnderlineField hint="Address" v-model:value="address" />
-      <UnderlineField hint="Phone" v-model:value="phone" />
-      <UnderlineField hint="Address" v-model:value="address" />
       <UnderlineField hint="Notes" v-model:value="notes" />
     </MdBody>
   </MdPage>
