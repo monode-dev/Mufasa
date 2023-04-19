@@ -62,8 +62,7 @@ watchEffect(() => {
     :sty="{
       width: 10,
       height: 2,
-      cornerRadius: 0.25,
-      axis: Axis.column,
+      ...sty,
     }"
   >
     <!-- Input -->
@@ -74,7 +73,7 @@ watchEffect(() => {
         axis: Axis.column,
       }"
     >
-      <B :sty="{ height: 0.5 }" />
+      <B :sty="{ height: 0.125 }" />
       <B
         :sty="{
           width: `1f`,
@@ -97,7 +96,7 @@ watchEffect(() => {
             caretColor: mdColors.green,
           }"
         />
-        <B :sty="{ width: 0.5 }" />
+        <B :sty="{ width: 0.125 }" />
       </B>
     </B>
 

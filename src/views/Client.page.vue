@@ -19,7 +19,10 @@ async function updateVersionNumText() {
   versionNumText.value = currentVersionInfo.bundle.version;
 }
 
-const text = ref("");
+const name = ref("");
+const phone = ref("");
+const address = ref("");
+const notes = ref("");
 </script>
 
 <script lang="ts">
@@ -45,9 +48,10 @@ export default {
 
     <!-- Body -->
     <MdBody>
-      <!-- Version Number -->
-      <B :sty="{ textColor: mdColors.grey }"> Coming Soon. </B>
-      <UnderlineField v-model:value="text" />
+      <UnderlineField hint="Name" v-model:value="name" />
+      <UnderlineField hint="Phone" v-model:value="phone" />
+      <UnderlineField hint="Address" v-model:value="address" />
+      <UnderlineField hint="Notes" v-model:value="notes" />
     </MdBody>
   </MdPage>
 </template>
