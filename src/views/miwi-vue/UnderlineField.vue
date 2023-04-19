@@ -104,7 +104,7 @@ watchEffect(() => {
     <B
       :sty="{
         width: `1f`,
-        height: 0.125,
+        height: 0.0625,
         background: inputElementHasFocus ? mdColors.green : mdColors.black,
       }"
     />
