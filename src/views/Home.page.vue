@@ -1,109 +1,17 @@
 <script setup lang="ts">
-import { ComponentPublicInstance, onMounted, ref, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { Sty, Axis, Align, mdColors, Spacing, Overflow } from "@/miwi-md/B.vue";
+import { Align, mdColors } from "@/miwi-md/B.vue";
 import { pushPage } from "@/Nav";
 import ConfettiExplosion from "vue-confetti-explosion";
-import { gsap } from "gsap";
 import settingsSvg from "@/assets/settings_FILL1_wght400_GRAD0_opsz48.svg";
-import { count, incCount } from "@/firebase";
 import SettingsPage from "./Settings.page.vue";
+import { count, incCount } from "@/firebase";
 /* We do this here instead of at the end of AutoUpdateLoadingScreen
  * so that we never accidentally see the loading splash screen. */
 SplashScreen.hide();
 
-// const { pushPage } = usePageStore();
-// const { count, incCount } = useCountStore();
-
-const tab0Ref = ref<ComponentPublicInstance | null>(null);
-const tab1Ref = ref<ComponentPublicInstance | null>(null);
-const tab2Ref = ref<ComponentPublicInstance | null>(null);
-const tabUnderline = ref<ComponentPublicInstance | null>(null);
-const tabBodiesParent = ref<ComponentPublicInstance | null>(null);
 const selectedTab = ref(1);
-function selectTab(newTab: number) {
-  if (newTab === selectedTab.value) return;
-  selectedTab.value = newTab;
-  const newUnderlinePosition =
-    newTab === 0
-      ? tab1Ref.value!.$el.offsetLeft - tab2Ref.value!.$el.offsetLeft
-      : newTab === 1
-      ? 0
-      : tab2Ref.value!.$el.offsetLeft - tab1Ref.value!.$el.offsetLeft;
-  const newTabPosition = newTab === 0 ? `100vw` : newTab === 1 ? 0 : `-100vw`;
-  gsap.to(tabUnderline.value!.$el, {
-    duration: 0.15,
-    x: newUnderlinePosition,
-    ease: "power1.out",
-  });
-  gsap.to(tabBodiesParent.value!.$el, {
-    duration: 0.15,
-    x: newTabPosition,
-    ease: "power1.out",
-  });
-}
-
-// Swipe gesture
-onMounted(() => {
-  let swipeStartTime = 0;
-  let swipeStartX = 0;
-  let swipeStartY = 0;
-  let lastSwipeX = 0;
-  let lastSwipeY = 0;
-  tabBodiesParent.value?.$el.addEventListener("touchstart", (e: TouchEvent) => {
-    const touch = e.touches[0];
-    swipeStartX = touch.clientX;
-    swipeStartY = touch.clientY;
-    lastSwipeX = touch.clientX;
-    lastSwipeY = touch.clientY;
-    swipeStartTime = Date.now();
-  });
-  tabBodiesParent.value?.$el.addEventListener("touchmove", (e: TouchEvent) => {
-    const touch = e.touches[0];
-    lastSwipeX = touch.clientX;
-    lastSwipeY = touch.clientY;
-  });
-  tabBodiesParent.value?.$el.addEventListener("touchend", (e: TouchEvent) => {
-    const deltaX = lastSwipeX - swipeStartX;
-    const deltaY = lastSwipeY - swipeStartY;
-    const deltaTime = Date.now() - swipeStartTime;
-    const velocityX = deltaX / deltaTime;
-    if (
-      Math.abs(deltaX) > Math.abs(deltaY) &&
-      Math.abs(deltaX) > 50 &&
-      Math.abs(velocityX) > 0.2
-    ) {
-      // e.preventDefault();
-      if (deltaX > 0) {
-        selectTab(Math.max(0, selectedTab.value - 1));
-      } else {
-        selectTab(Math.min(2, selectedTab.value + 1));
-      }
-    }
-  });
-});
-
-// Sty
-const tabButtonWidth = 4.75;
-const tabButtonSty: Partial<Sty> = {
-  width: tabButtonWidth,
-};
-const tabUnderlineRegionSty: Partial<Sty> = {
-  width: `1f`,
-  height: 0.375,
-  axis: Axis.row,
-  align: Align.bottomCenter,
-  spacing: Spacing.spaceAround,
-};
-const tabUnderlineFillerSty: Partial<Sty> = {
-  width: tabButtonWidth,
-  height: 0.125,
-};
-const tabUnderlineSty: Partial<Sty> = {
-  width: tabButtonWidth,
-  height: 0.125,
-  background: mdColors.sameAsText,
-};
 
 // Confetti
 const shouldShowConfetti = ref(false);
@@ -133,50 +41,19 @@ watchEffect(async () => {
       />
     </template>
     <template #bottom>
-      <B
-        :sty="{
-          width: `1f`,
-          axis: Axis.row,
-          align: Align.center,
-          spacing: Spacing.spaceAround,
-        }"
-      >
-        <B :sty="tabButtonSty" class="tab0" ref="tab0Ref" @click="selectTab(0)">
-          Clients
-        </B>
-        <B :sty="tabButtonSty" class="tab1" ref="tab1Ref" @click="selectTab(1)">
-          Deliveries
-        </B>
-        <B :sty="tabButtonSty" class="tab2" ref="tab2Ref" @click="selectTab(2)">
-          Calculator
-        </B>
-      </B>
-      <B :sty="tabUnderlineRegionSty">
-        <B :sty="tabUnderlineFillerSty" />
-        <B :sty="tabUnderlineSty" ref="tabUnderline" />
-        <B :sty="tabUnderlineFillerSty" />
-      </B>
+      <TabButtons
+        v-model:selectedTab="selectedTab"
+        :labels="[`Clients`, `Deliveries`, `Calculator`]"
+      />
     </template>
   </AppBar>
 
   <!-- Body -->
-  <B
-    ref="tabBodiesParent"
-    :sty="{
-      width: `300%`,
-      height: `1f`,
-      axis: Axis.row,
-      align: Align.topCenter,
-      overflowX: Overflow.crop,
-    }"
-  >
-    <ClientsTab />
-    <B
-      :sty="{
-        width: `1f`,
-        height: `1f`,
-      }"
-    >
+  <TabView v-model:selectedTab="selectedTab">
+    <template #tab0>
+      <ClientsTab />
+    </template>
+    <template #tab1>
       <Body :sty="{ align: Align.center }">
         <B>
           Database Sync Tester
@@ -191,16 +68,11 @@ watchEffect(async () => {
         </B>
         <Button @click="incCount"> Count: {{ count }} </Button>
       </Body>
-    </B>
-    <B
-      :sty="{
-        width: `1f`,
-        height: `1f`,
-      }"
-    >
+    </template>
+    <template #tab2>
       <Body :sty="{ align: Align.center, textColor: mdColors.grey }">
         Calculator Comming Soon...
       </Body>
-    </B>
-  </B>
+    </template>
+  </TabView>
 </template>

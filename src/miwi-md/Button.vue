@@ -19,6 +19,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  enabled: {
+    type: Boolean,
+    default: true,
+  },
 });
 </script>
 
