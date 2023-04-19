@@ -5,17 +5,22 @@ import { watch } from "chokidar";
 import glob from "fast-glob";
 
 export default function AutoMakeAllComponentsGlobal() {
+  let config;
   const componentsDTSPath = resolve(process.cwd(), "./src/components.d.ts");
   const mainTSPath = resolve(process.cwd(), "./src/main.ts");
 
   return {
     name: "vite-plugin-components-dts",
+    configResolved(resolvedConfig) {
+      // store the resolved config
+      config = resolvedConfig;
+    },
     async buildStart() {
       const vueFiles = await glob("**/*.vue", { ignore: "node_modules/**" });
       updateFiles(vueFiles);
 
       // Check if Vite is in development mode
-      if (this.config.mode === "development") {
+      if (config.mode === "development") {
         watch("**/*.vue", {
           ignored: "node_modules/**",
           ignoreInitial: true,
