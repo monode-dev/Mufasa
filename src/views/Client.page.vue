@@ -8,6 +8,7 @@ import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
 import MdAppBar from "@/views/miwi-vue/MdAppBar.vue";
 import MdBody from "@/views/miwi-vue/MdBody.vue";
 import Icon from "@/views/miwi-vue/Icon.vue";
+import UnderlineField from "./miwi-vue/UnderlineField.vue";
 
 const nav = useNav();
 
@@ -17,6 +18,8 @@ async function updateVersionNumText() {
   const currentVersionInfo = await CapacitorUpdater.current();
   versionNumText.value = currentVersionInfo.bundle.version;
 }
+
+const text = ref("");
 </script>
 
 <script lang="ts">
@@ -44,6 +47,7 @@ export default {
     <MdBody>
       <!-- Version Number -->
       <B :sty="{ textColor: mdColors.grey }"> Coming Soon. </B>
+      <UnderlineField v-model:value="text" />
     </MdBody>
   </MdPage>
 </template>
