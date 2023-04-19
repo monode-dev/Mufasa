@@ -8,7 +8,7 @@ import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
 import MdAppBar from "@/views/miwi-vue/MdAppBar.vue";
 import MdBody from "@/views/miwi-vue/MdBody.vue";
 import Icon from "@/views/miwi-vue/Icon.vue";
-import UnderlineField from "./miwi-vue/UnderlineField.vue";
+import Field from "./miwi-vue/Field.vue";
 
 const nav = useNav();
 
@@ -48,10 +48,10 @@ export default {
 
     <!-- Body -->
     <MdBody>
-      <UnderlineField hint="Name" v-model:value="name" />
-      <UnderlineField hint="Phone" v-model:value="phone" />
-      <UnderlineField hint="Address" v-model:value="address" />
-      <UnderlineField hint="Notes" v-model:value="notes" />
+      <Field underlined hint="Name" v-model:value="name" />
+      <Field underlined hint="Phone" v-model:value="phone" />
+      <Field underlined hint="Address" v-model:value="address" />
+      <Field underlined hint="Notes" v-model:value="notes" />
     </MdBody>
   </MdPage>
 </template>

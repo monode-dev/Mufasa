@@ -7,6 +7,10 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  underlined: {
+    type: Boolean,
+    default: false,
+  },
   value: {
     type: String,
     default: "",
@@ -65,47 +69,67 @@ watchEffect(() => {
       ...sty,
     }"
   >
-    <!-- Input -->
-    <B
-      :sty="{
-        width: `1f`,
-        height: `1f`,
-        axis: Axis.column,
-      }"
-    >
-      <B :sty="{ height: 0.5 }" />
+    <!-- Underliened -->
+    <B v-if="underlined">
+      <!-- Input -->
       <B
         :sty="{
           width: `1f`,
           height: `1f`,
-          axis: Axis.row,
+          axis: Axis.column,
         }"
       >
-        <B :sty="{ width: 0.25 }" />
-        <input
-          :ref="inputRef"
-          type="text"
-          :value="value"
-          @input="handleInput"
-          @focus="handleFocus"
-          @blur="handleBlur"
-          :placeholder="hint"
-          class="field"
-          :style="{
-            [`--placeholder-color`]: hintColor,
-            caretColor: mdColors.green,
+        <B :sty="{ height: 0.5 }" />
+        <B
+          :sty="{
+            width: `1f`,
+            height: `1f`,
+            axis: Axis.row,
           }"
-        />
-        <B :sty="{ width: 0.25 }" />
+        >
+          <B :sty="{ width: 0.25 }" />
+          <input
+            :ref="inputRef"
+            type="text"
+            :value="value"
+            @input="handleInput"
+            @focus="handleFocus"
+            @blur="handleBlur"
+            :placeholder="hint"
+            class="field"
+            :style="{
+              [`--placeholder-color`]: hintColor,
+              caretColor: mdColors.green,
+            }"
+          />
+          <B :sty="{ width: 0.25 }" />
+        </B>
       </B>
+
+      <!-- Underline -->
+      <B
+        :sty="{
+          width: `1f`,
+          height: 0.075,
+          background: inputElementHasFocus ? mdColors.green : mdColors.black,
+        }"
+      />
     </B>
 
-    <!-- Underline -->
-    <B
-      :sty="{
-        width: `1f`,
-        height: 0.075,
-        background: inputElementHasFocus ? mdColors.green : mdColors.black,
+    <!-- Blank -->
+    <input
+      v-else
+      :ref="inputRef"
+      type="text"
+      :value="value"
+      @input="handleInput"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      :placeholder="hint"
+      class="field"
+      :style="{
+        [`--placeholder-color`]: hintColor,
+        caretColor: mdColors.green,
       }"
     />
   </B>
