@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useNav } from "./Nav";
-import { Align, mdColors, Axis, sizeToCss } from "@/miwi-md/B.vue";
-import nowWiFiSvg from "@/assets/wifi_off_FILL1_wght400_GRAD0_opsz48.svg";
-import { Network } from "@capacitor/network";
-import { pageTransitions } from "@/Nav";
+import { StyleValue } from "vue";
+import { useNav } from "@/Nav";
 
 const nav = useNav();
 const pageIdTag = `_miwi_page_`;
@@ -26,108 +22,40 @@ function onPageLeave(el: Element, done: () => void) {
   nextPageLeaveTransition = page?.transitions.leave;
 }
 
-const hasInternet = ref(true);
-Network.getStatus().then((status) => (hasInternet.value = status.connected));
-Network.addListener("networkStatusChange", (status) => {
-  hasInternet.value = status.connected;
-});
-const offlineWarningTransitions = pageTransitions.from({
-  duration: 0.15,
-  y: sizeToCss(4),
-  ease: "power1.out",
-});
+function pageWrapperStyle(zIndex: number): StyleValue {
+  return {
+    background: 'transparent',
+    width: '100%',
+    height: '100%',
+    top: '0px',
+    left: '0px',
+    position: 'absolute',
+    zIndex,
+  };
+}
 </script>
 
 <template>
-  <B
-    :sty="{
-      width: `100%`,
-      height: `100%`,
-    }"
-  >
+  <Box :sty="{
+    width: `100%`,
+    height: `100%`,
+  }">
     <!-- Openned Pages -->
-    <transition-group
-      appear
-      :css="false"
-      @enter="onPageEnter"
-      @leave="onPageLeave"
-    >
-      <div
-        v-for="(page, index) in nav.openedPages"
-        :key="index"
-        :id="`${pageIdTag}${index}`"
-        :style="{
-          background: 'transparent',
-          width: '100%',
-          height: '100%',
-          top: '0px',
-          left: '0px',
-          position: 'absolute',
-          zIndex: 10 + index * 10,
-        }"
-      >
-        <Page><component :is="page.component" /></Page>
+    <transition-group appear :css="false" @enter="onPageEnter" @leave="onPageLeave">
+      <div v-for="(page, index) in nav.openedPages" :key="index" :id="`${pageIdTag}${index}`"
+        :style="pageWrapperStyle(10 + index * 10)">
+        <Page>
+          <component :is="page.component" />
+        </Page>
       </div>
     </transition-group>
 
     <!-- Offline warning is infront of all pages. -->
-    <Transition
-      appear
-      @enter="offlineWarningTransitions.enter"
-      @leave="offlineWarningTransitions.leave"
-    >
-      <div
-        v-if="!hasInternet"
-        :style="{
-          background: `transparent`,
-          width: `100%`,
-          height: `100%`,
-          bottom: 0,
-          left: 0,
-          position: `absolute`,
-          pointerEvents: `none`,
-          zIndex: 999999998,
-        }"
-      >
-        <B
-          :sty="{
-            width: `100%`,
-            height: `100%`,
-            padding: 1,
-            align: Align.bottomLeft,
-          }"
-        >
-          <B
-            :sty="{
-              background: mdColors.orange,
-              textColor: mdColors.white,
-              cornerRadius: 1,
-              shadowDirection: Align.center,
-              shadowSize: 2,
-              padding: 0.5,
-              axis: Axis.row,
-              spacing: 0.5,
-            }"
-          >
-            <Icon :size="1" :icon="nowWiFiSvg" alt="Offline" />
-            Will Sync When Online
-          </B>
-        </B>
-      </div>
-    </Transition>
+    <OfflineWarning />
 
     <!-- Splash screen is in front of everything. -->
-    <div
-      v-if="nav.openedPages.length < 1"
-      :style="{
-        background: `transparent`,
-        width: `100%`,
-        height: `100%`,
-        position: `absolute`,
-        zIndex: 999999999,
-      }"
-    >
+    <div v-if="nav.openedPages.length < 1" :style="pageWrapperStyle(999999999)">
       <AutoUpdateLoadingScreen />
     </div>
-  </B>
+  </Box>
 </template>

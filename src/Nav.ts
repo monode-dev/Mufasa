@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, reactive, Component } from "vue";
 import { gsap } from "gsap";
+import { SplashScreen } from "@capacitor/splash-screen";
 
 // Transitions
 export interface PageTransition {
@@ -66,6 +67,12 @@ export const useNav = defineStore("navigator", () => {
     openedPages: openedPages,
     pushPage(newPage: NavPage) {
       openedPages.push(newPage);
+
+      /* We do this here instead of at the end of AutoUpdateLoadingScreen
+       * so that we never accidentally see the loading splash screen. */
+      if (openedPages.length === 1) {
+        SplashScreen.hide();
+      }
     },
     popPage() {
       openedPages.pop();

@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import { onMounted, Ref, ref } from "vue";
-import { Sty, Axis, Align, mdColors, Spacing } from "@/miwi-md/B.vue";
+import { mdColors } from "@/miwi-md/Box.vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { SplashScreen } from "@capacitor/splash-screen";
-import updatingIcon from "@/assets/download_FILL1_wght400_GRAD0_opsz48.svg";
-// import router from '@/router';
-// import { usePageStore, pages } from '@/PageStore';
-// const { pushPage } = usePageStore();
 import { pushPage } from "@/Nav";
-import HomePage from "./Home.page.vue";
+import HomePage from "@/views/Home.page.vue";
 const textSize = 1.25;
 
 // Check for updates
@@ -30,16 +25,12 @@ async function getAndApplyPatch() {
 
       // Apply the patch
       await CapacitorUpdater.set({ id: patchData.id });
-
-      // Show the splash screen again
-      // await SplashScreen.show();
     }
   } catch (e) {
     console.error(e);
   }
 
   // Start the app
-  // pushPage(pages.home);
   pushPage(HomePage);
 }
 </script>
@@ -47,27 +38,17 @@ async function getAndApplyPatch() {
 <template>
   <Page :sty="{ background: mdColors.green }">
     <div class="prevent-select">
-      <B
-        :sty="{
-          align: Align.center,
-        }"
-      >
-        <Icon
-          :size="4"
-          :color="mdColors.white"
-          :icon="updatingIcon"
-          alt="Updating Icon"
-        />
-        <B
-          :sty="{
+      <Box :sty="{
+          align: $Align.center,
+          textColor: mdColors.white,
+        }">
+        <Icon :scale="4" :color="mdColors.white" icon="trayArrowDown" />
+        <Box :sty="{
             height: textSize,
-            textSize: textSize,
-            textColor: mdColors.white,
-          }"
-          >Updating...</B
-        >
-        <B :sty="{ height: 2 * textSize }"></B>
-      </B>
+            scale: textSize,
+          }">Updating...</Box>
+        <Box :sty="{ height: 2 * textSize }"></Box>
+      </Box>
     </div>
   </Page>
 </template>

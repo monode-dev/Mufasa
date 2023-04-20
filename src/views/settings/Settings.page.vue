@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { pageTransitions } from "@/Nav";
 import { appVersion } from "@/AppDetails";
-// import Mufasa from "@/Mufasa";
+
+function openTkeWebsite() {
+  window.open(`tke.us`, `_blank`);
+}
 </script>
 
 <script lang="ts">
@@ -12,7 +15,9 @@ export default {
 
 <template>
   <AppBar>Settings</AppBar>
+
   <Body>
     <Text hint>Version: {{ appVersion }}</Text>
+    <!-- <Text hint><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text> -->
   </Body>
 </template>

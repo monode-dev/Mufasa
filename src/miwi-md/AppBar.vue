@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import B, { Align, mdColors, Axis, Sty } from "@/miwi-md/B.vue";
+import Box, { Align, mdColors, Axis, Sty } from "./Box.vue";
 import { useNav } from "@/Nav";
-import Icon from "@/miwi-md/Icon.vue";
-import backSvg from "@/assets/arrow_back_FILL1_wght400_GRAD0_opsz48.svg";
+import Icon from "./Icon.vue";
 
 const nav = useNav();
 // We dont want this to be reactive since it should only change between loads.
@@ -20,75 +19,58 @@ const props = defineProps({
 </script>
 
 <template>
-  <B
-    :sty="{
-      width: `1f`,
-      background: mdColors.green,
-      shadowSize: 1.25,
-      shadowDirection: Align.bottomCenter,
-      align: Align.bottomCenter,
-      textColor: mdColors.white,
-      ...sty,
-    }"
-  >
+  <Box :sty="{
+    width: `1f`,
+    background: mdColors.green,
+    shadowSize: 1.25,
+    shadowDirection: Align.bottomCenter,
+    align: Align.bottomCenter,
+    textColor: mdColors.white,
+    ...sty,
+  }">
     <!-- Main Row -->
-    <B
-      :sty="{
+    <Box :sty="{
         width: `1f`,
         axis: Axis.row,
         padding: 0.5,
-        textSize: 1.5,
-      }"
-    >
+        scale: 1.5,
+      }">
       <!-- Left -->
-      <B
-        :sty="{
+      <Box :sty="{
           width: `1f`,
           align: Align.centerLeft,
-        }"
-      >
+        }">
         <slot name="left">
-          <Icon
-            v-if="numOpenPages > 1"
-            @click="nav.popPage()"
-            :size="1.25"
-            :icon="backSvg"
-            alt="Back Icon"
-        /></slot>
-      </B>
+          <Icon v-if="numOpenPages > 1" @click="nav.popPage()" :scale="1.25" icon="arrowLeft" alt="Back Icon" />
+        </slot>
+      </Box>
 
       <!-- Title / Center -->
-      <B
-        :sty="{
+      <Box :sty="{
           width: `3f`,
           align: Align.center,
           textIsBold: true,
           axis: Axis.row,
           // shouldLog: true,
-        }"
-      >
+        }">
         <slot></slot>
-      </B>
+      </Box>
 
       <!-- Right -->
-      <B
-        :sty="{
+      <Box :sty="{
           width: `1f`,
           align: Align.centerRight,
-        }"
-      >
+        }">
         <slot name="right"></slot>
-      </B>
-    </B>
+      </Box>
+    </Box>
 
     <!-- Bottom Row -->
-    <B
-      :sty="{
+    <Box :sty="{
         width: `1f`,
-        textSize: 1,
-      }"
-    >
+        scale: 1,
+      }">
       <slot name="bottom"></slot>
-    </B>
-  </B>
+    </Box>
+  </Box>
 </template>

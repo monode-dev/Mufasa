@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
-      "strict": true,
-      "target": "es2022",
-      "moduleResolution": "node",
-      "baseUrl": ".",
-      "allowJs": true,
-      "types": ["vite/client"],
-      "paths": {
-          "@/*": ["src/*"]
-      }
+    "strict": true,
+    "target": "es2022",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "allowJs": true,
+    "types": ["vite/client"],
+    "lib": ["ESNext", "DOM"],
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "esModuleInterop": true
   },
-  "include": ["env.d.ts", "src/**/*.vue", "src/**/*.ts"]
+  "include": ["env.d.ts", "src/**/*.vue", "src/**/*.ts", "types/global.d.ts"]
 }

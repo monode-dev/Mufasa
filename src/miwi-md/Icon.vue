@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
-import B, { FlexSize, mdColors } from './B.vue';
-import InlineSvg from 'vue-inline-svg';
+import Box, { FlexSize, mdColors } from './Box.vue';
 
 // Create a prop called size
 const props = defineProps({
@@ -9,35 +8,23 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  alt: {
-    type: String,
-    required: true,
-  },
   color: {
     type: String,
     default: mdColors.sameAsText,
   },
-  size: {
+  scale: {
     type: [Number, String, Object] as PropType<number | string | FlexSize>,
     default: 1,
   },
 });
+console.log(props.scale)
 </script>
 
 <template>
-  <B :sty="{
-    width: props.size,
-    height: props.size,
+  <Box :sty="{
+    width: scale,
+    height: scale,
   }">
-    <svg 
-      width="100%"
-      height="100%"
-      :fill="props.color"
-      :alt="props.alt">
-      <InlineSvg
-      width="100%"
-      height="100%"
-      :src="props.icon"></InlineSvg>
-    </svg>
-  </B>
+    <mdicon :name="icon" width="100%" height="100%" :fill="props.color" />
+  </Box>
 </template>

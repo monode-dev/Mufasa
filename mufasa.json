@@ -2,8 +2,8 @@
   "dfafca74-43a0-4034-ae63-50b7041d65b3": {
     "id": "dfafca74-43a0-4034-ae63-50b7041d65b3",
     "name": "Client",
-    "x": 550,
-    "y": 231,
+    "x": 512,
+    "y": 271,
     "code": "name: Text\r\naddresLine1: Text\r\naddressLine2: Text\r\nphone: Text\r\nemail: Text\r\ndeliveries: -|< Delivery"
   },
   "990e3ea5-04a6-4f41-bb15-c5e482616284": {
@@ -16,8 +16,8 @@
   "cloud": {
     "id": "cloud",
     "name": "Cloud",
-    "x": 179,
-    "y": 153,
+    "x": 186,
+    "y": 99,
     "code": "clients: -< Client"
   },
   "device": {

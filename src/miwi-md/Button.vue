@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import B, { Sty, mdColors, Axis } from "./B.vue";
+import Box, { Sty, mdColors, Axis, Align } from "./Box.vue";
+import { computed } from "@vue/reactivity";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -24,19 +25,36 @@ const props = defineProps({
     default: true,
   },
 });
+const shapeSty = computed(() => props.round ?
+  { cornerRadius: `100%` } : {
+    cornerRadius: 0.25,
+    padding: 0.5,
+  });
+const colorSty = computed(() => props.outlined ?
+  {
+    background: mdColors.white,
+    outlineColor: mdColors.green,
+    outlineSize: 0.125,
+  } satisfies Partial<Sty> : {
+    background: mdColors.green,
+    textColor: mdColors.white,
+  });
+const shadowSty = computed(() => props.raised ?
+  {
+    shadowSize: 1,
+    shadowDirection: Align.bottomRight,
+  } satisfies Partial<Sty> : {});
 </script>
 
 <template>
-  <B
-    :sty="{
-      cornerRadius: 0.25,
-      background: mdColors.green,
-      padding: 0.5,
-      axis: Axis.row,
-      textColor: mdColors.white,
-      ...sty,
-    }"
-  >
+  <Box :sty="{
+    align: Align.center,
+    axis: Axis.row,
+    ...shapeSty,
+    ...colorSty,
+    ...shadowSty,
+    ...sty,
+  }">
     <slot />
-  </B>
+  </Box>
 </template>

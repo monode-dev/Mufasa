@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
-import B, { Sty, Align, mdColors } from './B.vue';
+import Box, { Sty, Align, mdColors } from './Box.vue';
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -11,19 +11,19 @@ const props = defineProps({
 </script>
 
 <template>
-  <B :sty="{
+  <Box :sty="{
     width: `100%`,
     height: `100%`,
     background: `#f9fafdff`,
     ...sty,
   }">
     <!-- Content -->
-    <B :sty="{
+    <Box :sty="{
       width: `1f`,
       height: `1f`,
       align: Align.center,
     }">
       <slot />
-    </B>
-  </B>
+    </Box>
+  </Box>
 </template>

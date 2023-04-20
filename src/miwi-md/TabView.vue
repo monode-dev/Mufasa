@@ -7,7 +7,7 @@ import {
   ref,
   onMounted,
 } from "vue";
-import B, { Sty, Align, Axis, Overflow } from "./B.vue";
+import Box, { Sty, Align, Axis, Overflow } from "./Box.vue";
 import { gsap } from "gsap";
 
 // Allow overriding of the default sty
@@ -81,7 +81,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <B
+  <Box
     ref="tabBodiesParent"
     :sty="{
       width: `300%`,
@@ -91,29 +91,29 @@ onMounted(() => {
       overflowX: Overflow.crop,
     }"
   >
-    <B
+    <Box
       :sty="{
         width: `1f`,
         height: `1f`,
       }"
     >
       <slot name="tab0" />
-    </B>
-    <B
+    </Box>
+    <Box
       :sty="{
         width: `1f`,
         height: `1f`,
       }"
     >
       <slot name="tab1" />
-    </B>
-    <B
+    </Box>
+    <Box
       :sty="{
         width: `1f`,
         height: `1f`,
       }"
     >
       <slot name="tab2" />
-    </B>
-  </B>
+    </Box>
+  </Box>
 </template>

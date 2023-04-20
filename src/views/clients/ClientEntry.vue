@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { defineProps, PropType } from "vue";
-import { FlexSize, mdColors, Axis, Spacing } from "@/miwi-md/B.vue";
-import optionsSvg from "@/assets/more_vert_FILL1_wght400_GRAD0_opsz48.svg";
+import { defineProps } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
 
@@ -15,15 +13,12 @@ const props = defineProps({
 </script>
 
 <template>
-  <B
-    :onclick="() => pushPage(ClientPage)"
-    :sty="{
+  <Box :onclick="() => pushPage(ClientPage)" :sty="{
       width: `1f`,
-      spacing: Spacing.spaceBetween,
-      axis: Axis.row,
-    }"
-  >
+      spacing: $Spacing.spaceBetween,
+      axis: $Axis.row,
+    }">
     {{ props.name }}
-    <Icon :icon="optionsSvg" alt="Options" />
-  </B>
+    <Icon icon="dotsVertical" />
+  </Box>
 </template>

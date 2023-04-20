@@ -6,7 +6,7 @@ import {
   ref,
   ComponentPublicInstance,
 } from "vue";
-import B, { Sty, Axis, Align, mdColors, Spacing } from "./B.vue";
+import Box, { Sty, Axis, Align, mdColors, Spacing } from "./Box.vue";
 import { gsap } from "gsap";
 
 // Allow overriding of the default sty
@@ -54,7 +54,7 @@ const tabButtonWidth = 4.75;
 </script>
 
 <template>
-  <B
+  <Box
     :sty="{
       width: `1f`,
       axis: Axis.row,
@@ -63,17 +63,17 @@ const tabButtonWidth = 4.75;
       ...sty,
     }"
   >
-    <B :sty="{ width: tabButtonWidth }" ref="tab0Ref" @click="selectTab(0)">
+    <Box :sty="{ width: tabButtonWidth }" ref="tab0Ref" @click="selectTab(0)">
       Clients
-    </B>
-    <B :sty="{ width: tabButtonWidth }" ref="tab1Ref" @click="selectTab(1)">
+    </Box>
+    <Box :sty="{ width: tabButtonWidth }" ref="tab1Ref" @click="selectTab(1)">
       Deliveries
-    </B>
-    <B :sty="{ width: tabButtonWidth }" ref="tab2Ref" @click="selectTab(2)">
+    </Box>
+    <Box :sty="{ width: tabButtonWidth }" ref="tab2Ref" @click="selectTab(2)">
       Calculator
-    </B>
-  </B>
-  <B
+    </Box>
+  </Box>
+  <Box
     :sty="{
       width: `1f`,
       height: 0.375,
@@ -82,8 +82,8 @@ const tabButtonWidth = 4.75;
       spacing: Spacing.spaceAround,
     }"
   >
-    <B :sty="{ width: tabButtonWidth }" />
-    <B
+    <Box :sty="{ width: tabButtonWidth }" />
+    <Box
       :sty="{
         width: tabButtonWidth,
         height: 0.125,
@@ -91,6 +91,6 @@ const tabButtonWidth = 4.75;
       }"
       ref="tabUnderline"
     />
-    <B :sty="{ width: tabButtonWidth }" />
-  </B>
+    <Box :sty="{ width: tabButtonWidth }" />
+  </Box>
 </template>

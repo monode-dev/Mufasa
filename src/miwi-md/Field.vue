@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType, ref, VNodeRef, watchEffect } from "vue";
-import B, { Sty, mdColors, Axis } from "./B.vue";
+import Box, { Sty, mdColors, Axis } from "./Box.vue";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -61,7 +61,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <B
+  <Box
     @click="inputRef?.focus()"
     :sty="{
       width: 10,
@@ -70,24 +70,24 @@ watchEffect(() => {
     }"
   >
     <!-- Underliened -->
-    <B v-if="underlined">
+    <Box v-if="underlined">
       <!-- Input -->
-      <B
+      <Box
         :sty="{
           width: `1f`,
           height: `1f`,
           axis: Axis.column,
         }"
       >
-        <B :sty="{ height: 0.5 }" />
-        <B
+        <Box :sty="{ height: 0.5 }" />
+        <Box
           :sty="{
             width: `1f`,
             height: `1f`,
             axis: Axis.row,
           }"
         >
-          <B :sty="{ width: 0.25 }" />
+          <Box :sty="{ width: 0.25 }" />
           <input
             :ref="inputRef"
             type="text"
@@ -102,19 +102,19 @@ watchEffect(() => {
               caretColor: mdColors.green,
             }"
           />
-          <B :sty="{ width: 0.25 }" />
-        </B>
-      </B>
+          <Box :sty="{ width: 0.25 }" />
+        </Box>
+      </Box>
 
       <!-- Underline -->
-      <B
+      <Box
         :sty="{
           width: `1f`,
           height: 0.075,
           background: inputElementHasFocus ? mdColors.green : mdColors.black,
         }"
       />
-    </B>
+    </Box>
 
     <!-- Blank -->
     <input
@@ -132,7 +132,7 @@ watchEffect(() => {
         caretColor: mdColors.green,
       }"
     />
-  </B>
+  </Box>
 </template>
 
 <style scoped>

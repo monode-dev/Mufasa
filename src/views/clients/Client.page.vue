@@ -15,7 +15,11 @@ export default {
 </script>
 
 <template>
-  <AppBar>Client</AppBar>
+  <AppBar>Client
+    <template #right>
+      <SettingsButton />
+    </template>
+  </AppBar>
 
   <Body>
     <Field underlined hint="Name" v-model:value="name" />
