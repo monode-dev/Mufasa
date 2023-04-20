@@ -31,10 +31,7 @@ watchEffect(async () => {
     Fuel Calculator
     <template #right>
       <Icon
-        @click="
-          pushPage(SettingsPage)
-          //pushPage(pages.settings)
-        "
+        @click="pushPage(SettingsPage)"
         :size="1.25"
         :icon="settingsSvg"
         alt="Settings Icon"

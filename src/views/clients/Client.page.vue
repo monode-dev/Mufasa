@@ -17,7 +17,6 @@ export default {
 <template>
   <AppBar>Client</AppBar>
 
-  <!-- Body -->
   <Body>
     <Field underlined hint="Name" v-model:value="name" />
     <Field underlined hint="Phone" v-model:value="phone" />

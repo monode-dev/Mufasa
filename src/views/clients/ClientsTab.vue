@@ -49,7 +49,6 @@ import addSvg from "@/assets/add_FILL1_wght400_GRAD0_opsz48.svg";
       </B>
     </B>
 
-    <!-- Body -->
     <Body>
       <ClientEntry name="A&P Logging"></ClientEntry>
       <ClientEntry name="Aaron Hohman"></ClientEntry>
