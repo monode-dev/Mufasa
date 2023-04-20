@@ -24,9 +24,10 @@ const props = defineProps({
 
 <template>
   <Box :sty="{
-        textColor: hint ? mdColors.grey : undefined,
-        ...sty,
-      }">
+    textColor: hint ? mdColors.grey : undefined,
+    scale: heading ? 1.5 : title ? 1.25 : 1,
+    ...sty,
+  }">
     <slot></slot>
   </Box>
 </template>

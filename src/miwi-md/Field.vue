@@ -61,77 +61,49 @@ watchEffect(() => {
 </script>
 
 <template>
-  <Box
-    @click="inputRef?.focus()"
-    :sty="{
-      width: 10,
-      height: 2,
-      ...sty,
-    }"
-  >
+  <Box @click="inputRef?.focus()" :sty="{
+    width: 10,
+    height: 2,
+    ...sty,
+  }">
     <!-- Underliened -->
     <Box v-if="underlined">
       <!-- Input -->
-      <Box
-        :sty="{
+      <Box :sty="{
           width: `1f`,
           height: `1f`,
           axis: Axis.column,
-        }"
-      >
+        }">
         <Box :sty="{ height: 0.5 }" />
-        <Box
-          :sty="{
+        <Box :sty="{
             width: `1f`,
             height: `1f`,
             axis: Axis.row,
-          }"
-        >
+          }">
           <Box :sty="{ width: 0.25 }" />
-          <input
-            :ref="inputRef"
-            type="text"
-            :value="value"
-            @input="handleInput"
-            @focus="handleFocus"
-            @blur="handleBlur"
-            :placeholder="hint"
-            class="field"
-            :style="{
-              [`--placeholder-color`]: hintColor,
-              caretColor: mdColors.green,
-            }"
-          />
+          <input :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
+            :placeholder="hint" class="field" :style="{
+                [`--placeholder-color`]: hintColor,
+                caretColor: mdColors.green,
+              }" />
           <Box :sty="{ width: 0.25 }" />
         </Box>
       </Box>
 
       <!-- Underline -->
-      <Box
-        :sty="{
+      <Box :sty="{
           width: `1f`,
-          height: 0.075,
+          height: 0.0625,
           background: inputElementHasFocus ? mdColors.green : mdColors.black,
-        }"
-      />
+        }" />
     </Box>
 
     <!-- Blank -->
-    <input
-      v-else
-      :ref="inputRef"
-      type="text"
-      :value="value"
-      @input="handleInput"
-      @focus="handleFocus"
-      @blur="handleBlur"
-      :placeholder="hint"
-      class="field"
-      :style="{
-        [`--placeholder-color`]: hintColor,
-        caretColor: mdColors.green,
-      }"
-    />
+    <input v-else :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
+      :placeholder="hint" class="field" :style="{
+          [`--placeholder-color`]: hintColor,
+          caretColor: mdColors.green,
+        }" />
   </Box>
 </template>
 
@@ -148,6 +120,7 @@ watchEffect(() => {
   margin: 0;
   width: 100%;
 }
+
 .field::placeholder {
   color: var(--placeholder-color);
 }
