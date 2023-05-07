@@ -103,7 +103,7 @@ watchEffect(() => {
         <Box :sty="{
             width: `1f`,
             height: 0.0625,
-            background: inputElementHasFocus ? mdColors.green : mdColors.black,
+            background: inputElementHasFocus ? mdColors.green : hintColor,//mdColors.black,
           }" />
       </Box>
     </Box>
