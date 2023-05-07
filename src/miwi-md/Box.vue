@@ -138,7 +138,7 @@ export function sizeToCss(num: number | string) {
     return num;
   }
 }
-function numToFontSize(num: number) {
+export function numToFontSize(num: number) {
   return sizeToCss(fontSizeToHtmlUnit * num);
 }
 export interface FlexSize {

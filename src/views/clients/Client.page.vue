@@ -70,7 +70,7 @@ export default {
             </v-col>
           </v-row>
         </v-card-text>
-      </v-card>
+      </v-card>:sty="{ background: `red` }"
     </v-container> -->
     <Card title="Client Info" :sty="{ width: `1f`, spacing: 1, }">
       <Field underlined hint="Name" v-model:value="client.name" :sty="{ width: `1f` }" />
@@ -79,9 +79,11 @@ export default {
       <Field underlined hint="Address" v-model:value="client.address" :sty="{ width: `1f` }" />
       <Field underlined hint="Notes" v-model:value="client.notes" :sty="{ width: `1f` }" />
     </Card>
-    <Card title="Tanks" :sty="{ width: `1f`, spacing: 0, }">
+    <Card title="Tanks" :sty="{ width: `1f`, }">
+      <Text hint>Tanks coming soon.</Text>
     </Card>
-    <Card title="Deliveries" :sty="{ width: `1f`, spacing: 0, }">
+    <Card title="Deliveries" :sty="{ width: `1f` }">
+      <Text hint>Deliveries coming soon.</Text>
     </Card>
   </Body>
 </template>

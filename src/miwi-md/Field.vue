@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType, ref, VNodeRef, watchEffect } from "vue";
-import Box, { Sty, mdColors, Axis } from "./Box.vue";
+import Box, { Sty, mdColors, Axis, numToFontSize } from "./Box.vue";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -63,13 +63,13 @@ watchEffect(() => {
 <template>
   <Box @click="inputRef?.focus()" :sty="{
     width: `1f`,
-    height: underlined ? 1.25 : 1,
+    height: underlined ? undefined : 1,
     ...sty,
   }">
     <!-- Underliened -->
     <Box v-if="underlined" :sty="{
         width: `1f`,
-        height: `1f`,
+        height: 1,
       }">
       <!-- Input -->
       <Box :sty="{
@@ -84,10 +84,13 @@ watchEffect(() => {
           }">
           <Box :sty="{ width: 0.25 }" />
 
-          <Box :sty="{ width: `1f` }">
+          <Box :sty="{ width: `1f`, }">
             <input :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
               :placeholder="hint" class="field" :style="{
                   [`--placeholder-color`]: hintColor,
+                  padding: 0,
+                  margin: 0,
+                  height: numToFontSize(1),
                   caretColor: mdColors.green,
                 }" />
           </Box>
@@ -108,6 +111,9 @@ watchEffect(() => {
     <!-- Blank -->
     <input v-else :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
       :placeholder="hint" class="field" :style="{
+          padding: 0,
+          margin: 0,
+          height: numToFontSize(1),
           [`--placeholder-color`]: hintColor,
           caretColor: mdColors.green,
         }" />
