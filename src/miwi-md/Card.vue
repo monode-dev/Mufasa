@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { defineProps, PropType } from 'vue';
+import { defineProps, PropType, useSlots } from 'vue';
 import Box, { Align, mdColors, Axis, Sty } from './Box.vue';
+import { computed } from 'vue';
 
 // Allow overriding of the default sty
 const props = defineProps({
@@ -8,7 +9,14 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  title: {
+    type: String as PropType<string>,
+    default: ``,
+  }
 });
+
+const slots = useSlots()
+const contentSpacing = computed(() => props.sty.spacing ?? 1)
 </script>
 
 <template>
@@ -16,15 +24,24 @@ const props = defineProps({
     background: mdColors.white,
     cornerRadius: 0.5,
     shadowSize: 1.5,
-    shadowDirection: Align.center,
+    shadowDirection: Align.bottomRight,
     axis: Axis.column,
     align: Align.center,
     textColor: mdColors.black,
     scale: 1,
     padding: 1,
-    spacing: 1,
     ...sty,
+    spacing: title !== `` && typeof contentSpacing === `number` ? (contentSpacing / 2.0) : contentSpacing,
   }">
-    <slot />
+    <template v-if="title !== ``">
+      <Text title>{{ title }}</Text>
+      <Column v-if="slots.default" :sty="{
+          spacing: contentSpacing,
+          width: `100%`,
+        }">
+        <slot />
+      </Column>
+    </template>
+    <slot v-else />
   </Box>
 </template>

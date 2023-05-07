@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
+import { PropType, defineProps } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
+import { Client } from "@/Model";
 
 // Create a prop called size
 const props = defineProps({
-  name: {
-    type: String,
+  client: {
+    type: Object as PropType<Client>,
     required: true,
   },
 });
 </script>
 
 <template>
-  <Box :onclick="() => pushPage(ClientPage)" :sty="{
-      width: `1f`,
-      spacing: $Spacing.spaceBetween,
-      axis: $Axis.row,
-    }">
-    {{ props.name }}
+  <Box @click="pushPage(ClientPage)" :sty="{
+    width: `1f`,
+    spacing: $Spacing.spaceBetween,
+    axis: $Axis.row,
+  }">
+    {{ client.name }}
     <Icon icon="dotsVertical" />
   </Box>
 </template>

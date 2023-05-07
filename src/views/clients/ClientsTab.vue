@@ -1,44 +1,16 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
+import { useModel } from "@/Model";
 
-const clientNames = [
-  `A&P Logging`,
-  `Aaron Hohman`,
-  `Abigail Rodgers`,
-  `Advanced Tree Service`,
-  `Affordable Lawn Care`,
-  `Airport Fire Station`,
-  `Alan Battenfield`,
-  `Alanna Keneshiro`,
-  `Alice Conner`,
-  `All Creatures Animal Hospital`,
-  `All In One Rental`,
-  `Alyshia Peck`,
-  `Amy's Kitchen`,
-  `Ancheta Holdings`,
-  `Andrew Barnes`,
-  `Andrew Watson`,
-  `Andy Pollack`,
-  `Anthony Molle`,
-  `Applegate Store`,
-  `Art of Plumbing`,
-  `Asante`,
-  `Ashland Bus Shop`,
-  `Ashland Parks & Recreation`,
-  `Aurupa Spring Ranch`,
-  `Bart Cunningham`,
-  `Bart Masciarelli`,
-  `BBMD-Medford, Boise Phoenix`,
-  `Bear Creek Orchard`,
-] as const;
+const model = useModel();
 </script>
 
 <template>
   <Column :sty="{ width: `1f`, height: `1f` }">
-    <ClientSearchBar />
+    <ClientSearchBar :filtered-clients="model.clients.filter((client) => !client.archived)" />
 
     <Body>
-      <ClientEntry v-for="name in clientNames" :name="name"></ClientEntry>
+      <ClientEntry v-for="client in model.clients" :key="client._objId" :client="client"></ClientEntry>
     </Body>
     <!-- <Stack :sty="{
         width: `1f`,

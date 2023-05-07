@@ -1,6 +1,6 @@
 {
   "name": "ninety_percent",
-  "version": "1.13.59",
+  "version": "1.13.65",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -28,8 +28,8 @@
     "pinia": "^2.0.33",
     "vue": "^3.2.47",
     "vue-confetti-explosion": "^1.0.2",
-    "vue-inline-svg": "^3.1.2",
-    "vue3-mobile-detection": "^1.0.5"
+    "vue3-mobile-detection": "^1.0.5",
+    "vuetify": "^3.2.2"
   },
   "devDependencies": {
     "@capacitor/assets": "^2.0.4",

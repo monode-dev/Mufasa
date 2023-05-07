@@ -62,40 +62,47 @@ watchEffect(() => {
 
 <template>
   <Box @click="inputRef?.focus()" :sty="{
-    width: 10,
-    height: 2,
+    width: `1f`,
+    height: underlined ? 1.25 : 1,
     ...sty,
   }">
     <!-- Underliened -->
-    <Box v-if="underlined">
+    <Box v-if="underlined" :sty="{
+        width: `1f`,
+        height: `1f`,
+      }">
       <!-- Input -->
       <Box :sty="{
           width: `1f`,
           height: `1f`,
           axis: Axis.column,
         }">
-        <Box :sty="{ height: 0.5 }" />
         <Box :sty="{
             width: `1f`,
             height: `1f`,
             axis: Axis.row,
           }">
           <Box :sty="{ width: 0.25 }" />
-          <input :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
-            :placeholder="hint" class="field" :style="{
-                [`--placeholder-color`]: hintColor,
-                caretColor: mdColors.green,
-              }" />
+
+          <Box :sty="{ width: `1f` }">
+            <input :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
+              :placeholder="hint" class="field" :style="{
+                  [`--placeholder-color`]: hintColor,
+                  caretColor: mdColors.green,
+                }" />
+          </Box>
           <Box :sty="{ width: 0.25 }" />
         </Box>
       </Box>
 
       <!-- Underline -->
-      <Box :sty="{
-          width: `1f`,
-          height: 0.0625,
-          background: inputElementHasFocus ? mdColors.green : mdColors.black,
-        }" />
+      <Box :sty="{ width: `1f`, height: 0.25, align: $Align.bottomCenter }">
+        <Box :sty="{
+            width: `1f`,
+            height: 0.0625,
+            background: inputElementHasFocus ? mdColors.green : mdColors.black,
+          }" />
+      </Box>
     </Box>
 
     <!-- Blank -->

@@ -24,7 +24,8 @@ console.log(props.scale)
   <Box :sty="{
     width: scale,
     height: scale,
+    textColor: color,
   }">
-    <mdicon :name="icon" width="100%" height="100%" :fill="props.color" />
+    <mdicon :name="icon" width="100%" height="100%" />
   </Box>
 </template>

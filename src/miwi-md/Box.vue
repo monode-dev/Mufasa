@@ -391,11 +391,11 @@ export default defineComponent({
         // Add background images
         boxShadow: isDefined(this.sty.shadowSize)
           ? `${sizeToCss(
-            0.12 * this.sty.shadowSize * shadowDirection.x,
+            0.09 * this.sty.shadowSize * shadowDirection.x,
           )} ${sizeToCss(
-            -0.12 * this.sty.shadowSize * shadowDirection.y,
+            -0.09 * this.sty.shadowSize * shadowDirection.y,
           )} ${sizeToCss(
-            0.225 * this.sty.shadowSize,
+            0.4 * this.sty.shadowSize,
           )} 0 ${mdColors.grey.substring(0, 7)}cc`
           : undefined,
 

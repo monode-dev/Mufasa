@@ -1,12 +1,47 @@
 <script setup lang="ts">
+import { defineProps, PropType, ref, defineEmits, watchEffect, computed } from "vue";
 import { mdColors } from "@/miwi-md/Box.vue";
+import { useModel, Client } from "@/Model";
+import { mdiWatch } from "@mdi/js";
+import { pushPage } from "@/Nav";
+import ClientPage from "./Client.page.vue";
 
 const props = defineProps({
+  filteredClients: {
+    type: Array as PropType<Client[]>,
+    required: true,
+  },
   sty: {
     type: Object as StyProp,
     default: {},
   },
 });
+
+const model = useModel();
+
+const filterString = ref("");
+
+const textHasBeenEntered = computed(() => {
+  return filterString.value.length > 0;
+});
+
+watchEffect(() => {
+  emit("update:filteredClients", props.filteredClients.filter((client) => {
+    return client.name.toLowerCase().includes(filterString.value.toLowerCase());
+  }));
+});
+
+const emit = defineEmits(["update:filteredClients"]);
+
+function addPressed() {
+  if (textHasBeenEntered.value) {
+    model.createClient({
+      name: filterString.value,
+    });
+    filterString.value = "";
+    pushPage(ClientPage);
+  };
+}
 </script>
 
 <template>
@@ -30,14 +65,9 @@ const props = defineProps({
         axis: $Axis.row,
       }">
       <Box :sty="{ width: 0.25 }" />
-      Add New or Search
+      <Field hint="Add New or Search" v-model:value="filterString" />
       <Box :sty="{ width: 0.25 }" />
     </Box>
-    <Box :sty="{
-        align: $Align.center,
-        textColor: mdColors.white,
-      }">
-      <Icon :scale="1.5" icon="plus" />
-    </Box>
+    <Icon @click="addPressed" :scale="1.5" icon="plus" :color="mdColors.white" />
   </Box>
 </template>

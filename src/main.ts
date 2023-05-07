@@ -10,6 +10,12 @@ import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { registerGlobalProperties } from "@/miwi-md/BoxUtils";
 import mdiVue from "mdi-vue/v3";
 import * as mdijs from "@mdi/js";
+// Vuetify Imports
+import "vuetify/styles";
+import { createVuetify } from "vuetify";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+
 // Begin Generated Imports
 import App from "./App.vue";
 import AppBar from "./miwi-md/AppBar.vue";
@@ -76,6 +82,12 @@ vueApp.component("Settings", Settings);
 vueApp.component("SettingsButton", SettingsButton);
 // End Generated Components
 // vueApp.config.globalProperties.$align = Align;
+
+const vuetify = createVuetify({
+  components,
+  directives,
+});
+vueApp.use(vuetify);
 
 (async () => {
   try {
