@@ -24,28 +24,39 @@ function onPageLeave(el: Element, done: () => void) {
 
 function pageWrapperStyle(zIndex: number): StyleValue {
   return {
-    background: 'transparent',
-    width: '100%',
-    height: '100%',
-    top: '0px',
-    left: '0px',
-    position: 'absolute',
+    background: "transparent",
+    width: "100%",
+    height: "100%",
+    top: "0px",
+    left: "0px",
+    position: "absolute",
     zIndex,
   };
 }
 </script>
 
 <template>
-  <Box :sty="{
-    width: `100%`,
-    height: `100%`,
-  }">
+  <Box
+    :sty="{
+      width: `100%`,
+      height: `100%`,
+    }"
+  >
     <!-- Openned Pages -->
-    <transition-group appear :css="false" @enter="onPageEnter" @leave="onPageLeave">
-      <div v-for="(page, index) in nav.openedPages" :key="index" :id="`${pageIdTag}${index}`"
-        :style="pageWrapperStyle(10 + index * 10)">
+    <transition-group
+      appear
+      :css="false"
+      @enter="onPageEnter"
+      @leave="onPageLeave"
+    >
+      <div
+        v-for="(page, index) in nav.openedPages"
+        :key="index"
+        :id="`${pageIdTag}${index}`"
+        :style="pageWrapperStyle(10 + index * 10)"
+      >
         <Page>
-          <component :is="page.component" />
+          <component :is="page.component" v-bind="page.props" />
         </Page>
       </div>
     </transition-group>

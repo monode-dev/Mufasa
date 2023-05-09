@@ -15,7 +15,7 @@ const props = defineProps({
 
 <template>
   <Box
-    @click="pushPage(ClientPage)"
+    @click="pushPage(ClientPage, { client })"
     :sty="{
       width: `1f`,
       spacing: $Spacing.spaceBetween,

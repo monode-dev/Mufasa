@@ -62,11 +62,16 @@ export type Doc<T> = Partial<T> & DocSpecificProps;
 export type DocSpecificProps = {
   _firestoreRef: DocumentReference;
 };
-export function docProx<T extends Doc<{}>>(docRef: DocumentReference): T {
+export function docProx<T extends Doc<{}>>(
+  docRef: DocumentReference | Promise<DocumentReference>,
+): T {
   const data = ref<T | undefined>(undefined);
-  onSnapshot(docRef, (doc) => {
-    data.value = doc.data() as UnwrapRef<T>;
-  });
+  (async () => {
+    docRef = await docRef;
+    onSnapshot(docRef, (doc) => {
+      data.value = doc.data() as UnwrapRef<T>;
+    });
+  })();
   return new Proxy({} as T, {
     get: (_, prop) => {
       if (prop === "_firestoreRef") {
@@ -78,9 +83,12 @@ export function docProx<T extends Doc<{}>>(docRef: DocumentReference): T {
       if (prop === "_firestoreRef") {
         return false;
       }
-      updateDoc(docRef, {
-        [prop]: value,
-      });
+      (async () => {
+        docRef = await docRef;
+        updateDoc(docRef, {
+          [prop]: value,
+        });
+      })();
       return true;
     },
   });
@@ -103,7 +111,7 @@ export const useFirestore = defineStore("firestore", () => {
   });
   return {
     clients: clientsList,
-    async createClient(nameOrId: string): Promise<Client> {
+    createClient(nameOrId: string): Client {
       const wasGivenId = !isNaN(Number(nameOrId));
       const newClient: Omit<Client, keyof DocSpecificProps> = {
         name: wasGivenId ? "" : nameOrId,
@@ -114,7 +122,7 @@ export const useFirestore = defineStore("firestore", () => {
       };
 
       // Create a new client in the database
-      return docProx<Client>(await addDoc(clientCollection, newClient));
+      return docProx<Client>(addDoc(clientCollection, newClient));
     },
   };
 });

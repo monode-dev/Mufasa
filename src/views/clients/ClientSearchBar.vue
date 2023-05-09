@@ -47,9 +47,9 @@ const emit = defineEmits(["update:filteredClients"]);
 
 function addPressed() {
   if (textHasBeenEntered.value) {
-    model.createClient(filterString.value);
+    const newClient = model.createClient(filterString.value);
     filterString.value = "";
-    // pushPage(ClientPage);
+    pushPage(ClientPage, { client: newClient });
   }
 }
 </script>

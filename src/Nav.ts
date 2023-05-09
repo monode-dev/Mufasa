@@ -56,17 +56,21 @@ export const pageTransitions = {
 };
 
 // Nav Store
-export interface NavPage {
-  component: Component;
+export interface NavPage<T> {
+  component: Component<T>;
   transitions: PageTransition;
 }
 export const useNav = defineStore("navigator", () => {
-  const openedPages = reactive<NavPage[]>([]);
+  const openedPages = reactive<(NavPage<any> & { props: any })[]>([]);
 
   return {
     openedPages: openedPages,
-    pushPage(newPage: NavPage) {
-      openedPages.push(newPage);
+    pushPage<T>(newPage: NavPage<T>, props: T | {} = {}) {
+      console.log(newPage);
+      openedPages.push({
+        ...newPage,
+        props,
+      });
 
       /* We do this here instead of at the end of AutoUpdateLoadingScreen
        * so that we never accidentally see the loading splash screen. */
@@ -81,12 +85,15 @@ export const useNav = defineStore("navigator", () => {
   };
 });
 
-export function pushPage(newPage: Component) {
+export function pushPage<T>(newPage: Component<T>, props: T | {} = {}) {
   const nav = useNav();
-  nav.pushPage({
-    component: newPage,
-    transitions: (newPage as any).transitions ?? pageTransitions.none,
-  });
+  nav.pushPage(
+    {
+      component: newPage,
+      transitions: (newPage as any).transitions ?? pageTransitions.none,
+    },
+    props,
+  );
 }
 
 export function popPage() {
