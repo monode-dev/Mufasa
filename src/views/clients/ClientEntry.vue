@@ -2,7 +2,7 @@
 import { PropType, defineProps } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
-import { Client } from "@/Model";
+import { Client } from "@/firebase";
 
 // Create a prop called size
 const props = defineProps({
@@ -14,12 +14,15 @@ const props = defineProps({
 </script>
 
 <template>
-  <Box @click="pushPage(ClientPage)" :sty="{
-    width: `1f`,
-    spacing: $Spacing.spaceBetween,
-    axis: $Axis.row,
-  }">
-    {{ client.name }}
+  <Box
+    @click="pushPage(ClientPage)"
+    :sty="{
+      width: `1f`,
+      spacing: $Spacing.spaceBetween,
+      axis: $Axis.row,
+    }"
+  >
+    {{ client.name ?? `Loading...` }}
     <Icon icon="dotsVertical" />
   </Box>
 </template>

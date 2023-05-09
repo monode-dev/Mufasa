@@ -61,38 +61,59 @@ watchEffect(() => {
 </script>
 
 <template>
-  <Box @click="inputRef?.focus()" :sty="{
-    width: `1f`,
-    height: underlined ? undefined : 1,
-    ...sty,
-  }">
+  <Box
+    @click="inputRef?.focus()"
+    :sty="{
+      width: `1f`,
+      height: underlined ? undefined : 1,
+      ...sty,
+    }"
+  >
     <!-- Underliened -->
-    <Box v-if="underlined" :sty="{
+    <Box
+      v-if="underlined"
+      :sty="{
         width: `1f`,
         height: 1,
-      }">
+      }"
+    >
       <!-- Input -->
-      <Box :sty="{
+      <Box
+        :sty="{
           width: `1f`,
           height: `1f`,
           axis: Axis.column,
-        }">
-        <Box :sty="{
+        }"
+      >
+        <Box
+          :sty="{
             width: `1f`,
             height: `1f`,
             axis: Axis.row,
-          }">
+          }"
+        >
           <Box :sty="{ width: 0.25 }" />
 
           <Box :sty="{ width: `1f` }">
-            <input :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
-              :placeholder="hint" class="field" :style="{
-                  [`--placeholder-color`]: hintColor,
-                  padding: 0,
-                  margin: 0,
-                  height: numToFontSize(1),
-                  caretColor: mdColors.green,
-                }" />
+            <input
+              :ref="inputRef"
+              type="text"
+              :value="value"
+              @input="handleInput"
+              @focus="handleFocus"
+              @blur="handleBlur"
+              :placeholder="hint"
+              class="field"
+              :style="{
+                padding: 0,
+                margin: 0,
+                height: numToFontSize(
+                  typeof sty.scale === `string` ? 1 : sty.scale ?? 1,
+                ),
+                [`--placeholder-color`]: hintColor,
+                caretColor: mdColors.green,
+              }"
+            />
           </Box>
           <Box :sty="{ width: 0.25 }" />
         </Box>
@@ -100,23 +121,37 @@ watchEffect(() => {
 
       <!-- Underline -->
       <Box :sty="{ width: `1f`, height: 0.25, align: $Align.bottomCenter }">
-        <Box :sty="{
+        <Box
+          :sty="{
             width: `1f`,
             height: 0.0625,
-            background: inputElementHasFocus ? mdColors.green : hintColor,//mdColors.black,
-          }" />
+            background: inputElementHasFocus ? mdColors.green : hintColor, //mdColors.black,
+          }"
+        />
       </Box>
     </Box>
 
     <!-- Blank -->
-    <input v-else :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
-      :placeholder="hint" class="field" :style="{
-          padding: 0,
-          margin: 0,
-          height: numToFontSize(1),
-          [`--placeholder-color`]: hintColor,
-          caretColor: mdColors.green,
-        }" />
+    <input
+      v-else
+      :ref="inputRef"
+      type="text"
+      :value="value"
+      @input="handleInput"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      :placeholder="hint"
+      class="field"
+      :style="{
+        padding: 0,
+        margin: 0,
+        height: numToFontSize(
+          typeof sty.scale === `string` ? 1 : sty.scale ?? 1,
+        ),
+        [`--placeholder-color`]: hintColor,
+        caretColor: mdColors.green,
+      }"
+    />
   </Box>
 </template>
 

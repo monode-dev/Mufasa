@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 import { pageTransitions } from "@/Nav";
-import { Client, defaultClient } from "@/Model";
+import { Client } from "@/firebase";
 
 const props = defineProps({
   client: {
     type: Object as PropType<Client>,
     // required: true,
-    default: defaultClient,
+    default: {
+      name: "",
+      clientId: "",
+      phoneNumber: "",
+      address: "",
+      notes: "",
+    },
   },
 });
 </script>

@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
-import { useModel } from "@/Model";
+import { docProx, useFirestore } from "@/firebase";
 
-const model = useModel();
+const model = useFirestore();
 </script>
 
 <template>
   <Column :sty="{ width: `1f`, height: `1f` }">
-    <ClientSearchBar :filtered-clients="model.clients.filter((client) => !client.archived)" />
+    <ClientSearchBar :filteredClients="model.clients.map((client) => docProx(client))" />
 
     <Body>
-      <ClientEntry v-for="client in model.clients" :key="client._objId" :client="client"></ClientEntry>
+      <ClientEntry
+        v-for="client in model.clients"
+        :key="client.id"
+        :client="docProx(client)"
+      ></ClientEntry>
     </Body>
     <!-- <Stack :sty="{
         width: `1f`,

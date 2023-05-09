@@ -1,3 +1,4 @@
+import { defineStore } from "pinia";
 import { initializeApp } from "firebase/app";
 import {
   initializeFirestore,
@@ -6,8 +7,11 @@ import {
   onSnapshot,
   updateDoc,
   doc,
+  DocumentReference,
+  collection,
+  addDoc,
 } from "firebase/firestore";
-import { computed, ref } from "vue";
+import { UnwrapRef, computed, ref } from "vue";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
@@ -52,3 +56,65 @@ export function incCount() {
     count: newCount,
   });
 }
+
+// Firestore Utils
+export type Doc<T> = Partial<T> & DocSpecificProps;
+export type DocSpecificProps = {
+  _firestoreRef: DocumentReference;
+};
+export function docProx<T extends Doc<{}>>(docRef: DocumentReference): T {
+  const data = ref<T | undefined>(undefined);
+  onSnapshot(docRef, (doc) => {
+    data.value = doc.data() as UnwrapRef<T>;
+  });
+  return new Proxy({} as T, {
+    get: (_, prop) => {
+      if (prop === "_firestoreRef") {
+        return docRef;
+      }
+      return data.value?.[prop as keyof UnwrapRef<T>];
+    },
+    set: (_, prop, value) => {
+      if (prop === "_firestoreRef") {
+        return false;
+      }
+      updateDoc(docRef, {
+        [prop]: value,
+      });
+      return true;
+    },
+  });
+}
+
+//
+export type ClientId = `${number}` | ``;
+export type Client = Doc<{
+  name: string;
+  clientId: ClientId;
+  phoneNumber: string;
+  address: string;
+  notes: string;
+}>;
+export const useFirestore = defineStore("firestore", () => {
+  const clientCollection = collection(firebaseDb, `Client`);
+  const clientsList = ref<DocumentReference[]>([]);
+  onSnapshot(clientCollection, (querySnapshot) => {
+    clientsList.value = querySnapshot.docs.map((doc) => doc.ref);
+  });
+  return {
+    clients: clientsList,
+    async createClient(nameOrId: string): Promise<Client> {
+      const wasGivenId = !isNaN(Number(nameOrId));
+      const newClient: Omit<Client, keyof DocSpecificProps> = {
+        name: wasGivenId ? "" : nameOrId,
+        clientId: wasGivenId ? (nameOrId as ClientId) : "",
+        phoneNumber: "",
+        address: "",
+        notes: "",
+      };
+
+      // Create a new client in the database
+      return docProx<Client>(await addDoc(clientCollection, newClient));
+    },
+  };
+});
