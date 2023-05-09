@@ -129,7 +129,7 @@ export const mdColors = {
   transparent: `#ffffff00`,
   sameAsText: `currentColor`,
 } as const;
-const muToRem = 1;
+const muToRem = 1.0625;
 export function sizeToCss(num: number | string) {
   if (isNum(num)) {
     const remValue = num * muToRem;
