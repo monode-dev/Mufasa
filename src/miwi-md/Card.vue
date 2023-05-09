@@ -40,6 +40,7 @@ const contentSpacing = computed(() => props.sty.spacing ?? 1);
   >
     <template v-if="title !== ``">
       <Text title>{{ title }}</Text>
+      <!-- :sty="{ background: mdColors.green, textColor: mdColors.white }" -->
       <Column
         v-if="slots.default"
         :sty="{
