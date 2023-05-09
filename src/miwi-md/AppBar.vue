@@ -19,57 +19,75 @@ const props = defineProps({
 </script>
 
 <template>
-  <Box :sty="{
-    width: `1f`,
-    background: mdColors.green,
-    shadowSize: 1.25,
-    shadowDirection: Align.bottomCenter,
-    align: Align.bottomCenter,
-    textColor: mdColors.white,
-    ...sty,
-  }">
+  <Box
+    :sty="{
+      width: `1f`,
+      background: mdColors.green,
+      // shadowSize: 1.25,
+      // shadowDirection: Align.bottomCenter,
+      align: Align.bottomCenter,
+      textColor: mdColors.white,
+      ...sty,
+    }"
+  >
     <!-- Main Row -->
-    <Box :sty="{
+    <Box
+      :sty="{
         width: `1f`,
         axis: Axis.row,
         padding: 0.5,
         scale: 1.5,
-      }">
+      }"
+    >
       <!-- Left -->
-      <Box :sty="{
+      <Box
+        :sty="{
           width: `1f`,
           align: Align.centerLeft,
-        }">
+        }"
+      >
         <slot name="left">
-          <Icon v-if="numOpenPages > 1" @click="nav.popPage()" :scale="1.25" icon="arrowLeft" alt="Back Icon" />
+          <Icon
+            v-if="numOpenPages > 1"
+            @click="nav.popPage()"
+            :scale="1.25"
+            icon="arrowLeft"
+            alt="Back Icon"
+          />
         </slot>
       </Box>
 
       <!-- Title / Center -->
-      <Box :sty="{
+      <Box
+        :sty="{
           width: `3f`,
           align: Align.center,
           textIsBold: true,
           axis: Axis.row,
           // shouldLog: true,
-        }">
+        }"
+      >
         <slot></slot>
       </Box>
 
       <!-- Right -->
-      <Box :sty="{
+      <Box
+        :sty="{
           width: `1f`,
           align: Align.centerRight,
-        }">
+        }"
+      >
         <slot name="right"></slot>
       </Box>
     </Box>
 
     <!-- Bottom Row -->
-    <Box :sty="{
+    <Box
+      :sty="{
         width: `1f`,
         scale: 1,
-      }">
+      }"
+    >
       <slot name="bottom"></slot>
     </Box>
   </Box>
