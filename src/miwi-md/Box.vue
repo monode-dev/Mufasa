@@ -45,6 +45,7 @@ export const Axis = {
 } as const;
 export type Overflow = (typeof Overflow)[keyof typeof Overflow];
 export const Overflow = {
+  visible: `visible`,
   crop: `crop`,
   wrap: `wrap`,
   scroll: `scroll`,

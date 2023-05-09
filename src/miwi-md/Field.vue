@@ -66,6 +66,7 @@ watchEffect(() => {
     :sty="{
       width: `1f`,
       height: underlined ? undefined : 1,
+      textColor: mdColors.black,
       ...sty,
     }"
   >
