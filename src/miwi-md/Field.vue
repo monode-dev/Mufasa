@@ -84,7 +84,7 @@ watchEffect(() => {
           }">
           <Box :sty="{ width: 0.25 }" />
 
-          <Box :sty="{ width: `1f`, }">
+          <Box :sty="{ width: `1f` }">
             <input :ref="inputRef" type="text" :value="value" @input="handleInput" @focus="handleFocus" @blur="handleBlur"
               :placeholder="hint" class="field" :style="{
                   [`--placeholder-color`]: hintColor,

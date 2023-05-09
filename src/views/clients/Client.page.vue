@@ -19,7 +19,8 @@ export default {
 </script>
 
 <template>
-  <AppBar>Client
+  <AppBar
+    >Client
     <template #right>
       <SettingsButton />
     </template>
@@ -72,14 +73,43 @@ export default {
         </v-card-text>
       </v-card>:sty="{ background: `red` }"
     </v-container> -->
-    <Card title="Client Info" :sty="{ width: `1f`, spacing: 1, }">
-      <Field underlined hint="Name" v-model:value="client.name" :sty="{ width: `1f` }" />
-      <Field underlined hint="Client ID" v-model:value="client.clientId" :sty="{ width: `1f` }" />
-      <Field underlined hint="Phone" v-model:value="client.phoneNumber" :sty="{ width: `1f` }" />
-      <Field underlined hint="Address" v-model:value="client.address" :sty="{ width: `1f` }" />
-      <Field underlined hint="Notes" v-model:value="client.notes" :sty="{ width: `1f` }" />
+    <Card
+      title="Client Info"
+      :sty="{ width: `1f`, spacing: 1 }"
+      :shouldLog="true"
+    >
+      <Field
+        underlined
+        hint="Name"
+        v-model:value="client.name"
+        :sty="{ width: `1f` }"
+      />
+      <Field
+        underlined
+        hint="Client ID"
+        v-model:value="client.clientId"
+        :sty="{ width: `1f` }"
+      />
+      <Field
+        underlined
+        hint="Phone"
+        v-model:value="client.phoneNumber"
+        :sty="{ width: `1f` }"
+      />
+      <Field
+        underlined
+        hint="Address"
+        v-model:value="client.address"
+        :sty="{ width: `1f` }"
+      />
+      <Field
+        underlined
+        hint="Notes"
+        v-model:value="client.notes"
+        :sty="{ width: `1f` }"
+      />
     </Card>
-    <Card title="Tanks" :sty="{ width: `1f`, }">
+    <Card title="Tanks" :sty="{ width: `1f` }">
       <Text hint>Tanks coming soon.</Text>
     </Card>
     <Card title="Deliveries" :sty="{ width: `1f` }">

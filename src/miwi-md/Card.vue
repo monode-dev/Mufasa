@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { defineProps, PropType, useSlots } from 'vue';
-import Box, { Align, mdColors, Axis, Sty } from './Box.vue';
-import { computed } from 'vue';
+import { defineProps, PropType, useSlots } from "vue";
+import Box, { Align, mdColors, Axis, Sty } from "./Box.vue";
+import { computed } from "vue";
 
 // Allow overriding of the default sty
 const props = defineProps({
@@ -12,33 +12,45 @@ const props = defineProps({
   title: {
     type: String as PropType<string>,
     default: ``,
-  }
+  },
+  shouldLog: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const slots = useSlots()
-const contentSpacing = computed(() => props.sty.spacing ?? 1)
+const slots = useSlots();
+const contentSpacing = computed(() => props.sty.spacing ?? 1);
 </script>
 
 <template>
-  <Box :sty="{
-    background: mdColors.white,
-    cornerRadius: 0.5,
-    shadowSize: 1.5,
-    shadowDirection: Align.bottomRight,
-    axis: Axis.column,
-    align: Align.center,
-    textColor: mdColors.black,
-    scale: 1,
-    padding: 1,
-    ...sty,
-    spacing: title !== `` && typeof contentSpacing === `number` ? (contentSpacing / 2.0) : contentSpacing,
-  }">
+  <Box
+    :sty="{
+      background: mdColors.white,
+      cornerRadius: 0.5,
+      shadowSize: 1.5,
+      shadowDirection: Align.bottomRight,
+      axis: Axis.column,
+      align: Align.center,
+      textColor: mdColors.black,
+      scale: 1,
+      padding: 1,
+      ...sty,
+      spacing:
+        title !== `` && typeof contentSpacing === `number`
+          ? contentSpacing / 2.0
+          : contentSpacing,
+    }"
+  >
     <template v-if="title !== ``">
       <Text title>{{ title }}</Text>
-      <Column v-if="slots.default" :sty="{
+      <Column
+        v-if="slots.default"
+        :sty="{
           spacing: contentSpacing,
-          width: `100%`,
-        }">
+        }"
+        :shouldLog="shouldLog"
+      >
         <slot />
       </Column>
     </template>

@@ -5,9 +5,12 @@ import {
   defineComponent,
   getCurrentInstance,
   PropType,
+  ref,
   RendererElement,
   RendererNode,
   VNode,
+  VNodeRef,
+  watchEffect,
 } from "vue";
 import { isDefined, isNum, isString } from "./utils";
 
@@ -162,25 +165,25 @@ function computeSizeInfo({
     !isMainAxis && sizeIsFlex
       ? `100%`
       : isString(size)
-        ? size
-        : !isShrink && !sizeIsFlex
-          ? sizeToCss(size)
-          : sizeIsFlex
-            ? undefined
-            : `fit-content`;
+      ? size
+      : !isShrink && !sizeIsFlex
+      ? sizeToCss(size)
+      : sizeIsFlex
+      ? undefined
+      : `fit-content`;
   const minSize = sizeIsFlex
     ? isShrink
       ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
       : size.min === Infinity
-        ? exactSize
-        : sizeToCss(size.min)
+      ? exactSize
+      : sizeToCss(size.min)
     : exactSize;
   const maxSize = sizeIsFlex
     ? isShrink
       ? `fit-content`
       : size.max === Infinity
-        ? exactSize ?? `100%`
-        : sizeToCss(size.max)
+      ? exactSize ?? `100%`
+      : sizeToCss(size.max)
     : exactSize;
   return [exactSize, minSize, maxSize, sizeIsFlex] as const;
 }
@@ -193,11 +196,17 @@ export default defineComponent({
       default: {},
       required: false,
     },
+    shouldLog: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       parentAxis: Axis.column as Axis,
       _isBBox: true,
+      childWidthGrows: false,
+      childHeightGrows: false,
     };
   },
   computed: {
@@ -224,7 +233,12 @@ export default defineComponent({
     },
     style(): CSSProperties {
       const align = this.sty.align ?? Align.center;
-      let width = this.sty.width ?? -1;
+      let width =
+        (this.sty.width ?? -1) === -1
+          ? this.childWidthGrows
+            ? `1f`
+            : -1
+          : this.sty.width ?? -1;
       if (isString(width) && width.endsWith(`f`)) {
         width = {
           flex: parseFloat(width.split(`f`)[0]),
@@ -236,7 +250,12 @@ export default defineComponent({
         size: width,
         isMainAxis: this.parentAxis === Axis.row,
       });
-      let height = this.sty.height ?? -1;
+      let height =
+        (this.sty.height ?? -1) === -1
+          ? this.childHeightGrows
+            ? `1f`
+            : -1
+          : this.sty.height ?? -1;
       if (isString(height) && height.endsWith(`f`)) {
         height = {
           flex: parseFloat(height.split(`f`)[0]),
@@ -284,8 +303,9 @@ export default defineComponent({
               ? this.maxChildWidth
               : exactWidth;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
-            size = `calc(${size} - ${this.$parent?.$el?.paddingLeft ?? `0px`
-              } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
+            size = `calc(${size} - ${
+              this.$parent?.$el?.paddingLeft ?? `0px`
+            } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
           }
           return size;
         })(),
@@ -295,8 +315,9 @@ export default defineComponent({
               ? this.maxChildWidth
               : wMin;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
-            size = `calc(${size} - ${this.$parent?.$el?.paddingLeft ?? `0px`
-              } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
+            size = `calc(${size} - ${
+              this.$parent?.$el?.paddingLeft ?? `0px`
+            } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
           }
           return size;
         })(),
@@ -306,8 +327,9 @@ export default defineComponent({
               ? this.maxChildWidth
               : wMax;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
-            size = `calc(${size} - ${this.$parent?.$el?.paddingLeft ?? `0px`
-              } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
+            size = `calc(${size} - ${
+              this.$parent?.$el?.paddingLeft ?? `0px`
+            } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
           }
           return size;
         })(),
@@ -317,8 +339,9 @@ export default defineComponent({
               ? this.maxChildHeight
               : exactHeight;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
-            size = `calc(${size} - ${this.$parent?.$el?.paddingTop ?? `0px`
-              } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
+            size = `calc(${size} - ${
+              this.$parent?.$el?.paddingTop ?? `0px`
+            } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
           }
           return size;
         })(),
@@ -328,8 +351,9 @@ export default defineComponent({
               ? this.maxChildHeight
               : hMin;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
-            size = `calc(${size} - ${this.$parent?.$el?.paddingTop ?? `0px`
-              } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
+            size = `calc(${size} - ${
+              this.$parent?.$el?.paddingTop ?? `0px`
+            } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
           }
           return size;
         })(),
@@ -339,8 +363,9 @@ export default defineComponent({
               ? this.maxChildHeight
               : hMax;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
-            size = `calc(${size} - ${this.$parent?.$el?.paddingTop ?? `0px`
-              } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
+            size = `calc(${size} - ${
+              this.$parent?.$el?.paddingTop ?? `0px`
+            } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
           }
           return size;
         })(),
@@ -349,15 +374,15 @@ export default defineComponent({
             ? isFlexSize(height)
               ? `${height.flex * 100}%`
               : heightGrows
-                ? `100%`
-                : undefined
+              ? `100%`
+              : undefined
             : this.parentAxis === Axis.row
-              ? isFlexSize(width)
-                ? `${width.flex * 100}%`
-                : widthGrows
-                  ? `100%`
-                  : undefined
-              : undefined,
+            ? isFlexSize(width)
+              ? `${width.flex * 100}%`
+              : widthGrows
+              ? `100%`
+              : undefined
+            : undefined,
         // flexBasis:
         //   this.parentAxis === Axis.column
         //     ? isFlexSize(height)
@@ -391,12 +416,12 @@ export default defineComponent({
         // Add background images
         boxShadow: isDefined(this.sty.shadowSize)
           ? `${sizeToCss(
-            0.09 * this.sty.shadowSize * shadowDirection.x,
-          )} ${sizeToCss(
-            -0.09 * this.sty.shadowSize * shadowDirection.y,
-          )} ${sizeToCss(
-            0.4 * this.sty.shadowSize,
-          )} 0 ${mdColors.grey.substring(0, 7)}cc`
+              0.09 * this.sty.shadowSize * shadowDirection.x,
+            )} ${sizeToCss(
+              -0.09 * this.sty.shadowSize * shadowDirection.y,
+            )} ${sizeToCss(
+              0.4 * this.sty.shadowSize,
+            )} 0 ${mdColors.grey.substring(0, 7)}cc`
           : undefined,
 
         // Padding
@@ -413,33 +438,33 @@ export default defineComponent({
           // Exact spacing is handled through grid gap
           Object.values(Spacing as any).includes(this.sty.spacing)
             ? // For whatever reason, space-between with one item puts it at the start instead of centering it.
-            this.sty.spacing === Spacing.spaceBetween &&
+              this.sty.spacing === Spacing.spaceBetween &&
               this.children.length == 1
               ? Spacing.spaceAround
               : (this.sty.spacing as (typeof Spacing)[keyof typeof Spacing])
             : this.axis === Axis.column
-              ? isTop(align)
-                ? `flex-start`
-                : isCenterY(align)
-                  ? `safe center`
-                  : `flex-end`
-              : isLeft(align)
-                ? `flex-start`
-                : isCenterX(align)
-                  ? `safe center`
-                  : `flex-end`,
+            ? isTop(align)
+              ? `flex-start`
+              : isCenterY(align)
+              ? `safe center`
+              : `flex-end`
+            : isLeft(align)
+            ? `flex-start`
+            : isCenterX(align)
+            ? `safe center`
+            : `flex-end`,
         alignItems:
           this.axis === Axis.column
             ? isLeft(align)
               ? `flex-start`
               : isCenterX(align)
-                ? `safe center`
-                : `flex-end`
+              ? `safe center`
+              : `flex-end`
             : isTop(align)
-              ? `flex-start`
-              : isCenterY(align)
-                ? `safe center`
-                : `flex-end`,
+            ? `flex-start`
+            : isCenterY(align)
+            ? `safe center`
+            : `flex-end`,
 
         // Axis
         flexDirection: this.axis === Axis.stack ? undefined : this.axis,
@@ -451,20 +476,20 @@ export default defineComponent({
               ? `wrap`
               : undefined
             : this.sty.overflowY === Overflow.wrap
-              ? `wrap`
-              : undefined,
+            ? `wrap`
+            : undefined,
         overflowX:
           this.sty.overflowX === Overflow.scroll
             ? `auto` // Used to be `overlay` // Scroll when nesscary, and float above contents
             : this.sty.overflowX === Overflow.crop
-              ? `hidden`
-              : `visible`, //`hidden`,
+            ? `hidden`
+            : `visible`, //`hidden`,
         overflowY:
           this.sty.overflowY === Overflow.scroll
             ? `auto` // Scroll when nesscary, and float above contents
             : this.sty.overflowY === Overflow.crop
-              ? `hidden`
-              : `visible`, //`hidden`,
+            ? `hidden`
+            : `visible`, //`hidden`,
         scrollbarWidth: [this.sty.overflowX, this.sty.overflowY].includes(
           Overflow.scroll,
         )
@@ -510,8 +535,8 @@ export default defineComponent({
         textAlign: isLeft(align)
           ? `left`
           : isCenterX(align)
-            ? `center`
-            : `right`,
+          ? `center`
+          : `right`,
         color: this.sty.textColor,
         pointerEvents: this.sty.isInteractable ?? true ? undefined : `none`,
         zIndex: this.sty.zIndex,
@@ -548,6 +573,32 @@ export default defineComponent({
       this.parentAxis =
         (parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
     },
+    updateChildWidthGrows(slotRef: Element | undefined) {
+      if (!slotRef) return;
+      if ((this.sty.width ?? -1 !== -1) && (this.sty.height ?? -1 !== -1))
+        return;
+      const children = Array.from(slotRef.childNodes).filter(
+        (child) => child instanceof HTMLElement,
+      ) as HTMLElement[];
+      this.childWidthGrows = children.some((child) => {
+        if (!child.classList.contains(`b-x`)) return false;
+        const childStyle = child.style;
+        return (
+          childStyle.width === "100%" ||
+          (this.axis === Axis.row &&
+            (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
+        );
+      });
+      this.childHeightGrows = children.some((child) => {
+        if (!child.classList.contains(`b-x`)) return false;
+        const childStyle = getComputedStyle(child);
+        return (
+          childStyle.height === "100%" ||
+          (this.axis === Axis.column &&
+            (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
+        );
+      });
+    },
   },
   updated() {
     this.updateStats();
@@ -559,7 +610,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div :style="style">
+  <div class="b-x" :style="style" :ref="updateChildWidthGrows as any">
     <slot />
   </div>
 </template>
