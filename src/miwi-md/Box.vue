@@ -547,32 +547,6 @@ export default defineComponent({
     },
   },
   methods: {
-    // updateStats() {
-    //   const instance = getCurrentInstance();
-    //   /* This is janky, but it circumvents the issue of the parent being a custom Vue
-    //    * component insead of a `B` component, which are the only components with
-    //    * "substance". */
-    //   const parent = (() => {
-    //     let lastCheckedParentUid = -1;
-    //     function findParent(
-    //       node: ComponentInternalInstance | null | undefined,
-    //     ): ComponentInternalInstance | null | undefined {
-    //       if (node === null || node === undefined) return undefined;
-    //       if (node?.parent?.data?._isBBox ?? false) {
-    //         return node.parent;
-    //       }
-    //       if (lastCheckedParentUid === node.uid) {
-    //         return undefined;
-    //       } else {
-    //         lastCheckedParentUid = node.uid;
-    //         return findParent(instance?.parent ?? undefined);
-    //       }
-    //     }
-    //     return findParent(instance);
-    //   })();
-    //   this.parentAxis =
-    //     (parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
-    // },
     updateFromHtml(divRef: Element | undefined) {
       // Update parent axis
       (() => {
@@ -613,12 +587,6 @@ export default defineComponent({
       })();
     },
   },
-  // updated() {
-  //   this.updateStats();
-  // },
-  // mounted() {
-  //   this.updateStats();
-  // },
 });
 </script>
 

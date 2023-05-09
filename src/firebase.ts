@@ -97,9 +97,9 @@ export type Client = Doc<{
 }>;
 export const useFirestore = defineStore("firestore", () => {
   const clientCollection = collection(firebaseDb, `Client`);
-  const clientsList = ref<DocumentReference[]>([]);
+  const clientsList = ref<Client[]>([]);
   onSnapshot(clientCollection, (querySnapshot) => {
-    clientsList.value = querySnapshot.docs.map((doc) => doc.ref);
+    clientsList.value = querySnapshot.docs.map((doc) => docProx(doc.ref));
   });
   return {
     clients: clientsList,

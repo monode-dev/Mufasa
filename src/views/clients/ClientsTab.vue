@@ -7,16 +7,14 @@ const model = useFirestore();
 
 <template>
   <Column :sty="{ width: `1f`, height: `1f` }">
-    <!-- <ClientSearchBar
-      :filteredClients="model.clients.map((client) => docProx(client))"
-    /> -->
+    <ClientSearchBar :filteredClients="model.clients" />
 
     <Body>
-      <!-- <ClientEntry
-        v-for="client in model.clients"
-        :key="client.id"
-        :client="docProx(client)"
-      ></ClientEntry> -->
+      <ClientEntry
+        v-for="(client, index) in model.clients"
+        :key="index"
+        :client="client"
+      ></ClientEntry>
     </Body>
     <!-- <Stack :sty="{
         width: `1f`,
