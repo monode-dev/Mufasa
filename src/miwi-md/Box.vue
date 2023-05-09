@@ -129,10 +129,10 @@ export const mdColors = {
   transparent: `#ffffff00`,
   sameAsText: `currentColor`,
 } as const;
-const fontSizeToHtmlUnit = 0.825;
+const muToRem = 1;
 export function sizeToCss(num: number | string) {
   if (isNum(num)) {
-    const remValue = num * (1.125 / fontSizeToHtmlUnit);
+    const remValue = num * muToRem;
     const fontSize = parseFloat(
       getComputedStyle(document.documentElement).fontSize,
     );
@@ -143,7 +143,8 @@ export function sizeToCss(num: number | string) {
   }
 }
 export function numToFontSize(num: number) {
-  return sizeToCss(fontSizeToHtmlUnit * num);
+  // return sizeToCss(fontSizeToHtmlUnit * num);
+  return sizeToCss(num * muToRem);
 }
 export interface FlexSize {
   flex: number;
@@ -538,6 +539,8 @@ export default defineComponent({
           : isCenterX(align)
           ? `center`
           : `right`,
+        lineHeight:
+          this.sty.scale === undefined ? undefined : sizeToCss(this.sty.scale),
         color: this.sty.textColor,
         pointerEvents: this.sty.isInteractable ?? true ? undefined : `none`,
         zIndex: this.sty.zIndex,

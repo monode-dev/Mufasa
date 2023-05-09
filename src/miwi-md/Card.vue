@@ -44,6 +44,20 @@ const contentSpacing = computed(() => props.sty.spacing ?? 1);
   >
     <template v-if="title !== ``">
       <Text title>{{ title }}</Text>
+      <!-- <Box
+        :sty="{
+          axis: Axis.row,
+        }"
+      >
+        <Text :sty="{ background: mdColors.green }">{{ title }}</Text>
+        <Box
+          :sty="{
+            background: mdColors.red,
+            height: 1,
+            width: 1,
+          }"
+        />
+      </Box> -->
       <Column
         v-if="slots.default"
         :sty="{
