@@ -1,6 +1,13 @@
-import { initializeApp } from 'firebase/app';
-import { initializeFirestore, CACHE_SIZE_UNLIMITED, enableIndexedDbPersistence , onSnapshot, updateDoc, doc } from 'firebase/firestore';
-import { computed, ref } from 'vue';
+import { initializeApp } from "firebase/app";
+import {
+  initializeFirestore,
+  CACHE_SIZE_UNLIMITED,
+  enableIndexedDbPersistence,
+  onSnapshot,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+import { computed, ref } from "vue";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
@@ -8,11 +15,13 @@ const firebaseConfig = {
   projectId: "ninety-percent",
   storageBucket: "ninety-percent.appspot.com",
   messagingSenderId: "341748622809",
-  appId: "1:341748622809:web:a114f74a7c325fc68de5c8"
+  appId: "1:341748622809:web:a114f74a7c325fc68de5c8",
 };
 
 const app = initializeApp(firebaseConfig);
-export const firebaseDb = initializeFirestore(app, { cacheSizeBytes: CACHE_SIZE_UNLIMITED, });
+export const firebaseDb = initializeFirestore(app, {
+  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+});
 enableIndexedDbPersistence(firebaseDb)
   .then(() => {
     // Offline persistence enabled successfully

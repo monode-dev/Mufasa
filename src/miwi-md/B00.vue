@@ -373,7 +373,7 @@ export default defineComponent({
           : undefined,
 
         // Text Style
-        fontFamily: this.sty.fontFamily,
+        fontFamily: this.sty.fontFamily ?? `inherit`,
         fontSize: isNum(this.sty.textSize)
           ? numToFontSize(this.sty.textSize)
           : this.sty.textSize,
