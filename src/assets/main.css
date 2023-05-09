@@ -1,14 +1,14 @@
 @font-face {
   font-family: "Roboto";
   src: local("Roboto"),
-   url(../fonts/Roboto/Roboto-Regular.ttf) format("truetype");
+    url(../fonts/Roboto/Roboto-Regular.ttf) format("truetype");
 }
 
 body {
   /* padding: 60px 0 0 0; */
   padding: env(safe-area-inset-top) 0 0 0;
   box-sizing: border-box;
-  background-color: #4caf50ff;
+  background-color: rgb(175, 76, 158); /* #4caf50ff; */
   min-height: 100vh;
   height: 100vh;
   max-height: 100vh;
@@ -24,10 +24,10 @@ body {
   margin: 0;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
-  -ms-overflow-style: none;  /* IE and Edge */
+  -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   display: none;
 }
 
