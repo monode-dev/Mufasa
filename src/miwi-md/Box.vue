@@ -213,24 +213,24 @@ export default defineComponent({
     axis(): Axis {
       return this.sty.axis ?? Axis.column;
     },
-    maxChildWidth(): number {
-      if (this.axis === Axis.stack) {
-        return this.children.reduce((tot, curr) => {
-          return Math.max(tot, curr.el?.offsetWidth ?? 0);
-        }, 0);
-      } else {
-        return 0;
-      }
-    },
-    maxChildHeight(): number {
-      if (this.axis === Axis.stack) {
-        return this.children.reduce((tot, curr) => {
-          return Math.max(tot, curr.el?.offsetHeight ?? 0);
-        }, 0);
-      } else {
-        return 0;
-      }
-    },
+    // maxChildWidth(): number {
+    //   if (this.axis === Axis.stack) {
+    //     return this.children.reduce((tot, curr) => {
+    //       return Math.max(tot, curr.el?.offsetWidth ?? 0);
+    //     }, 0);
+    //   } else {
+    //     return 0;
+    //   }
+    // },
+    // maxChildHeight(): number {
+    //   if (this.axis === Axis.stack) {
+    //     return this.children.reduce((tot, curr) => {
+    //       return Math.max(tot, curr.el?.offsetHeight ?? 0);
+    //     }, 0);
+    //   } else {
+    //     return 0;
+    //   }
+    // },
     style(): CSSProperties {
       const align = this.sty.align ?? Align.center;
       let width =
@@ -298,10 +298,10 @@ export default defineComponent({
         boxSizing: `border-box`,
         // Using minWidth and maxWidth tells css to not override the size of this element
         width: (() => {
-          let size =
-            this.axis === Axis.stack && width === -1
-              ? this.maxChildWidth
-              : exactWidth;
+          let size = exactWidth;
+          // this.axis === Axis.stack && width === -1
+          //   ? this.maxChildWidth
+          //   : exactWidth;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingLeft ?? `0px`
@@ -310,10 +310,10 @@ export default defineComponent({
           return size;
         })(),
         minWidth: (() => {
-          let size =
-            this.axis === Axis.stack && width === -1
-              ? this.maxChildWidth
-              : wMin;
+          let size = wMin;
+          // this.axis === Axis.stack && width === -1
+          //   ? this.maxChildWidth
+          //   : wMin;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingLeft ?? `0px`
@@ -322,10 +322,10 @@ export default defineComponent({
           return size;
         })(),
         maxWidth: (() => {
-          let size =
-            this.axis === Axis.stack && width === -1
-              ? this.maxChildWidth
-              : wMax;
+          let size = wMax;
+          // this.axis === Axis.stack && width === -1
+          //   ? this.maxChildWidth
+          //   : wMax;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingLeft ?? `0px`
@@ -334,10 +334,10 @@ export default defineComponent({
           return size;
         })(),
         height: (() => {
-          let size =
-            this.axis === Axis.stack && height === -1
-              ? this.maxChildHeight
-              : exactHeight;
+          let size = exactHeight;
+          // this.axis === Axis.stack && height === -1
+          //   ? this.maxChildHeight
+          //   : exactHeight;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingTop ?? `0px`
@@ -346,10 +346,10 @@ export default defineComponent({
           return size;
         })(),
         minHeight: (() => {
-          let size =
-            this.axis === Axis.stack && height === -1
-              ? this.maxChildHeight
-              : hMin;
+          let size = hMin;
+          // this.axis === Axis.stack && height === -1
+          //   ? this.maxChildHeight
+          //   : hMin;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingTop ?? `0px`
@@ -358,10 +358,10 @@ export default defineComponent({
           return size;
         })(),
         maxHeight: (() => {
-          let size =
-            this.axis === Axis.stack && height === -1
-              ? this.maxChildHeight
-              : hMax;
+          let size = hMax;
+          // this.axis === Axis.stack && height === -1
+          //   ? this.maxChildHeight
+          //   : hMax;
           if ((this.$parent as any)?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingTop ?? `0px`
@@ -513,7 +513,7 @@ export default defineComponent({
             : undefined,
 
         // Text Style
-        fontFamily: `Roboto`,
+        fontFamily: `Roboto`, //this.sty.fontFamily ?? `Roboto` ?? `inherit`,
         fontSize: isNum(this.sty.scale)
           ? numToFontSize(this.sty.scale)
           : this.sty.scale,
@@ -547,70 +547,83 @@ export default defineComponent({
     },
   },
   methods: {
-    updateStats() {
-      const instance = getCurrentInstance();
-      /* This is janky, but it circumvents the issue of the parent being a custom Vue
-       * component insead of a `B` component, which are the only components with
-       * "substance". */
-      const parent = (() => {
-        let lastCheckedParentUid = -1;
-        function findParent(
-          node: ComponentInternalInstance | null | undefined,
-        ): ComponentInternalInstance | null | undefined {
-          if (node === null || node === undefined) return undefined;
-          if (node?.parent?.data?._isBBox ?? false) {
-            return node.parent;
-          }
-          if (lastCheckedParentUid === node.uid) {
-            return undefined;
-          } else {
-            lastCheckedParentUid = node.uid;
-            return findParent(instance?.parent ?? undefined);
-          }
-        }
-        return findParent(instance);
+    // updateStats() {
+    //   const instance = getCurrentInstance();
+    //   /* This is janky, but it circumvents the issue of the parent being a custom Vue
+    //    * component insead of a `B` component, which are the only components with
+    //    * "substance". */
+    //   const parent = (() => {
+    //     let lastCheckedParentUid = -1;
+    //     function findParent(
+    //       node: ComponentInternalInstance | null | undefined,
+    //     ): ComponentInternalInstance | null | undefined {
+    //       if (node === null || node === undefined) return undefined;
+    //       if (node?.parent?.data?._isBBox ?? false) {
+    //         return node.parent;
+    //       }
+    //       if (lastCheckedParentUid === node.uid) {
+    //         return undefined;
+    //       } else {
+    //         lastCheckedParentUid = node.uid;
+    //         return findParent(instance?.parent ?? undefined);
+    //       }
+    //     }
+    //     return findParent(instance);
+    //   })();
+    //   this.parentAxis =
+    //     (parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
+    // },
+    updateFromHtml(divRef: Element | undefined) {
+      // Update parent axis
+      (() => {
+        const parent = divRef?.parentElement;
+        if (!parent) return;
+        parent.style.flexDirection === `row`
+          ? (this.parentAxis = Axis.row)
+          : parent.style.flexDirection === `column`
+          ? (this.parentAxis = Axis.column)
+          : (this.parentAxis = Axis.stack);
       })();
-      this.parentAxis =
-        (parent?.props?.sty as Partial<Sty>)?.axis ?? Axis.column;
+      // Update Child Size Grows
+      (() => {
+        if (!divRef) return;
+        if ((this.sty.width ?? -1 !== -1) && (this.sty.height ?? -1 !== -1))
+          return;
+        const children = Array.from(divRef.childNodes).filter(
+          (child) => child instanceof HTMLElement,
+        ) as HTMLElement[];
+        this.childWidthGrows = children.some((child) => {
+          if (!child.classList.contains(`b-x`)) return false;
+          const childStyle = child.style;
+          return (
+            childStyle.width === "100%" ||
+            (this.axis === Axis.row &&
+              (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
+          );
+        });
+        this.childHeightGrows = children.some((child) => {
+          if (!child.classList.contains(`b-x`)) return false;
+          const childStyle = getComputedStyle(child);
+          return (
+            childStyle.height === "100%" ||
+            (this.axis === Axis.column &&
+              (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
+          );
+        });
+      })();
     },
-    updateChildWidthGrows(slotRef: Element | undefined) {
-      if (!slotRef) return;
-      if ((this.sty.width ?? -1 !== -1) && (this.sty.height ?? -1 !== -1))
-        return;
-      const children = Array.from(slotRef.childNodes).filter(
-        (child) => child instanceof HTMLElement,
-      ) as HTMLElement[];
-      this.childWidthGrows = children.some((child) => {
-        if (!child.classList.contains(`b-x`)) return false;
-        const childStyle = child.style;
-        return (
-          childStyle.width === "100%" ||
-          (this.axis === Axis.row &&
-            (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
-        );
-      });
-      this.childHeightGrows = children.some((child) => {
-        if (!child.classList.contains(`b-x`)) return false;
-        const childStyle = getComputedStyle(child);
-        return (
-          childStyle.height === "100%" ||
-          (this.axis === Axis.column &&
-            (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
-        );
-      });
-    },
   },
-  updated() {
-    this.updateStats();
-  },
-  mounted() {
-    this.updateStats();
-  },
+  // updated() {
+  //   this.updateStats();
+  // },
+  // mounted() {
+  //   this.updateStats();
+  // },
 });
 </script>
 
 <template>
-  <div class="b-x" :style="style" :ref="updateChildWidthGrows as any">
+  <div class="b-x" :style="style" :ref="(updateFromHtml as any)">
     <slot />
   </div>
 </template>
