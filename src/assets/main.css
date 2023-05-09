@@ -26,7 +26,6 @@ body {
   -webkit-tap-highlight-color: transparent;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-  z-index: 999999999;
 }
 ::-webkit-scrollbar {
   display: none;

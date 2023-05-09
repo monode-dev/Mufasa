@@ -23,8 +23,8 @@ const props = defineProps({
     :sty="{
       width: `1f`,
       background: mdColors.green,
-      // shadowSize: 1.25,
-      // shadowDirection: Align.bottomCenter,
+      shadowSize: 1.25,
+      shadowDirection: Align.bottomCenter,
       align: Align.bottomCenter,
       textColor: mdColors.white,
       ...sty,
