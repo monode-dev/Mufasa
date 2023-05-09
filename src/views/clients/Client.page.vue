@@ -33,11 +33,7 @@ export default {
   </AppBar>
 
   <Body>
-    <Card
-      title="Client Info"
-      :sty="{ width: `1f`, spacing: 1 }"
-      :shouldLog="true"
-    >
+    <Card title="Client Info" :sty="{ width: `1f` }">
       <Field
         underlined
         hint="Name"
