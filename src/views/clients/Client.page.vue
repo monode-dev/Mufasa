@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 import { pageTransitions } from "@/Nav";
-import { Align } from "@/miwi-md/Box.vue";
+import { Align, mdColors } from "@/miwi-md/Box.vue";
 import { Client } from "@/firebase";
 
 const props = defineProps({
@@ -69,7 +69,9 @@ export default {
       />
     </Card>
     <Box />
-    <Text title>Tanks</Text>
+    <Box>
+      <Text title>Tanks</Text>
+    </Box>
     <!-- title="Tanks"  -->
     <Card :sty="{ width: `1f`, align: Align.centerLeft }">
       <Text>Tank A</Text>
