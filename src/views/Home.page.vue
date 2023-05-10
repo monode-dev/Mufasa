@@ -14,7 +14,7 @@ const selectedTab = ref(1);
     <template #bottom>
       <TabButtons
         v-model:selectedTab="selectedTab"
-        :labels="[`Clients`, `Deliveries`, `Calculator`]"
+        :labels="[`Clients`, `Deliveries`, `Calculators`]"
       />
     </template>
   </AppBar>

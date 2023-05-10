@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 import { pageTransitions } from "@/Nav";
-import { Client } from "@/firebase";
 import { Align } from "@/miwi-md/Box.vue";
+import { Client } from "@/firebase";
 
 const props = defineProps({
   client: {
@@ -34,7 +34,9 @@ export default {
   </AppBar>
 
   <Body v-if="client.isLoaded">
-    <Card title="Client Info" :sty="{ width: `1f` }">
+    <Text title>Client Info</Text>
+    <!-- title="Client Info" -->
+    <Card :sty="{ width: `1f` }">
       <Field
         underlined
         hint="Name"
@@ -66,11 +68,41 @@ export default {
         :sty="{ width: `1f` }"
       />
     </Card>
-    <Card title="Tanks" :sty="{ width: `1f` }">
-      <Text hint>Tanks coming soon.</Text>
+    <Box />
+    <Text title>Tanks</Text>
+    <!-- title="Tanks"  -->
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank A</Text>
     </Card>
-    <Card title="Deliveries" :sty="{ width: `1f` }">
-      <Text hint>Deliveries coming soon.</Text>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank B</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank C</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank D</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank E</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank F</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank G</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank H</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank I</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank J</Text>
+    </Card>
+    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
+      <Text>Tank K</Text>
     </Card>
   </Body>
   <Body v-else :sty="{ align: Align.center }">

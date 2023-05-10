@@ -64,13 +64,13 @@ const tabButtonWidth = 4.75;
     }"
   >
     <Box :sty="{ width: tabButtonWidth }" ref="tab0Ref" @click="selectTab(0)">
-      Clients
+      {{ labels[0] }}
     </Box>
     <Box :sty="{ width: tabButtonWidth }" ref="tab1Ref" @click="selectTab(1)">
-      Deliveries
+      {{ labels[1] }}
     </Box>
     <Box :sty="{ width: tabButtonWidth }" ref="tab2Ref" @click="selectTab(2)">
-      Calculator
+      {{ labels[2] }}
     </Box>
   </Box>
   <Box
