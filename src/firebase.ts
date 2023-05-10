@@ -58,9 +58,20 @@ export function incCount() {
 }
 
 // Firestore Utils
-export type Doc<T> = Partial<T> & DocSpecificProps;
+export type LOADING = null;
+export const LOADING: LOADING = null;
+export type DELETED = undefined;
+export const DELETED: DELETED = undefined;
+export function isLoaded<T>(value: T | LOADING | DELETED): value is T {
+  return value !== LOADING && value !== DELETED;
+}
+export type Doc<T> = {
+  [K in keyof T]: T[K] | LOADING | DELETED;
+} & DocSpecificProps;
 export type DocSpecificProps = {
   _firestoreRef: DocumentReference;
+  isLoaded: boolean;
+  isDeleted: boolean;
 };
 export function docProx<T extends Doc<{}>>(
   docRef: DocumentReference | Promise<DocumentReference>,
@@ -76,6 +87,10 @@ export function docProx<T extends Doc<{}>>(
     get: (_, prop) => {
       if (prop === "_firestoreRef") {
         return docRef;
+      } else if (prop === "isLoaded") {
+        return computed(() => isLoaded(data.value));
+      } else if (prop === "isDeleted") {
+        return computed(() => data.value === DELETED);
       }
       return data.value?.[prop as keyof UnwrapRef<T>];
     },

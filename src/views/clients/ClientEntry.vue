@@ -2,7 +2,8 @@
 import { PropType, defineProps } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
-import { Client } from "@/firebase";
+import { Client, LOADING } from "@/firebase";
+import { mdColors } from "@/miwi-md/Box.vue";
 
 // Create a prop called size
 const props = defineProps({
@@ -20,6 +21,7 @@ const props = defineProps({
       width: `1f`,
       spacing: $Spacing.spaceBetween,
       axis: $Axis.row,
+      textColor: client.name === LOADING ? mdColors.grey : mdColors.black,
     }"
   >
     {{ client.name ?? `Loading...` }}

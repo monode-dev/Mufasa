@@ -12,7 +12,8 @@ const props = defineProps({
     default: false,
   },
   value: {
-    type: String,
+    type: String as PropType<string | undefined | null>,
+    optional: true,
     default: "",
   },
   hasFocus: {

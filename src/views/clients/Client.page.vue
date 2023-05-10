@@ -2,6 +2,7 @@
 import { PropType } from "vue";
 import { pageTransitions } from "@/Nav";
 import { Client } from "@/firebase";
+import { Align } from "@/miwi-md/Box.vue";
 
 const props = defineProps({
   client: {
@@ -32,7 +33,7 @@ export default {
     </template>
   </AppBar>
 
-  <Body>
+  <Body v-if="client.isLoaded">
     <Card title="Client Info" :sty="{ width: `1f` }">
       <Field
         underlined
@@ -71,5 +72,8 @@ export default {
     <Card title="Deliveries" :sty="{ width: `1f` }">
       <Text hint>Deliveries coming soon.</Text>
     </Card>
+  </Body>
+  <Body v-else :sty="{ align: Align.center }">
+    <Text hint>Loading...</Text>
   </Body>
 </template>

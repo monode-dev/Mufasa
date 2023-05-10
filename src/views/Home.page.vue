@@ -12,7 +12,10 @@ const selectedTab = ref(1);
       <SettingsButton />
     </template>
     <template #bottom>
-      <TabButtons v-model:selectedTab="selectedTab" :labels="[`Clients`, `Deliveries`, `Calculator`]" />
+      <TabButtons
+        v-model:selectedTab="selectedTab"
+        :labels="[`Clients`, `Deliveries`, `Calculator`]"
+      />
     </template>
   </AppBar>
 
@@ -25,9 +28,8 @@ const selectedTab = ref(1);
       <ConfettiTab />
     </template>
     <template #tab2>
-
-      <Body :sty="{ align: $Align.center, textColor: mdColors.grey }">
-        Calculator Comming Soon...
+      <Body :sty="{ align: $Align.center }">
+        <Text hint>Calculator Comming Soon...</Text>
       </Body>
     </template>
   </TabView>
