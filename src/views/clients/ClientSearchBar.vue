@@ -49,7 +49,7 @@ function addPressed() {
   if (textHasBeenEntered.value) {
     const newClient = model.createClient(filterString.value);
     filterString.value = "";
-    // pushPage(ClientPage, { client: newClient });
+    pushPage(ClientPage, { client: newClient });
   }
 }
 </script>
