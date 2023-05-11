@@ -505,14 +505,12 @@ export default defineComponent({
 
         // Spacing
         // TODO: Default could maybe be based off of font size.
-        rowGap:
-          this.axis === Axis.column && isDefined(this.sty.spacing)
-            ? sizeToCss(this.sty.spacing)
-            : undefined,
-        columnGap:
-          this.axis === Axis.row && isDefined(this.sty.spacing)
-            ? sizeToCss(this.sty.spacing)
-            : undefined,
+        rowGap: isDefined(this.sty.spacing)
+          ? sizeToCss(this.sty.spacing)
+          : undefined,
+        columnGap: isDefined(this.sty.spacing)
+          ? sizeToCss(this.sty.spacing)
+          : undefined,
 
         // Text Style
         fontFamily: `Roboto`, //this.sty.fontFamily ?? `Roboto` ?? `inherit`,

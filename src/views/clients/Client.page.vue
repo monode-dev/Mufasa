@@ -17,6 +17,11 @@ const props = defineProps({
     },
   },
 });
+
+const tankNums: number[] = [];
+for (let i = 1; i <= 5; i++) {
+  tankNums.push(i);
+}
 </script>
 
 <script lang="ts">
@@ -73,39 +78,7 @@ export default {
       <Text title>Tanks</Text>
     </Box>
     <!-- title="Tanks"  -->
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank A</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank B</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank C</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank D</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank E</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank F</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank G</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank H</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank I</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank J</Text>
-    </Card>
-    <Card :sty="{ width: `1f`, align: Align.centerLeft }">
-      <Text>Tank K</Text>
-    </Card>
+    <TankEntry v-for="num in tankNums" :key="num">{{ num }}</TankEntry>
   </Body>
   <Body v-else :sty="{ align: Align.center }">
     <Text hint>Loading...</Text>
