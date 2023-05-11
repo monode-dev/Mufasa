@@ -32,14 +32,25 @@ export default {
 
 <template>
   <AppBar
-    >Client
+    >Edit Client
     <template #right>
       <SettingsButton />
     </template>
   </AppBar>
 
   <Body v-if="client.isLoaded">
-    <Text title>Client Info</Text>
+    <Box
+      :sty="{
+        width: `1f`,
+        axis: $Axis.row,
+        spacing: $Spacing.spaceBetween,
+        align: $Align.topCenter,
+      }"
+    >
+      <Icon icon="dotsVertical" :color="mdColors.transparent" />
+      <Text title>Client Info</Text>
+      <Icon icon="dotsVertical" />
+    </Box>
     <!-- title="Client Info" -->
     <Card :sty="{ width: `1f` }">
       <Field

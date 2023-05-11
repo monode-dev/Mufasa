@@ -42,7 +42,7 @@ const colorSty = computed(() =>
   props.outlined
     ? ({
         background: mdColors.white,
-        outlineColor: mdColors.green,
+        outlineColor: mdColors.sameAsText,
         outlineSize: 0.125,
       } satisfies Partial<Sty>)
     : {
