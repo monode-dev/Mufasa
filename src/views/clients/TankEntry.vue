@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { mdColors } from "@/miwi-md/Box.vue";
+import { ref } from "vue";
+
+const length = ref(`0`);
+const depth = ref(`0`);
+const height = ref(`0`);
+const shortHeight = ref(`0`);
 </script>
 
 <template>
@@ -15,29 +20,27 @@ import { mdColors } from "@/miwi-md/Box.vue";
 
       <Icon icon="dotsVertical" />
     </Box>
-    <Row :sty="{ width: `1f`, spacing: 0.5, align: $Align.topCenter }">
-      <Text>Fuel:</Text>
-      <DropDown selected="GAPRMC" />
-    </Row>
-    <Row :sty="{ width: `1f`, spacing: 0.5, align: $Align.topCenter }">
-      <Text>Shape:</Text>
-      <DropDown selected="Horizontal Cylinder" />
-    </Row>
-    <!-- <Box
+    <DropDown label="Fuel" selected="GAPRMC" />
+    <DropDown label="Shape" selected="Horizontal Cylinder" />
+    <Row
       :sty="{
         width: `1f`,
-        axis: $Axis.row,
         spacing: 1,
       }"
     >
-      <Row :sty="{ width: `1f`, spacing: 0.25, align: $Align.topCenter }">
-        <Text>Shape:</Text>
-        <DropDown selected="Cylinder H" />
-      </Row>
-      <Row :sty="{ width: `1f`, spacing: 0.25, align: $Align.topCenter }">
-        <Text>Fuel:</Text>
-        <DropDown selected="GAPRMC" />
-      </Row>
-    </Box> -->
+      <Label label="Length"><Field v-model:value="length" underlined /></Label>
+      <Label label="Depth"><Field v-model:value="depth" underlined /></Label>
+    </Row>
+    <Row
+      :sty="{
+        width: `1f`,
+        spacing: 1,
+      }"
+    >
+      <Label label="Height"><Field v-model:value="height" underlined /></Label>
+      <Label label="Short Height"
+        ><Field v-model:value="shortHeight" underlined
+      /></Label>
+    </Row>
   </Card>
 </template>

@@ -11,6 +11,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  label: {
+    type: String,
+    default: "",
+  },
   selected: {
     type: String,
     default: "",
@@ -19,32 +23,35 @@ const props = defineProps({
 </script>
 
 <template>
-  <Box :sty="{ width: `1f`, ...sty }">
-    <!-- Text -->
-    <Box
-      :sty="{
-        width: `1f`,
-        axis: $Axis.row,
-        spacing: $Spacing.spaceBetween,
-      }"
-    >
-      <Text>{{ selected }}</Text>
-      <Icon icon="menuDown" />
-    </Box>
-    <!-- Underline -->
-    <Box
-      :sty="{
-        width: `1f`,
-        height: 0.25,
-      }"
-    >
+  <Row :sty="{ width: `1f`, spacing: 0.5, align: $Align.topCenter, ...sty }">
+    <Text>{{ label }}:</Text>
+    <Box :sty="{ width: `1f` }">
+      <!-- Text -->
       <Box
         :sty="{
           width: `1f`,
-          height: 0.0625,
-          background: mdColors.grey,
+          axis: $Axis.row,
+          spacing: $Spacing.spaceBetween,
         }"
-      />
+      >
+        <Text>{{ selected }}</Text>
+        <Icon icon="menuDown" />
+      </Box>
+      <!-- Underline -->
+      <Box
+        :sty="{
+          width: `1f`,
+          height: 0.25,
+        }"
+      >
+        <Box
+          :sty="{
+            width: `1f`,
+            height: 0.0625,
+            background: mdColors.grey,
+          }"
+        />
+      </Box>
     </Box>
-  </Box>
+  </Row>
 </template>
