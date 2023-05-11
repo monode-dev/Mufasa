@@ -11,7 +11,7 @@ const model = useFirestore();
 
     <Body>
       <ClientEntry
-        v-for="(client, index) in model.clients.sort((a, b) => {
+        v-for="(client, index) in [...model.clients].sort((a, b) => {
           //
           if (!isLoaded(a.name)) {
             return 1;
