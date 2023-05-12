@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 function deletePressed() {
-  console.log(`Delete ${props.client.name}.`);
+  props.client.deleteDoc();
 }
 </script>
 

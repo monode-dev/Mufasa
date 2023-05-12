@@ -10,6 +10,7 @@ import {
   DocumentReference,
   collection,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { UnwrapRef, computed, ref } from "vue";
 
@@ -72,15 +73,16 @@ export type DocSpecificProps = {
   _firestoreRef: DocumentReference;
   isLoaded: boolean;
   isDeleted: boolean;
+  deleteDoc(): Promise<void>;
 };
 export function docProx<T extends Doc<{}>>(
   docRef: DocumentReference | Promise<DocumentReference>,
 ): T {
-  const data = ref<T | undefined>(undefined);
+  const data = ref<T | LOADING | DELETED>(LOADING);
   (async () => {
     docRef = await docRef;
     onSnapshot(docRef, (doc) => {
-      data.value = doc.data() as UnwrapRef<T>;
+      data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
     });
   })();
   return new Proxy({} as T, {
@@ -91,6 +93,11 @@ export function docProx<T extends Doc<{}>>(
         return computed(() => isLoaded(data.value));
       } else if (prop === "isDeleted") {
         return computed(() => data.value === DELETED);
+      } else if (prop === "deleteDoc") {
+        return async () => {
+          docRef = await docRef;
+          deleteDoc(docRef);
+        };
       }
       return data.value?.[prop as keyof UnwrapRef<T>];
     },
