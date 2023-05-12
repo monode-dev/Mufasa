@@ -10,6 +10,7 @@ import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { registerGlobalProperties } from "@/miwi-md/BoxUtils";
 import mdiVue from "mdi-vue/v3";
 import * as mdijs from "@mdi/js";
+
 // Vuetify Imports
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
