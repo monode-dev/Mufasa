@@ -50,30 +50,35 @@ export default {
         <Field
           underlined
           hint="Name"
+          icon="account"
           v-model:value="client.name"
           :sty="{ width: `1f` }"
         />
         <Field
           underlined
           hint="Client ID"
+          icon="identifier"
           v-model:value="client.clientId"
           :sty="{ width: `1f` }"
         />
         <Field
           underlined
           hint="Phone"
+          icon="phone"
           v-model:value="client.phoneNumber"
           :sty="{ width: `1f` }"
         />
         <Field
           underlined
           hint="Address"
+          icon="mapMarker"
           v-model:value="client.address"
           :sty="{ width: `1f` }"
         />
         <Field
           underlined
           hint="Notes"
+          icon="textBox"
           v-model:value="client.notes"
           :sty="{ width: `1f` }"
         />

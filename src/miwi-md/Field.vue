@@ -72,7 +72,11 @@ watchEffect(() => {
 });
 
 const detailColor = computed(() =>
-  inputElementHasFocus.value ? mdColors.green : mdColors.grey,
+  inputElementHasFocus.value
+    ? mdColors.green
+    : props.value === ``
+    ? mdColors.grey
+    : mdColors.black,
 );
 </script>
 
