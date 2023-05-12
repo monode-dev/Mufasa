@@ -56,7 +56,9 @@ export default {
       }"
     >
       <Text :sty="{ height: -1, overflowY: $Overflow.wrap }">
-        Are you sure you want to delete this client?
+        Are you sure you want to permanently delete "{{ client.clientId ?? `` }}
+        {{ client.clientId && client.name ? ` - ` : `` }}
+        {{ client.name ?? `` }}"?
       </Text>
       <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
         <Button outlined @click.stop="handleYes">Yes</Button>
