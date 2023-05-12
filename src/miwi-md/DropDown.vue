@@ -19,6 +19,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  underlined: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 
@@ -39,6 +43,7 @@ const props = defineProps({
       </Box>
       <!-- Underline -->
       <Box
+        v-if="underlined"
         :sty="{
           width: `1f`,
           height: 0.25,

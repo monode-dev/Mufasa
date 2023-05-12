@@ -25,22 +25,20 @@ const shortHeight = ref(`0`);
     <Row
       :sty="{
         width: `1f`,
-        spacing: 1,
+        // spacing: 1,
       }"
     >
-      <Label label="Length"><Field v-model:value="length" underlined /></Label>
-      <Label label="Depth"><Field v-model:value="depth" underlined /></Label>
+      <Label label="Length"><Field v-model:value="length" /></Label>
+      <Label label="Depth"><Field v-model:value="depth" /></Label>
     </Row>
     <Row
       :sty="{
         width: `1f`,
-        spacing: 1,
+        // spacing: 1,
       }"
     >
-      <Label label="Height"><Field v-model:value="height" underlined /></Label>
-      <Label label="Short Height"
-        ><Field v-model:value="shortHeight" underlined
-      /></Label>
+      <Label label="Height"><Field v-model:value="height" /></Label>
+      <Label label="Short Height"><Field v-model:value="shortHeight" /></Label>
     </Row>
   </Card>
 </template>

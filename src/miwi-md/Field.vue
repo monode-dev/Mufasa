@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { defineProps, PropType, ref, VNodeRef, watchEffect } from "vue";
+import {
+  computed,
+  defineProps,
+  PropType,
+  ref,
+  VNodeRef,
+  watchEffect,
+} from "vue";
 import Box, { Sty, mdColors, Axis, numToFontSize } from "./Box.vue";
 // Allow overriding of the default sty
 const props = defineProps({
@@ -27,6 +34,10 @@ const props = defineProps({
   hintColor: {
     type: String,
     default: mdColors.grey,
+  },
+  icon: {
+    type: String,
+    default: "",
   },
 });
 const emit = defineEmits(["update:value", "update:hasFocus"]);
@@ -59,6 +70,10 @@ watchEffect(() => {
     }
   }
 });
+
+const detailColor = computed(() =>
+  inputElementHasFocus.value ? mdColors.green : mdColors.grey,
+);
 </script>
 
 <template>
@@ -68,9 +83,12 @@ watchEffect(() => {
       width: `1f`,
       height: underlined ? undefined : 1,
       textColor: mdColors.black,
+      axis: Axis.row,
+      spacing: 0.25,
       ...sty,
     }"
   >
+    <Icon v-if="icon !== ``" :icon="icon" :color="detailColor" />
     <!-- Underliened -->
     <Box
       v-if="underlined"
@@ -127,7 +145,7 @@ watchEffect(() => {
           :sty="{
             width: `1f`,
             height: 0.0625,
-            background: inputElementHasFocus ? mdColors.green : hintColor, //mdColors.black,
+            background: detailColor,
           }"
         />
       </Box>
