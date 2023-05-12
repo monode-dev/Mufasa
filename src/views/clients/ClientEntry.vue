@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { PropType, defineProps, ref } from "vue";
+import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
 import { Client, LOADING } from "@/firebase";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
-import vClickOutside from 'v-click-outside'
+import vClickOutside from "v-click-outside";
 
 // Create a prop called size
 const props = defineProps({
@@ -14,7 +14,15 @@ const props = defineProps({
   },
 });
 
+const dropDownModalRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
+
+// Close the dropdown when the user clicks outside of it
+document.addEventListener("click", (e) => {
+  if (dropDownIsOpen.value && !dropDownModalRef.value?.$el.contains(e.target)) {
+    dropDownIsOpen.value = false;
+  }
+});
 </script>
 
 <template>
@@ -47,6 +55,7 @@ const dropDownIsOpen = ref(false);
     <Box v-if="dropDownIsOpen">
       <Box :sty="{ height: 0.25 }" />
       <Box
+        ref="dropDownModalRef"
         :sty="{
           padding: 1,
           spacing: 1,
