@@ -14,10 +14,12 @@ export default {
 </script>
 
 <template>
-  <AppBar>Settings</AppBar>
+  <Page>
+    <AppBar>Settings</AppBar>
 
-  <Body>
-    <Text hint>Version: {{ appVersion }}</Text>
-    <!-- <Text hint><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text> -->
-  </Body>
+    <Body>
+      <Text hint>Version: {{ appVersion }}</Text>
+      <!-- <Text hint><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text> -->
+    </Body>
+  </Page>
 </template>

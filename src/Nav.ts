@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, Component, shallowRef } from "vue";
+import { computed, Component, shallowRef, ref } from "vue";
 import { gsap } from "gsap";
 import { SplashScreen } from "@capacitor/splash-screen";
 
@@ -64,6 +64,7 @@ export const useNav = defineStore("navigator", () => {
   const openedPages = shallowRef<(NavPage<any> & { props: any })[]>([]);
 
   return {
+    notchHeight: ref(`0px`),
     openedPages: computed(() => openedPages.value),
     pushPage<T>(newPage: NavPage<T>, props: T | {} = {}) {
       openedPages.value = [

@@ -55,9 +55,14 @@ function pageWrapperStyle(zIndex: number): StyleValue {
         :id="`${pageIdTag}${index}`"
         :style="pageWrapperStyle(10 + index * 10)"
       >
-        <Page>
+        <Box
+          :sty="{
+            width: `100%`,
+            height: `100%`,
+          }"
+        >
           <component :is="page.component" v-bind="page.props" />
-        </Page>
+        </Box>
       </div>
     </transition-group>
 

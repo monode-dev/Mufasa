@@ -2,9 +2,16 @@
 import { mdColors } from "@/miwi-md/Box.vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { pushPage } from "@/Nav";
+import { pushPage, useNav } from "@/Nav";
 import HomePage from "@/views/Home.page.vue";
 const textSize = 1.25;
+
+// Calculate notchHeight
+// const nav = useNav();
+// nav.notchHeight = (() => {
+//   const bodyStyle = getComputedStyle(document.body);
+//   return bodyStyle.paddingTop;
+// })();
 
 // Check for updates
 getAndApplyPatch();
@@ -38,15 +45,20 @@ async function getAndApplyPatch() {
 <template>
   <Page :sty="{ background: mdColors.green }">
     <div class="prevent-select">
-      <Box :sty="{
+      <Box
+        :sty="{
           align: $Align.center,
           textColor: mdColors.white,
-        }">
+        }"
+      >
         <Icon :scale="4" :color="mdColors.white" icon="trayArrowDown" />
-        <Box :sty="{
+        <Box
+          :sty="{
             height: textSize,
             scale: textSize,
-          }">Updating...</Box>
+          }"
+          >Updating...</Box
+        >
         <Box :sty="{ height: 2 * textSize }"></Box>
       </Box>
     </div>

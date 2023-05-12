@@ -19,6 +19,16 @@ const props = defineProps({
 </script>
 
 <template>
+  <!-- Notch Spacer -->
+  <Box
+    :sty="{
+      width: `1f`,
+      height: `env(safe-area-inset-top)`,
+      background: mdColors.green,
+    }"
+  />
+
+  <!-- App Bar -->
   <Box
     :sty="{
       width: `1f`,

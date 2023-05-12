@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType, VNodeRef, defineProps, ref } from "vue";
+import { PropType, VNodeRef, defineProps, ref, watchEffect } from "vue";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
 
 // Create a prop called size
@@ -20,11 +20,19 @@ const dropDownModalRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
 
 // Close the dropdown when the user clicks outside of it
-document.addEventListener("click", (e) => {
+function closeOnClickOutside(e: MouseEvent) {
   if (dropDownIsOpen.value && !dropDownModalRef.value?.$el.contains(e.target)) {
     dropDownIsOpen.value = false;
   }
+}
+watchEffect(() => {
+  if (dropDownIsOpen.value) {
+    document.addEventListener("click", closeOnClickOutside);
+  } else {
+    document.removeEventListener("click", closeOnClickOutside);
+  }
 });
+document.addEventListener("click", closeOnClickOutside);
 </script>
 
 <template>

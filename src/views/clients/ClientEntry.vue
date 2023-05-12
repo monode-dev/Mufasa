@@ -2,6 +2,7 @@
 import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
+import DeleteClientPage from "./DeleteClient.page.vue";
 import { Client, LOADING } from "@/firebase";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
 
@@ -14,7 +15,7 @@ const props = defineProps({
 });
 
 function deletePressed() {
-  props.client.deleteDoc();
+  pushPage(DeleteClientPage, { client: props.client });
 }
 </script>
 
