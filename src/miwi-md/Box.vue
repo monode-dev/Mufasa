@@ -129,6 +129,9 @@ export const mdColors = {
   transparent: `#ffffff00`,
   sameAsText: `currentColor`,
 } as const;
+
+// Size
+// scale: [positive-space, negative-space]
 const muToRem = 1.125; //1.0625;
 export function sizeToCss(num: number | string) {
   if (isNum(num)) {

@@ -49,7 +49,7 @@ export default {
     >
       <Icon icon="dotsVertical" :color="mdColors.transparent" />
       <Text title>Client Info</Text>
-      <Icon icon="dotsVertical" />
+      <DeleteOptionsButton />
     </Box>
     <!-- title="Client Info" -->
     <Card :sty="{ width: `1f` }">

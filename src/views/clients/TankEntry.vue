@@ -18,7 +18,7 @@ const shortHeight = ref(`0`);
     >
       <Text>#<slot /></Text>
 
-      <Icon icon="dotsVertical" />
+      <DeleteOptionsButton />
     </Box>
     <DropDown label="Fuel" selected="GAPRMC" />
     <DropDown label="Shape" selected="Horizontal Cylinder" />

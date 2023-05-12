@@ -4,7 +4,6 @@ import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
 import { Client, LOADING } from "@/firebase";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
-import vClickOutside from "v-click-outside";
 
 // Create a prop called size
 const props = defineProps({
@@ -14,15 +13,9 @@ const props = defineProps({
   },
 });
 
-const dropDownModalRef = ref<VNodeRef | null>(null);
-const dropDownIsOpen = ref(false);
-
-// Close the dropdown when the user clicks outside of it
-document.addEventListener("click", (e) => {
-  if (dropDownIsOpen.value && !dropDownModalRef.value?.$el.contains(e.target)) {
-    dropDownIsOpen.value = false;
-  }
-});
+function deletePressed() {
+  console.log(`Delete ${props.client.name}.`);
+}
 </script>
 
 <template>
@@ -33,7 +26,6 @@ document.addEventListener("click", (e) => {
       align: $Align.topRight,
     }"
   >
-    <!-- Entry -->
     <Box
       @click="pushPage(ClientPage, { client })"
       :sty="{
@@ -46,33 +38,7 @@ document.addEventListener("click", (e) => {
       }"
     >
       {{ client.name ?? `Loading...` }}
-      <Icon
-        @click.stop="(e) => (dropDownIsOpen = !dropDownIsOpen)"
-        icon="dotsVertical"
-      />
-    </Box>
-    <!-- Drop Down -->
-    <Box v-if="dropDownIsOpen">
-      <Box :sty="{ height: 0.25 }" />
-      <Box
-        ref="dropDownModalRef"
-        :sty="{
-          padding: 1,
-          spacing: 1,
-          shadowSize: 1,
-          zIndex: 10000,
-          background: mdColors.white,
-        }"
-      >
-        <Row :sty="{ textColor: mdColors.red, spacing: 0.25 }">
-          <Text>Delete</Text>
-          <Icon icon="delete" />
-        </Row>
-        <Row :sty="{ spacing: 0.25 }">
-          <Text>Cancel</Text>
-          <Icon icon="close" />
-        </Row>
-      </Box>
+      <DeleteOptionsButton @delete="deletePressed" />
     </Box>
   </Box>
 </template>

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, reactive, Component } from "vue";
+import { computed, Component, shallowRef } from "vue";
 import { gsap } from "gsap";
 import { SplashScreen } from "@capacitor/splash-screen";
 
@@ -61,27 +61,31 @@ export interface NavPage<T> {
   transitions: PageTransition;
 }
 export const useNav = defineStore("navigator", () => {
-  const openedPages = reactive<(NavPage<any> & { props: any })[]>([]);
+  const openedPages = shallowRef<(NavPage<any> & { props: any })[]>([]);
 
   return {
-    openedPages: openedPages,
+    openedPages: computed(() => openedPages.value),
     pushPage<T>(newPage: NavPage<T>, props: T | {} = {}) {
-      console.log(newPage);
-      openedPages.push({
-        ...newPage,
-        props,
-      });
+      openedPages.value = [
+        ...openedPages.value,
+        {
+          ...newPage,
+          props,
+        },
+      ];
 
       /* We do this here instead of at the end of AutoUpdateLoadingScreen
        * so that we never accidentally see the loading splash screen. */
-      if (openedPages.length === 1) {
+      if (openedPages.value.length === 1) {
         SplashScreen.hide();
       }
     },
     popPage() {
-      openedPages.pop();
+      openedPages.value = openedPages.value.slice(0, -1);
     },
-    currentPage: computed(() => openedPages[openedPages.length - 1]),
+    currentPage: computed(
+      () => openedPages.value[openedPages.value.length - 1],
+    ),
   };
 });
 
