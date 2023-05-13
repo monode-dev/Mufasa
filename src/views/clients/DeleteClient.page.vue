@@ -17,7 +17,6 @@ const props = defineProps({
 const cardRef = ref<VNodeRef | null>(null);
 
 function closePopUp() {
-  document.removeEventListener("click", popOnClickOutside);
   popPage();
 }
 function handleYes() {
@@ -32,7 +31,6 @@ function popOnClickOutside(e: MouseEvent) {
     e.stopPropagation();
   }
 }
-document.addEventListener("click", popOnClickOutside);
 </script>
 
 <script lang="ts">
@@ -43,6 +41,7 @@ export default {
 
 <template>
   <Box
+    @click="popOnClickOutside"
     :sty="{
       width: `1f`,
       height: `1f`,

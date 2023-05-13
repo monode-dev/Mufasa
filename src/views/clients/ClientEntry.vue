@@ -17,6 +17,11 @@ const props = defineProps({
 function deletePressed() {
   pushPage(DeleteClientPage, { client: props.client });
 }
+
+function clicked() {
+  console.log(`clicked`);
+  pushPage(ClientPage, { client: props.client });
+}
 </script>
 
 <template>
@@ -28,7 +33,7 @@ function deletePressed() {
     }"
   >
     <Box
-      @click="pushPage(ClientPage, { client })"
+      @click.stop="clicked"
       :sty="{
         width: `1f`,
         height: `100%`,

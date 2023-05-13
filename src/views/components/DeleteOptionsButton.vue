@@ -21,12 +21,14 @@ const dropDownIsOpen = ref(false);
 
 // Close the dropdown when the user clicks outside of it
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
-  if (dropDownIsOpen.value && !dropDownModalRef.value?.$el.contains(e.target)) {
-    e.stopPropagation();
+  if (!dropDownModalRef.value?.$el.contains(e.target)) {
+    console.log(`closeOnClickOutside`);
     dropDownIsOpen.value = false;
+    e.stopPropagation();
   }
 }
 watchEffect(() => {
+  console.log(`dropDownIsOpen: ${dropDownIsOpen.value}`);
   if (dropDownIsOpen.value) {
     document.addEventListener("click", closeOnClickOutside);
     document.addEventListener("touchend", closeOnClickOutside);
