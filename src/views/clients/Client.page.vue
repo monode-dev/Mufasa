@@ -1,19 +1,31 @@
 <script setup lang="ts">
-import { PropType } from "vue";
-import { pageTransitions } from "@/Nav";
+import { PropType, watchEffect } from "vue";
+import { pageTransitions, popPage } from "@/Nav";
 import { Align, mdColors } from "@/miwi-md/Box.vue";
 import { Client } from "@/firebase";
+import { pushPage } from "@/Nav";
+import DeleteClientPage from "@/views/clients/DeleteClient.page.vue";
 
 const props = defineProps({
   client: {
-    type: Object as PropType<Client>,
+    type: Object as () => Client,
     required: true,
   },
+});
+
+watchEffect(() => {
+  if (props.client.isDeleted) {
+    popPage();
+  }
 });
 
 const tankNums: number[] = [];
 for (let i = 1; i <= 5; i++) {
   tankNums.push(i);
+}
+
+function deletePressed() {
+  pushPage(DeleteClientPage, { client: props.client });
 }
 </script>
 
@@ -43,7 +55,7 @@ export default {
       >
         <Icon icon="dotsVertical" :color="mdColors.transparent" />
         <Text title>Client Info</Text>
-        <DeleteOptionsButton />
+        <DeleteOptionsButton @delete="deletePressed" />
       </Box>
       <!-- title="Client Info" -->
       <Card :sty="{ width: `1f` }">

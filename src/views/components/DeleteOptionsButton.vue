@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { PropType, VNodeRef, defineProps, ref, watchEffect } from "vue";
+import {
+  PropType,
+  VNodeRef,
+  defineProps,
+  onMounted,
+  onUnmounted,
+  ref,
+  watchEffect,
+} from "vue";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
 
 // Create a prop called size
@@ -22,20 +30,17 @@ const dropDownIsOpen = ref(false);
 // Close the dropdown when the user clicks outside of it
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
   if (!dropDownModalRef.value?.$el.contains(e.target)) {
-    console.log(`closeOnClickOutside`);
     dropDownIsOpen.value = false;
-    e.stopPropagation();
+    //e.stopPropagation();
   }
 }
-watchEffect(() => {
-  console.log(`dropDownIsOpen: ${dropDownIsOpen.value}`);
-  if (dropDownIsOpen.value) {
-    document.addEventListener("click", closeOnClickOutside);
-    document.addEventListener("touchend", closeOnClickOutside);
-  } else {
-    document.removeEventListener("click", closeOnClickOutside);
-    document.removeEventListener("touchend", closeOnClickOutside);
-  }
+onMounted(() => {
+  document.addEventListener("click", closeOnClickOutside);
+  document.addEventListener("touchend", closeOnClickOutside);
+});
+onUnmounted(() => {
+  document.removeEventListener("click", closeOnClickOutside);
+  document.removeEventListener("touchend", closeOnClickOutside);
 });
 </script>
 
