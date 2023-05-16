@@ -66,11 +66,12 @@ export const useNav = defineStore("navigator", () => {
   return {
     notchHeight: ref(`0px`),
     openedPages: computed(() => openedPages.value),
-    pushPage<T>(newPage: NavPage<T>, props: T | {} = {}) {
+    pushPage<T>(newPage: Component<T>, props: T | {} = {}) {
       openedPages.value = [
         ...openedPages.value,
         {
-          ...newPage,
+          component: newPage,
+          transitions: (newPage as any).transitions ?? pageTransitions.none,
           props,
         },
       ];
@@ -92,13 +93,7 @@ export const useNav = defineStore("navigator", () => {
 
 export function pushPage<T>(newPage: Component<T>, props: T | {} = {}) {
   const nav = useNav();
-  nav.pushPage(
-    {
-      component: newPage,
-      transitions: (newPage as any).transitions ?? pageTransitions.none,
-    },
-    props,
-  );
+  nav.pushPage(newPage, props);
 }
 
 export function popPage() {

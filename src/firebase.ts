@@ -90,9 +90,9 @@ export function docProx<T extends Doc<{}>>(
       if (prop === "_firestoreRef") {
         return docRef;
       } else if (prop === "isLoaded") {
-        return computed(() => isLoaded(data.value));
+        return isLoaded(data.value);
       } else if (prop === "isDeleted") {
-        return computed(() => data.value === DELETED);
+        return data.value === DELETED;
       } else if (prop === "deleteDoc") {
         return async () => {
           docRef = await docRef;

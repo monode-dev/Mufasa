@@ -19,7 +19,6 @@ function deletePressed() {
 }
 
 function clicked() {
-  console.log(`clicked`);
   pushPage(ClientPage, { client: props.client });
 }
 </script>
