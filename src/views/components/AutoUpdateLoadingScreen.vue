@@ -59,7 +59,7 @@ async function getAndApplyPatch() {
           }"
           >Updating...</Box
         >
-        <Box :sty="{ height: 2 * textSize }"></Box>
+        <!-- <Box :sty="{ height: 2 * textSize }"></Box> -->
       </Box>
     </div>
   </Page>
