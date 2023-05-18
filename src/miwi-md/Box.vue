@@ -23,7 +23,12 @@ export interface Sty {
   background: string;
   shadowSize: number;
   shadowDirection: Align;
-  padding: string | number;
+  padding:
+    | `css ${string}`
+    | number
+    | `${number}`
+    | `${number} ${number}`
+    | `${number} ${number} ${number} ${number}`;
   align: Align;
   axis: Axis;
   overflowX: Overflow;
@@ -36,6 +41,8 @@ export interface Sty {
   textIsUnderlined: boolean;
   isInteractable: boolean;
   zIndex: number;
+  shouldLog: boolean;
+  debugName: string;
 }
 export type Axis = (typeof Axis)[keyof typeof Axis];
 export const Axis = {
@@ -160,9 +167,13 @@ function isFlexSize(size: any): size is FlexSize {
 function computeSizeInfo({
   size,
   isMainAxis,
+  shouldLog,
+  debugName,
 }: {
   size: number | string | FlexSize;
   isMainAxis: boolean;
+  shouldLog: boolean;
+  debugName: string;
 }) {
   const isShrink = size === -1;
   const sizeIsFlex = isFlexSize(size);
@@ -200,10 +211,6 @@ export default defineComponent({
       type: Object as PropType<Partial<Sty>>,
       default: {},
       required: false,
-    },
-    shouldLog: {
-      type: Boolean,
-      default: false,
     },
   },
   data() {
@@ -254,6 +261,8 @@ export default defineComponent({
       const [exactWidth, wMin, wMax, widthGrows] = computeSizeInfo({
         size: width,
         isMainAxis: this.parentAxis === Axis.row,
+        shouldLog: this.sty.shouldLog ?? false,
+        debugName: `${this.sty.debugName ?? `Box`} width`,
       });
       let height =
         (this.sty.height ?? -1) === -1
@@ -271,6 +280,8 @@ export default defineComponent({
       const [exactHeight, hMin, hMax, heightGrows] = computeSizeInfo({
         size: height,
         isMainAxis: this.parentAxis === Axis.column,
+        shouldLog: this.sty.shouldLog ?? false,
+        debugName: `${this.sty.debugName ?? `Box`} height`,
       });
       const shadowDirection = (() => {
         switch (this.sty.shadowDirection ?? Align.bottomRight) {
@@ -294,9 +305,15 @@ export default defineComponent({
             return { x: 1, y: -1 };
         }
       })();
-      const cssPadding = isNum(this.sty.padding)
-        ? sizeToCss(this.sty.padding)
-        : this.sty.padding;
+      const cssPadding =
+        isString(this.sty.padding) && this.sty.padding.startsWith(`css `)
+          ? this.sty.padding.split(`css `)[1]
+          : isNum(this.sty.padding)
+          ? sizeToCss(this.sty.padding)
+          : (this.sty.padding ?? ``)
+              .split(` `)
+              .map((p) => sizeToCss(Number(p)))
+              .join(` `);
       return {
         // Sizing
         display: `flex`,
@@ -575,20 +592,20 @@ export default defineComponent({
         ) as HTMLElement[];
         this.childWidthGrows = children.some((child) => {
           if (!child.classList.contains(`b-x`)) return false;
-          const childStyle = child.style;
           return (
-            childStyle.width === "100%" ||
+            child.style.width === "100%" ||
             (this.axis === Axis.row &&
-              (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
+              (getComputedStyle(child).flexBasis !== "auto" ||
+                getComputedStyle(child).flexGrow !== "0"))
           );
         });
         this.childHeightGrows = children.some((child) => {
           if (!child.classList.contains(`b-x`)) return false;
-          const childStyle = getComputedStyle(child);
           return (
-            childStyle.height === "100%" ||
+            child.style.height === "100%" ||
             (this.axis === Axis.column &&
-              (childStyle.flexBasis !== "auto" || childStyle.flexGrow !== "0"))
+              (getComputedStyle(child).flexBasis !== "auto" ||
+                getComputedStyle(child).flexGrow !== "0"))
           );
         });
       })();

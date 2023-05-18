@@ -10,7 +10,12 @@ interface _Sty {
   background: string;
   shadowSize: number;
   shadowDirection: Align;
-  padding: string | number;
+  padding:
+    | `css ${string}`
+    | number
+    | `${number}`
+    | `${number} ${number}`
+    | `${number} ${number} ${number} ${number}`;
   align: Align;
   axis: Axis;
   overflowX: Overflow;
@@ -23,6 +28,8 @@ interface _Sty {
   textIsUnderlined: boolean;
   isInteractable: boolean;
   zIndex: number;
+  shouldLog: boolean;
+  debugName: string;
 }
 export interface FlexSize {
   flex: number;

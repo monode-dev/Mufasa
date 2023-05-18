@@ -18,7 +18,7 @@ const props = defineProps({
     required: true,
   },
   sty: {
-    type: Object as StyProp,
+    type: Object as PropType<Partial<Sty>>,
     default: {},
   },
 });

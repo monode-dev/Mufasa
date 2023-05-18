@@ -132,6 +132,35 @@ export function newDocCollection<
 }
 
 //
+function prop<T>(init: T) {
+  return ref(init);
+}
+function formula<T, R = any>(compute: (inst: T) => R) {
+  return computed(compute);
+}
+function action<T>(doAction: (inst: T) => Promise<void>) {
+  return doAction;
+}
+/* type DocFormat<T extends {
+  [key: string]: Prop | Formula<T> | Action<T>;
+}> = T;
+const clientDocCollection = newDocCollection({
+  name: prop(``),
+  clientId: prop<number | undefined>(undefined),
+  phoneNumber: prop(``),
+  address: prop(``),
+  notes: prop(``),
+  // Should be able to be inferred
+  customCreate: (create, props: { nameOrId: string }) => {
+    const wasGivenId = !isNaN(Number(nameOrId));
+    return create ({
+        name: wasGivenId ? undefined : nameOrId,
+        clientId: wasGivenId ? (nameOrId as ClientId) : undefined,
+    });
+  },
+});*/
+
+//
 export type ClientId = `${number}` | ``;
 export type Client = Doc<{
   name: string;

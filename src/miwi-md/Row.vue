@@ -11,10 +11,12 @@ const props = defineProps({
 </script>
 
 <template>
-  <Box :sty="{
-                axis: Axis.row,
-                ...sty,
-              }">
+  <Box
+    :sty="{
+      axis: Axis.row,
+      ...sty,
+    }"
+  >
     <slot />
   </Box>
 </template>

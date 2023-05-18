@@ -7,7 +7,8 @@ const model = useFirestore();
 
 <template>
   <Column :sty="{ width: `1f`, height: `1f` }">
-    <ClientSearchBar :filteredClients="model.clients" />
+    <!-- <ClientSearchBar :filteredClients="model.clients" /> -->
+    <ClientActionBar />
 
     <Body>
       <ClientEntry
