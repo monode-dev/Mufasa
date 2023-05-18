@@ -81,14 +81,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <Box
+  <Row
     ref="tabBodiesParent"
     :sty="{
       width: `300%`,
       height: `1f`,
-      axis: Axis.row,
       align: Align.topCenter,
       overflowX: Overflow.crop,
+      spacing: 1,
     }"
   >
     <Box
@@ -115,5 +115,5 @@ onMounted(() => {
     >
       <slot name="tab2" />
     </Box>
-  </Box>
+  </Row>
 </template>

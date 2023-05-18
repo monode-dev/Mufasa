@@ -1,6 +1,5 @@
 
 import App from "./App.vue";
-import Home from "./views/Home.page.vue";
 import AppBar from "./miwi-md/AppBar.vue";
 import B00 from "./miwi-md/B00.vue";
 import Body from "./miwi-md/Body.vue";
@@ -17,6 +16,7 @@ import Stack from "./miwi-md/Stack.vue";
 import TabButtons from "./miwi-md/TabButtons.vue";
 import TabView from "./miwi-md/TabView.vue";
 import Text from "./miwi-md/Text.vue";
+import Home from "./views/Home.page.vue";
 import Client from "./views/clients/Client.page.vue";
 import ClientActionBar from "./views/clients/ClientActionBar.vue";
 import ClientEntry from "./views/clients/ClientEntry.vue";
@@ -37,7 +37,6 @@ import SettingsButton from "./views/settings/SettingsButton.vue";
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
     App: typeof App;
-Home: typeof Home;
 AppBar: typeof AppBar;
 B00: typeof B00;
 Body: typeof Body;
@@ -54,6 +53,7 @@ Stack: typeof Stack;
 TabButtons: typeof TabButtons;
 TabView: typeof TabView;
 Text: typeof Text;
+Home: typeof Home;
 Client: typeof Client;
 ClientActionBar: typeof ClientActionBar;
 ClientEntry: typeof ClientEntry;
