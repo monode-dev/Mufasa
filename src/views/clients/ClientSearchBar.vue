@@ -77,7 +77,7 @@ function addPressed() {
       }"
     >
       <Box :sty="{ width: 0.25 }" />
-      <Field hint="Add New or Search" v-model:value="filterString" />
+      <Field hint="Search by Name or ID" v-model:value="filterString" />
       <Box :sty="{ width: 0.25 }" />
     </Row>
     <Icon

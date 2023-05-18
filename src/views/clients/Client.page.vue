@@ -4,7 +4,7 @@ import { pageTransitions, popPage } from "@/Nav";
 import { Align, mdColors } from "@/miwi-md/Box.vue";
 import { Client } from "@/firebase";
 import { pushPage } from "@/Nav";
-import DeleteClientPage from "@/views/clients/DeleteClient.page.vue";
+import DeleteClientPage from "@/views/clients/DeleteClient.dialog.vue.js";
 
 const props = defineProps({
   client: {
