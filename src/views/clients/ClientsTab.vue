@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
-import { docProx, isLoaded, useFirestore } from "@/firebase";
+import { LOADING, docProx, DELETED, useFirestore } from "@/firebase";
 
 const model = useFirestore();
 </script>
@@ -13,9 +13,9 @@ const model = useFirestore();
       <ClientEntry
         v-for="(client, index) in [...model.clients].sort((a, b) => {
           //
-          if (!isLoaded(a.name)) {
+          if (!a.isLoaded || a.name === LOADING || a.name === DELETED) {
             return 1;
-          } else if (!isLoaded(b.name)) {
+          } else if (!b.isLoaded || b.name === LOADING || b.name === DELETED) {
             return -1;
           } else {
             return a.name.localeCompare(b.name);

@@ -22,6 +22,7 @@ const props = defineProps({
 
 <template>
   <Row
+    v-if="fuelType.isLoaded"
     :sty="{
       ...sty,
       textColor: fuelType.isVisible ? sty.textColor : mdColors.grey,
@@ -33,7 +34,7 @@ const props = defineProps({
         width: `1f`,
       }"
     >
-      <Field v-model:value="fuelType.name" />
+      <Field v-model:value="fuelType.name" hint="Unnamed" />
     </Label>
     <Label
       label="Rate"
@@ -41,7 +42,7 @@ const props = defineProps({
         width: `1f`,
       }"
     >
-      <Field v-model:value="fuelType.rate" />
+      <Field v-model:value="fuelType.rate" hint="$/Unit" />
     </Label>
     <Icon
       :icon="fuelType.isVisible ? `eye` : `eyeOff`"
@@ -49,4 +50,5 @@ const props = defineProps({
     />
     <!-- <DeleteOptionsButton @delete="deletePressed" /> -->
   </Row>
+  <Text v-else hint :sty="{ width: `1f` }">Loading...</Text>
 </template>

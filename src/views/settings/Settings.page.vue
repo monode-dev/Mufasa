@@ -2,7 +2,7 @@
 import { pageTransitions } from "@/Nav";
 import { appVersion } from "@/AppDetails";
 import { ref } from "vue";
-import { isLoaded, useFirestore } from "@/firebase";
+import { LOADING, DELETED, useFirestore } from "@/firebase";
 import { mdColors } from "@/miwi-md/Box.vue";
 
 function openTkeWebsite() {
@@ -41,10 +41,20 @@ export default {
         <FuelTypeEntry
           v-for="fuelType in [...model.fuelTypes].sort((a, b) => {
             //
-            if (!isLoaded(a.createdPosix)) {
+            if (!a.isLoaded) {
               return 1;
-            } else if (!isLoaded(b.createdPosix)) {
+            } else if (!b.isLoaded) {
               return -1;
+            } else if (
+              a.createdPosix === LOADING ||
+              a.createdPosix === DELETED
+            ) {
+              return -1;
+            } else if (
+              b.createdPosix === LOADING ||
+              b.createdPosix === DELETED
+            ) {
+              return 1;
             } else {
               return b.createdPosix - a.createdPosix;
             }

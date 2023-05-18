@@ -63,9 +63,6 @@ export type LOADING = null;
 export const LOADING: LOADING = null;
 export type DELETED = undefined;
 export const DELETED: DELETED = undefined;
-export function isLoaded<T>(value: T | LOADING | DELETED): value is T {
-  return value !== LOADING && value !== DELETED;
-}
 export type Doc<T extends {} = {}> = {
   [K in keyof T]: T[K] | LOADING | DELETED;
 } & DocSpecificProps;
@@ -90,7 +87,7 @@ export function docProx<T extends Doc<{}>>(
       if (prop === "_firestoreRef") {
         return docRef;
       } else if (prop === "isLoaded") {
-        return isLoaded(data.value);
+        return data.value !== LOADING && data.value !== DELETED;
       } else if (prop === "isDeleted") {
         return data.value === DELETED;
       } else if (prop === "deleteDoc") {
@@ -145,7 +142,7 @@ export type Client = Doc<{
 }>;
 export type FuelType = Doc<{
   name: string;
-  rate: number;
+  rate: number | null;
   isVisible: boolean;
   createdPosix: number;
 }>;
@@ -170,7 +167,7 @@ export const useFirestore = defineStore("firestore", () => {
     () => {
       return {
         name: ``,
-        rate: 0,
+        rate: null,
         isVisible: true,
         createdPosix: Date.now(),
       } satisfies Omit<FuelType, keyof DocSpecificProps>;
