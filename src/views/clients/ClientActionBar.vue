@@ -17,10 +17,10 @@ const props = defineProps({
     :sty="{
       width: `1f`,
       background: mdColors.green,
-      padding: 0.5,
+      padding: `0.5 0`,
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
-      spacing: $Spacing.spaceBetween,
+      spacing: $Spacing.spaceEvenly,
       ...sty,
     }"
   >
