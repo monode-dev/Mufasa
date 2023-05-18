@@ -13,6 +13,7 @@ import * as mdijs from "@mdi/js";
 
 // Begin Generated Imports
 import App from "./App.vue";
+import Home from "./views/Home.page.vue";
 import AppBar from "./miwi-md/AppBar.vue";
 import B00 from "./miwi-md/B00.vue";
 import Body from "./miwi-md/Body.vue";
@@ -29,7 +30,6 @@ import Stack from "./miwi-md/Stack.vue";
 import TabButtons from "./miwi-md/TabButtons.vue";
 import TabView from "./miwi-md/TabView.vue";
 import Text from "./miwi-md/Text.vue";
-import Home from "./views/Home.page.vue";
 import Client from "./views/clients/Client.page.vue";
 import ClientEntry from "./views/clients/ClientEntry.vue";
 import ClientSearchBar from "./views/clients/ClientSearchBar.vue";
@@ -56,6 +56,7 @@ vueApp.use(mdiVue, {
 });
 // Begin Generated Components
 vueApp.component("App", App);
+vueApp.component("Home", Home);
 vueApp.component("AppBar", AppBar);
 vueApp.component("B00", B00);
 vueApp.component("Body", Body);
@@ -72,7 +73,6 @@ vueApp.component("Stack", Stack);
 vueApp.component("TabButtons", TabButtons);
 vueApp.component("TabView", TabView);
 vueApp.component("Text", Text);
-vueApp.component("Home", Home);
 vueApp.component("Client", Client);
 vueApp.component("ClientEntry", ClientEntry);
 vueApp.component("ClientSearchBar", ClientSearchBar);

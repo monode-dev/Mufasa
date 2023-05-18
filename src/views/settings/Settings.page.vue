@@ -61,6 +61,7 @@ export default {
             ><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text
           >
         </Column>
+        <Box :sty="{ height: 1 }" />
       </Column>
     </Body>
   </Page>
