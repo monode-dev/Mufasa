@@ -5,8 +5,11 @@ import { count, incCount } from "@/firebase";
 
 // Confetti
 const shouldShowConfetti = ref(false);
+const confettiRunCount = ref(0);
 watchEffect(async () => {
+  confettiRunCount.value++;
   if (count.value % 10 !== 0) return;
+  if (confettiRunCount.value < 2) return;
   shouldShowConfetti.value = true;
   await new Promise((resolve) => setTimeout(resolve, 3000));
   shouldShowConfetti.value = false;
