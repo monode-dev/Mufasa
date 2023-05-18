@@ -24,8 +24,8 @@ const props = defineProps({
       ...sty,
     }"
   >
-    <OutlinedActionButton label="New" icon="plus" />
     <OutlinedActionButton label="Search" icon="magnify" />
+    <OutlinedActionButton label="New" icon="plus" />
     <OutlinedActionButton label="Import" icon="import" />
     <OutlinedActionButton label="Export" icon="export" />
   </Row>
