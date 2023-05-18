@@ -88,7 +88,6 @@ onMounted(() => {
       height: `1f`,
       align: Align.topCenter,
       overflowX: Overflow.crop,
-      spacing: 1,
     }"
   >
     <Box

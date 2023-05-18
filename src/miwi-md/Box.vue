@@ -57,7 +57,10 @@ export const Overflow = {
   wrap: `wrap`,
   scroll: `scroll`,
 } as const;
-export type Spacing = number | (typeof Spacing)[keyof typeof Spacing];
+export type Spacing =
+  | number
+  | `css ${string}`
+  | (typeof Spacing)[keyof typeof Spacing];
 export const Spacing = {
   spaceBetween: `space-between`,
   spaceAround: `space-around`,
@@ -525,10 +528,14 @@ export default defineComponent({
         // Spacing
         // TODO: Default could maybe be based off of font size.
         rowGap: isDefined(this.sty.spacing)
-          ? sizeToCss(this.sty.spacing)
+          ? isString(this.sty.spacing) && this.sty.spacing.startsWith(`css `)
+            ? this.sty.spacing
+            : sizeToCss(this.sty.spacing)
           : undefined,
         columnGap: isDefined(this.sty.spacing)
-          ? sizeToCss(this.sty.spacing)
+          ? isString(this.sty.spacing) && this.sty.spacing.startsWith(`css `)
+            ? this.sty.spacing
+            : sizeToCss(this.sty.spacing)
           : undefined,
 
         // Text Style
