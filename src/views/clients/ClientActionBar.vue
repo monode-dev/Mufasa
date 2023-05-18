@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, PropType } from "vue";
+import { defineProps, PropType, ref } from "vue";
 import { Sty } from "@/miwi-md/Box.vue";
 import { mdColors } from "@/miwi-md/Box.vue";
 
@@ -10,10 +10,25 @@ const props = defineProps({
     default: {},
   },
 });
+
+enum Mode {
+  Home = "Home",
+  Search = "Search",
+  New = "New",
+  Import = "Import",
+  Export = "Export",
+}
+const mode = ref(Mode.Home);
 </script>
 
 <template>
+  <ClientSearchBar
+    v-if="mode === Mode.Search"
+    @close="mode = Mode.Home"
+    :filtered-clients="[]"
+  />
   <Row
+    v-else
     :sty="{
       width: `1f`,
       background: mdColors.green,
@@ -24,7 +39,11 @@ const props = defineProps({
       ...sty,
     }"
   >
-    <OutlinedActionButton label="Search" icon="magnify" />
+    <OutlinedActionButton
+      label="Search"
+      icon="magnify"
+      @click.stop="mode = Mode.Search"
+    />
     <OutlinedActionButton label="New" icon="plus" />
     <OutlinedActionButton label="Import" icon="import" />
     <OutlinedActionButton label="Export" icon="export" />

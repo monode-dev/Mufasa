@@ -43,7 +43,7 @@ watchEffect(() => {
   );
 });
 
-const emit = defineEmits(["update:filteredClients"]);
+const emit = defineEmits(["update:filteredClients", "close"]);
 
 function addPressed() {
   if (textHasBeenEntered.value) {
@@ -81,10 +81,16 @@ function addPressed() {
       <Box :sty="{ width: 0.25 }" />
     </Row>
     <Icon
+      @click="emit(`close`)"
+      :scale="1.5"
+      icon="close"
+      :color="mdColors.white"
+    />
+    <!-- <Icon
       @click="addPressed"
       :scale="1.5"
       icon="plus"
       :color="mdColors.white"
-    />
+    /> -->
   </Row>
 </template>
