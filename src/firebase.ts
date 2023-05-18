@@ -66,7 +66,7 @@ export const DELETED: DELETED = undefined;
 export function isLoaded<T>(value: T | LOADING | DELETED): value is T {
   return value !== LOADING && value !== DELETED;
 }
-export type Doc<T> = {
+export type Doc<T extends {} = {}> = {
   [K in keyof T]: T[K] | LOADING | DELETED;
 } & DocSpecificProps;
 export type DocSpecificProps = {
@@ -115,6 +115,24 @@ export function docProx<T extends Doc<{}>>(
     },
   });
 }
+export function newDocCollection<
+  T extends Doc,
+  CreateArgs extends any[],
+  Create extends (...args: CreateArgs) => Omit<T, keyof DocSpecificProps>,
+>(collectionName: string, caster: T, createDoc: Create) {
+  const collectionRef = collection(firebaseDb, collectionName);
+  const collectionList = ref<T[]>([]);
+  onSnapshot(collectionRef, (querySnapshot) => {
+    collectionList.value = querySnapshot.docs.map((doc) => docProx(doc.ref));
+  });
+  return {
+    list: collectionList,
+    create(...args: CreateArgs) {
+      const newDoc = createDoc(...args);
+      return docProx<T>(addDoc(collectionRef, newDoc));
+    },
+  };
+}
 
 //
 export type ClientId = `${number}` | ``;
@@ -125,26 +143,43 @@ export type Client = Doc<{
   address: string;
   notes: string;
 }>;
+export type FuelType = Doc<{
+  name: string;
+  rate: number;
+  isVisible: boolean;
+  createdPosix: number;
+}>;
 export const useFirestore = defineStore("firestore", () => {
-  const clientCollection = collection(firebaseDb, `Client`);
-  const clientsList = ref<Client[]>([]);
-  onSnapshot(clientCollection, (querySnapshot) => {
-    clientsList.value = querySnapshot.docs.map((doc) => docProx(doc.ref));
-  });
-  return {
-    clients: clientsList,
-    createClient(nameOrId: string): Client {
+  const clientDocCollection = newDocCollection(
+    `Client`,
+    {} as Client,
+    (nameOrId: string) => {
       const wasGivenId = !isNaN(Number(nameOrId));
-      const newClient: Omit<Client, keyof DocSpecificProps> = {
+      return {
         name: wasGivenId ? "" : nameOrId,
         clientId: wasGivenId ? (nameOrId as ClientId) : "",
         phoneNumber: "",
         address: "",
         notes: "",
-      };
-
-      // Create a new client in the database
-      return docProx<Client>(addDoc(clientCollection, newClient));
+      } satisfies Omit<Client, keyof DocSpecificProps>;
     },
+  );
+  const fuelTypeDocCollection = newDocCollection(
+    `FuelType`,
+    {} as FuelType,
+    () => {
+      return {
+        name: ``,
+        rate: 0,
+        isVisible: true,
+        createdPosix: Date.now(),
+      } satisfies Omit<FuelType, keyof DocSpecificProps>;
+    },
+  );
+  return {
+    clients: clientDocCollection.list,
+    createClient: clientDocCollection.create,
+    fuelTypes: fuelTypeDocCollection.list,
+    createFuelType: fuelTypeDocCollection.create,
   };
 });

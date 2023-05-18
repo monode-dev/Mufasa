@@ -25,7 +25,6 @@ const shortHeight = ref(`0`);
     <Row
       :sty="{
         width: `1f`,
-        // spacing: 1,
       }"
     >
       <Label label="Length"><Field v-model:value="length" /></Label>
@@ -34,7 +33,6 @@ const shortHeight = ref(`0`);
     <Row
       :sty="{
         width: `1f`,
-        // spacing: 1,
       }"
     >
       <Label label="Height"><Field v-model:value="height" /></Label>

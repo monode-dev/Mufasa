@@ -209,7 +209,7 @@ export default defineComponent({
   data() {
     return {
       parentAxis: Axis.column as Axis,
-      _isBBox: true,
+      childCount: 0,
       childWidthGrows: false,
       childHeightGrows: false,
     };
@@ -443,8 +443,7 @@ export default defineComponent({
           // Exact spacing is handled through grid gap
           Object.values(Spacing as any).includes(this.sty.spacing)
             ? // For whatever reason, space-between with one item puts it at the start instead of centering it.
-              this.sty.spacing === Spacing.spaceBetween &&
-              this.children.length == 1
+              this.sty.spacing === Spacing.spaceBetween && this.childCount === 1
               ? Spacing.spaceAround
               : (this.sty.spacing as (typeof Spacing)[keyof typeof Spacing])
             : this.axis === Axis.column
@@ -547,9 +546,6 @@ export default defineComponent({
         zIndex: this.sty.zIndex,
       };
     },
-    children() {
-      return this.$slots?.default?.() ?? [];
-    },
   },
   methods: {
     updateFromHtml(divRef: Element | undefined) {
@@ -562,6 +558,12 @@ export default defineComponent({
           : parent.style.flexDirection === `column`
           ? (this.parentAxis = Axis.column)
           : (this.parentAxis = Axis.stack);
+      })();
+      // Update Child Count
+      (() => {
+        if (!divRef) return;
+        const children = Array.from(divRef.childNodes);
+        this.childCount = children.length;
       })();
       // Update Child Size Grows
       (() => {

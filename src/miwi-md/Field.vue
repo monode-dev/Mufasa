@@ -19,7 +19,7 @@ const props = defineProps({
     default: false,
   },
   value: {
-    type: String as PropType<string | undefined | null>,
+    type: [String, Number] as PropType<string | number | undefined | null>,
     optional: true,
     default: "",
   },

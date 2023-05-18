@@ -55,11 +55,10 @@ function addPressed() {
 </script>
 
 <template>
-  <Box
+  <Row
     :sty="{
       width: `1f`,
       background: mdColors.green,
-      axis: $Axis.row,
       padding: 0.5,
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
@@ -67,7 +66,7 @@ function addPressed() {
       ...sty,
     }"
   >
-    <Box
+    <Row
       :sty="{
         width: `1f`,
         padding: 0.25,
@@ -75,18 +74,17 @@ function addPressed() {
         align: $Align.centerLeft,
         background: mdColors.white,
         textColor: mdColors.grey,
-        axis: $Axis.row,
       }"
     >
       <Box :sty="{ width: 0.25 }" />
       <Field hint="Add New or Search" v-model:value="filterString" />
       <Box :sty="{ width: 0.25 }" />
-    </Box>
+    </Row>
     <Icon
       @click="addPressed"
       :scale="1.5"
       icon="plus"
       :color="mdColors.white"
     />
-  </Box>
+  </Row>
 </template>

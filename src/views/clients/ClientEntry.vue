@@ -24,26 +24,17 @@ function clicked() {
 </script>
 
 <template>
-  <Box
+  <Row
+    @click.stop="clicked"
     :sty="{
       width: `1f`,
       height: 1,
-      align: $Align.topRight,
+      spacing: $Spacing.spaceBetween,
+      textColor: client.name === LOADING ? mdColors.grey : mdColors.black,
+      overflowY: Overflow.visible,
     }"
   >
-    <Box
-      @click.stop="clicked"
-      :sty="{
-        width: `1f`,
-        height: `100%`,
-        spacing: $Spacing.spaceBetween,
-        axis: $Axis.row,
-        textColor: client.name === LOADING ? mdColors.grey : mdColors.black,
-        overflowY: Overflow.visible,
-      }"
-    >
-      {{ client.name ?? `Loading...` }}
-      <DeleteOptionsButton @delete="deletePressed" />
-    </Box>
-  </Box>
+    <Text>{{ client.name ?? `Loading...` }}</Text>
+    <DeleteOptionsButton @delete="deletePressed" />
+  </Row>
 </template>

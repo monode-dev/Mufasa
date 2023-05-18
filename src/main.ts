@@ -41,6 +41,7 @@ import ConfettiTab from "./views/components/ConfettiTab.vue";
 import DeleteOptionsButton from "./views/components/DeleteOptionsButton.vue";
 import Label from "./views/components/Label.vue";
 import OfflineWarning from "./views/components/OfflineWarning.vue";
+import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
 // End Generated Imports
@@ -83,6 +84,7 @@ vueApp.component("ConfettiTab", ConfettiTab);
 vueApp.component("DeleteOptionsButton", DeleteOptionsButton);
 vueApp.component("Label", Label);
 vueApp.component("OfflineWarning", OfflineWarning);
+vueApp.component("FuelTypeEntry", FuelTypeEntry);
 vueApp.component("Settings", Settings);
 vueApp.component("SettingsButton", SettingsButton);
 // End Generated Components

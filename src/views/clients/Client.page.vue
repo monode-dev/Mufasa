@@ -38,17 +38,16 @@ export default {
 <template>
   <Page>
     <AppBar
-      >Edit Client
+      ><Text>Edit Client</Text>
       <template #right>
         <SettingsButton />
       </template>
     </AppBar>
 
     <Body v-if="client.isLoaded">
-      <Box
+      <Row
         :sty="{
           width: `1f`,
-          axis: $Axis.row,
           spacing: $Spacing.spaceBetween,
           align: $Align.topCenter,
         }"
@@ -56,8 +55,7 @@ export default {
         <Icon icon="dotsVertical" :color="mdColors.transparent" />
         <Text title>Client Info</Text>
         <DeleteOptionsButton @delete="deletePressed" />
-      </Box>
-      <!-- title="Client Info" -->
+      </Row>
       <Card :sty="{ width: `1f` }">
         <Field
           underlined
@@ -99,7 +97,6 @@ export default {
       <Box>
         <Text title>Tanks</Text>
       </Box>
-      <!-- title="Tanks"  -->
       <TankEntry v-for="num in tankNums" :key="num">{{ num }}</TankEntry>
     </Body>
     <Body v-else :sty="{ align: Align.center }">
