@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
-import { pageTransitions, popPage } from "@/Nav";
-import { Client } from "@/firebase";
-import { PropType, VNodeRef, ref } from "vue";
+import { pageTransitions, popPage, pushPage } from "@/Nav";
+import { Client, useFirestore } from "@/firebase";
+import { PropType, VNodeRef, computed, ref } from "vue";
+import ClientPage from "./Client.page.vue";
 
 const props = defineProps({
   client: {
@@ -14,14 +15,26 @@ const props = defineProps({
   //   required: true,
   // },
 });
+
+const model = useFirestore();
+
 const cardRef = ref<VNodeRef | null>(null);
+const name = ref("");
+
+const textHasBeenEntered = computed(() => {
+  return name.value.length > 0;
+});
 
 function closePopUp() {
   popPage();
 }
 function handleYes() {
   closePopUp();
-  props.client.deleteDoc();
+  if (textHasBeenEntered.value) {
+    const newClient = model.createClient(name.value);
+    name.value = "";
+    pushPage(ClientPage, { client: newClient });
+  }
 }
 
 // Close the pop up when the user clicks outside of it
@@ -52,16 +65,19 @@ export default {
       ref="cardRef"
       :sty="{
         width: `75%`,
+        shadowSize: 0,
       }"
     >
-      <Text :sty="{ height: -1, overflowY: $Overflow.wrap }">
-        Are you sure you want to permanently delete "{{ client.clientId ?? `` }}
-        {{ client.clientId && client.name ? ` - ` : `` }}
-        {{ client.name ?? `` }}"?
-      </Text>
+      <Text title>Create Client</Text>
+      <Field
+        underlined
+        v-model:value="name"
+        hint="Enter client name."
+        :sty="{ width: `1f` }"
+      />
       <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
-        <Button outlined @click.stop="handleYes">Yes</Button>
-        <Button @click.stop="closePopUp">No</Button>
+        <Button outlined @click.stop="closePopUp">Cancel</Button>
+        <Button @click.stop="handleYes">Create</Button>
       </Row>
     </Card>
   </Box>

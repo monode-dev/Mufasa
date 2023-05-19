@@ -2,6 +2,8 @@
 import { defineProps, PropType, ref } from "vue";
 import { Sty } from "@/miwi-md/Box.vue";
 import { mdColors } from "@/miwi-md/Box.vue";
+import { pushPage } from "@/Nav";
+import CreateClientDialog from "./CreateClient.dialog.vue";
 
 // Allow overriding of the default sty
 const props = defineProps({
@@ -44,7 +46,11 @@ const mode = ref(Mode.Home);
       icon="magnify"
       @click.stop="mode = Mode.Search"
     />
-    <OutlinedActionButton label="New" icon="plus" />
+    <OutlinedActionButton
+      label="New"
+      icon="plus"
+      @click.stop="pushPage(CreateClientDialog)"
+    />
     <OutlinedActionButton label="Import" icon="import" />
     <OutlinedActionButton label="Export" icon="export" />
   </Row>

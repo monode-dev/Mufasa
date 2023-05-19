@@ -9,8 +9,6 @@ import {
 } from "vue";
 import { mdColors } from "@/miwi-md/Box.vue";
 import { Doc, Client, useFirestore } from "@/firebase";
-import { pushPage } from "@/Nav";
-import ClientPage from "./Client.page.vue";
 
 const props = defineProps({
   filteredClients: {
@@ -44,14 +42,6 @@ watchEffect(() => {
 });
 
 const emit = defineEmits(["update:filteredClients", "close"]);
-
-function addPressed() {
-  if (textHasBeenEntered.value) {
-    const newClient = model.createClient(filterString.value);
-    filterString.value = "";
-    pushPage(ClientPage, { client: newClient });
-  }
-}
 </script>
 
 <template>

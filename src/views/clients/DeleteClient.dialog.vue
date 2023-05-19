@@ -52,6 +52,7 @@ export default {
       ref="cardRef"
       :sty="{
         width: `75%`,
+        shadowSize: 0,
       }"
     >
       <Text :sty="{ height: -1, overflowY: $Overflow.wrap }">
