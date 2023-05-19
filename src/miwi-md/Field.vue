@@ -123,6 +123,7 @@ const detailColor = computed(() =>
               :ref="inputRef"
               type="text"
               :value="value"
+              :autofocus="hasFocus"
               @input="handleInput"
               @focus="handleFocus"
               @blur="handleBlur"

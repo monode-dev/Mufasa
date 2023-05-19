@@ -72,6 +72,7 @@ export default {
       <Field
         underlined
         v-model:value="name"
+        :has-focus="true"
         hint="Enter client name."
         :sty="{ width: `1f` }"
       />
