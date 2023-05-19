@@ -23,6 +23,13 @@ export default {
     <AppBar>Settings</AppBar>
 
     <Body>
+      <!-- Account -->
+      <Card>
+        <Text title>Account</Text>
+        <Text hint>Account settings will go here.</Text>
+      </Card>
+
+      <!-- Fuel Types -->
       <Card>
         <Row
           :sty="{

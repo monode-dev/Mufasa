@@ -4,6 +4,7 @@ import { Sty } from "@/miwi-md/Box.vue";
 import { mdColors } from "@/miwi-md/Box.vue";
 import { pushPage } from "@/Nav";
 import CreateClientDialog from "./CreateClient.dialog.vue";
+import { Client } from "@/firebase";
 
 // Allow overriding of the default sty
 const props = defineProps({
@@ -11,7 +12,13 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  filterString: {
+    type: String,
+    required: true,
+  },
 });
+
+const emit = defineEmits(["update:filterString"]);
 
 enum Mode {
   Home = "Home",
@@ -27,7 +34,8 @@ const mode = ref(Mode.Home);
   <ClientSearchBar
     v-if="mode === Mode.Search"
     @close="mode = Mode.Home"
-    :filtered-clients="[]"
+    :filterString="props.filterString"
+    @update:filterString="emit('update:filterString', $event)"
   />
   <Row
     v-else

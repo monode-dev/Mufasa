@@ -1,18 +1,34 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
-import { LOADING, docProx, DELETED, useFirestore } from "@/firebase";
+import { LOADING, docProx, DELETED, useFirestore, Client } from "@/firebase";
+import { ref } from "vue";
+import { computed } from "@vue/reactivity";
 
 const model = useFirestore();
+
+const filterString = ref("");
+const filteredClients = computed(() =>
+  model.clients.filter((client) => {
+    if (!client.name && !client.clientId) return false;
+    if (filterString.value.length === 0) return true;
+    return (
+      (client.name?.toLowerCase().includes(filterString.value.toLowerCase()) ??
+        false) ||
+      (client.clientId?.toString().includes(filterString.value.toLowerCase()) ??
+        false)
+    );
+  }),
+);
 </script>
 
 <template>
   <Column :sty="{ width: `1f`, height: `1f` }">
     <!-- <ClientSearchBar :filteredClients="model.clients" /> -->
-    <ClientActionBar />
+    <ClientActionBar v-model:filterString="filterString" />
 
     <Body>
       <ClientEntry
-        v-for="(client, index) in [...model.clients].sort((a, b) => {
+        v-for="(client, index) in [...filteredClients].sort((a, b) => {
           //
           if (!a.isLoaded || a.name === LOADING || a.name === DELETED) {
             return 1;
@@ -24,7 +40,7 @@ const model = useFirestore();
         })"
         :key="index"
         :client="client"
-      ></ClientEntry>
+      />
     </Body>
     <!-- <Stack :sty="{
         width: `1f`,
