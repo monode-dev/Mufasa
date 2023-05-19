@@ -17,8 +17,14 @@ const offlineWarningTransitions = pageTransitions.from({
 </script>
 
 <template>
-  <Transition appear @enter="offlineWarningTransitions.enter" @leave="offlineWarningTransitions.leave">
-    <div v-if="!hasInternet" :style="{
+  <Transition
+    appear
+    @enter="offlineWarningTransitions.enter"
+    @leave="offlineWarningTransitions.leave"
+  >
+    <div
+      v-if="!hasInternet"
+      :style="{
         background: `transparent`,
         width: `100%`,
         height: `100%`,
@@ -27,14 +33,18 @@ const offlineWarningTransitions = pageTransitions.from({
         position: `absolute`,
         pointerEvents: `none`,
         zIndex: 999999998,
-      }">
-      <Box :sty="{
+      }"
+    >
+      <Box
+        :sty="{
           width: `100%`,
           height: `100%`,
           padding: 1,
           align: $Align.bottomLeft,
-        }">
-        <Box :sty="{
+        }"
+      >
+        <Box
+          :sty="{
             background: mdColors.orange,
             textColor: mdColors.white,
             cornerRadius: 1,
@@ -43,7 +53,8 @@ const offlineWarningTransitions = pageTransitions.from({
             padding: 0.5,
             axis: $Axis.row,
             spacing: 0.5,
-          }">
+          }"
+        >
           <Icon :scale="1" icon="wifiOff" />
           Will Sync When Online
         </Box>

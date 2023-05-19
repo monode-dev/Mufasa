@@ -19,11 +19,15 @@ const filteredClients = computed(() =>
     );
   }),
 );
+
+let clientNums: number[] = [];
+for (let i = 1; i <= 50; i++) {
+  clientNums.push(i);
+}
 </script>
 
 <template>
   <Column :sty="{ width: `1f`, height: `1f` }">
-    <!-- <ClientSearchBar :filteredClients="model.clients" /> -->
     <ClientActionBar v-model:filterString="filterString" />
 
     <Body>
@@ -42,7 +46,10 @@ const filteredClients = computed(() =>
         :client="client"
       />
     </Body>
-    <!-- <Stack :sty="{
+  </Column>
+</template>
+
+<!-- <Stack :sty="{
         width: `1f`,
         height: `1f`,
       }">
@@ -61,5 +68,3 @@ const filteredClients = computed(() =>
           </Button>
         </Box>
       </Stack> -->
-  </Column>
-</template>

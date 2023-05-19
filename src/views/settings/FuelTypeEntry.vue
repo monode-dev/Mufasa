@@ -28,22 +28,45 @@ const props = defineProps({
       textColor: fuelType.isVisible ? sty.textColor : mdColors.grey,
     }"
   >
-    <Label
-      label="Name"
-      :sty="{
-        width: `1f`,
-      }"
-    >
-      <Field v-model:value="fuelType.name" hint="Unnamed" />
-    </Label>
-    <Label
-      label="Rate"
-      :sty="{
-        width: `1f`,
-      }"
-    >
-      <Field v-model:value="fuelType.rate" hint="$/Unit" />
-    </Label>
+    <Box :sty="{ width: `1f`, height: 1, axis: $Axis.stack }">
+      <Box
+        v-if="!fuelType.isVisible"
+        :sty="{ width: `1f`, height: `1f`, padding: `0 1 0 0` }"
+      >
+        <Box
+          :sty="{ width: `1f`, height: 0.0625, background: mdColors.grey }"
+        />
+      </Box>
+
+      <Label
+        label="Name"
+        :sty="{
+          width: `1f`,
+        }"
+      >
+        <Field
+          v-model:value="fuelType.name"
+          hint="Unnamed"
+          :sty="{
+            textColor: fuelType.isVisible ? mdColors.black : mdColors.grey,
+          }"
+        />
+      </Label>
+      <Label
+        label="Rate"
+        :sty="{
+          width: `1f`,
+        }"
+      >
+        <Field
+          v-model:value="fuelType.rate"
+          hint="$/Unit"
+          :sty="{
+            textColor: fuelType.isVisible ? mdColors.black : mdColors.grey,
+          }"
+        />
+      </Label>
+    </Box>
     <Icon
       :icon="fuelType.isVisible ? `eye` : `eyeOff`"
       @click.stop="fuelType.isVisible = !fuelType.isVisible"

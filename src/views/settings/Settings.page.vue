@@ -24,7 +24,7 @@ export default {
 
     <Body>
       <!-- Account -->
-      <Card>
+      <Card :sty="{ width: `1f` }">
         <Text title>Account</Text>
         <Text hint>Account settings will go here.</Text>
       </Card>

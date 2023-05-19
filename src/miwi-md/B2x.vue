@@ -1,72 +1,32 @@
-<script lang="ts">
-import {
-  ComponentInternalInstance,
-  CSSProperties,
-  defineComponent,
-  getCurrentInstance,
-  PropType,
-  ref,
-  RendererElement,
-  RendererNode,
-  VNode,
-  VNodeRef,
-  watchEffect,
-} from "vue";
-import { isDefined, isNum, isString } from "./utils";
+<script>
+import { defineComponent } from "vue";
 
-export interface Sty {
-  width: number | string | FlexSize;
-  height: number | string | FlexSize;
-  cornerRadius: number | string | [number, number, number, number];
-  outlineColor: string;
-  outlineSize: number;
-  background: string;
-  shadowSize: number;
-  shadowDirection: Align;
-  padding:
-    | `css ${string}`
-    | number
-    | `${number}`
-    | `${number} ${number}`
-    | `${number} ${number} ${number} ${number}`;
-  align: Align;
-  axis: Axis;
-  overflowX: Overflow;
-  overflowY: Overflow;
-  spacing: Spacing;
-  scale: number | string;
-  textColor: string;
-  textIsBold: boolean;
-  textIsItalic: boolean;
-  textIsUnderlined: boolean;
-  isInteractable: boolean;
-  zIndex: number;
-  shouldLog: boolean;
-  debugName: string;
+export function isDefined(x) {
+  return x !== undefined && x !== null;
 }
-export type Axis = (typeof Axis)[keyof typeof Axis];
+export function isNum(x) {
+  return isDefined(x) && typeof x === `number`;
+}
+export function isString(x) {
+  return isDefined(x) && typeof x === `string`;
+}
+
 export const Axis = {
   row: `row`,
   column: `column`,
   stack: `stack`,
-} as const;
-export type Overflow = (typeof Overflow)[keyof typeof Overflow];
+};
 export const Overflow = {
   visible: `visible`,
   crop: `crop`,
   wrap: `wrap`,
   scroll: `scroll`,
-} as const;
-export type Spacing =
-  | number
-  | `css ${string}`
-  | (typeof Spacing)[keyof typeof Spacing];
+};
 export const Spacing = {
   spaceBetween: `space-between`,
   spaceAround: `space-around`,
   spaceEvenly: `space-evenly`,
-} as const;
-export type Align = (typeof Align)[keyof typeof Align];
+};
 export const Align = {
   topLeft: `topLeft`,
   topCenter: `topCenter`,
@@ -77,49 +37,29 @@ export const Align = {
   bottomLeft: `bottomLeft`,
   bottomCenter: `bottomCenter`,
   bottomRight: `bottomRight`,
-} as const;
-function isLeft(align: Align) {
-  const validAligns: Align[] = [
-    Align.topLeft,
-    Align.centerLeft,
-    Align.bottomLeft,
-  ];
+};
+function isLeft(align) {
+  const validAligns = [Align.topLeft, Align.centerLeft, Align.bottomLeft];
   return validAligns.includes(align);
 }
-function isCenterX(align: Align) {
-  const validAligns: Align[] = [
-    Align.topCenter,
-    Align.center,
-    Align.bottomCenter,
-  ];
+function isCenterX(align) {
+  const validAligns = [Align.topCenter, Align.center, Align.bottomCenter];
   return validAligns.includes(align);
 }
-function isRight(align: Align) {
-  const validAligns: Align[] = [
-    Align.topRight,
-    Align.centerRight,
-    Align.bottomRight,
-  ];
+function isRight(align) {
+  const validAligns = [Align.topRight, Align.centerRight, Align.bottomRight];
   return validAligns.includes(align);
 }
-function isTop(align: Align) {
-  const validAligns: Align[] = [Align.topLeft, Align.topCenter, Align.topRight];
+function isTop(align) {
+  const validAligns = [Align.topLeft, Align.topCenter, Align.topRight];
   return validAligns.includes(align);
 }
-function isCenterY(align: Align) {
-  const validAligns: Align[] = [
-    Align.centerLeft,
-    Align.center,
-    Align.centerRight,
-  ];
+function isCenterY(align) {
+  const validAligns = [Align.centerLeft, Align.center, Align.centerRight];
   return validAligns.includes(align);
 }
-function isBottom(align: Align) {
-  const validAligns: Align[] = [
-    Align.bottomLeft,
-    Align.bottomCenter,
-    Align.bottomRight,
-  ];
+function isBottom(align) {
+  const validAligns = [Align.bottomLeft, Align.bottomCenter, Align.bottomRight];
   return validAligns.includes(align);
 }
 export const mdColors = {
@@ -138,12 +78,12 @@ export const mdColors = {
   black: `#000000ff`,
   transparent: `#ffffff00`,
   sameAsText: `currentColor`,
-} as const;
+};
 
 // Size
 // scale: [positive-space, negative-space]
 const muToRem = 1.125; //1.0625;
-export function sizeToCss(num: number | string) {
+export function sizeToCss(num) {
   if (isNum(num)) {
     const remValue = num * muToRem;
     const fontSize = parseFloat(
@@ -155,29 +95,14 @@ export function sizeToCss(num: number | string) {
     return num;
   }
 }
-export function numToFontSize(num: number) {
+export function numToFontSize(num) {
   // return sizeToCss(fontSizeToHtmlUnit * num);
   return sizeToCss(num);
 }
-export interface FlexSize {
-  flex: number;
-  min: number;
-  max: number;
-}
-function isFlexSize(size: any): size is FlexSize {
+function isFlexSize(size) {
   return isDefined(size?.flex);
 }
-function computeSizeInfo({
-  size,
-  isMainAxis,
-  shouldLog,
-  debugName,
-}: {
-  size: number | string | FlexSize;
-  isMainAxis: boolean;
-  shouldLog: boolean;
-  debugName: string;
-}) {
+function computeSizeInfo({ size, isMainAxis, shouldLog, debugName }) {
   const isShrink = size === -1;
   const sizeIsFlex = isFlexSize(size);
   const exactSize =
@@ -189,8 +114,7 @@ function computeSizeInfo({
       ? sizeToCss(size)
       : sizeIsFlex
       ? undefined
-      : //: `fit-content`;
-        `auto`;
+      : `fit-content`;
   const minSize = sizeIsFlex
     ? isShrink
       ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
@@ -200,34 +124,33 @@ function computeSizeInfo({
     : exactSize;
   const maxSize = sizeIsFlex
     ? isShrink
-      ? //? `fit-content`
-        `auto`
+      ? `fit-content`
       : size.max === Infinity
       ? exactSize ?? `100%`
       : sizeToCss(size.max)
     : exactSize;
-  return [exactSize, minSize, maxSize, sizeIsFlex] as const;
+  return [exactSize, minSize, maxSize, sizeIsFlex];
 }
 
 export default defineComponent({
-  name: "Box",
+  name: "b2x",
   props: {
     sty: {
-      type: Object as PropType<Partial<Sty>>,
+      type: Object,
       default: {},
       required: false,
     },
   },
   data() {
     return {
-      parentAxis: Axis.column as Axis,
+      parentAxis: Axis.column,
       childCount: 0,
       childWidthGrows: false,
       childHeightGrows: false,
     };
   },
   computed: {
-    axis(): Axis {
+    axis() {
       return this.sty.axis ?? Axis.column;
     },
     // maxChildWidth(): number {
@@ -248,7 +171,7 @@ export default defineComponent({
     //     return 0;
     //   }
     // },
-    style(): CSSProperties {
+    style() {
       const align = this.sty.align ?? Align.center;
       let width =
         (this.sty.width ?? -1) === -1
@@ -310,15 +233,9 @@ export default defineComponent({
             return { x: 1, y: -1 };
         }
       })();
-      const cssPadding =
-        isString(this.sty.padding) && this.sty.padding.startsWith(`css `)
-          ? this.sty.padding.split(`css `)[1]
-          : isNum(this.sty.padding)
-          ? sizeToCss(this.sty.padding)
-          : (this.sty.padding ?? ``)
-              .split(` `)
-              .map((p) => sizeToCss(Number(p)))
-              .join(` `);
+      const cssPadding = isString(this.sty.padding)
+        ? this.sty.padding
+        : sizeToCss(this.sty.padding);
       return {
         // Sizing
         display: `flex`,
@@ -329,7 +246,7 @@ export default defineComponent({
           // this.axis === Axis.stack && width === -1
           //   ? this.maxChildWidth
           //   : exactWidth;
-          if ((this.$parent as any)?.sty?.axis === Axis.stack) {
+          if (this.$parent?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingLeft ?? `0px`
             } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
@@ -341,7 +258,7 @@ export default defineComponent({
           // this.axis === Axis.stack && width === -1
           //   ? this.maxChildWidth
           //   : wMin;
-          if ((this.$parent as any)?.sty?.axis === Axis.stack) {
+          if (this.$parent?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingLeft ?? `0px`
             } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
@@ -353,7 +270,7 @@ export default defineComponent({
           // this.axis === Axis.stack && width === -1
           //   ? this.maxChildWidth
           //   : wMax;
-          if ((this.$parent as any)?.sty?.axis === Axis.stack) {
+          if (this.$parent?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingLeft ?? `0px`
             } - ${this.$parent?.$el?.paddingRight ?? `0px`})`;
@@ -365,7 +282,7 @@ export default defineComponent({
           // this.axis === Axis.stack && height === -1
           //   ? this.maxChildHeight
           //   : exactHeight;
-          if ((this.$parent as any)?.sty?.axis === Axis.stack) {
+          if (this.$parent?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingTop ?? `0px`
             } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
@@ -377,7 +294,7 @@ export default defineComponent({
           // this.axis === Axis.stack && height === -1
           //   ? this.maxChildHeight
           //   : hMin;
-          if ((this.$parent as any)?.sty?.axis === Axis.stack) {
+          if (this.$parent?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingTop ?? `0px`
             } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
@@ -389,7 +306,7 @@ export default defineComponent({
           // this.axis === Axis.stack && height === -1
           //   ? this.maxChildHeight
           //   : hMax;
-          if ((this.$parent as any)?.sty?.axis === Axis.stack) {
+          if (this.$parent?.sty?.axis === Axis.stack) {
             size = `calc(${size} - ${
               this.$parent?.$el?.paddingTop ?? `0px`
             } - ${this.$parent?.$el?.paddingBottom ?? `0px`})`;
@@ -457,17 +374,15 @@ export default defineComponent({
 
         // Align: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
         position:
-          (this.$parent as any)?.sty?.axis === Axis.stack
-            ? `absolute`
-            : `relative`,
+          this.$parent?.sty?.axis === Axis.stack ? `absolute` : `relative`,
         //margin: 0,
         justifyContent:
           // Exact spacing is handled through grid gap
-          Object.values(Spacing as any).includes(this.sty.spacing)
+          Object.values(Spacing).includes(this.sty.spacing)
             ? // For whatever reason, space-between with one item puts it at the start instead of centering it.
               this.sty.spacing === Spacing.spaceBetween && this.childCount === 1
               ? Spacing.spaceAround
-              : (this.sty.spacing as (typeof Spacing)[keyof typeof Spacing])
+              : this.sty.spacing
             : this.axis === Axis.column
             ? isTop(align)
               ? `flex-start`
@@ -530,12 +445,12 @@ export default defineComponent({
         // Spacing
         // TODO: Default could maybe be based off of font size.
         rowGap: isDefined(this.sty.spacing)
-          ? isString(this.sty.spacing) && this.sty.spacing.startsWith(`css `)
+          ? isString(this.sty.spacing)
             ? this.sty.spacing
             : sizeToCss(this.sty.spacing)
           : undefined,
         columnGap: isDefined(this.sty.spacing)
-          ? isString(this.sty.spacing) && this.sty.spacing.startsWith(`css `)
+          ? isString(this.sty.spacing)
             ? this.sty.spacing
             : sizeToCss(this.sty.spacing)
           : undefined,
@@ -574,7 +489,7 @@ export default defineComponent({
     },
   },
   methods: {
-    updateFromHtml(divRef: Element | undefined) {
+    updateFromHtml(divRef) {
       // Update parent axis
       (() => {
         const parent = divRef?.parentElement;
@@ -598,7 +513,7 @@ export default defineComponent({
           return;
         const children = Array.from(divRef.childNodes).filter(
           (child) => child instanceof HTMLElement,
-        ) as HTMLElement[];
+        );
         this.childWidthGrows = children.some((child) => {
           if (!child.classList.contains(`b-x`)) return false;
           return (
@@ -624,7 +539,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="b-x" :style="style" :ref="(updateFromHtml as any)">
+  <div class="b-x" :style="style" :ref="updateFromHtml">
     <slot />
   </div>
 </template>

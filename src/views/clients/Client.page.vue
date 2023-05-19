@@ -94,9 +94,19 @@ export default {
         />
       </Card>
       <Box />
-      <Box>
+      <Row
+        :sty="{
+          width: `1f`,
+          spacing: $Spacing.spaceBetween,
+          align: $Align.topCenter,
+        }"
+      >
+        <Box :sty="{ width: 1.75 }" />
         <Text title>Tanks</Text>
-      </Box>
+        <Box :sty="{ width: 1.75, align: $Align.centerLeft }">
+          <Icon icon="plus" :scale="1.25" />
+        </Box>
+      </Row>
       <TankEntry v-for="num in tankNums" :key="num">{{ num }}</TankEntry>
     </Body>
     <Body v-else :sty="{ align: Align.center }">

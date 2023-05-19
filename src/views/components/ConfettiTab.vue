@@ -2,6 +2,7 @@
 import { ref, watchEffect } from "vue";
 import ConfettiExplosion from "vue-confetti-explosion";
 import { count, incCount } from "@/firebase";
+import { mdColors } from "@/miwi-md/Box.vue";
 
 // Confetti
 const shouldShowConfetti = ref(false);
