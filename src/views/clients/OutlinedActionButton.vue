@@ -28,7 +28,7 @@ const props = defineProps({
       background: mdColors.green,
       textColor: mdColors.white,
       padding: `0.25 0.5`,
-      spacing: 0.25,
+      spacing: 0.125,
       ...sty,
     }"
   >
