@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, PropType } from "vue";
+import { PropType } from "vue";
 import Box, { Align, mdColors, Axis, Sty } from "./Box.vue";
 import { useNav } from "@/Nav";
 import Icon from "./Icon.vue";
@@ -24,7 +24,8 @@ const props = defineProps({
     :sty="{
       width: `1f`,
       height: `env(safe-area-inset-top)`,
-      background: mdColors.green,
+      background: sty.background ?? mdColors.green,
+      zIndex: 1,
     }"
   />
 

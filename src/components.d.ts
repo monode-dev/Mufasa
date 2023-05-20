@@ -2,6 +2,7 @@
 import App from "./App.vue";
 import AppBar from "./miwi-md/AppBar.vue";
 import B00 from "./miwi-md/B00.vue";
+import B2x from "./miwi-md/B2x.vue";
 import Body from "./miwi-md/Body.vue";
 import Box from "./miwi-md/Box.vue";
 import Button from "./miwi-md/Button.vue";
@@ -40,6 +41,7 @@ declare module "@vue/runtime-core" {
     App: typeof App;
 AppBar: typeof AppBar;
 B00: typeof B00;
+B2x: typeof B2x;
 Body: typeof Body;
 Box: typeof Box;
 Button: typeof Button;

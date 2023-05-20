@@ -22,7 +22,7 @@ workflows:
           cd ios/App && pod install
       - name: Export TS project
         script: |
-          npm run build
+          npm run build:full
       # - name: Build Capacitor
       #   script: |
       #     npx cap build ios
@@ -43,7 +43,7 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          agvtool new-version -all 1.13.125 
+          agvtool new-version -all 1.13.126 
         # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
         # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme

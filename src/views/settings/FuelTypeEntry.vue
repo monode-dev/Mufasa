@@ -46,6 +46,7 @@ const props = defineProps({
       >
         <Field
           v-model:value="fuelType.name"
+          :disabled="!fuelType.isVisible"
           hint="Unnamed"
           :sty="{
             textColor: fuelType.isVisible ? mdColors.black : mdColors.grey,
@@ -60,6 +61,7 @@ const props = defineProps({
       >
         <Field
           v-model:value="fuelType.rate"
+          :disabled="!fuelType.isVisible"
           hint="$/Unit"
           :sty="{
             textColor: fuelType.isVisible ? mdColors.black : mdColors.grey,

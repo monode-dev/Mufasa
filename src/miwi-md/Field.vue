@@ -39,6 +39,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emit = defineEmits(["update:value", "update:hasFocus"]);
 const inputRef = ref<VNodeRef | null>(null);
@@ -129,6 +133,7 @@ const detailColor = computed(() =>
               @blur="handleBlur"
               :placeholder="hint"
               class="field"
+              :disabled="disabled"
               :style="{
                 padding: 0,
                 margin: 0,
@@ -167,6 +172,7 @@ const detailColor = computed(() =>
       @blur="handleBlur"
       :placeholder="hint"
       class="field"
+      :disabled="disabled"
       :style="{
         padding: 0,
         margin: 0,

@@ -15,6 +15,7 @@ import * as mdijs from "@mdi/js";
 import App from "./App.vue";
 import AppBar from "./miwi-md/AppBar.vue";
 import B00 from "./miwi-md/B00.vue";
+import B2x from "./miwi-md/B2x.vue";
 import Body from "./miwi-md/Body.vue";
 import Box from "./miwi-md/Box.vue";
 import Button from "./miwi-md/Button.vue";
@@ -61,6 +62,7 @@ vueApp.use(mdiVue, {
 vueApp.component("App", App);
 vueApp.component("AppBar", AppBar);
 vueApp.component("B00", B00);
+vueApp.component("B2x", B2x);
 vueApp.component("Body", Body);
 vueApp.component("Box", Box);
 vueApp.component("Button", Button);
