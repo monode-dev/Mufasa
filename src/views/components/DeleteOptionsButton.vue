@@ -16,6 +16,10 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  options: {
+    type: Array as PropType<{ label: string; id: string }[]>,
+    default: [],
+  },
 });
 
 const emit = defineEmits(["delete"]);
