@@ -8,10 +8,9 @@ import {
 } from "./Mufasa";
 
 export type ClientId = `${number}` | ``;
-// export type Client = (typeof mufasaTypes)["Client"];
 export type Client = (typeof mufasaTypes)["Client"];
 const a = {} as Client;
-a.clientId;
+a.fuelType;
 // export type TankShape = typeof mufasaTypes["TankShape"];
 // const tankShape = {
 //   none: 0,
@@ -24,9 +23,6 @@ a.clientId;
 // } as const;
 // export type Tank = DocFromObj<typeof tankModel>;
 export type FuelType = (typeof mufasaTypes)["FuelType"];
-// export type FuelType = (typeof mufasaTypes)["fuelTypes"];
-const b = {} as FuelType;
-b.isVisible;
 
 // App Data Structure
 export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
@@ -39,7 +35,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
         phoneNumber: prim<string>(``),
         address: prim<string>(``),
         notes: prim<string>(``),
-        // fuelType: one(`FuelType`),
+        fuelType: one(`FuelType`, null),
         // tanks: obj({
         //   typeName: `FuelType`,
         //   props: {

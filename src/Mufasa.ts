@@ -163,7 +163,7 @@ export type GetDocType<T extends { create: (...args: any) => Doc<{}> }> =
 export type Obj = {
   typeName: string;
   props: {
-    [key: string]: Prim | One /* | One | Many */;
+    [key: string]: Prim | One<string> /* | One | Many */;
   };
 };
 export function obj<T extends Obj>(objDef: T) {
@@ -173,7 +173,7 @@ type TypeMap = { [typeName: string]: Obj };
 export type ObjToTsType<T extends Obj, D extends TypeMap> = {
   -readonly [K in keyof T["props"]]: T["props"][K] extends Prim<infer R>
     ? R
-    : T["props"][K] extends One
+    : T["props"][K] extends One<string>
     ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>>
     : never;
 };
@@ -197,7 +197,10 @@ type PossiblyUndefinedKeys<T> = {
 type MakeUndefiendPropsOptional<T> = Omit<T, PossiblyUndefinedKeys<T>> & {
   [K in PossiblyUndefinedKeys<T>]?: T[K];
 };
-type CreateParamsFromObj<T extends Obj> = MakeUndefiendPropsOptional<{
+type CreateParamsFromObj<
+  T extends Obj,
+  D extends TypeMap,
+> = MakeUndefiendPropsOptional<{
   [K in keyof T["props"]]: T["props"][K] extends Prim<
     infer PropType,
     infer PropIsRequired
@@ -205,8 +208,10 @@ type CreateParamsFromObj<T extends Obj> = MakeUndefiendPropsOptional<{
     ? PropIsRequired extends true
       ? PropType
       : PropType | undefined
-    : T["props"][K] extends One
-    ? T["props"][K]["type"]
+    : T["props"][K] extends One<string, infer OneIsRequired>
+    ? OneIsRequired extends true
+      ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>>
+      : Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | undefined
     : never;
 }>;
 
@@ -235,17 +240,21 @@ export function prim<
 }
 
 // One
-export type One = {
-  type: string;
+export type One<T extends string, IsRequired = boolean> = {
+  type: T;
   quantity: `one`;
   // backRefPropName: string | undefined,
   init: null | (() => Obj);
 };
-export function one(options: string): One {
+export function one<T extends string, IsRequired extends boolean = false>(
+  options: T,
+  init: null | (() => Obj),
+  isRequired?: IsRequired,
+): One<T, IsRequired> {
   return {
     type: options,
     quantity: `one`,
-    init: null,
+    init: init,
   };
 }
 
@@ -268,10 +277,10 @@ function docCollectionFromMany<T extends Obj, D extends TypeMap>(
   objFormats: ObjFormats,
 ) {
   type TsType = ObjToTsType<T, D>;
-  type CreateType = (createParams: CreateParamsFromObj<T>) => TsType;
+  type CreateType = (createParams: CreateParamsFromObj<T, D>) => TsType;
   return newDocCollection<TsType, Parameters<CreateType>, CreateType>(
     many.type.typeName,
-    (createParams: CreateParamsFromObj<T>) => {
+    (createParams: CreateParamsFromObj<T, D>) => {
       function getDefaultProps() {
         const defaultProps: { [key: string]: any } = {};
         const defProps = many.type.props;
