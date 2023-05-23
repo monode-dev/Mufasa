@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
-import { LOADING, docProx, DELETED, useFirestore, Client } from "@/firebase";
+import { getAppData, Client } from "@/AppData";
+import { LOADING, docProx, DELETED } from "@/Mufasa";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
 
-const model = useFirestore();
+const appData = getAppData();
 
 const filterString = ref("");
 const filteredClients = computed(() =>
-  model.clients.filter((client) => {
+  appData.clients.list.filter((client) => {
     if (!client.name && !client.clientId) return false;
     if (filterString.value.length === 0) return true;
     return (

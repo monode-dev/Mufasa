@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, useFirestore } from "@/firebase";
+import { Client, getAppData } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
 import ClientPage from "./Client.page.vue";
 
@@ -16,7 +16,7 @@ const props = defineProps({
   // },
 });
 
-const model = useFirestore();
+const appData = getAppData();
 
 const cardRef = ref<VNodeRef | null>(null);
 const name = ref("");
@@ -31,7 +31,7 @@ function closePopUp() {
 function handleYes() {
   closePopUp();
   if (textHasBeenEntered.value) {
-    const newClient = model.createClient(name.value);
+    const newClient = appData.clients.create({ name: name.value });
     name.value = "";
     pushPage(ClientPage, { client: newClient });
   }

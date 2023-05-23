@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
 import { Sty } from "@/miwi-md/Box.vue";
-import { FuelType } from "@/firebase";
+import { FuelType } from "@/Mufasa";
 import { mdColors } from "@/miwi-md/Box.vue";
 // Allow overriding of the default sty
 const props = defineProps({

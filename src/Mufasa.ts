@@ -201,7 +201,14 @@ export type ObjToTsType<T extends Obj> = {
     ? R
     : never;
 };
-type CreateParamsFromObj<T extends Obj> = {
+export type DocFromObj<T extends Obj> = Doc<ObjToTsType<T>>;
+type PossiblyUndefinedKeys<T> = {
+  [K in keyof T]: undefined extends T[K] ? K : never;
+}[keyof T];
+type MakeUndefiendPropsOptional<T> = Omit<T, PossiblyUndefinedKeys<T>> & {
+  [K in PossiblyUndefinedKeys<T>]?: T[K];
+};
+type CreateParamsFromObj<T extends Obj> = MakeUndefiendPropsOptional<{
   [K in keyof T["props"]]: T["props"][K] extends Prim<
     infer PropType,
     infer PropIsRequired
@@ -210,7 +217,7 @@ type CreateParamsFromObj<T extends Obj> = {
       ? PropType
       : PropType | undefined
     : never;
-};
+}>;
 
 // Many
 export type Many<T extends Obj = Obj> = {
@@ -225,7 +232,9 @@ export function many<T extends Obj>(options: T) {
   };
 }
 function docCollectionFromMany<T extends Obj>(many: Many<T>) {
-  return newDocCollection(
+  type TsType = ObjToTsType<T>;
+  type CreateType = (createParams: CreateParamsFromObj<T>) => TsType;
+  return newDocCollection<TsType, Parameters<CreateType>, CreateType>(
     many.type.typeName,
     (createParams: CreateParamsFromObj<T>) => {
       function getDefaultProps() {
@@ -247,175 +256,36 @@ function docCollectionFromMany<T extends Obj>(many: Many<T>) {
       return {
         ...getDefaultProps(),
         ...createParams,
-      } as ObjToTsType<T>;
+      } as any;
     },
   );
 }
-// type CreateParamsFromObj<T extends Many<O>, O extends Obj> = {
-//   [K in keyof T["type"]["props"]]: T["type"]["props"][K] extends Prim
-//     ? T["type"]["props"][K]["init"] extends FROM_CREATE
-//       ? undefined
-//       : T["type"]["props"][K]["init"] extends () => infer R
-//       ? R
-//       : T["type"]["props"][K]["init"]
-//     : never;
-// };
-// function implementMany<T extends Many<O>, O extends Obj>(myMany: T) {
-//   return newDocCollection(
-//     myMany.type.typeName,
-//     (createParams: CreateParamsFromObj<T, O>) => {
-//       function getDefaultProps() {
-//         const defaultProps: { [key: string]: any } = {};
-//         const defProps = myMany.type.props;
-//         for (const key of Object.keys(defProps)) {
-//           const prop = defProps[key];
-//           if (prop.type === `primitive`) {
-//             const init = prop.init;
-//             if (isFromCreate(init)) {
-//               defaultProps[key] = undefined;
-//             } else if (typeof init === `function`) {
-//               defaultProps[key] = init();
-//             } else {
-//               defaultProps[key] = init;
-//             }
-//           }
-//         }
-//         return defaultProps;
-//       }
-//       return {
-//         ...getDefaultProps(),
-//         ...createParams,
-//       };
-//     },
-//   );
-// }
-// export type RootObj<T extends Many<O>, O extends Obj> = {
-//   [key: string]: T;
-// };
-// export function defineAppDataStructure<T extends RootObj<any, any>>(
-//   modelName: string,
-//   modelDef: T,
-// ) {
-//   return defineStore(modelName, () => {
-//     const manyCollections: {
-//       [K in keyof T]: ReturnType<typeof implementMany>;
-//     } = {} as any;
-//     for (const key of Object.keys(modelDef)) {
-//       const many = modelDef[key];
-//       if (many.type.typeName) {
-//         manyCollections[key as keyof typeof manyCollections] =
-//           implementMany(many);
-//       }
-//     }
-//     return manyCollections;
-//   });
-// }
-// const useData = defineAppDataStructure(`ninetyPercent`, {
-//   clients: many({
-//     type: obj({
-//       typeName: `Client`,
-//       props: {
-//         name: prim<string>(FROM_CREATE),
-//         clientId: prim<number | null>(null),
-//         phoneNumber: prim<string>(``),
-//         address: prim<string>(``),
-//         notes: prim<string>(``),
-//       } as const,
-//     } as const),
-//   } as const),
-//   fuelTypes: many({
-//     type: obj({
-//       typeName: `FuelType`,
-//       props: {
-//         name: prim<string>(``),
-//         rate: prim<number | null>(null),
-//         isVisible: prim<boolean>(true),
-//         createdPosix: prim<number>(() => Date.now()),
-//       } as const,
-//     } as const),
-//   } as const),
-// } as const);
-// const data = useData();
-// data.clients.create({});
 
-// Client
-export type ClientId = `${number}` | ``;
-// export type Client = GetDocType<typeof clientDocCollection>;
-// const clientDocCollection = newDocCollection(`Client`, (nameOrId: string) => {
-//   const wasGivenId = !isNaN(Number(nameOrId));
-//   return {
-//     name: (wasGivenId ? "" : nameOrId) satisfies string,
-//     clientId: (wasGivenId ? (nameOrId as ClientId) : "") satisfies ClientId,
-//     phoneNumber: "" satisfies string,
-//     address: "" satisfies string,
-//     notes: "" satisfies string,
-//   };
-// });
-export type Client = ObjToTsType<typeof clientModel> & DocSpecificProps;
-const clientModel = obj({
-  typeName: `Client`,
-  props: {
-    name: prim<string, RequireOnCreate>(undefined),
-    clientId: prim<number | null>(null),
-    phoneNumber: prim<string>(``),
-    address: prim<string>(``),
-    notes: prim<string>(``),
-  },
-});
-const clientDocCollection = docCollectionFromMany(many(clientModel));
-
-// Tank
-// export type TankShape = (typeof tankShape)[keyof typeof tankShape];
-// const tankShape = {
-//   none: 0,
-//   horizontalCylinder: 6,
-//   verticalCylinder: 1,
-//   oval: 2,
-//   rectangle: 3,
-//   ellipse: 4,
-//   truckBedTank: 5,
-// } as const;
-// export type Tank = GetDocType<typeof tankDocCollection>;
-// const tankDocCollection = newDocCollection(`Tank`, () => {
-//   return {
-//     fuelType: null satisfies FuelType | null,
-//     shape: 0 satisfies TankShape,
-//     length: 0 satisfies number,
-//     depth: 0 satisfies number,
-//     height: 0 satisfies number,
-//     shortHeight: 0 satisfies number,
-//   };
-// });
-
-// Fuel Type
-// export type FuelType = GetDocType<typeof fuelTypeDocCollection>;
-// const fuelTypeDocCollection = newDocCollection(`FuelType`, () => {
-//   return {
-//     name: `` satisfies string,
-//     rate: null satisfies number | null,
-//     isVisible: true satisfies boolean,
-//     createdPosix: Date.now() satisfies number,
-//   };
-// });
-export type FuelType = ObjToTsType<typeof fuelTypeModel> & DocSpecificProps;
-const fuelTypeModel = obj({
-  typeName: `FuelType`,
-  props: {
-    name: prim<string, RequireOnCreate>(undefined),
-    clientId: prim<number | null>(null),
-    phoneNumber: prim<string>(``),
-    address: prim<string>(``),
-    notes: prim<string>(``),
-  },
-});
-const fuelTypeDocCollection = docCollectionFromMany(many(fuelTypeModel));
-
-// Pinia Store
-export const useFirestore = defineStore("firestore", () => {
+// App Data Structure
+export type AppDataStructure = {
+  [key: string]: Many;
+};
+type TypesFromDataStructure<T extends AppDataStructure> = {
+  [K in keyof T as T[K][`type`][`typeName`]]: Doc<ObjToTsType<T[K][`type`]>>;
+};
+export function defineAppDataStructure<T extends AppDataStructure>(
+  modelName: string,
+  modelDef: T,
+) {
   return {
-    clients: clientDocCollection.list,
-    createClient: clientDocCollection.create,
-    fuelTypes: fuelTypeDocCollection.list,
-    createFuelType: fuelTypeDocCollection.create,
+    getAppData: defineStore(modelName, () => {
+      const manyCollections: {
+        [K in keyof T]: ReturnType<typeof docCollectionFromMany<T[K][`type`]>>;
+      } = {} as any;
+      for (const key of Object.keys(modelDef)) {
+        const many = modelDef[key];
+        if (many.type.typeName) {
+          manyCollections[key as keyof typeof manyCollections] =
+            docCollectionFromMany(many) as any;
+        }
+      }
+      return manyCollections;
+    }),
+    mufasaTypes: {} as TypesFromDataStructure<T>,
   };
-});
+}

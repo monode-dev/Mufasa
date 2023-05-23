@@ -4,7 +4,6 @@ import { Sty } from "@/miwi-md/Box.vue";
 import { mdColors } from "@/miwi-md/Box.vue";
 import { pushPage } from "@/Nav";
 import CreateClientDialog from "./CreateClient.dialog.vue";
-import { Client } from "@/firebase";
 
 // Allow overriding of the default sty
 const props = defineProps({

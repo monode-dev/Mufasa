@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  defineProps,
-  PropType,
-  ref,
-  defineEmits,
-  watchEffect,
-  computed,
-} from "vue";
+import { defineProps, PropType, defineEmits } from "vue";
 import { mdColors } from "@/miwi-md/Box.vue";
 
 const props = defineProps({

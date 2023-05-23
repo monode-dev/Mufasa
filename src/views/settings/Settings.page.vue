@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { pageTransitions } from "@/Nav";
 import { appVersion } from "@/AppDetails";
-import { ref } from "vue";
-import { LOADING, DELETED, useFirestore } from "@/firebase";
+import { getAppData } from "@/AppData";
+import { LOADING, DELETED } from "@/Mufasa";
 import { mdColors } from "@/miwi-md/Box.vue";
 
 function openTkeWebsite() {
   window.open(`tke.us`, `_blank`);
 }
 
-const model = useFirestore();
+const appData = getAppData();
 </script>
 
 <script lang="ts">
@@ -41,12 +41,12 @@ export default {
           <Text title>Fuel Types</Text>
           <Icon
             icon="plus"
-            @click.stop="model.createFuelType()"
+            @click.stop="appData.fuelTypes.create({})"
             :scale="1.25"
           />
         </Row>
         <FuelTypeEntry
-          v-for="fuelType in [...model.fuelTypes].sort((a, b) => {
+          v-for="fuelType in [...appData.fuelTypes.list].sort((a, b) => {
             //
             if (!a.isLoaded) {
               return 1;
