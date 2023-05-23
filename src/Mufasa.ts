@@ -11,8 +11,9 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  Unsubscribe,
 } from "firebase/firestore";
-import { UnwrapRef, computed, ref } from "vue";
+import { ComputedRef, UnwrapRef, computed, isRef, ref, watchEffect } from "vue";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
@@ -27,6 +28,7 @@ const app = initializeApp(firebaseConfig);
 export const firebaseDb = initializeFirestore(app, {
   cacheSizeBytes: CACHE_SIZE_UNLIMITED,
 });
+// TODO: Overide indexedDB persistence to use capacitor storage
 enableIndexedDbPersistence(firebaseDb)
   .then(() => {
     // Offline persistence enabled successfully
@@ -58,7 +60,7 @@ export function incCount() {
   });
 }
 
-// Firestore Utils
+// Object
 export type LOADING = null;
 export const LOADING: LOADING = null;
 export type DELETED = undefined;
@@ -73,14 +75,45 @@ export type DocSpecificProps = {
   deleteDoc(): Promise<void>;
 };
 export function docProx<T extends Doc<{}>>(
-  docRef: DocumentReference | Promise<DocumentReference>,
+  docRef:
+    | DocumentReference
+    | Promise<DocumentReference>
+    | ComputedRef<DocumentReference | DELETED | LOADING>,
+  typeName: string,
+  objFormats: ObjFormats,
 ): T {
+  async function getDocRef(): Promise<DocumentReference | DELETED> {
+    const unpromisedDocRef = await docRef;
+    if (isRef(unpromisedDocRef)) {
+      while (unpromisedDocRef.value === LOADING) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      return unpromisedDocRef.value;
+    } else {
+      return unpromisedDocRef;
+    }
+  }
   const data = ref<T | LOADING | DELETED>(LOADING);
   (async () => {
-    docRef = await docRef;
-    onSnapshot(docRef, (doc) => {
-      data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
-    });
+    const unpromisedDocRef = await docRef;
+    if (isRef(unpromisedDocRef)) {
+      let unsubscribe: Unsubscribe | undefined;
+      watchEffect(() => {
+        unsubscribe?.();
+        if (unpromisedDocRef.value === LOADING) return;
+        if (unpromisedDocRef.value === DELETED) {
+          data.value = DELETED;
+        } else {
+          unsubscribe = onSnapshot(unpromisedDocRef.value, (doc) => {
+            data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
+          });
+        }
+      });
+    } else {
+      onSnapshot(unpromisedDocRef, (doc) => {
+        data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
+      });
+    }
   })();
   return new Proxy({} as T, {
     get: (_, prop) => {
@@ -92,21 +125,34 @@ export function docProx<T extends Doc<{}>>(
         return data.value === DELETED;
       } else if (prop === "deleteDoc") {
         return async () => {
-          docRef = await docRef;
-          deleteDoc(docRef);
+          const actualDocRef = await getDocRef();
+          if (actualDocRef !== DELETED) {
+            await deleteDoc(actualDocRef);
+          }
         };
+      } else if (objFormats[typeName]?.[prop as string]?.format === `one`) {
+        const format = objFormats[typeName][prop as string];
+        const childDocRef = computed(() =>
+          data.value === DELETED || data.value === LOADING
+            ? data.value
+            : (data.value[prop as keyof UnwrapRef<T>] as DocumentReference),
+        );
+        return docProx(childDocRef, format.type!, objFormats);
+      } else {
+        return data.value?.[prop as keyof UnwrapRef<T>];
       }
-      return data.value?.[prop as keyof UnwrapRef<T>];
     },
     set: (_, prop, value) => {
       if (prop === "_firestoreRef") {
         return false;
       }
       (async () => {
-        docRef = await docRef;
-        updateDoc(docRef, {
-          [prop]: value,
-        });
+        const actualDocRef = await getDocRef();
+        if (actualDocRef !== DELETED) {
+          updateDoc(actualDocRef, {
+            [prop]: value,
+          });
+        }
       })();
       return true;
     },
@@ -114,53 +160,55 @@ export function docProx<T extends Doc<{}>>(
 }
 export type GetDocType<T extends { create: (...args: any) => Doc<{}> }> =
   ReturnType<T["create"]>;
-export function newDocCollection<
-  T extends {},
-  CreateArgs extends any[],
-  Create extends (...args: CreateArgs) => T,
->(collectionName: string, createDoc: Create) {
-  const collectionRef = collection(firebaseDb, collectionName);
-  const collectionList = ref<Doc<T>[]>([]);
-  onSnapshot(collectionRef, (querySnapshot) => {
-    collectionList.value = querySnapshot.docs.map((doc) => docProx(doc.ref));
-  });
-  return {
-    list: collectionList,
-    create(...args: CreateArgs) {
-      const newDoc = createDoc(...args);
-      return docProx<Doc<T>>(addDoc(collectionRef, newDoc));
-    },
+export type Obj = {
+  typeName: string;
+  props: {
+    [key: string]: Prim | One /* | One | Many */;
   };
+};
+export function obj<T extends Obj>(objDef: T) {
+  return objDef;
 }
-
-//
-// function prop<T>(init: T) {
-//   return ref(init);
-// }
-// function formula<T, R = any>(compute: (inst: T) => R) {
-//   return computed(compute);
-// }
-// function action<T>(doAction: (inst: T) => Promise<void>) {
-//   return doAction;
-// }
-/* type DocFormat<T extends {
-  [key: string]: Prop | Formula<T> | Action<T>;
-}> = T;
-const clientDocCollection = newDocCollection({
-  name: prop(``),
-  clientId: prop<number | undefined>(undefined),
-  phoneNumber: prop(``),
-  address: prop(``),
-  notes: prop(``),
-  // Should be able to be inferred
-  customCreate: (create, props: { nameOrId: string }) => {
-    const wasGivenId = !isNaN(Number(nameOrId));
-    return create ({
-        name: wasGivenId ? undefined : nameOrId,
-        clientId: wasGivenId ? (nameOrId as ClientId) : undefined,
-    });
-  },
-});*/
+type TypeMap = { [typeName: string]: Obj };
+export type ObjToTsType<T extends Obj, D extends TypeMap> = {
+  -readonly [K in keyof T["props"]]: T["props"][K] extends Prim<infer R>
+    ? R
+    : T["props"][K] extends One
+    ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>>
+    : never;
+};
+// const temp = obj({
+//   typeName: `Client`,
+//   props: {
+//     name: prim<string, RequireOnCreate>(undefined),
+//     clientId: prim<number | null>(null),
+//     phoneNumber: prim<string>(``),
+//     address: prim<string>(``),
+//     notes: prim<string>(``),
+//     // fuelType: one(`FuelType`),
+//   },
+// });
+// type Temp = TypesFromDataStructure<{ [`clients`]: Many<typeof temp> }>;
+// const temp2: Temp = {} as Temp;
+// temp2.clients.;
+type PossiblyUndefinedKeys<T> = {
+  [K in keyof T]: undefined extends T[K] ? K : never;
+}[keyof T];
+type MakeUndefiendPropsOptional<T> = Omit<T, PossiblyUndefinedKeys<T>> & {
+  [K in PossiblyUndefinedKeys<T>]?: T[K];
+};
+type CreateParamsFromObj<T extends Obj> = MakeUndefiendPropsOptional<{
+  [K in keyof T["props"]]: T["props"][K] extends Prim<
+    infer PropType,
+    infer PropIsRequired
+  >
+    ? PropIsRequired extends true
+      ? PropType
+      : PropType | undefined
+    : T["props"][K] extends One
+    ? T["props"][K]["type"]
+    : never;
+}>;
 
 // Primitive
 export type PrimTsType = number | boolean | string /* | binary */ | null;
@@ -186,53 +234,40 @@ export function prim<
   };
 }
 
-// Object
-export type Obj = {
-  typeName: string;
-  props: {
-    [key: string]: Prim /* | One | Many */;
+// One
+export type One = {
+  type: string;
+  quantity: `one`;
+  // backRefPropName: string | undefined,
+  init: null | (() => Obj);
+};
+export function one(options: string): One {
+  return {
+    type: options,
+    quantity: `one`,
+    init: null,
   };
-};
-export function obj<T extends Obj>(objDef: T) {
-  return objDef;
 }
-export type ObjToTsType<T extends Obj> = {
-  -readonly [K in keyof T["props"]]: T["props"][K] extends Prim<infer R>
-    ? R
-    : never;
-};
-export type DocFromObj<T extends Obj> = Doc<ObjToTsType<T>>;
-type PossiblyUndefinedKeys<T> = {
-  [K in keyof T]: undefined extends T[K] ? K : never;
-}[keyof T];
-type MakeUndefiendPropsOptional<T> = Omit<T, PossiblyUndefinedKeys<T>> & {
-  [K in PossiblyUndefinedKeys<T>]?: T[K];
-};
-type CreateParamsFromObj<T extends Obj> = MakeUndefiendPropsOptional<{
-  [K in keyof T["props"]]: T["props"][K] extends Prim<
-    infer PropType,
-    infer PropIsRequired
-  >
-    ? PropIsRequired extends true
-      ? PropType
-      : PropType | undefined
-    : never;
-}>;
 
 // Many
 export type Many<T extends Obj = Obj> = {
   type: T; // | string,
+  quantity: `many`;
   // backRefPropName: string | undefined,
   // quantitySelf: `one` | `many`,
   // init: [] | FROM_CREATE | (() => ManyParams),
 };
-export function many<T extends Obj>(options: T) {
+export function many<T extends Obj>(options: T): Many<T> {
   return {
     type: options,
+    quantity: `many`,
   };
 }
-function docCollectionFromMany<T extends Obj>(many: Many<T>) {
-  type TsType = ObjToTsType<T>;
+function docCollectionFromMany<T extends Obj, D extends TypeMap>(
+  many: Many<T>,
+  objFormats: ObjFormats,
+) {
+  type TsType = ObjToTsType<T, D>;
   type CreateType = (createParams: CreateParamsFromObj<T>) => TsType;
   return newDocCollection<TsType, Parameters<CreateType>, CreateType>(
     many.type.typeName,
@@ -258,30 +293,110 @@ function docCollectionFromMany<T extends Obj>(many: Many<T>) {
         ...createParams,
       } as any;
     },
+    objFormats,
   );
 }
+function newDocCollection<
+  T extends {},
+  CreateArgs extends any[],
+  Create extends (...args: CreateArgs) => T,
+>(typeName: string, createDoc: Create, objFormats: ObjFormats) {
+  const collectionRef = collection(firebaseDb, typeName);
+  const collectionList = ref<Doc<T>[]>([]);
+  onSnapshot(collectionRef, (querySnapshot) => {
+    collectionList.value = querySnapshot.docs.map((doc) =>
+      docProx(doc.ref, typeName, objFormats),
+    );
+  });
+  return {
+    list: collectionList,
+    create(...args: CreateArgs) {
+      const newDoc = createDoc(...args);
+      return docProx<Doc<T>>(
+        addDoc(collectionRef, newDoc),
+        typeName,
+        objFormats,
+      );
+    },
+  };
+}
+
+// Formula
+// function formula<T, R = any>(compute: (inst: T) => R) {
+//   return computed(compute);
+// }
+
+// Action
+// function action<T>(doAction: (inst: T) => Promise<void>) {
+//   return doAction;
+// }
 
 // App Data Structure
-export type AppDataStructure = {
-  [key: string]: Many;
+type ObjFormats = {
+  [typeName: string]: {
+    [propName: string]: {
+      format: `prim` | `one` | `many`;
+      type?: string;
+    };
+  };
 };
-type TypesFromDataStructure<T extends AppDataStructure> = {
-  [K in keyof T as T[K][`type`][`typeName`]]: Doc<ObjToTsType<T[K][`type`]>>;
+export type AppDataStructure<K extends string> = {
+  [Key in K]: Many;
 };
-export function defineAppDataStructure<T extends AppDataStructure>(
+type DataStructureToTypeMap<T extends AppDataStructure<string>> = {
+  [K in keyof T as T[K][`type`][`typeName`]]: T[K][`type`];
+};
+type TypesFromDataStructure<T extends AppDataStructure<string>> = {
+  [K in keyof T as T[K][`type`][`typeName`]]: Doc<
+    ObjToTsType<T[K][`type`], DataStructureToTypeMap<T>>
+  >;
+};
+export function defineAppDataStructure<T extends AppDataStructure<string>>(
   modelName: string,
   modelDef: T,
 ) {
+  const objFormats = (() => {
+    const objFormats: ObjFormats = {};
+    for (const key of Object.keys(modelDef)) {
+      const many = modelDef[key];
+      if (many.type.typeName) {
+        const propFormats: ObjFormats[string] = {};
+        for (const propName of Object.keys(many.type.props)) {
+          const prop = many.type.props[propName];
+          if (prop.type === `primitive`) {
+            propFormats[propName] = {
+              format: `prim`,
+              type: undefined,
+            };
+          } else if (`quantity` in prop && prop.quantity === `one`) {
+            propFormats[propName] = {
+              format: `one`,
+              type: prop.type,
+            };
+          } else {
+            propFormats[propName] = {
+              format: `many`,
+              type: prop.type,
+            };
+          }
+        }
+        objFormats[many.type.typeName] = propFormats;
+      }
+    }
+    return objFormats;
+  })();
   return {
     getAppData: defineStore(modelName, () => {
       const manyCollections: {
-        [K in keyof T]: ReturnType<typeof docCollectionFromMany<T[K][`type`]>>;
+        [K in keyof T]: ReturnType<
+          typeof docCollectionFromMany<T[K][`type`], DataStructureToTypeMap<T>>
+        >;
       } = {} as any;
       for (const key of Object.keys(modelDef)) {
         const many = modelDef[key];
         if (many.type.typeName) {
           manyCollections[key as keyof typeof manyCollections] =
-            docCollectionFromMany(many) as any;
+            docCollectionFromMany(many, objFormats) as any;
         }
       }
       return manyCollections;
