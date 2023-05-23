@@ -4,10 +4,10 @@ import {
   many,
   obj,
   prim,
-  DocFromObj,
 } from "./Mufasa";
 
-// Tank
+export type ClientId = `${number}` | ``;
+export type Client = (typeof mufasaTypes)["Client"];
 // export type TankShape = typeof mufasaTypes["TankShape"];
 // const tankShape = {
 //   none: 0,
@@ -19,20 +19,6 @@ import {
 //   truckBedTank: 5,
 // } as const;
 // export type Tank = DocFromObj<typeof tankModel>;
-// const tankModel = obj({
-//   typeName: `FuelType`,
-//   props: {
-//     // fuelType: one<FuelType | null>(undefined),
-//     shape: prim<TankShape>(tankShape.none),
-//     length: prim<number>(0),
-//     depth: prim<number>(0),
-//     height: prim<number>(0),
-//     shortHeight: prim<number>(0),
-//   },
-// });
-
-export type ClientId = `${number}` | ``;
-export type Client = (typeof mufasaTypes)["Client"];
 export type FuelType = (typeof mufasaTypes)["FuelType"];
 
 // App Data Structure
@@ -46,6 +32,17 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
         phoneNumber: prim<string>(``),
         address: prim<string>(``),
         notes: prim<string>(``),
+        // tanks: obj({
+        //   typeName: `FuelType`,
+        //   props: {
+        //     // fuelType: one<FuelType | null>(undefined),
+        //     shape: prim<TankShape>(tankShape.none),
+        //     length: prim<number>(0),
+        //     depth: prim<number>(0),
+        //     height: prim<number>(0),
+        //     shortHeight: prim<number>(0),
+        //   },
+        // });
       },
     }),
   ),
