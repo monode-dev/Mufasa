@@ -2,9 +2,11 @@
 import { PropType, watchEffect } from "vue";
 import { pageTransitions, popPage } from "@/Nav";
 import { Align, mdColors } from "@/miwi-md/Box.vue";
-import { Client } from "@/Mufasa";
+import { Client } from "@/AppData";
 import { pushPage } from "@/Nav";
 import DeleteClientPage from "@/views/clients/DeleteClient.dialog.vue";
+import { FuelType, getAppData } from "@/AppData";
+const appData = getAppData();
 
 const props = defineProps({
   client: {
@@ -27,6 +29,14 @@ for (let i = 1; i <= 5; i++) {
 function deletePressed() {
   pushPage(DeleteClientPage, { client: props.client });
 }
+
+// watchEffect(() => {
+//   if (props.client.isLoaded) {
+//     if (props.client.fuelType?.isLoaded) {
+//       console.log(props.client.fuelType.name);
+//     }
+//   }
+// });
 </script>
 
 <script lang="ts">
@@ -38,7 +48,7 @@ export default {
 <template>
   <Page>
     <AppBar
-      ><Text>Edit Client</Text>
+      ><Text title>Edit Client</Text>
       <template #right>
         <SettingsButton />
       </template>
@@ -91,6 +101,19 @@ export default {
           icon="textBox"
           v-model:value="client.notes"
           :sty="{ width: `1f` }"
+        />
+        <DropDown
+          v-if="client.fuelType?.isLoaded"
+          label="Fuel"
+          v-model:selected="client.fuelType"
+          :options="[
+            { label: `None`, doc: null },
+            ...appData.fuelTypes.list
+              .filter((x) => x.name !== ``)
+              .map((x) => {
+                return { label: x.name, doc: x };
+              }),
+          ]"
         />
       </Card>
       <Box />

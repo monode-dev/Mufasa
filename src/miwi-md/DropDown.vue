@@ -64,7 +64,12 @@ onUnmounted(() => {
 
 function getLabelForSelected(selected: Doc | null) {
   for (const option of props.options) {
-    if (selected === null && option.doc === null) {
+    if (
+      (selected?._firestoreRef === null ||
+        selected?._firestoreRef === undefined) &&
+      (option.doc?._firestoreRef === null ||
+        option.doc?._firestoreRef === undefined)
+    ) {
       return option.label;
     }
     const optionPath = option.doc?._firestoreRef?.path;

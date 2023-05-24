@@ -112,9 +112,14 @@ export function docProx<T extends Doc<{}>>(
         }
       });
     } else {
-      onSnapshot(unpromisedDocRef, (doc) => {
-        data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
-      });
+      if (unpromisedDocRef === LOADING) return;
+      if (unpromisedDocRef === DELETED) {
+        data.value = DELETED;
+      } else {
+        onSnapshot(unpromisedDocRef, (doc) => {
+          data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
+        });
+      }
     }
   })();
   return (() => {
@@ -142,19 +147,23 @@ export function docProx<T extends Doc<{}>>(
     };
 
     // Add getters and setters for each property
-    for (let [prop, format] of Object.entries(objFormats[typeName])) {
-      Object.defineProperty(proxy, prop, {
+    for (let [propKey, format] of Object.entries(objFormats[typeName])) {
+      Object.defineProperty(proxy, propKey, {
         get: function () {
           if (format.format === `one`) {
-            const format = objFormats[typeName][prop as string];
-            const childDocRef = computed(() =>
-              data.value === DELETED || data.value === LOADING
-                ? data.value
-                : (data.value[prop as keyof UnwrapRef<T>] as DocumentReference),
+            const format = objFormats[typeName][propKey as string];
+            // const childDocRef = computed(() =>
+            //   data.value === DELETED || data.value === LOADING
+            //     ? data.value
+            //     : (data.value[propKey as keyof UnwrapRef<T>] as DocumentReference),
+            // );
+            return docProx(
+              data.value?.[propKey as keyof UnwrapRef<T>] as DocumentReference,
+              format.type!,
+              objFormats,
             );
-            return docProx(childDocRef, format.type!, objFormats);
           } else {
-            return data.value?.[prop as keyof UnwrapRef<T>];
+            return data.value?.[propKey as keyof UnwrapRef<T>];
           }
         },
         set: function (newValue) {
@@ -162,7 +171,10 @@ export function docProx<T extends Doc<{}>>(
             const actualDocRef = await getDocRef();
             if (actualDocRef !== DELETED) {
               updateDoc(actualDocRef, {
-                [prop]: newValue,
+                [propKey]:
+                  format.format === `one`
+                    ? newValue?._firestoreRef ?? null
+                    : newValue,
               });
             }
           })();
