@@ -27,12 +27,12 @@ const fuelType = ref<FuelType | null>(null);
       label="Fuel"
       v-model:selected="fuelType"
       :options="[
+        { label: `None`, doc: null },
         ...appData.fuelTypes.list
           .filter((x) => x.name !== ``)
           .map((x) => {
             return { label: x.name, doc: x };
           }),
-        { label: `None`, doc: null },
       ]"
     />
     <!-- <DropDown label="Shape" selected="Horizontal Cylinder" /> -->
