@@ -28,7 +28,7 @@ const fuelType = ref<FuelType | null>(null);
       v-model:selected="fuelType"
       :options="[
         { label: `None`, doc: null },
-        ...appData.fuelTypes.list
+        ...appData.fuelTypes
           .filter((x) => x.name !== ``)
           .map((x) => {
             return { label: x.name, doc: x };

@@ -31,7 +31,7 @@ function closePopUp() {
 function handleYes() {
   closePopUp();
   if (textHasBeenEntered.value) {
-    const newClient = appData.clients.create({ name: name.value });
+    const newClient = appData.clients.add({ name: name.value });
     name.value = "";
     pushPage(ClientPage, { client: newClient });
   }

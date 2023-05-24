@@ -9,7 +9,7 @@ const appData = getAppData();
 
 const filterString = ref("");
 const filteredClients = computed(() =>
-  appData.clients.list.filter((client) => {
+  appData.clients.filter((client) => {
     if (!client.name && !client.clientId) return false;
     if (filterString.value.length === 0) return true;
     return (

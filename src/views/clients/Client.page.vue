@@ -108,7 +108,7 @@ export default {
           v-model:selected="client.fuelType"
           :options="[
             { label: `None`, doc: null },
-            ...appData.fuelTypes.list
+            ...appData.fuelTypes
               .filter((x) => x.name !== ``)
               .map((x) => {
                 return { label: x.name, doc: x };

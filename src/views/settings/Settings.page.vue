@@ -41,12 +41,12 @@ export default {
           <Text title>Fuel Types</Text>
           <Icon
             icon="plus"
-            @click.stop="appData.fuelTypes.create({})"
+            @click.stop="appData.fuelTypes.add({})"
             :scale="1.25"
           />
         </Row>
         <FuelTypeEntry
-          v-for="fuelType in [...appData.fuelTypes.list].sort((a, b) => {
+          v-for="fuelType in [...appData.fuelTypes].sort((a, b) => {
             //
             if (!a.isLoaded) {
               return 1;

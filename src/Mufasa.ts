@@ -13,7 +13,15 @@ import {
   deleteDoc,
   Unsubscribe,
 } from "firebase/firestore";
-import { ComputedRef, UnwrapRef, computed, isRef, ref, watchEffect } from "vue";
+import {
+  ComputedRef,
+  Ref,
+  UnwrapRef,
+  computed,
+  isRef,
+  ref,
+  watchEffect,
+} from "vue";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
@@ -344,17 +352,36 @@ function newDocCollection<
       docProx(doc.ref, typeName, objFormats),
     );
   });
-  return {
-    list: collectionList,
-    create(...args: CreateArgs) {
-      const newDoc = createDoc(...args);
-      return docProx<Doc<T>>(
-        addDoc(collectionRef, newDoc),
-        typeName,
-        objFormats,
-      );
-    },
+  type List<T extends Doc<{}>, CreateArgs extends any[]> = {
+    [Symbol.iterator]: () => IterableIterator<T>;
+    readonly length: number;
+    filter(filterFn: (doc: T) => boolean): List<T, CreateArgs>;
+    map<R>(mapFn: (doc: T) => R): Array<R>;
+    add(...args: CreateArgs): T;
   };
+  function newListFor<T extends Doc<{}>>(
+    collectionList: ComputedRef<T[]> | Ref<T[]>,
+  ): List<T, CreateArgs> {
+    return {
+      [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
+      get length() {
+        return collectionList.value.length;
+      },
+      filter(filterFn: (doc: T) => boolean) {
+        return newListFor(
+          computed(() => collectionList.value.filter(filterFn)),
+        );
+      },
+      map<R>(mapFn: (doc: T) => R) {
+        return collectionList.value.map(mapFn);
+      },
+      add(...args: CreateArgs) {
+        const newDoc = createDoc(...args);
+        return docProx<T>(addDoc(collectionRef, newDoc), typeName, objFormats);
+      },
+    };
+  }
+  return newListFor(collectionList);
 }
 
 // Formula
