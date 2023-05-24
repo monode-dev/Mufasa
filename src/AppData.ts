@@ -9,8 +9,8 @@ import {
 
 export type ClientId = `${number}` | ``;
 export type Client = (typeof mufasaTypes)["Client"];
-const a = {} as Client;
-a.fuelType;
+// const a = {} as Client;
+// a.fuelType;
 // export type TankShape = typeof mufasaTypes["TankShape"];
 // const tankShape = {
 //   none: 0,

@@ -29,11 +29,15 @@ function deletePressed() {
 }
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
+const openDropDownRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
 
 // Close the dropdown when the user clicks outside of it
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
-  if (!dropDownModalRef.value?.$el.contains(e.target)) {
+  if (
+    !dropDownModalRef.value?.$el.contains(e.target) &&
+    !openDropDownRef.value?.$el.contains(e.target)
+  ) {
     dropDownIsOpen.value = false;
     //e.stopPropagation();
   }
@@ -66,6 +70,7 @@ onUnmounted(() => {
     >
       <Icon
         @click.stop="(e) => (dropDownIsOpen = !dropDownIsOpen)"
+        ref="openDropDownRef"
         icon="dotsVertical"
       />
     </Box>

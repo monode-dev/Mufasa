@@ -189,8 +189,7 @@ function computeSizeInfo({
       ? sizeToCss(size)
       : sizeIsFlex
       ? undefined
-      : //: `fit-content`;
-        `auto`;
+      : `fit-content`;
   const minSize = sizeIsFlex
     ? isShrink
       ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
@@ -200,8 +199,7 @@ function computeSizeInfo({
     : exactSize;
   const maxSize = sizeIsFlex
     ? isShrink
-      ? //? `fit-content`
-        `auto`
+      ? `fit-content`
       : size.max === Infinity
       ? exactSize ?? `100%`
       : sizeToCss(size.max)

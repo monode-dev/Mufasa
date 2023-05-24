@@ -66,7 +66,9 @@ export const LOADING: LOADING = null;
 export type DELETED = undefined;
 export const DELETED: DELETED = undefined;
 export type Doc<T extends {} = {}> = {
-  [K in keyof T]: T[K] | LOADING | DELETED;
+  [K in keyof T]: T[K] extends number | string | boolean
+    ? T[K]
+    : T[K] | LOADING | DELETED;
 } & DocSpecificProps;
 export type DocSpecificProps = {
   _firestoreRef: DocumentReference;
@@ -210,8 +212,8 @@ type CreateParamsFromObj<
       : PropType | undefined
     : T["props"][K] extends One<string, infer OneIsRequired>
     ? OneIsRequired extends true
-      ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>>
-      : Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | undefined
+      ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | null
+      : Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | null | undefined
     : never;
 }>;
 
