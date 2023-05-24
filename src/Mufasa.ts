@@ -71,9 +71,9 @@ export type Doc<T extends {} = {}> = {
     : T[K] | LOADING | DELETED;
 } & DocSpecificProps;
 export type DocSpecificProps = {
-  _firestoreRef: DocumentReference;
-  isLoaded: boolean;
-  isDeleted: boolean;
+  readonly _firestoreRef: DocumentReference | null | undefined;
+  readonly isLoaded: boolean;
+  readonly isDeleted: boolean;
   deleteDoc(): Promise<void>;
 };
 export function docProx<T extends Doc<{}>>(
@@ -117,48 +117,61 @@ export function docProx<T extends Doc<{}>>(
       });
     }
   })();
-  return new Proxy({} as T, {
-    get: (_, prop) => {
-      if (prop === "_firestoreRef") {
-        return docRef;
-      } else if (prop === "isLoaded") {
-        return data.value !== LOADING && data.value !== DELETED;
-      } else if (prop === "isDeleted") {
-        return data.value === DELETED;
-      } else if (prop === "deleteDoc") {
-        return async () => {
-          const actualDocRef = await getDocRef();
-          if (actualDocRef !== DELETED) {
-            await deleteDoc(actualDocRef);
-          }
-        };
-      } else if (objFormats[typeName]?.[prop as string]?.format === `one`) {
-        const format = objFormats[typeName][prop as string];
-        const childDocRef = computed(() =>
-          data.value === DELETED || data.value === LOADING
-            ? data.value
-            : (data.value[prop as keyof UnwrapRef<T>] as DocumentReference),
-        );
-        return docProx(childDocRef, format.type!, objFormats);
-      } else {
-        return data.value?.[prop as keyof UnwrapRef<T>];
-      }
-    },
-    set: (_, prop, value) => {
-      if (prop === "_firestoreRef") {
-        return false;
-      }
-      (async () => {
+  return (() => {
+    // Add the doc specific properties
+    let proxy: { [key: string]: any } = {
+      get _firestoreRef() {
+        if (isRef(docRef)) {
+          return docRef.value satisfies DocumentReference | null | undefined;
+        } else {
+          return docRef;
+        }
+      },
+      get isLoaded() {
+        return data !== LOADING && data !== DELETED;
+      },
+      get isDeleted() {
+        return data === DELETED;
+      },
+      async deleteDoc() {
         const actualDocRef = await getDocRef();
         if (actualDocRef !== DELETED) {
-          updateDoc(actualDocRef, {
-            [prop]: value,
-          });
+          await deleteDoc(actualDocRef);
         }
-      })();
-      return true;
-    },
-  });
+      },
+    };
+
+    // Add getters and setters for each property
+    for (let [prop, format] of Object.entries(objFormats[typeName])) {
+      Object.defineProperty(proxy, prop, {
+        get: function () {
+          if (format.format === `one`) {
+            const format = objFormats[typeName][prop as string];
+            const childDocRef = computed(() =>
+              data.value === DELETED || data.value === LOADING
+                ? data.value
+                : (data.value[prop as keyof UnwrapRef<T>] as DocumentReference),
+            );
+            return docProx(childDocRef, format.type!, objFormats);
+          } else {
+            return data.value?.[prop as keyof UnwrapRef<T>];
+          }
+        },
+        set: function (newValue) {
+          (async () => {
+            const actualDocRef = await getDocRef();
+            if (actualDocRef !== DELETED) {
+              updateDoc(actualDocRef, {
+                [prop]: newValue,
+              });
+            }
+          })();
+        },
+      });
+    }
+
+    return proxy as T;
+  })();
 }
 export type GetDocType<T extends { create: (...args: any) => Doc<{}> }> =
   ReturnType<T["create"]>;

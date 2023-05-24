@@ -8,11 +8,16 @@ import {
   VNodeRef,
 } from "vue";
 import Box, { Sty, mdColors, Axis, Align, Overflow } from "./Box.vue";
+import { Doc } from "@/Mufasa";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
     type: Object as PropType<Partial<Sty>>,
     default: {},
+  },
+  options: {
+    type: Array as PropType<{ label: string; doc: Doc | null }[]>,
+    default: [],
   },
   enabled: {
     type: Boolean,
@@ -23,14 +28,16 @@ const props = defineProps({
     default: "",
   },
   selected: {
-    type: String,
-    default: "",
+    type: [Object, null] as PropType<Doc | null>,
+    required: true,
   },
   underlined: {
     type: Boolean,
     default: false,
   },
 });
+
+const emit = defineEmits(["update:selected"]);
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
 const openDropDownRef = ref<VNodeRef | null>(null);
@@ -54,6 +61,28 @@ onUnmounted(() => {
   document.removeEventListener("click", closeOnClickOutside);
   document.removeEventListener("touchend", closeOnClickOutside);
 });
+
+function getLabelForSelected(selected: Doc | null) {
+  for (const option of props.options) {
+    if (selected === null && option.doc === null) {
+      return option.label;
+    }
+    const optionPath = option.doc?._firestoreRef?.path;
+    if (
+      optionPath !== null &&
+      optionPath !== undefined &&
+      optionPath === selected?._firestoreRef?.path
+    ) {
+      return option.label;
+    }
+  }
+  return "";
+}
+
+function selectOption(option: { label: string; doc: Doc | null }) {
+  emit(`update:selected`, option.doc);
+  dropDownIsOpen.value = false;
+}
 </script>
 
 <template>
@@ -87,7 +116,7 @@ onUnmounted(() => {
             spacing: $Spacing.spaceBetween,
           }"
         >
-          <Text>{{ selected }}</Text>
+          <Text>{{ getLabelForSelected(selected) }}</Text>
           <Icon icon="menuDown" />
         </Row>
         <!-- Drop Down -->
@@ -102,11 +131,15 @@ onUnmounted(() => {
               shadowSize: 1,
               zIndex: 10000,
               background: mdColors.white,
-              align: $Align.centerLeft,
             }"
           >
-            <Text>Cancel</Text>
-            <Text>Cancel</Text>
+            <Text
+              v-for="(option, index) in options"
+              :key="index"
+              :sty="{ width: `1f`, align: $Align.centerLeft }"
+              @click.stop="selectOption(option)"
+              >{{ option.label }}</Text
+            >
           </Box>
         </Box>
       </Box>

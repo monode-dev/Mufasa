@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
+import { FuelType, getAppData } from "@/AppData";
+const appData = getAppData();
 
 const length = ref(`0`);
 const depth = ref(`0`);
 const height = ref(`0`);
 const shortHeight = ref(`0`);
+const fuelType = ref<FuelType | null>(null);
 </script>
 
 <template>
@@ -20,8 +23,19 @@ const shortHeight = ref(`0`);
 
       <DeleteOptionsButton />
     </Box>
-    <DropDown label="Fuel" selected="GAPRMC" />
-    <DropDown label="Shape" selected="Horizontal Cylinder" />
+    <DropDown
+      label="Fuel"
+      v-model:selected="fuelType"
+      :options="[
+        ...appData.fuelTypes.list
+          .filter((x) => x.name !== ``)
+          .map((x) => {
+            return { label: x.name, doc: x };
+          }),
+        { label: `None`, doc: null },
+      ]"
+    />
+    <!-- <DropDown label="Shape" selected="Horizontal Cylinder" /> -->
     <Row
       :sty="{
         width: `1f`,
