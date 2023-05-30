@@ -27,14 +27,13 @@ workflows:
       - name: Build Android release
         script: |
           cd android
-          gradlew bundleRelease \
+          ./gradlew bundleRelease \
             -PversionCode=1.13.131  \
             -PversionName=1.13.131 
     artifacts:
       - android/app/build/outputs/**/*.apk
     publishing:
       email:
-        recipients:
           - melchiah@tke.us
           - melchiah.mauck@gmail.com
         notify:
@@ -88,7 +87,7 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          agvtool new-version -all 1.17.0 
+          agvtool new-version -all 1.18.0 
         # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
         # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme
