@@ -28,7 +28,7 @@ const props = defineProps({
     default: "",
   },
   selected: {
-    type: [Object, null] as PropType<Doc | null>,
+    type: [Object, null, undefined] as PropType<Doc | null | undefined>,
     required: true,
   },
   underlined: {
@@ -62,7 +62,7 @@ onUnmounted(() => {
   document.removeEventListener("touchend", closeOnClickOutside);
 });
 
-function getLabelForSelected(selected: Doc | null) {
+function getLabelForSelected(selected: Doc | null | undefined) {
   for (const option of props.options) {
     if (
       (selected?._firestoreRef === null ||

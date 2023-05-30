@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage } from "@/Nav";
-import { Client } from "@/Mufasa";
+import { Client } from "@/AppData";
 import { PropType, VNodeRef, ref } from "vue";
 
 const props = defineProps({

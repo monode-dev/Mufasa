@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
-import { FuelType, getAppData } from "@/AppData";
+import { FuelType, Tank, getAppData } from "@/AppData";
 const appData = getAppData();
 
-const length = ref(`0`);
-const depth = ref(`0`);
-const height = ref(`0`);
-const shortHeight = ref(`0`);
-const fuelType = ref<FuelType | null>(null);
+const props = defineProps({
+  tank: {
+    type: Object as () => Tank,
+    required: true,
+  },
+});
 </script>
 
 <template>
@@ -25,7 +26,7 @@ const fuelType = ref<FuelType | null>(null);
     </Box>
     <DropDown
       label="Fuel"
-      v-model:selected="fuelType"
+      v-model:selected="tank.fuelType"
       :options="[
         { label: `None`, doc: null },
         ...appData.fuelTypes
@@ -41,16 +42,16 @@ const fuelType = ref<FuelType | null>(null);
         width: `1f`,
       }"
     >
-      <Label label="Length"><Field v-model:value="length" /></Label>
-      <Label label="Depth"><Field v-model:value="depth" /></Label>
+      <Label label="Length"><Field v-model:value="tank.length" /></Label>
+      <Label label="Depth"><Field v-model:value="tank.depth" /></Label>
     </Row>
     <Row
       :sty="{
         width: `1f`,
       }"
     >
-      <Label label="Height"><Field v-model:value="height" /></Label>
-      <Label label="Short Height"><Field v-model:value="shortHeight" /></Label>
+      <Label label="Height"><Field v-model:value="tank.height" /></Label>
+      <Label label="Short Height"><Field v-model:value="tank.shortHeight" /></Label>
     </Row>
   </Card>
 </template>

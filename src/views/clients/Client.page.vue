@@ -30,13 +30,9 @@ function deletePressed() {
   pushPage(DeleteClientPage, { client: props.client });
 }
 
-// watchEffect(() => {
-//   if (props.client.isLoaded) {
-//     if (props.client.fuelType?.isLoaded) {
-//       console.log(props.client.fuelType.name);
-//     }
-//   }
-// });
+watchEffect(() => {
+  console.log(props.client.tanks?.length);
+});
 </script>
 
 <script lang="ts">
@@ -127,10 +123,15 @@ export default {
         <Box :sty="{ width: 1.75 }" />
         <Text title>Tanks</Text>
         <Box :sty="{ width: 1.75, align: $Align.centerLeft }">
-          <Icon icon="plus" :scale="1.25" />
+          <Icon icon="plus" :scale="1.25" @click.stop="client.tanks?.add({})" />
         </Box>
       </Row>
-      <TankEntry v-for="num in tankNums" :key="num">{{ num }}</TankEntry>
+      <TankEntry
+        v-for="(tank, index) in client.tanks"
+        :key="index"
+        :tank="tank"
+        >{{ index + 1 }}</TankEntry
+      >
     </Body>
     <Body v-else :sty="{ align: Align.center }">
       <Text hint>Loading...</Text>

@@ -1,4 +1,49 @@
 workflows:
+  android-workflow:
+    name: Ionic Capacitor Android Workflow
+    max_build_duration: 120
+    environment:
+      android_signing:
+        - keystore_reference
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "us.tke.dataplate"
+        GOOGLE_PLAY_TRACK: internal
+      node: latest
+    scripts:
+      - name: Install npm dependencies for Ionic Capacitor project
+        script: | 
+          npm install
+      - name: Set up local.properties
+        script: | 
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Export TS project
+        script: |
+          npm run build:full
+      - name: Update dependencies and copy web assets to native project
+        script: |
+          npx cap sync android
+      - name: Build Android release
+        script: |
+          cd android
+          ./gradlew bundleRelease \
+            -PversionCode=1.13.131  \
+            -PversionName=1.0.1.13.131 
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - melchiah@tke.us
+          - melchiah.mauck@gmail.com
+        notify:
+          success: true
+          failure: false
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: false
   ios-workflow:
     name: iOS Workflow
     max_build_duration: 120
@@ -43,7 +88,7 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          agvtool new-version -all 1.13.131 
+          agvtool new-version -all 1.13.132 
         # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
         # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme
