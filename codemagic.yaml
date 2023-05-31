@@ -31,6 +31,18 @@ workflows:
           ./gradlew bundleRelease \
             -PversionCode=131  \
             -PversionName=1.13
+      - name: Print APK path
+        script: |
+          cd android
+          echo "android"
+          cd app
+          echo "app"
+          cd build
+          echo "build"
+          cd outputs
+          echo "outputs"
+          echo "APK path: $(find . -name '*.aab')"
+          echo "APK path: $(find . -name '*.apk')"
     artifacts:
       - android/app/build/outputs/**/*.apk
     publishing:
@@ -89,7 +101,7 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          agvtool new-version -all 1.22.0 
+          agvtool new-version -all 1.23.0 
         # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
         # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme
