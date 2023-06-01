@@ -86,14 +86,18 @@ export type DocSpecificProps = {
   readonly isDeleted: boolean;
   deleteDoc(): Promise<void>;
 };
-export function docProx<T extends Doc<{}>>(
+export function docProx<
+  TypeName extends string,
+  F extends ObjFormats,
+  T extends Doc<{}> = FormatToTsType<TypeName, F>,
+>(
   docRef:
     | DocumentReference
     | Promise<DocumentReference | null | undefined>
     | null
     | undefined,
-  typeName: string,
-  objFormats: ObjFormats,
+  typeName: TypeName,
+  objFormats: F,
 ): T {
   const data = ref<T | null | undefined>(null);
 
@@ -171,9 +175,8 @@ export function docProx<T extends Doc<{}>>(
         : format.format === `many`
         ? /* Many */ {
             get: function () {
-              return newDocCollection(
+              return listProx(
                 typeName,
-                format.create!,
                 objFormats,
                 `mx_parent`,
                 proxy._firestoreRef ?? undefined,
@@ -258,10 +261,9 @@ export type One<T extends string = string> = {
   // backRefPropName: string | undefined,
   init: null | (() => Obj);
 };
-export function one<T extends string, IsRequired extends boolean = false>(
+export function one<T extends string>(
   options: T,
   init: null | (() => Obj),
-  isRequired?: IsRequired,
 ): One<T> {
   return {
     type: options,
@@ -284,46 +286,6 @@ export function many<T extends Obj>(options: T): Many<T> {
     quantity: `many`,
   };
 }
-function docCollectionFromMany<T extends Obj, D extends TypeMap>(
-  many: Many<T>,
-  objFormats: ObjFormats,
-) {
-  type TsType = ObjToTsType<T, D>;
-  type CreateType = (
-    createParams: CreateParamsFromObj<T, D>,
-    mx_parent?: DocumentReference,
-  ) => TsType;
-  return newDocCollection<TsType, CreateParamsFromObj<T, D>, CreateType>(
-    many.type.typeName,
-    (
-      createParams: CreateParamsFromObj<T, D>,
-      mx_parent?: DocumentReference,
-    ) => {
-      function getDefaultProps() {
-        const defaultProps: { [key: string]: any } = {};
-        const defProps = many.type.props;
-        for (const key of Object.keys(defProps)) {
-          const prop = defProps[key];
-          if (prop.type === `primitive`) {
-            const init = prop.init;
-            if (typeof init === `function`) {
-              defaultProps[key] = init();
-            } else {
-              defaultProps[key] = init;
-            }
-          }
-        }
-        return defaultProps;
-      }
-      return {
-        ...getDefaultProps(),
-        ...createParams,
-        ...(mx_parent === undefined ? {} : { mx_parent }),
-      } as any;
-    },
-    objFormats,
-  );
-}
 export type List<T extends Doc<{}>, CreateArgs extends any> = {
   [Symbol.iterator]: () => IterableIterator<T>;
   readonly length: number;
@@ -331,19 +293,18 @@ export type List<T extends Doc<{}>, CreateArgs extends any> = {
   map<R>(mapFn: (doc: T) => R): Array<R>;
   add(params: CreateArgs): T;
 };
-function newDocCollection<
-  T extends {},
-  CreateArgs extends any,
-  Create extends (params: CreateArgs, mx_parent?: DocumentReference) => T,
+function listProx<
+  TypeName extends string,
+  F extends ObjFormats,
+  T extends Doc<{}> = FormatToTsType<TypeName, F>,
 >(
-  typeName: string,
-  createDoc: Create,
-  objFormats: ObjFormats,
+  typeName: TypeName,
+  objFormats: F,
   propName?: string,
   mx_parent?: DocumentReference,
 ) {
   const collectionRef = collection(firebaseDb, typeName);
-  const collectionList = ref<Doc<T>[]>([]);
+  const collectionList = ref<T[]>([]);
   if (propName) {
     if (mx_parent) {
       onSnapshot(
@@ -364,10 +325,11 @@ function newDocCollection<
     });
   }
   return newListFor(collectionList, mx_parent);
+  type CreateParams = CreateParamsFromFormat<TypeName, F>;
   function newListFor<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
     mx_parent?: DocumentReference,
-  ): List<T, CreateArgs> {
+  ): List<T, CreateParams> {
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
       get length() {
@@ -381,9 +343,33 @@ function newDocCollection<
       map<R>(mapFn: (doc: T) => R) {
         return collectionList.value.map(mapFn);
       },
-      add(params: CreateArgs) {
-        const newDoc = createDoc(params, mx_parent);
-        return docProx<T>(addDoc(collectionRef, newDoc), typeName, objFormats);
+      add(createParams: CreateParams) {
+        const newDoc = {
+          ...getDefaultProps(),
+          ...createParams,
+          ...(mx_parent === undefined ? {} : { mx_parent }),
+        };
+        return docProx<TypeName, F>(
+          addDoc(collectionRef, newDoc),
+          typeName,
+          objFormats,
+        ) as T;
+        function getDefaultProps() {
+          const defaultProps: { [key: string]: any } = {};
+          const defProps = objFormats[typeName];
+          for (const key of Object.keys(defProps)) {
+            const prop = defProps[key];
+            if (prop.format === `prim`) {
+              const init = prop.init;
+              if (typeof init === `function`) {
+                defaultProps[key] = init();
+              } else {
+                defaultProps[key] = init;
+              }
+            }
+          }
+          return defaultProps;
+        }
       },
     };
   }
@@ -406,7 +392,6 @@ type ObjFormats = {
       format: `prim` | `one` | `many`;
       typeName: string | undefined;
       init: any;
-      readonly create?: (params: any, mx_parent?: DocumentReference) => any;
     };
   };
 };
@@ -431,36 +416,6 @@ type CreateParamsFromFormat<TypeName extends string, F extends ObjFormats> = {
     ? FormatToTsType<F[TypeName][K][`type`][`typeName`], F> | null | undefined
     : never;
 };
-function createFromFormat<T extends string, F extends ObjFormats>(
-  typeName: T,
-  objFormats: F,
-  getMx_Parent: () => DocumentReference | undefined,
-) {
-  return (createParams: CreateParamsFromFormat<T, F>) => {
-    function getDefaultProps() {
-      const defaultProps: { [key: string]: any } = {};
-      const defProps = objFormats[typeName];
-      for (const key of Object.keys(defProps)) {
-        const prop = defProps[key];
-        if (prop.format === `prim`) {
-          const init = prop.init;
-          if (typeof init === `function`) {
-            defaultProps[key] = init();
-          } else {
-            defaultProps[key] = init;
-          }
-        }
-      }
-      return defaultProps;
-    }
-    const mx_parent = getMx_Parent();
-    return {
-      ...getDefaultProps(),
-      ...createParams,
-      ...(mx_parent === undefined ? {} : { mx_parent }),
-    } as any;
-  };
-}
 type DataStructureToTypeMap<T extends Obj[`props`]> = {
   [K in keyof T as T[K] extends Many
     ? T[K][`type`][`typeName`]
@@ -491,39 +446,16 @@ type TypesFromObjProps<T extends Obj[`props`], D extends Obj[`props`]> = {
       : never;
   }[keyof T]
 >;
+type ObjPropsToObjFormats<T extends Obj[`props`]> = {
+  throw
+};
 export function defineAppDataStructure<T extends { [key: string]: Many }>(
   modelName: string,
   modelDef: T,
 ) {
-  function defineCreate<T extends Obj, D extends TypeMap>(many: Many<T>) {
-    return (
-      createParams: CreateParamsFromObj<T, D>,
-      mx_parent?: DocumentReference,
-    ) => {
-      function getDefaultProps() {
-        const defaultProps: { [key: string]: any } = {};
-        const defProps = many.type.props;
-        for (const key of Object.keys(defProps)) {
-          const prop = defProps[key];
-          if (prop.type === `primitive`) {
-            const init = prop.init;
-            if (typeof init === `function`) {
-              defaultProps[key] = init();
-            } else {
-              defaultProps[key] = init;
-            }
-          }
-        }
-        return defaultProps;
-      }
-      return {
-        ...getDefaultProps(),
-        ...createParams,
-        ...(mx_parent === undefined ? {} : { mx_parent }),
-      } as any;
-    };
-  }
-  function buildObjFormats(allProps: Obj[`props`] = modelDef) {
+  function buildObjFormats<T extends Obj[`props`]>(
+    allProps: T,
+  ): ObjPropsToObjFormats<T> {
     let objFormats: ObjFormats = {};
     for (const key of Object.keys(allProps)) {
       const entry = allProps[key];
@@ -550,7 +482,6 @@ export function defineAppDataStructure<T extends { [key: string]: Many }>(
               format: `many`,
               typeName: prop.type.typeName,
               init: undefined,
-              create: defineCreate(prop as any),
             };
           }
         }
@@ -559,19 +490,21 @@ export function defineAppDataStructure<T extends { [key: string]: Many }>(
     }
     return objFormats;
   }
-  const objFormats = buildObjFormats();
+  const objFormats = buildObjFormats(modelDef);
   return {
     getAppData: defineStore(modelName, () => {
       const manyCollections: {
         [K in keyof T]: ReturnType<
-          typeof docCollectionFromMany<T[K][`type`], DataStructureToTypeMap<T>>
+          typeof listProx<T[K][`type`][`typeName`], typeof objFormats>
         >;
       } = {} as any;
       for (const key of Object.keys(modelDef)) {
         const many = modelDef[key];
         if (many.type.typeName) {
-          manyCollections[key as keyof typeof manyCollections] =
-            docCollectionFromMany(many, objFormats) as any;
+          manyCollections[key as keyof typeof manyCollections] = listProx(
+            many.type.typeName,
+            objFormats,
+          ) as any;
         }
       }
       return manyCollections;
