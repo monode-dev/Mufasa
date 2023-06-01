@@ -3,7 +3,6 @@ import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
 import DeleteClientPage from "./DeleteClient.dialog.vue";
-import { LOADING } from "@/Mufasa";
 import { Client } from "@/AppData";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
 
@@ -31,7 +30,8 @@ function clicked() {
       width: `1f`,
       height: 1,
       spacing: $Spacing.spaceBetween,
-      textColor: client.name === LOADING ? mdColors.grey : mdColors.black,
+      textColor: 
+              ([undefined, null] as any[]).includes(client.name) ? mdColors.grey : mdColors.black,
       overflowY: Overflow.visible,
     }"
   >

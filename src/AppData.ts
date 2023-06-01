@@ -33,7 +33,7 @@ export const { getAppData, mufasaTypes, test } = defineAppDataStructure(
       obj({
         typeName: `Client`,
         props: {
-          name: prim<string, RequireOnCreate>(undefined),
+          name: prim<string>(``),
           clientId: prim<number | null>(null),
           phoneNumber: prim<string>(``),
           address: prim<string>(``),

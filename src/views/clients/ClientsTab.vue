@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
 import { getAppData, Client } from "@/AppData";
-import { LOADING, docProx, DELETED } from "@/Mufasa";
+import { docProx } from "@/Mufasa";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
 
@@ -35,9 +35,9 @@ for (let i = 1; i <= 50; i++) {
       <ClientEntry
         v-for="(client, index) in [...filteredClients].sort((a, b) => {
           //
-          if (!a.isLoaded || a.name === LOADING || a.name === DELETED) {
+          if (!a.isLoaded || ([undefined, null] as (string | undefined | null)[]).includes(a.name)) {
             return 1;
-          } else if (!b.isLoaded || b.name === LOADING || b.name === DELETED) {
+          } else if (!b.isLoaded || ([undefined, null] as (string | undefined | null)[]).includes(b.name)) {
             return -1;
           } else {
             return a.name.localeCompare(b.name);

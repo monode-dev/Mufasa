@@ -2,7 +2,6 @@
 import { pageTransitions } from "@/Nav";
 import { appVersion } from "@/AppDetails";
 import { getAppData } from "@/AppData";
-import { LOADING, DELETED } from "@/Mufasa";
 import { mdColors } from "@/miwi-md/Box.vue";
 
 function openTkeWebsite() {
@@ -53,13 +52,11 @@ export default {
             } else if (!b.isLoaded) {
               return -1;
             } else if (
-              a.createdPosix === LOADING ||
-              a.createdPosix === DELETED
+              ([undefined, null] as any[]).includes(a.createdPosix)
             ) {
               return -1;
             } else if (
-              b.createdPosix === LOADING ||
-              b.createdPosix === DELETED
+              ([undefined, null] as any[]).includes(b.createdPosix)
             ) {
               return 1;
             } else {

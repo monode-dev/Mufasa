@@ -25,6 +25,7 @@ import {
   ref,
   watchEffect,
 } from "vue";
+import { exists } from "./utils";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
@@ -76,14 +77,8 @@ export function incCount() {
 }
 
 // Object
-export type LOADING = null;
-export const LOADING: LOADING = null;
-export type DELETED = undefined;
-export const DELETED: DELETED = undefined;
 export type Doc<T extends {} = {}> = {
-  [K in keyof T]: T[K] extends number | string | boolean
-    ? T[K]
-    : T[K] | LOADING | DELETED;
+  [K in keyof T]: T[K] | null | undefined;
 } & DocSpecificProps;
 export type DocSpecificProps = {
   readonly _firestoreRef: DocumentReference | null | undefined;
@@ -94,145 +89,113 @@ export type DocSpecificProps = {
 export function docProx<T extends Doc<{}>>(
   docRef:
     | DocumentReference
-    | Promise<DocumentReference>
-    | ComputedRef<DocumentReference | DELETED | LOADING>,
+    | Promise<DocumentReference | null | undefined>
+    | null
+    | undefined,
   typeName: string,
   objFormats: ObjFormats,
 ): T {
-  async function getDocRef(): Promise<DocumentReference | DELETED> {
-    const unpromisedDocRef = await docRef;
-    if (isRef(unpromisedDocRef)) {
-      while (unpromisedDocRef.value === LOADING) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+  const data = ref<T | null | undefined>(null);
+  let proxy: Doc<{ [key: string]: any }> = {
+    get _firestoreRef() {
+      if (exists(docRef) && `path` in docRef) {
+        return docRef;
+      } else {
+        return undefined;
       }
-      return unpromisedDocRef.value;
-    } else {
-      return unpromisedDocRef;
-    }
-  }
-  const data = ref<T | LOADING | DELETED>(LOADING);
+    },
+    get isLoaded() {
+      return data.value !== null && data.value !== undefined;
+    },
+    get isDeleted() {
+      return data.value === undefined;
+    },
+    async deleteDoc() {
+      const actualDocRef = await docRef;
+      if (exists(actualDocRef)) {
+        // Delete all sub docs
+        for (const format of Object.values(objFormats[typeName])) {
+          if (format.format === `many`) {
+            const collectionRef = collection(firebaseDb, format.typeName!);
+            const docs = await getDocs(
+              query(collectionRef, where(`mx_parent`, "==", actualDocRef.path)),
+            );
+            docs.forEach((doc) => deleteDoc(doc.ref));
+          }
+        }
+        await deleteDoc(actualDocRef);
+      }
+    },
+  };
   (async () => {
     const unpromisedDocRef = await docRef;
-    if (isRef(unpromisedDocRef)) {
-      let unsubscribe: Unsubscribe | undefined;
-      watchEffect(() => {
-        unsubscribe?.();
-        if (unpromisedDocRef.value === LOADING) return;
-        if (unpromisedDocRef.value === DELETED) {
-          data.value = DELETED;
-        } else {
-          unsubscribe = onSnapshot(unpromisedDocRef.value, (doc) => {
-            data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
-          });
-        }
-      });
+    if (!exists(unpromisedDocRef)) {
+      data.value = unpromisedDocRef;
     } else {
-      if (unpromisedDocRef === LOADING) return;
-      if (unpromisedDocRef === DELETED) {
-        data.value = DELETED;
-      } else {
-        onSnapshot(unpromisedDocRef, (doc) => {
-          data.value = doc.data() as UnwrapRef<T> | LOADING | DELETED;
-        });
-      }
-    }
-  })();
-  return (() => {
-    // Add the doc specific properties
-    let proxy: { [key: string]: any } = {
-      get _firestoreRef() {
-        if (isRef(docRef)) {
-          return docRef.value satisfies DocumentReference | null | undefined;
-        } else {
-          return docRef;
-        }
-      },
-      get isLoaded() {
-        return data !== LOADING && data !== DELETED;
-      },
-      get isDeleted() {
-        return data === DELETED;
-      },
-      async deleteDoc() {
-        const actualDocRef = await getDocRef();
-        if (actualDocRef !== DELETED) {
-          // Delete all sub docs
-          for (const [propKey, format] of Object.entries(
-            objFormats[typeName],
-          )) {
-            if (format.format === `many`) {
-              const collectionRef = collection(firebaseDb, format.typeName!);
-              const docs = await getDocs(
-                query(
-                  collectionRef,
-                  where(`mx_parent`, "==", actualDocRef.path),
-                ),
-              );
-              docs.forEach((doc) => deleteDoc(doc.ref));
-            }
-          }
-          await deleteDoc(actualDocRef);
-        }
-      },
-    };
-
-    // Add getters and setters for each property
-    for (let [propKey, format] of Object.entries(objFormats[typeName])) {
-      Object.defineProperty(proxy, propKey, {
-        get: function () {
-          if (format.format === `one`) {
-            const format = objFormats[typeName][propKey as string];
-            // const childDocRef = computed(() =>
-            //   data.value === DELETED || data.value === LOADING
-            //     ? data.value
-            //     : (data.value[propKey as keyof UnwrapRef<T>] as DocumentReference),
-            // );
-            return docProx(
-              data.value?.[propKey as keyof UnwrapRef<T>] as DocumentReference,
-              format.typeName!,
-              objFormats,
-            );
-          } else if (format.format === `many`) {
-            return newDocCollection(
-              format.typeName!,
-              format.create!,
-              objFormats,
-              `mx_parent`,
-              (() => {
-                if (isRef(docRef)) {
-                  return docRef.value ?? undefined;
-                } else if (`path` in docRef) {
-                  return docRef;
-                } else {
-                  return undefined;
-                }
-              })(),
-            );
-          } else {
-            return data.value?.[propKey as keyof UnwrapRef<T>];
-          }
-        },
-        set:
-          format.format === `many`
-            ? undefined
-            : function (newValue) {
-                (async () => {
-                  const actualDocRef = await getDocRef();
-                  if (actualDocRef !== DELETED) {
-                    updateDoc(actualDocRef, {
-                      [propKey]:
-                        format.format === `one`
-                          ? newValue?._firestoreRef ?? null
-                          : newValue,
-                    });
-                  }
-                })();
-              },
+      onSnapshot(unpromisedDocRef, (doc) => {
+        data.value = doc.data() as UnwrapRef<T> | null | undefined;
       });
     }
-
-    return proxy as T;
   })();
+
+  // Add getters and setters for each property
+  for (let [propKey, format] of Object.entries(objFormats[typeName])) {
+    Object.defineProperty(
+      proxy,
+      propKey,
+      format.format === `one`
+        ? /* One */ {
+            get: function () {
+              return docProx(
+                data.value?.[propKey as keyof typeof data.value] as
+                  | DocumentReference
+                  | null
+                  | undefined,
+                format.typeName!,
+                objFormats,
+              );
+            },
+            set: function (newValue: any) {
+              (async () => {
+                const actualDocRef = proxy._firestoreRef;
+                if (exists(actualDocRef)) {
+                  updateDoc(actualDocRef, {
+                    [propKey]: newValue?._firestoreRef ?? null,
+                  });
+                }
+              })();
+            },
+          }
+        : format.format === `many`
+        ? /* Many  */ {
+            get: function () {
+              return newDocCollection(
+                typeName,
+                format.create!,
+                objFormats,
+                `mx_parent`,
+                proxy._firestoreRef ?? undefined,
+              );
+            },
+            set: undefined,
+          }
+        : /* Prim */ {
+            get: function () {
+              return data.value?.[propKey as keyof typeof data.value];
+            },
+            set: function (newValue: any) {
+              const actualDocRef = proxy._firestoreRef;
+              if (exists(actualDocRef)) {
+                updateDoc(actualDocRef, {
+                  [propKey]: newValue,
+                });
+              }
+            },
+          },
+    );
+  }
+
+  return proxy as T;
 }
 export type GetDocType<T extends { create: (...args: any) => Doc<{}> }> =
   ReturnType<T["create"]>;
@@ -258,55 +221,22 @@ export type ObjToTsType<T extends Obj, D extends TypeMap> = {
       >
     : never;
 };
-// const temp = obj({
-//   typeName: `Client`,
-//   props: {
-//     name: prim<string, RequireOnCreate>(undefined),
-//     clientId: prim<number | null>(null),
-//     phoneNumber: prim<string>(``),
-//     address: prim<string>(``),
-//     notes: prim<string>(``),
-//     // fuelType: one(`FuelType`),
-//   },
-// });
-// type Temp = TypesFromDataStructure<{ [`clients`]: Many<typeof temp> }>;
-// const temp2: Temp = {} as Temp;
-// temp2.clients.;
-type PossiblyUndefinedKeys<T> = {
-  [K in keyof T]: undefined extends T[K] ? K : never;
-}[keyof T];
-type MakeUndefiendPropsOptional<T> = Omit<T, PossiblyUndefinedKeys<T>> & {
-  [K in PossiblyUndefinedKeys<T>]?: T[K];
-};
-type CreateParamsFromObj<
-  T extends Obj,
-  D extends TypeMap,
-> = MakeUndefiendPropsOptional<{
-  [K in keyof T["props"]]: T["props"][K] extends Prim<
-    infer PropType,
-    infer PropIsRequired
-  >
-    ? PropIsRequired extends true
-      ? PropType
-      : PropType | undefined
-    : T["props"][K] extends One<string, infer OneIsRequired>
-    ? OneIsRequired extends true
-      ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | null
-      : Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | null | undefined
+type CreateParamsFromObj<T extends Obj, D extends TypeMap> = {
+  [K in keyof T["props"]]?: T["props"][K] extends Prim<infer PropType>
+    ? PropType | undefined
+    : T["props"][K] extends One
+    ? Doc<ObjToTsType<D[T["props"][K]["type"]], D>> | null | undefined
     : T["props"][K] extends Many
     ?
         | Doc<ObjToTsType<D[T["props"][K][`type`][`typeName`]], D>>
         | null
         | undefined
     : never;
-}>;
+};
 
 // Primitive
 export type PrimTsType = number | boolean | string /* | binary */ | null;
-export type Prim<
-  T extends PrimTsType = PrimTsType,
-  IsRequired extends boolean = boolean,
-> = {
+export type Prim<T extends PrimTsType = PrimTsType> = {
   type: `primitive`;
   init: PrimInitTsType<T>;
 };
@@ -315,10 +245,7 @@ export type PrimInitTsType<T extends PrimTsType> =
   | (() => PrimTsType)
   | undefined;
 export type RequireOnCreate = true;
-export function prim<
-  T extends PrimTsType,
-  IsRequiredOnCreate extends RequireOnCreate | false = false,
->(init: PrimInitTsType<T>): Prim<T, IsRequiredOnCreate> {
+export function prim<T extends PrimTsType>(init: PrimInitTsType<T>): Prim<T> {
   return {
     type: `primitive`,
     init,
@@ -326,7 +253,7 @@ export function prim<
 }
 
 // One
-export type One<T extends string, IsRequired = boolean> = {
+export type One<T extends string = string> = {
   type: T;
   quantity: `one`;
   // backRefPropName: string | undefined,
@@ -336,7 +263,7 @@ export function one<T extends string, IsRequired extends boolean = false>(
   options: T,
   init: null | (() => Obj),
   isRequired?: IsRequired,
-): One<T, IsRequired> {
+): One<T> {
   return {
     type: options,
     quantity: `one`,
