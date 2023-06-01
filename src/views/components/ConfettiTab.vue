@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import ConfettiExplosion from "vue-confetti-explosion";
-import { count, incCount } from "@/Mufasa";
+import { count, incCount } from "@/Count";
 import { mdColors } from "@/miwi-md/Box.vue";
 
 // Confetti

@@ -50,23 +50,6 @@ try {
   // console.log(err);
 }
 
-const countDoc = doc(firebaseDb, `count`, `count`);
-const _count = ref(0);
-onSnapshot(countDoc, (querySnapshot) => {
-  const newCount = querySnapshot?.data()?.count;
-  if (newCount !== undefined) {
-    _count.value = newCount;
-  }
-});
-export const count = computed(() => _count.value);
-
-export function incCount() {
-  const newCount = count.value + 1;
-  updateDoc(countDoc, {
-    count: newCount,
-  });
-}
-
 // Object
 export type Doc<T extends {} = {}> = {
   [K in keyof T]: T[K] | null | undefined;
