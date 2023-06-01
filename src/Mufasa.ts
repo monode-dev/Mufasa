@@ -11,20 +11,11 @@ import {
   collection,
   addDoc,
   deleteDoc,
-  Unsubscribe,
   where,
   query,
   getDocs,
 } from "firebase/firestore";
-import {
-  ComputedRef,
-  Ref,
-  UnwrapRef,
-  computed,
-  isRef,
-  ref,
-  watchEffect,
-} from "vue";
+import { ComputedRef, Ref, UnwrapRef, computed, ref } from "vue";
 import { exists } from "./utils";
 
 const firebaseConfig = {
@@ -391,20 +382,25 @@ type ObjFormats = {
     [propName: string]: {
       format: `prim` | `one` | `many`;
       typeName: string | undefined;
+      primType: PrimTsType | undefined;
       init: any;
     };
   };
 };
 type FormatToTsType<TypeName extends string, F extends ObjFormats> = Doc<{
-  -readonly [K in keyof F[TypeName]]: F[TypeName][K] extends Prim<infer R>
-    ? R
-    : F[TypeName][K] extends One<string>
-    ? FormatToTsType<F[TypeName][K]["type"], F>
-    : F[TypeName][K] extends Many
-    ? List<
-        FormatToTsType<F[TypeName][K][`type`][`typeName`], F>,
-        CreateParamsFromFormat<F[TypeName][K][`type`][`typeName`], F>
-      >
+  -readonly [K in keyof F[TypeName]]: F[TypeName][K][`format`] extends `prim`
+    ? F[TypeName][K][`primType`]
+    : F[TypeName][K][`format`] extends `one`
+    ? F[TypeName][K][`typeName`] extends string
+      ? FormatToTsType<F[TypeName][K][`typeName`], F>
+      : never
+    : F[TypeName][K][`format`] extends `many`
+    ? F[TypeName][K][`typeName`] extends string
+      ? List<
+          FormatToTsType<F[TypeName][K][`typeName`], F>,
+          CreateParamsFromFormat<F[TypeName][K][`typeName`], F>
+        >
+      : never
     : never;
 }>;
 type CreateParamsFromFormat<TypeName extends string, F extends ObjFormats> = {
@@ -446,21 +442,57 @@ type TypesFromObjProps<T extends Obj[`props`], D extends Obj[`props`]> = {
       : never;
   }[keyof T]
 >;
-type ObjPropsToObjFormats<T extends Obj[`props`]> = {
-  throw
-};
+type ObjToFormat<T extends Obj, D extends TypeMap> = Doc<{
+  -readonly [K in keyof T["props"]]: T["props"][K] extends Prim<infer R>
+    ? {
+        format: `prim`;
+        typeName: undefined;
+        primType: R;
+        init: any;
+      }
+    : T["props"][K] extends One<string>
+    ? {
+        format: `one`;
+        typeName: T["props"][K]["type"];
+        primType: undefined;
+        init: any;
+      }
+    : T["props"][K] extends Many
+    ? {
+        format: `many`;
+        typeName: T["props"][K]["type"]["typeName"];
+        primType: undefined;
+        init: any;
+      }
+    : never;
+}>;
+type ObjPropsToObjFormats<T extends Obj[`props`], D extends Obj[`props`]> = {
+  [K in keyof T as T[K] extends Many
+    ? T[K][`type`][`typeName`]
+    : never]: T[K] extends Many
+    ? ObjToFormat<T[K][`type`], DataStructureToTypeMap<D>>
+    : never;
+} & UnionToIntersection<
+  {
+    [K in keyof T]: T[K] extends Many
+      ? TypesFromObjProps<T[K][`type`][`props`], D>
+      : never;
+  }[keyof T]
+>;
 export function defineAppDataStructure<T extends { [key: string]: Many }>(
   modelName: string,
   modelDef: T,
 ) {
-  function buildObjFormats<T extends Obj[`props`]>(
+  function buildObjFormats<T extends Obj[`props`], D extends Obj[`props`]>(
     allProps: T,
-  ): ObjPropsToObjFormats<T> {
+  ): ObjPropsToObjFormats<T, D> {
     let objFormats: ObjFormats = {};
     for (const key of Object.keys(allProps)) {
       const entry = allProps[key];
       if (`quantity` in entry && entry.quantity === `many`) {
-        const subFormats = buildObjFormats(entry.type.props);
+        const subFormats = buildObjFormats<typeof entry.type.props, D>(
+          entry.type.props,
+        );
         objFormats = { ...objFormats, ...subFormats };
         const propFormats: ObjFormats[string] = {};
         for (const propName of Object.keys(entry.type.props)) {
@@ -470,18 +502,21 @@ export function defineAppDataStructure<T extends { [key: string]: Many }>(
               format: `prim`,
               typeName: undefined,
               init: prop.init,
+              primType: {} as any,
             };
           } else if (`quantity` in prop && prop.quantity === `one`) {
             propFormats[propName] = {
               format: `one`,
               typeName: prop.type,
               init: prop.init,
+              primType: undefined,
             };
           } else {
             propFormats[propName] = {
               format: `many`,
               typeName: prop.type.typeName,
               init: undefined,
+              primType: undefined,
             };
           }
         }
@@ -490,7 +525,7 @@ export function defineAppDataStructure<T extends { [key: string]: Many }>(
     }
     return objFormats;
   }
-  const objFormats = buildObjFormats(modelDef);
+  const objFormats = buildObjFormats<T, T>(modelDef);
   return {
     getAppData: defineStore(modelName, () => {
       const manyCollections: {
