@@ -1,12 +1,6 @@
 import { UnionToIntersection } from "firebase/firestore";
-import {
-  RequireOnCreate,
-  defineAppDataStructure,
-  many,
-  obj,
-  one,
-  prim,
-} from "./Mufasa";
+import { defineAppDataStructure } from "./mufasa/Implement";
+import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 
 export type ClientId = `${number}` | ``;
 export type Client = (typeof mufasaTypes)["Client"];
@@ -26,47 +20,42 @@ export type Tank = (typeof mufasaTypes)["Tank"];
 export type FuelType = (typeof mufasaTypes)["FuelType"];
 
 // App Data Structure
-export const { getAppData, mufasaTypes, test } = defineAppDataStructure(
-  `firestore`,
-  {
-    clients: many(
-      obj({
-        typeName: `Client`,
-        props: {
-          name: prim<string>(``),
-          clientId: prim<number | null>(null),
-          phoneNumber: prim<string>(``),
-          address: prim<string>(``),
-          notes: prim<string>(``),
-          fuelType: one(`FuelType`, null),
-          tanks: many(
-            obj({
-              typeName: `Tank`,
-              props: {
-                fuelType: one(`FuelType`, null),
-                shape: prim<TankShape>(tankShape.none),
-                length: prim<number>(0),
-                depth: prim<number>(0),
-                height: prim<number>(0),
-                shortHeight: prim<number>(0),
-              },
-            } as const),
-          ),
-        },
-      } as const),
-    ),
-    fuelTypes: many(
-      obj({
-        typeName: `FuelType`,
-        props: {
-          name: prim<string>(undefined),
-          rate: prim<number | null>(null),
-          isVisible: prim<boolean>(false),
-          createdPosix: prim<number>(() => Date.now()),
-        },
-      } as const),
-    ),
-  },
-);
-
-test.Tank;
+export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
+  clients: defMany(
+    defObj({
+      typeName: `Client`,
+      props: {
+        name: defPrim<string>(``),
+        clientId: defPrim<number | null>(null),
+        phoneNumber: defPrim<string>(``),
+        address: defPrim<string>(``),
+        notes: defPrim<string>(``),
+        fuelType: defOne(`FuelType`, null),
+        tanks: defMany(
+          defObj({
+            typeName: `Tank`,
+            props: {
+              fuelType: defOne(`FuelType`, null),
+              shape: defPrim<TankShape>(tankShape.none),
+              length: defPrim<number>(0),
+              depth: defPrim<number>(0),
+              height: defPrim<number>(0),
+              shortHeight: defPrim<number>(0),
+            },
+          } as const),
+        ),
+      },
+    } as const),
+  ),
+  fuelTypes: defMany(
+    defObj({
+      typeName: `FuelType`,
+      props: {
+        name: defPrim<string>(undefined),
+        rate: defPrim<number | null>(null),
+        isVisible: defPrim<boolean>(false),
+        createdPosix: defPrim<number>(() => Date.now()),
+      },
+    } as const),
+  ),
+});

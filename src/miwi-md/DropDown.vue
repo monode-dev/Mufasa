@@ -8,7 +8,7 @@ import {
   VNodeRef,
 } from "vue";
 import Box, { Sty, mdColors, Axis, Align, Overflow } from "./Box.vue";
-import { Doc } from "@/Mufasa";
+import { Doc } from "@/mufasa/Implement";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {

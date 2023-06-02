@@ -6,7 +6,6 @@ import {
   enableIndexedDbPersistence,
   onSnapshot,
   updateDoc,
-  doc,
   DocumentReference,
   collection,
   addDoc,
@@ -16,8 +15,21 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { ComputedRef, Ref, UnwrapRef, computed, ref } from "vue";
-import { exists } from "./utils";
+import { exists } from "../utils";
+import { DefMany, DefObj } from "./Define";
+import {
+  CreateParamsFromDoc,
+  FormatToTs,
+  FormatToTsType,
+  ObjFormats,
+  ObjPropsToObjFormats,
+} from "./Parse";
 
+//
+//
+//
+//
+// SECTION: Firestore
 const firebaseConfig = {
   apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
   authDomain: "ninety-percent.firebaseapp.com",
@@ -50,7 +62,11 @@ try {
   // console.log(err);
 }
 
-// Object
+//
+//
+//
+//
+// SECTION: Doc
 export type Doc<T extends {} = {}> = {
   [K in keyof T]: T[K] | null | undefined;
 } & DocSpecificProps;
@@ -176,101 +192,23 @@ export function docProx<
 
   return proxy as T;
 }
-export type GetDocType<T extends { create: (...args: any) => Doc<{}> }> =
-  ReturnType<T["create"]>;
-export type Obj = {
-  typeName: string;
-  props: {
-    [key: string]: Prim | One<string> | Many /* | One | Many */;
-  };
-};
-export function obj<T extends Obj>(objDef: T) {
-  return objDef;
-}
-type TypeMap = { [typeName: string]: Obj };
-export type ObjToTsType<T extends Obj, D extends TypeMap> = Doc<{
-  -readonly [K in keyof T["props"]]: T["props"][K] extends Prim<infer R>
-    ? R
-    : T["props"][K] extends One<string>
-    ? ObjToTsType<D[T["props"][K]["type"]], D>
-    : T["props"][K] extends Many
-    ? List<
-        ObjToTsType<T["props"][K][`type`], D>,
-        CreateParamsFromObj<T["props"][K][`type`], D>
-      >
-    : never;
-}>;
-type CreateParamsFromObj<T extends Obj, D extends TypeMap> = {
-  [K in keyof T["props"]]?: T["props"][K] extends Prim<infer PropType>
-    ? PropType | undefined
-    : T["props"][K] extends One
-    ? ObjToTsType<D[T["props"][K]["type"]], D> | null | undefined
-    : T["props"][K] extends Many
-    ? ObjToTsType<D[T["props"][K][`type`][`typeName`]], D> | null | undefined
-    : never;
-};
 
-// Primitive
-export type PrimTsType = number | boolean | string /* | binary */ | null;
-export type Prim<T extends PrimTsType = PrimTsType> = {
-  type: `primitive`;
-  init: PrimInitTsType<T>;
-};
-export type PrimInitTsType<T extends PrimTsType> =
-  | T
-  | (() => PrimTsType)
-  | undefined;
-export type RequireOnCreate = true;
-export function prim<T extends PrimTsType>(init: PrimInitTsType<T>): Prim<T> {
-  return {
-    type: `primitive`,
-    init,
-  };
-}
-
-// One
-export type One<T extends string = string> = {
-  type: T;
-  quantity: `one`;
-  // backRefPropName: string | undefined,
-  init: null | (() => Obj);
-};
-export function one<T extends string>(
-  options: T,
-  init: null | (() => Obj),
-): One<T> {
-  return {
-    type: options,
-    quantity: `one`,
-    init: init,
-  };
-}
-
-// Many
-export type Many<T extends Obj = Obj> = {
-  type: T; // | string,
-  quantity: `many`;
-  // backRefPropName: string | undefined,
-  // quantitySelf: `one` | `many`,
-  // init: [] | FROM_CREATE | (() => ManyParams),
-};
-export function many<T extends Obj>(options: T): Many<T> {
-  return {
-    type: options,
-    quantity: `many`,
-  };
-}
-export type List<T extends Doc<{}>, CreateArgs extends any> = {
+//
+//
+//
+//
+// SECTION: List
+export type List<T extends Doc> = {
   [Symbol.iterator]: () => IterableIterator<T>;
   readonly length: number;
-  filter(filterFn: (doc: T) => boolean): List<T, CreateArgs>;
+  filter(filterFn: (doc: T) => boolean): List<T>;
   map<R>(mapFn: (doc: T) => R): Array<R>;
-  add(params: CreateArgs): T;
+  add(params: CreateParamsFromDoc<T>): T;
 };
 function listProx<
   TypeName extends string,
   F extends ObjFormats,
-  T extends Doc<{}> = FormatToTsType<TypeName, F>,
+  T extends Doc = FormatToTsType<TypeName, F>,
 >(
   typeName: TypeName,
   objFormats: F,
@@ -278,46 +216,48 @@ function listProx<
   mx_parent?: DocumentReference,
 ) {
   const collectionRef = collection(firebaseDb, typeName);
-  const collectionList = ref<T[]>([]);
-  if (propName) {
-    if (mx_parent) {
-      onSnapshot(
-        query(collectionRef, where(`mx_parent`, "==", mx_parent)),
-        (querySnapshot) => {
-          collectionList.value = querySnapshot.docs.map((doc) => {
-            // console.log(doc.ref.path, typeName);
-            return docProx(doc.ref, typeName, objFormats);
-          });
-        },
-      );
+  const collectionList = (() => {
+    const collectionList = ref<T[]>([]);
+    if (propName) {
+      if (mx_parent) {
+        onSnapshot(
+          query(collectionRef, where(`mx_parent`, "==", mx_parent)),
+          (querySnapshot) => {
+            collectionList.value = querySnapshot.docs.map((doc) => {
+              // console.log(doc.ref.path, typeName);
+              return docProx(doc.ref, typeName, objFormats);
+            });
+          },
+        );
+      }
+    } else {
+      onSnapshot(collectionRef, (querySnapshot) => {
+        collectionList.value = querySnapshot.docs.map((doc) =>
+          docProx(doc.ref, typeName, objFormats),
+        );
+      });
     }
-  } else {
-    onSnapshot(collectionRef, (querySnapshot) => {
-      collectionList.value = querySnapshot.docs.map((doc) =>
-        docProx(doc.ref, typeName, objFormats),
-      );
-    });
-  }
-  return newListFor(collectionList, mx_parent);
-  type CreateParams = CreateParamsFromFormat<TypeName, F>;
-  function newListFor<T extends Doc<{}>>(
+    return collectionList;
+  })();
+  return vueRefToList(collectionList, mx_parent);
+  function vueRefToList<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
     mx_parent?: DocumentReference,
-  ): List<T, CreateParams> {
+  ): List<T> {
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
       get length() {
         return collectionList.value.length;
       },
-      filter(filterFn: (doc: T) => boolean) {
-        return newListFor(
+      filter(filterFn) {
+        return vueRefToList(
           computed(() => collectionList.value.filter(filterFn)),
         );
       },
-      map<R>(mapFn: (doc: T) => R) {
+      map(mapFn) {
         return collectionList.value.map(mapFn);
       },
-      add(createParams: CreateParams) {
+      add(createParams) {
         const newDoc = {
           ...getDefaultProps(),
           ...createParams,
@@ -349,126 +289,19 @@ function listProx<
   }
 }
 
-// Formula
-// function formula<T, R = any>(compute: (inst: T) => R) {
-//   return computed(compute);
-// }
-
-// Action
-// function action<T>(doAction: (inst: T) => Promise<void>) {
-//   return doAction;
-// }
-
-// App Data Structure
-type ObjFormats = {
-  [typeName: string]: {
-    [propName: string]: {
-      format: `prim` | `one` | `many`;
-      typeName: string | undefined;
-      primType: PrimTsType | undefined;
-      init: any;
-    };
-  };
-};
-type FormatToTsType<TypeName extends string, F extends ObjFormats> = Doc<{
-  -readonly [K in keyof F[TypeName]]: F[TypeName][K][`format`] extends `prim`
-    ? F[TypeName][K][`primType`]
-    : F[TypeName][K][`format`] extends `one`
-    ? F[TypeName][K][`typeName`] extends string
-      ? FormatToTsType<F[TypeName][K][`typeName`], F>
-      : never
-    : F[TypeName][K][`format`] extends `many`
-    ? F[TypeName][K][`typeName`] extends string
-      ? List<
-          FormatToTsType<F[TypeName][K][`typeName`], F>,
-          CreateParamsFromFormat<F[TypeName][K][`typeName`], F>
-        >
-      : never
-    : never;
-}>;
-type CreateParamsFromFormat<TypeName extends string, F extends ObjFormats> = {
-  [K in keyof F[TypeName]]?: F[TypeName][K] extends Prim<infer PropType>
-    ? PropType | undefined
-    : F[TypeName][K] extends One
-    ? FormatToTsType<F[TypeName][K]["type"], F> | null | undefined
-    : F[TypeName][K] extends Many
-    ? FormatToTsType<F[TypeName][K][`type`][`typeName`], F> | null | undefined
-    : never;
-};
-type DataStructureToTypeMap<T extends Obj[`props`]> = {
-  [K in keyof T as T[K] extends Many
-    ? T[K][`type`][`typeName`]
-    : never]: T[K] extends Many ? T[K][`type`] : never;
-} & UnionToIntersection<
-  {
-    [K in keyof T]: T[K] extends Many
-      ? DataStructureToTypeMap<T[K][`type`][`props`]>
-      : never;
-  }[keyof T]
->;
-export type UnionToIntersection<U> = (
-  U extends any ? (k: U) => void : never
-) extends (k: infer I) => void
-  ? I
-  : never;
-
-type TypesFromObjProps<T extends Obj[`props`], D extends Obj[`props`]> = {
-  [K in keyof T as T[K] extends Many
-    ? T[K][`type`][`typeName`]
-    : never]: T[K] extends Many
-    ? ObjToTsType<T[K][`type`], DataStructureToTypeMap<D>>
-    : never;
-} & UnionToIntersection<
-  {
-    [K in keyof T]: T[K] extends Many
-      ? TypesFromObjProps<T[K][`type`][`props`], D>
-      : never;
-  }[keyof T]
->;
-type ObjToFormat<T extends Obj, D extends TypeMap> = Doc<{
-  -readonly [K in keyof T["props"]]: T["props"][K] extends Prim<infer R>
-    ? {
-        format: `prim`;
-        typeName: undefined;
-        primType: R;
-        init: any;
-      }
-    : T["props"][K] extends One<string>
-    ? {
-        format: `one`;
-        typeName: T["props"][K]["type"];
-        primType: undefined;
-        init: any;
-      }
-    : T["props"][K] extends Many
-    ? {
-        format: `many`;
-        typeName: T["props"][K]["type"]["typeName"];
-        primType: undefined;
-        init: any;
-      }
-    : never;
-}>;
-type ObjPropsToObjFormats<T extends Obj[`props`], D extends Obj[`props`]> = {
-  [K in keyof T as T[K] extends Many
-    ? T[K][`type`][`typeName`]
-    : never]: T[K] extends Many
-    ? ObjToFormat<T[K][`type`], DataStructureToTypeMap<D>>
-    : never;
-} & UnionToIntersection<
-  {
-    [K in keyof T]: T[K] extends Many
-      ? TypesFromObjProps<T[K][`type`][`props`], D>
-      : never;
-  }[keyof T]
->;
-export function defineAppDataStructure<T extends { [key: string]: Many }>(
+//
+//
+//
+//
+// SECTION: Define
+export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
   modelName: string,
   modelDef: T,
 ) {
-  function buildObjFormats<T extends Obj[`props`], D extends Obj[`props`]>(
-    allProps: T,
-  ): ObjPropsToObjFormats<T, D> {
+  function buildObjFormats<
+    T extends DefObj[`props`],
+    D extends DefObj[`props`],
+  >(allProps: T): ObjPropsToObjFormats<T, D> {
     let objFormats: ObjFormats = {};
     for (const key of Object.keys(allProps)) {
       const entry = allProps[key];
@@ -506,7 +339,7 @@ export function defineAppDataStructure<T extends { [key: string]: Many }>(
         objFormats[entry.type.typeName] = propFormats;
       }
     }
-    return objFormats;
+    return objFormats as any;
   }
   const objFormats = buildObjFormats<T, T>(modelDef);
   return {
@@ -527,7 +360,6 @@ export function defineAppDataStructure<T extends { [key: string]: Many }>(
       }
       return manyCollections;
     }),
-    mufasaTypes: {} as TypesFromObjProps<T, T>,
-    test: {} as DataStructureToTypeMap<T>,
+    mufasaTypes: {} as FormatToTs<typeof objFormats>,
   };
 }

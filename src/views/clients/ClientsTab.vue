@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
 import { getAppData, Client } from "@/AppData";
-import { docProx } from "@/Mufasa";
+import { docProx } from "@/mufasa/Implement";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
 
