@@ -21,17 +21,17 @@ watchEffect(() => {
   }
 });
 
-const tankNums: number[] = [];
-for (let i = 1; i <= 5; i++) {
-  tankNums.push(i);
-}
-
 function deletePressed() {
   pushPage(DeleteClientPage, { client: props.client });
 }
 
+// watchEffect(() => {
+//   console.log(
+//     `client: ${props.client._firestoreRef?.path}, length: ${props.client.tanks?.length}`,
+//   );
+// });
 watchEffect(() => {
-  console.log(props.client.tanks?.length);
+  console.log(`client: ${props.client._firestoreRef?.path}`);
 });
 </script>
 

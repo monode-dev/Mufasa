@@ -14,7 +14,7 @@ import {
   query,
   getDocs,
 } from "firebase/firestore";
-import { ComputedRef, Ref, UnwrapRef, computed, ref } from "vue";
+import { ComputedRef, Ref, UnwrapRef, computed, ref, watchEffect } from "vue";
 import { exists } from "../utils";
 import { DefMany, DefObj } from "./Define";
 import {
@@ -136,58 +136,58 @@ export function docProx<
 
   // Add getters and setters for each property
   for (let [propKey, format] of Object.entries(objFormats[typeName])) {
-    Object.defineProperty(
-      proxy,
-      propKey,
-      format.format === `one`
-        ? /* One */ {
-            get: function () {
-              return docProx(
-                data.value?.[propKey as keyof typeof data.value] as
-                  | DocumentReference
-                  | null
-                  | undefined,
-                format.typeName!,
-                objFormats,
-              );
-            },
-            set: function (newValue: any) {
-              (async () => {
-                const actualDocRef = proxy._firestoreRef;
-                if (exists(actualDocRef)) {
-                  updateDoc(actualDocRef, {
-                    [propKey]: newValue?._firestoreRef ?? null,
-                  });
-                }
-              })();
-            },
+    if (format.format === `one`) {
+      const newDocProx = docProx(
+        data.value?.[propKey as keyof typeof data.value] as
+          | DocumentReference
+          | null
+          | undefined,
+        format.typeName!,
+        objFormats,
+      );
+      Object.defineProperty(proxy, propKey, {
+        get: function () {
+          return newDocProx;
+        },
+        set: function (newValue: any) {
+          (async () => {
+            const actualDocRef = proxy._firestoreRef;
+            if (exists(actualDocRef)) {
+              updateDoc(actualDocRef, {
+                [propKey]: newValue?._firestoreRef ?? null,
+              });
+            }
+          })();
+        },
+      });
+    } else if (format.format === `many`) {
+      const newListProx = listProx(
+        format.typeName!,
+        objFormats,
+        true,
+        proxy._firestoreRef ?? undefined,
+      );
+      Object.defineProperty(proxy, propKey, {
+        get: function () {
+          return newListProx;
+        },
+        set: undefined,
+      });
+    } else {
+      Object.defineProperty(proxy, propKey, {
+        get: function () {
+          return data.value?.[propKey as keyof typeof data.value];
+        },
+        set: function (newValue: any) {
+          const actualDocRef = proxy._firestoreRef;
+          if (exists(actualDocRef)) {
+            updateDoc(actualDocRef, {
+              [propKey]: newValue,
+            });
           }
-        : format.format === `many`
-        ? /* Many */ {
-            get: function () {
-              return listProx(
-                typeName,
-                objFormats,
-                `mx_parent`,
-                proxy._firestoreRef ?? undefined,
-              );
-            },
-            set: undefined,
-          }
-        : /* Prim */ {
-            get: function () {
-              return data.value?.[propKey as keyof typeof data.value];
-            },
-            set: function (newValue: any) {
-              const actualDocRef = proxy._firestoreRef;
-              if (exists(actualDocRef)) {
-                updateDoc(actualDocRef, {
-                  [propKey]: newValue,
-                });
-              }
-            },
-          },
-    );
+        },
+      });
+    }
   }
 
   return proxy as T;
@@ -205,6 +205,16 @@ export type List<T extends Doc> = {
   map<R>(mapFn: (doc: T) => R): Array<R>;
   add(params: CreateParamsFromDoc<T>): T;
 };
+function genRandomChars(length: number) {
+  let result = ``;
+  const characters = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`;
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+const PARENT_KEY = `mx_parent`;
 function listProx<
   TypeName extends string,
   F extends ObjFormats,
@@ -212,17 +222,23 @@ function listProx<
 >(
   typeName: TypeName,
   objFormats: F,
-  propName?: string,
+  isChild: boolean = false,
   mx_parent?: DocumentReference,
 ) {
+  const chars = genRandomChars(10);
   const collectionRef = collection(firebaseDb, typeName);
   const collectionList = (() => {
     const collectionList = ref<T[]>([]);
-    if (propName) {
+    if (isChild) {
       if (mx_parent) {
+        // console.log(
+        //   `typeName: ${typeName}, propName: ${propName}, mx_parent: ${mx_parent.path}`,
+        // );
         onSnapshot(
-          query(collectionRef, where(`mx_parent`, "==", mx_parent)),
+          // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
+          query(collectionRef, where(PARENT_KEY, "==", mx_parent)),
           (querySnapshot) => {
+            // console.log(querySnapshot.docs.length);
             collectionList.value = querySnapshot.docs.map((doc) => {
               // console.log(doc.ref.path, typeName);
               return docProx(doc.ref, typeName, objFormats);
@@ -239,6 +255,9 @@ function listProx<
     }
     return collectionList;
   })();
+  // watchEffect(() => {
+  //   console.log(`${chars}: ${collectionList.value.length}`);
+  // });
   return vueRefToList(collectionList, mx_parent);
   function vueRefToList<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
@@ -247,6 +266,9 @@ function listProx<
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
       get length() {
+        // console.log(
+        //   `Getting length for typeName: ${typeName}, mx_parent: ${mx_parent?.path}: ${collectionList.value.length}`,
+        // );
         return collectionList.value.length;
       },
       filter(filterFn) {

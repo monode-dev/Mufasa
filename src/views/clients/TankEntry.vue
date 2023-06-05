@@ -24,7 +24,7 @@ const props = defineProps({
 
       <DeleteOptionsButton />
     </Box>
-    <DropDown
+    <!-- <DropDown
       label="Fuel"
       v-model:selected="tank.fuelType"
       :options="[
@@ -35,7 +35,7 @@ const props = defineProps({
             return { label: x.name, doc: x };
           }),
       ]"
-    />
+    /> -->
     <!-- <DropDown label="Shape" selected="Horizontal Cylinder" /> -->
     <Row
       :sty="{
@@ -51,7 +51,9 @@ const props = defineProps({
       }"
     >
       <Label label="Height"><Field v-model:value="tank.height" /></Label>
-      <Label label="Short Height"><Field v-model:value="tank.shortHeight" /></Label>
+      <Label label="Short Height"
+        ><Field v-model:value="tank.shortHeight"
+      /></Label>
     </Row>
   </Card>
 </template>
