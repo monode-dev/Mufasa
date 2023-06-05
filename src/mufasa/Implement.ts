@@ -137,17 +137,16 @@ export function docProx<
   // Add getters and setters for each property
   for (let [propKey, format] of Object.entries(objFormats[typeName])) {
     if (format.format === `one`) {
-      const newDocProx = docProx(
-        data.value?.[propKey as keyof typeof data.value] as
-          | DocumentReference
-          | null
-          | undefined,
-        format.typeName!,
-        objFormats,
-      );
       Object.defineProperty(proxy, propKey, {
         get: function () {
-          return newDocProx;
+          return docProx(
+            data.value?.[propKey as keyof typeof data.value] as
+              | DocumentReference
+              | null
+              | undefined,
+            format.typeName!,
+            objFormats,
+          );
         },
         set: function (newValue: any) {
           (async () => {
@@ -231,16 +230,11 @@ function listProx<
     const collectionList = ref<T[]>([]);
     if (isChild) {
       if (mx_parent) {
-        // console.log(
-        //   `typeName: ${typeName}, propName: ${propName}, mx_parent: ${mx_parent.path}`,
-        // );
         onSnapshot(
           // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
           query(collectionRef, where(PARENT_KEY, "==", mx_parent)),
           (querySnapshot) => {
-            // console.log(querySnapshot.docs.length);
             collectionList.value = querySnapshot.docs.map((doc) => {
-              // console.log(doc.ref.path, typeName);
               return docProx(doc.ref, typeName, objFormats);
             });
           },
@@ -255,9 +249,6 @@ function listProx<
     }
     return collectionList;
   })();
-  // watchEffect(() => {
-  //   console.log(`${chars}: ${collectionList.value.length}`);
-  // });
   return vueRefToList(collectionList, mx_parent);
   function vueRefToList<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
@@ -266,9 +257,6 @@ function listProx<
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
       get length() {
-        // console.log(
-        //   `Getting length for typeName: ${typeName}, mx_parent: ${mx_parent?.path}: ${collectionList.value.length}`,
-        // );
         return collectionList.value.length;
       },
       filter(filterFn) {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import { FuelType, Tank, getAppData } from "@/AppData";
+import { popPage } from "@/Nav";
 const appData = getAppData();
 
 const props = defineProps({
@@ -8,6 +9,12 @@ const props = defineProps({
     type: Object as () => Tank,
     required: true,
   },
+});
+
+watchEffect(() => {
+  if (props.tank.isDeleted) {
+    popPage();
+  }
 });
 </script>
 
@@ -24,18 +31,18 @@ const props = defineProps({
 
       <DeleteOptionsButton />
     </Box>
-    <!-- <DropDown
+    <DropDown
       label="Fuel"
       v-model:selected="tank.fuelType"
       :options="[
         { label: `None`, doc: null },
         ...appData.fuelTypes
-          .filter((x) => x.name !== ``)
+          .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
           .map((x) => {
-            return { label: x.name, doc: x };
+            return { label: x.name!, doc: x };
           }),
       ]"
-    /> -->
+    />
     <!-- <DropDown label="Shape" selected="Horizontal Cylinder" /> -->
     <Row
       :sty="{

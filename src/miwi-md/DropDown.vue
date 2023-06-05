@@ -16,7 +16,7 @@ const props = defineProps({
     default: {},
   },
   options: {
-    type: Array as PropType<{ label: string; doc: Doc | null }[]>,
+    type: Array as PropType<{ label: string; doc: Doc | null | undefined }[]>,
     default: [],
   },
   enabled: {
@@ -84,7 +84,7 @@ function getLabelForSelected(selected: Doc | null | undefined) {
   return "";
 }
 
-function selectOption(option: { label: string; doc: Doc | null }) {
+function selectOption(option: { label: string; doc: Doc | null | undefined }) {
   emit(`update:selected`, option.doc);
   dropDownIsOpen.value = false;
 }

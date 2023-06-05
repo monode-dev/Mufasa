@@ -24,15 +24,6 @@ watchEffect(() => {
 function deletePressed() {
   pushPage(DeleteClientPage, { client: props.client });
 }
-
-// watchEffect(() => {
-//   console.log(
-//     `client: ${props.client._firestoreRef?.path}, length: ${props.client.tanks?.length}`,
-//   );
-// });
-watchEffect(() => {
-  console.log(`client: ${props.client._firestoreRef?.path}`);
-});
 </script>
 
 <script lang="ts">
