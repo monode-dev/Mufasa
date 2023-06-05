@@ -34,13 +34,14 @@ watchEffect(() => {
     <DropDown
       label="Fuel"
       v-model:selected="tank.fuelType"
+      :getKeyFromData="(data: FuelType | null) => {
+        return data?._firestoreRef?.path;
+      }"
       :options="[
-        { label: `None`, doc: null },
+        { label: `None`, data: null },
         ...appData.fuelTypes
           .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
-          .map((x) => {
-            return { label: x.name!, doc: x };
-          }),
+          .map((x) => ({ label: x.name!, data: x })),
       ]"
     />
     <!-- <DropDown label="Shape" selected="Horizontal Cylinder" /> -->

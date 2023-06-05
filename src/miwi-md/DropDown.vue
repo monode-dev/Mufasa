@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  computed,
   defineProps,
   onMounted,
   onUnmounted,
@@ -8,15 +9,18 @@ import {
   VNodeRef,
 } from "vue";
 import Box, { Sty, mdColors, Axis, Align, Overflow } from "./Box.vue";
-import { Doc } from "@/mufasa/Implement";
 // Allow overriding of the default sty
+type Option = {
+  label: string;
+  data: any;
+};
 const props = defineProps({
   sty: {
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
   options: {
-    type: Array as PropType<{ label: string; doc: Doc | null | undefined }[]>,
+    type: Array as PropType<Option[]>,
     default: [],
   },
   enabled: {
@@ -28,7 +32,13 @@ const props = defineProps({
     default: "",
   },
   selected: {
-    type: [Object, null, undefined] as PropType<Doc | null | undefined>,
+    type: [Object, null, undefined] as PropType<any>,
+    required: true,
+  },
+  getKeyFromData: {
+    type: [Function] as PropType<
+      (data: any) => string | number | boolean | undefined
+    >,
     required: true,
   },
   underlined: {
@@ -42,6 +52,12 @@ const emit = defineEmits(["update:selected"]);
 const dropDownModalRef = ref<VNodeRef | null>(null);
 const openDropDownRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
+const selectedOption = computed(() => {
+  const selectedKey = props.getKeyFromData(props.selected);
+  return props.options.find(
+    (x) => props.getKeyFromData(x.data) === selectedKey,
+  );
+});
 
 // Close the dropdown when the user clicks outside of it
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
@@ -62,30 +78,8 @@ onUnmounted(() => {
   document.removeEventListener("touchend", closeOnClickOutside);
 });
 
-function getLabelForSelected(selected: Doc | null | undefined) {
-  for (const option of props.options) {
-    if (
-      (selected?._firestoreRef === null ||
-        selected?._firestoreRef === undefined) &&
-      (option.doc?._firestoreRef === null ||
-        option.doc?._firestoreRef === undefined)
-    ) {
-      return option.label;
-    }
-    const optionPath = option.doc?._firestoreRef?.path;
-    if (
-      optionPath !== null &&
-      optionPath !== undefined &&
-      optionPath === selected?._firestoreRef?.path
-    ) {
-      return option.label;
-    }
-  }
-  return "";
-}
-
-function selectOption(option: { label: string; doc: Doc | null | undefined }) {
-  emit(`update:selected`, option.doc);
+function selectOption(option: Option) {
+  emit(`update:selected`, option.data);
   dropDownIsOpen.value = false;
 }
 </script>
@@ -121,7 +115,7 @@ function selectOption(option: { label: string; doc: Doc | null | undefined }) {
             spacing: $Spacing.spaceBetween,
           }"
         >
-          <Text>{{ getLabelForSelected(selected) }}</Text>
+          <Text>{{ selectedOption?.label ?? `None` }}</Text>
           <Icon icon="menuDown" />
         </Row>
         <!-- Drop Down -->
