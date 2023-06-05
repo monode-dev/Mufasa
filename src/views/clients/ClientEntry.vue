@@ -2,9 +2,9 @@
 import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
-import DeleteClientPage from "./DeleteClient.dialog.vue";
 import { Client } from "@/AppData";
 import { Overflow, mdColors } from "@/miwi-md/Box.vue";
+import DeleteDialog from "../components/DeleteDialog.vue";
 
 // Create a prop called size
 const props = defineProps({
@@ -15,7 +15,14 @@ const props = defineProps({
 });
 
 function deletePressed() {
-  pushPage(DeleteClientPage, { client: props.client });
+  pushPage(DeleteDialog, {
+    obj: props.client,
+    message: `Are you sure you want to permanently delete "${
+      props.client.clientId ?? ``
+    } ${props.client.clientId && props.client.name ? ` - ` : ``} ${
+      props.client.name ?? ``
+    }"?`,
+  });
 }
 
 function clicked() {

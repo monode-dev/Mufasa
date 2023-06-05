@@ -32,7 +32,6 @@ const props = defineProps({
     default: "",
   },
   selected: {
-    type: [Object, null, undefined] as PropType<any>,
     required: true,
   },
   getKeyFromData: {
@@ -53,9 +52,9 @@ const dropDownModalRef = ref<VNodeRef | null>(null);
 const openDropDownRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
 const selectedOption = computed(() => {
-  const selectedKey = props.getKeyFromData(props.selected);
+  const selectedKey = props.getKeyFromData(props.selected) ?? undefined;
   return props.options.find(
-    (x) => props.getKeyFromData(x.data) === selectedKey,
+    (x) => (props.getKeyFromData(x.data) ?? undefined) === selectedKey,
   );
 });
 

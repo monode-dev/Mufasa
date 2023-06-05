@@ -4,8 +4,8 @@ import { pageTransitions, popPage } from "@/Nav";
 import { Align, mdColors } from "@/miwi-md/Box.vue";
 import { Client } from "@/AppData";
 import { pushPage } from "@/Nav";
-import DeleteClientPage from "@/views/clients/DeleteClient.dialog.vue";
 import { FuelType, getAppData } from "@/AppData";
+import DeleteDialog from "../components/DeleteDialog.vue";
 const appData = getAppData();
 
 const props = defineProps({
@@ -22,7 +22,14 @@ watchEffect(() => {
 });
 
 function deletePressed() {
-  pushPage(DeleteClientPage, { client: props.client });
+  pushPage(DeleteDialog, {
+    obj: props.client,
+    message: `Are you sure you want to permanently delete "${
+      props.client.clientId ?? ``
+    } ${props.client.clientId && props.client.name ? ` - ` : ``} ${
+      props.client.name ?? ``
+    }"?`,
+  });
 }
 </script>
 
@@ -89,19 +96,6 @@ export default {
           v-model:value="client.notes"
           :sty="{ width: `1f` }"
         />
-        <!-- <DropDown
-          v-if="client.fuelType?.isLoaded"
-          label="Fuel"
-          v-model:selected="client.fuelType"
-          :options="[
-            { label: `None`, doc: null },
-            ...appData.fuelTypes
-              .filter((x) => x.name !== ``)
-              .map((x) => {
-                return { label: x.name, doc: x };
-              }),
-          ]"
-        /> -->
       </Card>
       <Box />
       <Row

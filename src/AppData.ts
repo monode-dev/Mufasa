@@ -7,15 +7,26 @@ export type Client = (typeof mufasaTypes)["Client"];
 // const a = {} as Client;
 // a.fuelType;
 export type TankShape = (typeof tankShape)[keyof typeof tankShape];
-const tankShape = {
+export const tankShape = {
   none: 0,
-  horizontalCylinder: 6,
-  verticalCylinder: 1,
-  oval: 2,
-  rectangle: 3,
-  ellipse: 4,
-  truckBedTank: 5,
+  horizontalCylinder: 1,
+  verticalCylinder: 2,
+  oval: 3,
+  rectangle: 4,
+  ellipse: 5,
+  truckBedTank: 6,
 } as const;
+export function getTankShapeName(shape: TankShape) {
+  return {
+    [tankShape.none]: `None`,
+    [tankShape.horizontalCylinder]: `Horizontal Cylinder`,
+    [tankShape.verticalCylinder]: `Vertical Cylinder`,
+    [tankShape.oval]: `Oval`,
+    [tankShape.rectangle]: `Rectangle`,
+    [tankShape.ellipse]: `Ellipse`,
+    [tankShape.truckBedTank]: `Truck Bed Tank`,
+  }[shape];
+}
 export type Tank = (typeof mufasaTypes)["Tank"];
 export type FuelType = (typeof mufasaTypes)["FuelType"];
 
@@ -30,7 +41,6 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
         phoneNumber: defPrim<string>(``),
         address: defPrim<string>(``),
         notes: defPrim<string>(``),
-        // fuelType: defOne(`FuelType`, null),
         tanks: defMany(
           defObj({
             typeName: `Tank`,

@@ -3,6 +3,8 @@ import { defineProps, PropType } from "vue";
 import { Sty } from "@/miwi-md/Box.vue";
 import { FuelType } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box.vue";
+import { pushPage } from "@/Nav";
+import DeleteDialogVue from "../components/DeleteDialog.vue";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -15,9 +17,14 @@ const props = defineProps({
   },
 });
 
-// function deletePressed() {
-//   props.fuelType.deleteDoc();
-// }
+function deletePressed() {
+  pushPage(DeleteDialogVue, {
+    obj: props.fuelType,
+    message: `Are you sure you want to permanently delete "${
+      props.fuelType.name ?? `this fuel type`
+    }"? Associated tanks will have their fuel type set to "None".`,
+  });
+}
 </script>
 
 <template>
@@ -69,11 +76,11 @@ const props = defineProps({
         />
       </Label>
     </Box>
-    <Icon
+    <!-- <Icon
       :icon="fuelType.isVisible ? `eye` : `eyeOff`"
       @click.stop="fuelType.isVisible = !fuelType.isVisible"
-    />
-    <!-- <DeleteOptionsButton @delete="deletePressed" /> -->
+    /> -->
+    <DeleteOptionsButton @delete="deletePressed" />
   </Row>
   <Text v-else hint :sty="{ width: `1f` }">Loading...</Text>
 </template>

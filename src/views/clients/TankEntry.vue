@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
-import { FuelType, Tank, getAppData } from "@/AppData";
-import { popPage } from "@/Nav";
+import {
+  FuelType,
+  Tank,
+  getAppData,
+  tankShape,
+  getTankShapeName,
+} from "@/AppData";
+import { popPage, pushPage } from "@/Nav";
+import DeleteDialogVue from "../components/DeleteDialog.vue";
 const appData = getAppData();
 
 const props = defineProps({
@@ -11,11 +18,12 @@ const props = defineProps({
   },
 });
 
-watchEffect(() => {
-  if (props.tank.isDeleted) {
-    popPage();
-  }
-});
+function deletePressed() {
+  pushPage(DeleteDialogVue, {
+    obj: props.tank,
+    message: `Are you sure you want to permanently delete this tank? Associated delvieries will NOT be deleted.`,
+  });
+}
 </script>
 
 <template>
@@ -29,7 +37,7 @@ watchEffect(() => {
     >
       <Text>#<slot /></Text>
 
-      <DeleteOptionsButton />
+      <DeleteOptionsButton @delete="deletePressed" />
     </Box>
     <DropDown
       label="Fuel"
@@ -38,13 +46,23 @@ watchEffect(() => {
         return data?._firestoreRef?.path;
       }"
       :options="[
-        { label: `None`, data: null },
+        { label: `None`, data: undefined },
         ...appData.fuelTypes
           .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
           .map((x) => ({ label: x.name!, data: x })),
       ]"
     />
-    <!-- <DropDown label="Shape" selected="Horizontal Cylinder" /> -->
+    <DropDown
+      label="Shape"
+      v-model:selected="tank.shape"
+      :getKeyFromData="(data: any) => data"
+      :options="[
+        ...Object.values(tankShape).map((x) => ({
+          label: getTankShapeName(x),
+          data: x,
+        })),
+      ]"
+    />
     <Row
       :sty="{
         width: `1f`,
