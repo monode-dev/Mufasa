@@ -98,7 +98,7 @@ export default {
           v-model:value="client.notes"
           :sty="{ width: `1f` }"
         />
-        <DropDown
+        <!-- <DropDown
           v-if="client.fuelType?.isLoaded"
           label="Fuel"
           v-model:selected="client.fuelType"
@@ -110,7 +110,7 @@ export default {
                 return { label: x.name, doc: x };
               }),
           ]"
-        />
+        /> -->
       </Card>
       <Box />
       <Row

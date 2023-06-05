@@ -8,7 +8,7 @@ workflows:
       groups:
         - google_play
       vars:
-        PACKAGE_NAME: "us.tke.dataplate"
+        PACKAGE_NAME: "us.tke.ninetypercent"
         GOOGLE_PLAY_TRACK: internal
       node: latest
     scripts:
@@ -102,7 +102,7 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          agvtool new-version -all 1.24.0 
+          agvtool new-version -all 1.24.1 
         # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
         # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme

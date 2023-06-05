@@ -19,6 +19,7 @@ export type PrimInitTsType<T extends PrimTsType> =
   | T
   | (() => PrimTsType)
   | undefined;
+// TODO: We need a type has no surounding whitespace.
 export function defPrim<T extends PrimTsType>(
   init: PrimInitTsType<T>,
 ): DefPrim<T> {

@@ -30,7 +30,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
         phoneNumber: defPrim<string>(``),
         address: defPrim<string>(``),
         notes: defPrim<string>(``),
-        fuelType: defOne(`FuelType`, null),
+        // fuelType: defOne(`FuelType`, null),
         tanks: defMany(
           defObj({
             typeName: `Tank`,
