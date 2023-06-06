@@ -1,4 +1,3 @@
-import { UnionToIntersection } from "firebase/firestore";
 import { defineAppDataStructure } from "./mufasa/Implement";
 import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 
