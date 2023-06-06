@@ -6,15 +6,21 @@ import {
   tankShape,
   getTankShapeName,
 } from "@/AppData";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 // import { exists } from "@/utils";
 
 // const appData = getAppData();
-const isLookUp = ref(true);
+const tabIndex = ref(0);
+const isDeliveryTab = computed(() => tabIndex.value === 0);
+const toDeliverTab = () => (tabIndex.value = 0);
+const isClientTab = computed(() => tabIndex.value === 1);
+const toClientTab = () => (tabIndex.value = 1);
+const isDimensionsTab = computed(() => tabIndex.value === 2);
+const toDimensionsTab = () => (tabIndex.value = 2);
 
 // Look Up
-const client = ref<Client | null>(null);
-const tank = ref<Tank | null>(null);
+const client = ref<string>(`None`);
+const tank = ref<string>(`None`);
 
 // Use Dimensions
 const dimTankShape = ref(tankShape.none);
@@ -22,6 +28,9 @@ const dimLength = ref(0);
 const dimDepth = ref(0);
 const dimHeight = ref(0);
 const dimShortHeight = ref(0);
+
+// Other
+const stickedDepth = ref(0);
 </script>
 
 <template>
@@ -36,30 +45,110 @@ const dimShortHeight = ref(0);
       <Row
         :sty="{
           width: `1f`,
-          spacing: $Spacing.spaceAround,
+          spacing: $Spacing.spaceBetween,
           align: $Align.centerLeft, //$Align.center,
         }"
       >
-        <Button pill :outlined="!isLookUp" @click.stop="isLookUp = true"
-          >Look Up</Button
+        <Button pill :outlined="!isDeliveryTab" @click.stop="toDeliverTab"
+          >Delivery</Button
         >
-        <Button pill :outlined="isLookUp" @click.stop="isLookUp = false"
-          >Use Dimensions</Button
+        <Button pill :outlined="!isClientTab" @click.stop="toClientTab"
+          >Client</Button
+        >
+        <Button pill :outlined="!isDimensionsTab" @click.stop="toDimensionsTab"
+          >Dimensions</Button
         >
       </Row>
       <Box
-        v-if="isLookUp"
+        v-if="isDeliveryTab"
         :sty="{
           width: `1f`,
           spacing: 1,
         }"
       >
-        <Text>Client</Text>
-        <Text>Tank</Text>
-        <Text>-</Text>
+        <DropDown
+          label="Delivery"
+          v-model:selected="client"
+          :getKeyFromData="(data: any) => data"
+          :options="[
+            {
+              label: `None`,
+              data: `None`,
+            },
+            {
+              label: `Upcoming Delivery A`,
+              data: `Upcoming Delivery A`,
+            },
+            {
+              label: `Upcoming Delivery B`,
+              data: `Upcoming Delivery B`,
+            },
+            {
+              label: `Upcoming Delivery C`,
+              data: `Upcoming Delivery C`,
+            },
+          ]"
+        />
+        <Text>---</Text>
+        <Text>---</Text>
       </Box>
       <Box
-        v-else
+        v-if="isClientTab"
+        :sty="{
+          width: `1f`,
+          spacing: 1,
+        }"
+      >
+        <DropDown
+          label="Client"
+          v-model:selected="client"
+          :getKeyFromData="(data: any) => data"
+          :options="[
+            {
+              label: `None`,
+              data: `None`,
+            },
+            {
+              label: `Client A`,
+              data: `Client A`,
+            },
+            {
+              label: `Client B`,
+              data: `Client B`,
+            },
+            {
+              label: `Client C`,
+              data: `Client C`,
+            },
+          ]"
+        />
+        <DropDown
+          label="Tank"
+          v-model:selected="tank"
+          :getKeyFromData="(data: any) => data"
+          :options="[
+            {
+              label: `None`,
+              data: `None`,
+            },
+            {
+              label: `Tank A`,
+              data: `Tank A`,
+            },
+            {
+              label: `Tank B`,
+              data: `Tank B`,
+            },
+            {
+              label: `Tank C`,
+              data: `Tank C`,
+            },
+          ]"
+        />
+        <Text>---</Text>
+      </Box>
+      <Box
+        v-if="isDimensionsTab"
         :sty="{
           width: `1f`,
           spacing: 1,
@@ -95,16 +184,41 @@ const dimShortHeight = ref(0);
           /></Label>
         </Row>
       </Box>
-      <Text>Sticked Depth</Text>
+      <Row
+        :sty="{
+          width: `1f`,
+        }"
+      >
+        <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label>
+        <Box :sty="{ width: `1f` }" />
+      </Row>
     </Card>
     <Box />
+    <!-- <Box :sty="{ height: 1 }" /> -->
     <Text title>Estimates</Text>
     <Card
       :sty="{
         width: `1f`,
       }"
     >
-      <Text>90%</Text>
+      <Row
+        :sty="{
+          width: `1f`,
+        }"
+      >
+        <Label label="70%" :sty="{ align: $Align.centerLeft }">5 Units</Label>
+        <Label label="80%" :sty="{ align: $Align.centerLeft }">10 Units</Label>
+      </Row>
+      <Row
+        :sty="{
+          width: `1f`,
+        }"
+      >
+        <Label label="90%" :sty="{ align: $Align.centerLeft }">50 Units</Label>
+        <Label label="100%" :sty="{ align: $Align.centerLeft }"
+          >100 Units</Label
+        >
+      </Row>
     </Card>
   </Body>
 </template>
