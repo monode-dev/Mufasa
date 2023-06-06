@@ -55,6 +55,7 @@ const dimShortHeight = ref(0);
       >
         <Text>Client</Text>
         <Text>Tank</Text>
+        <Text>-</Text>
       </Box>
       <Box
         v-else
