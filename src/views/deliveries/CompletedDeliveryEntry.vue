@@ -14,9 +14,16 @@ const amount = ref(0);
 
 <template>
   <Card :sty="{ width: `1f` }">
-    <Text hint :sty="{ width: `1f`, align: $Align.centerLeft }"
-      >Tue: March 10th 2021</Text
+    <Row
+      :sty="{
+        width: `1f`,
+      }"
     >
+      <Text hint :sty="{ width: `1f`, align: $Align.centerLeft }"
+        >Tue: March 10th 2021</Text
+      >
+      <DeleteOptionsButton />
+    </Row>
     <Row
       :sty="{
         width: `1f`,
