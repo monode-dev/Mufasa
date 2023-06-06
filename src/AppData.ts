@@ -63,7 +63,6 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
       props: {
         name: defPrim<string>(undefined),
         rate: defPrim<number | null>(null),
-        isVisible: defPrim<boolean>(false),
         createdPosix: defPrim<number>(() => Date.now()),
       },
     } as const),
