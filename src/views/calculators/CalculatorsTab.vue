@@ -18,11 +18,14 @@ const toTankTab = () => (tabIndex.value = 1);
 const isDimensionsTab = computed(() => tabIndex.value === 2);
 const toDimensionsTab = () => (tabIndex.value = 2);
 
-// Look Up
+// Delivery
+const delivery = ref<string>(`None`);
+
+// Client
 const client = ref<string>(`None`);
 const tank = ref<string>(`None`);
 
-// Use Dimensions
+// Dimensions
 const dimTankShape = ref(tankShape.none);
 const dimLength = ref(0);
 const dimDepth = ref(0);
@@ -68,7 +71,7 @@ const stickedDepth = ref(0);
       >
         <DropDown
           label="Delivery"
-          v-model:selected="client"
+          v-model:selected="delivery"
           :getKeyFromData="(data: any) => data"
           :options="[
             {
@@ -181,14 +184,7 @@ const stickedDepth = ref(0);
           /></Label>
         </Row>
       </Box>
-      <Row
-        :sty="{
-          width: `1f`,
-        }"
-      >
-        <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label>
-        <Box :sty="{ width: `1f` }" />
-      </Row>
+      <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label>
 
       <Box v-if="isTankTab || isDeliveryTab" :sty="{ height: 1 }" />
       <Box v-if="isDeliveryTab" :sty="{ height: 1 }" />

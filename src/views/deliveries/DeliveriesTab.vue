@@ -7,6 +7,8 @@ import {
   getTankShapeName,
 } from "@/AppData";
 import { ref } from "vue";
+import { pushPage } from "@/Nav";
+import CreateDeliveryDialog from "./CreateDelivery.dialog.vue";
 // import { exists } from "@/utils";
 
 // const appData = getAppData();
@@ -30,7 +32,11 @@ const dimShortHeight = ref(0);
       <Box :sty="{ width: 1.75 }" />
       <Text title>Upcoming Deliveries</Text>
       <Box :sty="{ width: 1.75, align: $Align.centerLeft }">
-        <Icon icon="plus" :scale="1.25" />
+        <Icon
+          icon="plus"
+          :scale="1.25"
+          @click.stop="pushPage(CreateDeliveryDialog)"
+        />
       </Box>
     </Row>
     <Card :sty="{ width: `1f` }">
