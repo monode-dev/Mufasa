@@ -5,7 +5,7 @@ import { getAppData } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box.vue";
 
 function openTkeWebsite() {
-  window.open(`tke.us`, `_blank`);
+  window.open(`https://www.tke.us`, `_blank`);
 }
 
 const appData = getAppData();
@@ -60,7 +60,7 @@ export default {
             ) {
               return 1;
             } else {
-              return b.createdPosix - a.createdPosix;
+              return b.createdPosix! - a.createdPosix!;
             }
           })"
           :fuelType="fuelType"
