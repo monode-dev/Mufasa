@@ -138,7 +138,7 @@ export default {
         /></Label>
         <DropDown
           label="Fuel Type"
-          v-model:selected="tank"
+          v-model:selected="fuelType"
           :getKeyFromData="(data: any) => data"
           :options="[
             {

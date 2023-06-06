@@ -39,25 +39,16 @@ const dimShortHeight = ref(0);
         />
       </Box>
     </Row>
-    <Card :sty="{ width: `1f` }">
-      <Text hint>Upcoming Delivery A</Text>
-    </Card>
-    <Card :sty="{ width: `1f` }">
-      <Text hint>Upcoming Delivery B</Text>
-    </Card>
-    <Card :sty="{ width: `1f` }">
-      <Text hint>Upcoming Delivery C</Text>
-    </Card>
+    <UpcomingDeliveryEntry :isAuto="true" />
+    <UpcomingDeliveryEntry :isAuto="true" />
+    <UpcomingDeliveryEntry :isAuto="false" />
     <Box />
     <Text title>Completed Deliveries</Text>
-    <Card :sty="{ width: `1f` }">
-      <Text hint>Completed Delivery A</Text>
-    </Card>
-    <Card :sty="{ width: `1f` }">
-      <Text hint>Completed Delivery B</Text>
-    </Card>
-    <Card :sty="{ width: `1f` }">
-      <Text hint>Completed Delivery C</Text>
-    </Card>
+    <CompletedDeliveryEntry />
+    <CompletedDeliveryEntry />
+    <CompletedDeliveryEntry />
+    <CompletedDeliveryEntry />
+    <CompletedDeliveryEntry />
+    <CompletedDeliveryEntry />
   </Body>
 </template>

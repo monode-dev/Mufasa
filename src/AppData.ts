@@ -67,19 +67,38 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
       },
     } as const),
   ),
-  delivery: defMany(
+  autoUpcomingDeliveries: defMany(
     defObj({
-      typeName: `Delivery`,
+      typeName: `AutoUpcomingDelivery`,
       props: {
-        isAutoInput: defPrim<boolean>(true),
         client: defOne(`Client`, null),
+        tank: defOne(`Tank`, null),
+        amount: defPrim<number>(0),
+      },
+    } as const),
+  ),
+  manualUpcomingDeliveries: defMany(
+    defObj({
+      typeName: `ManualUpcomingDelivery`,
+      props: {
         clientName: defPrim<string>(``),
         fuelType: defOne(`FuelType`, null),
+        amount: defPrim<number>(0),
+      },
+    } as const),
+  ),
+  completedDeliveries: defMany(
+    defObj({
+      typeName: `CompletedDelivery`,
+      props: {
+        client: defOne(`Client`, null),
+        clientName: defPrim<string>(``),
+        tank: defOne(`Tank`, null),
+        fuelType: defOne(`FuelType`, null),
         fuelTypeName: defPrim<string>(``),
-        quantity: defPrim<number>(0),
+        amount: defPrim<number>(0),
         rate: defPrim<number>(0),
         completedDate: defPrim<number>(0),
-        isCompleted: defPrim<boolean>(false),
       },
     } as const),
   ),
