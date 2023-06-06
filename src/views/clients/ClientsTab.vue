@@ -30,12 +30,12 @@ const filteredClients = computed(() =>
       <ClientEntry
         v-for="(client, index) in [...filteredClients].sort((a, b) => {
           //
-          if (!a.isLoaded || exists(a.name)) {
+          if (!a.isLoaded || !exists(a.name)) {
             return 1;
-          } else if (!b.isLoaded || exists(b.name)) {
+          } else if (!b.isLoaded || !exists(b.name)) {
             return -1;
           } else {
-            return a.name!.localeCompare(b.name!);
+            return a.name.localeCompare(b.name);
           }
         })"
         :key="index"

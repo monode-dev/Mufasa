@@ -67,4 +67,19 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
       },
     } as const),
   ),
+  delivery: defMany(
+    defObj({
+      typeName: `Delivery`,
+      props: {
+        client: defOne(`Client`, null),
+        clientName: defPrim<string>(``),
+        date: defPrim<number>(() => Date.now()),
+        fuelType: defOne(`FuelType`, null),
+        fuelTypeName: defPrim<string>(``),
+        quantity: defPrim<number>(0),
+        rate: defPrim<number>(0),
+        isCompleted: defPrim<boolean>(false),
+      },
+    } as const),
+  ),
 });
