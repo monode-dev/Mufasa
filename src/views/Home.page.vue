@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { mdColors } from "@/miwi-md/Box.vue";
 
 const selectedTab = ref(1);
 </script>
@@ -26,7 +25,7 @@ const selectedTab = ref(1);
         <ClientsTab />
       </template>
       <template #tab1>
-        <ConfettiTab />
+        <DeliveriesTab />
       </template>
       <template #tab2>
         <CalculatorsTab />
