@@ -26,10 +26,32 @@ const dimShortHeight = ref(0);
 
 <template>
   <Body>
-    <Text title>Upcoming Deliveries</Text>
-    <Text hint>Incomplete deliveries will go here.</Text>
+    <Row :sty="{ width: `1f`, spacing: $Spacing.spaceBetween }">
+      <Box :sty="{ width: 1.75 }" />
+      <Text title>Upcoming Deliveries</Text>
+      <Box :sty="{ width: 1.75, align: $Align.centerLeft }">
+        <Icon icon="plus" :scale="1.25" />
+      </Box>
+    </Row>
+    <Card :sty="{ width: `1f` }">
+      <Text hint>Upcoming Delivery A</Text>
+    </Card>
+    <Card :sty="{ width: `1f` }">
+      <Text hint>Upcoming Delivery B</Text>
+    </Card>
+    <Card :sty="{ width: `1f` }">
+      <Text hint>Upcoming Delivery C</Text>
+    </Card>
     <Box />
     <Text title>Completed Deliveries</Text>
-    <Text hint>Completed deliveries will go here.</Text>
+    <Card :sty="{ width: `1f` }">
+      <Text hint>Completed Delivery A</Text>
+    </Card>
+    <Card :sty="{ width: `1f` }">
+      <Text hint>Completed Delivery B</Text>
+    </Card>
+    <Card :sty="{ width: `1f` }">
+      <Text hint>Completed Delivery C</Text>
+    </Card>
   </Body>
 </template>

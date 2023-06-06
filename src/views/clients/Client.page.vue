@@ -102,7 +102,6 @@ export default {
         :sty="{
           width: `1f`,
           spacing: $Spacing.spaceBetween,
-          align: $Align.topCenter,
         }"
       >
         <Box :sty="{ width: 1.75 }" />
