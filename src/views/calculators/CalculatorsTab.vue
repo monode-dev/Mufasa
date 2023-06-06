@@ -13,8 +13,8 @@ import { computed, ref } from "vue";
 const tabIndex = ref(0);
 const isDeliveryTab = computed(() => tabIndex.value === 0);
 const toDeliverTab = () => (tabIndex.value = 0);
-const isClientTab = computed(() => tabIndex.value === 1);
-const toClientTab = () => (tabIndex.value = 1);
+const isTankTab = computed(() => tabIndex.value === 1);
+const toTankTab = () => (tabIndex.value = 1);
 const isDimensionsTab = computed(() => tabIndex.value === 2);
 const toDimensionsTab = () => (tabIndex.value = 2);
 
@@ -52,8 +52,8 @@ const stickedDepth = ref(0);
         <Button pill :outlined="!isDeliveryTab" @click.stop="toDeliverTab"
           >Delivery</Button
         >
-        <Button pill :outlined="!isClientTab" @click.stop="toClientTab"
-          >Client</Button
+        <Button pill :outlined="!isTankTab" @click.stop="toTankTab"
+          >Tank</Button
         >
         <Button pill :outlined="!isDimensionsTab" @click.stop="toDimensionsTab"
           >Dimensions</Button
@@ -91,7 +91,7 @@ const stickedDepth = ref(0);
         />
       </Box>
       <Box
-        v-if="isClientTab"
+        v-if="isTankTab"
         :sty="{
           width: `1f`,
           spacing: 1,
@@ -190,7 +190,7 @@ const stickedDepth = ref(0);
         <Box :sty="{ width: `1f` }" />
       </Row>
 
-      <Box v-if="isClientTab || isDeliveryTab" :sty="{ height: 1 }" />
+      <Box v-if="isTankTab || isDeliveryTab" :sty="{ height: 1 }" />
       <Box v-if="isDeliveryTab" :sty="{ height: 1 }" />
     </Card>
     <Box />
