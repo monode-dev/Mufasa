@@ -26,6 +26,7 @@ const dimShortHeight = ref(0);
 
 <template>
   <Body>
+    <Text title>Tank Details</Text>
     <Card
       :sty="{
         width: `1f`,
@@ -94,13 +95,15 @@ const dimShortHeight = ref(0);
           /></Label>
         </Row>
       </Box>
+      <Text>Sticked Depth</Text>
     </Card>
+    <Box />
+    <Text title>Estimates</Text>
     <Card
       :sty="{
         width: `1f`,
       }"
     >
-      <Text>Sticked Depth</Text>
       <Text>90%</Text>
     </Card>
   </Body>
