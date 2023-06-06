@@ -89,8 +89,6 @@ const stickedDepth = ref(0);
             },
           ]"
         />
-        <Text>---</Text>
-        <Text>---</Text>
       </Box>
       <Box
         v-if="isClientTab"
@@ -145,7 +143,6 @@ const stickedDepth = ref(0);
             },
           ]"
         />
-        <Text>---</Text>
       </Box>
       <Box
         v-if="isDimensionsTab"
@@ -192,6 +189,9 @@ const stickedDepth = ref(0);
         <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label>
         <Box :sty="{ width: `1f` }" />
       </Row>
+
+      <Box v-if="isClientTab || isDeliveryTab" :sty="{ height: 1 }" />
+      <Box v-if="isDeliveryTab" :sty="{ height: 1 }" />
     </Card>
     <Box />
     <!-- <Box :sty="{ height: 1 }" /> -->
