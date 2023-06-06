@@ -29,9 +29,7 @@ const selectedTab = ref(1);
         <ConfettiTab />
       </template>
       <template #tab2>
-        <Body :sty="{ align: $Align.center }">
-          <Text hint>Calculator Comming Soon...</Text>
-        </Body>
+        <CalculatorsTab />
       </template>
     </TabView>
   </Page>

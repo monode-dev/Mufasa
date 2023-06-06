@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
 import { getAppData, Client } from "@/AppData";
-import { docProx } from "@/mufasa/Implement";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
+import { exists } from "@/utils";
 
 const appData = getAppData();
 
@@ -20,11 +20,6 @@ const filteredClients = computed(() =>
     );
   }),
 );
-
-let clientNums: number[] = [];
-for (let i = 1; i <= 50; i++) {
-  clientNums.push(i);
-}
 </script>
 
 <template>
@@ -35,12 +30,12 @@ for (let i = 1; i <= 50; i++) {
       <ClientEntry
         v-for="(client, index) in [...filteredClients].sort((a, b) => {
           //
-          if (!a.isLoaded || ([undefined, null] as (string | undefined | null)[]).includes(a.name)) {
+          if (!a.isLoaded || exists(a.name)) {
             return 1;
-          } else if (!b.isLoaded || ([undefined, null] as (string | undefined | null)[]).includes(b.name)) {
+          } else if (!b.isLoaded || exists(b.name)) {
             return -1;
           } else {
-            return a.name.localeCompare(b.name);
+            return a.name!.localeCompare(b.name!);
           }
         })"
         :key="index"
@@ -49,23 +44,3 @@ for (let i = 1; i <= 50; i++) {
     </Body>
   </Column>
 </template>
-
-<!-- <Stack :sty="{
-        width: `1f`,
-        height: `1f`,
-      }">
-
-        <Body>
-          <ClientEntry v-for="name in clientNames" :name="name"></ClientEntry>
-        </Body>
-        <Box :sty="{
-          width: `1f`,
-          height: `1f`,
-          align: Align.bottomRight,
-          padding: 0.5,
-        }">
-          <Button raised round :sty="{ width: 2, height: 2, scale: 1.5 }">
-            <Icon :size="1.5" :icon="addSvg" alt="Add Icon" />
-          </Button>
-        </Box>
-      </Stack> -->
