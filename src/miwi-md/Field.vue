@@ -158,8 +158,12 @@ onMounted(() => {
                 padding: 0,
                 margin: 0,
                 height: numToFontSize(
-                  typeof sty.scale === `string` ? 1 : scale,
+                  typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
                 ),
+                lineHeight:
+                  typeof sty.scale === `string`
+                    ? sty.scale
+                    : sizeToCss(sty.scale ?? scale),
                 [`--placeholder-color`]: hintColor,
                 caretColor: `#f2b212ff`,
               }"
