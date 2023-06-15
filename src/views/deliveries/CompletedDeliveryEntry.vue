@@ -32,7 +32,7 @@
         <Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }"
           >10.589</Text
         >
-        <Text :sty="{ height: 1 }">of:</Text>
+        <Text :sty="{ height: 1, backgound: `#00ff00` }">of:</Text>
       </Row>
       <Row
         :sty="{
@@ -40,7 +40,13 @@
           spacing: 0.25,
         }"
       >
-        <Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }"
+        <Text
+          :sty="{
+            width: `1f`,
+            align: $Align.centerLeft,
+            height: 1,
+            backgound: `#ff0000`,
+          }"
           >GAUL</Text
         >
         <Text :sty="{ height: 1 }">to:</Text>
