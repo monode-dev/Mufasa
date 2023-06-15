@@ -186,8 +186,8 @@ const stickedDepth = ref(0);
       </Box>
       <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label>
 
-      <Box v-if="isTankTab || isDeliveryTab" :sty="{ height: 1 }" />
-      <Box v-if="isDeliveryTab" :sty="{ height: 1 }" />
+      <!-- <Box v-if="isTankTab || isDeliveryTab" :sty="{ height: 1 }" />
+      <Box v-if="isDeliveryTab" :sty="{ height: 1 }" /> -->
     </Card>
     <Box />
     <!-- <Box :sty="{ height: 1 }" /> -->
