@@ -210,6 +210,7 @@ onMounted(() => {
   margin: 0;
   width: 100%;
   overflow: visible;
+  background-color: #ff0000;
 }
 
 .field::placeholder {
