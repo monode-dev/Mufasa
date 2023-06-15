@@ -228,6 +228,9 @@ onMounted(() => {
   width: 100%;
   overflow: visible;
   background-color: #ff0000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .field::placeholder {
