@@ -37,7 +37,7 @@ const tank = ref("Tank B");
           width: `1f`,
         }"
       >
-        <Field v-model:value="amount" hint="Amount" />
+        <Field :sty="{ height: 1 }" v-model:value="amount" hint="Amount" />
         <Text :sty="{ height: 1 }">of:</Text>
       </Row>
       <Row
@@ -45,7 +45,7 @@ const tank = ref("Tank B");
           width: `1f`,
         }"
       >
-        <Field v-model:value="fuelType" hint="Fuel" />
+        <Field :sty="{ height: 1 }" v-model:value="fuelType" hint="Fuel" />
         <Text :sty="{ height: 1 }">to:</Text>
       </Row>
       <Row
