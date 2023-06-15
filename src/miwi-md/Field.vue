@@ -8,7 +8,14 @@ import {
   watchEffect,
   onMounted,
 } from "vue";
-import Box, { Sty, mdColors, Axis, numToFontSize, Overflow } from "./Box.vue";
+import Box, {
+  Sty,
+  mdColors,
+  Axis,
+  numToFontSize,
+  Overflow,
+  sizeToCss,
+} from "./Box.vue";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -189,7 +196,13 @@ onMounted(() => {
         padding: 0,
         margin: 0,
         overflowY: `visible`,
-        height: numToFontSize(typeof sty.scale === `string` ? 1 : scale),
+        height: numToFontSize(
+          typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
+        ),
+        lineHeight:
+          typeof sty.scale === `string`
+            ? sty.scale
+            : sizeToCss(sty.scale ?? scale),
         [`--placeholder-color`]: hintColor,
         caretColor: `#f2b212ff`,
       }"
