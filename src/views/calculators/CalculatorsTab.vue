@@ -93,7 +93,7 @@ const stickedDepth = ref(0);
           ]"
         />
       </Box>
-      <Box
+      <Row
         v-if="isTankTab"
         :sty="{
           width: `1f`,
@@ -146,7 +146,7 @@ const stickedDepth = ref(0);
             },
           ]"
         />
-      </Box>
+      </Row>
       <Box
         v-if="isDimensionsTab"
         :sty="{
