@@ -97,7 +97,7 @@ const stickedDepth = ref(0);
         v-if="isTankTab"
         :sty="{
           width: `1f`,
-          spacing: 1,
+          spacing: 0.5,
         }"
       >
         <DropDown

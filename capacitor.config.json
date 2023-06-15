@@ -2,6 +2,7 @@
   "appId": "us.tke.ninetypercent",
   "appName": "90%",
   "webDir": "dist",
+  "backgroundColor": "#4caf50",
   "bundledWebRuntime": false,
   "plugins": {
     "CapacitorUpdater": {
