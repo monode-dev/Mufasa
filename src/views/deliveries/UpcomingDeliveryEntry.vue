@@ -11,7 +11,7 @@ const props = defineProps({
 
 const clientName = ref("12345 - Client A");
 const amount = ref(10.5);
-const fuelType = ref("GAUL");
+const fuelType = ref("GAULyp");
 const tank = ref("Tank B");
 </script>
 
