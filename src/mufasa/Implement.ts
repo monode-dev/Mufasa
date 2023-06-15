@@ -13,10 +13,18 @@ import {
   where,
   query,
   getDocs,
+  doc,
 } from "firebase/firestore";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  deleteObject,
+} from "firebase/storage";
 import { ComputedRef, Ref, UnwrapRef, computed, ref, watchEffect } from "vue";
 import { exists } from "../utils";
 import { DefMany, DefObj } from "./Define";
+import { Device } from "@capacitor/device";
 import {
   CreateParamsFromDoc,
   FormatToTs,
@@ -24,6 +32,12 @@ import {
   ObjFormats,
   ObjPropsToObjFormats,
 } from "./Parse";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import {
+  deleteFileFromIndexedDB,
+  readFileFromIndexedDB,
+  writeFileToIndexedDB,
+} from "./IndexedDBFileSystem";
 
 //
 //
@@ -39,8 +53,8 @@ const firebaseConfig = {
   appId: "1:341748622809:web:a114f74a7c325fc68de5c8",
 };
 
-const app = initializeApp(firebaseConfig);
-export const firebaseDb = initializeFirestore(app, {
+const firebasApp = initializeApp(firebaseConfig);
+export const firebaseDb = initializeFirestore(firebasApp, {
   cacheSizeBytes: CACHE_SIZE_UNLIMITED,
 });
 try {
@@ -60,6 +74,67 @@ try {
   // }
 } catch (err) {
   // console.log(err);
+}
+
+async function getUuid() {
+  return `${(await Device.getId()).uuid}-${Date.now()}`;
+}
+
+async function completeFileUpload({
+  docPath,
+  propKey,
+  fileId,
+  data,
+  oldFileIdToDelete,
+}: {
+  docPath: string;
+  propKey: string;
+  fileId: string;
+  data: string;
+  oldFileIdToDelete: string | undefined;
+}) {
+  // Upload data to firebase storage
+  let haveUploaded = false;
+  while (!haveUploaded) {
+    try {
+      await uploadBytes(
+        storageRef(getStorage(firebasApp), `MX_Files/${fileId}.txt`),
+        new TextEncoder().encode(data),
+      );
+      haveUploaded = true;
+    } catch (err) {}
+  }
+  await writeFileToIndexedDB(`MX_Files`, `${fileId}.txt`, data);
+  // await Filesystem.writeFile({
+  //   path: `MX_Files/${fileId}.txt`,
+  //   data: data,
+  //   directory: Directory.Data,
+  //   encoding: Encoding.UTF8,
+  //   recursive: true,
+  // });
+
+  deleteFileFromIndexedDB(`MX_FilesToUpload`, `${fileId}.txt`);
+  // Filesystem.deleteFile({
+  //   path: `MX_FilesToUpload/${fileId}.txt`,
+  //   directory: Directory.Data,
+  // });
+
+  deleteFileFromIndexedDB(`MX_FilesToUpload`, `${fileId}.json`);
+  // Filesystem.deleteFile({
+  //   path: `MX_FilesToUpload/${fileId}.json`,
+  //   directory: Directory.Data,
+  // });
+  updateDoc(doc(firebaseDb, docPath), {
+    [propKey]: {
+      local: null,
+      remote: fileId,
+    },
+  });
+  if (exists(oldFileIdToDelete)) {
+    deleteObject(
+      storageRef(getStorage(firebasApp), `MX_Files/${oldFileIdToDelete}.txt`),
+    );
+  }
 }
 
 //
@@ -114,7 +189,7 @@ export function docProx<
           if (format.format === `many`) {
             const collectionRef = collection(firebaseDb, format.typeName!);
             const docs = await getDocs(
-              query(collectionRef, where(`mx_parent`, "==", actualDocRef.path)),
+              query(collectionRef, where(`mx_parent`, "==", actualDocRef)),
             );
             docs.forEach((doc) => deleteDoc(doc.ref));
           }
@@ -126,7 +201,7 @@ export function docProx<
   (async () => {
     const unpromisedDocRef = await docRef;
     if (!exists(unpromisedDocRef)) {
-      data.value = unpromisedDocRef;
+      data.value = undefined;
     } else {
       onSnapshot(unpromisedDocRef, (doc) => {
         data.value = doc.data() as UnwrapRef<T> | null | undefined;
@@ -164,13 +239,142 @@ export function docProx<
         format.typeName!,
         objFormats,
         true,
-        proxy._firestoreRef ?? undefined,
+        docRef ?? undefined,
       );
       Object.defineProperty(proxy, propKey, {
         get: function () {
           return newListProx;
         },
         set: undefined,
+      });
+    } else if (format.format === `file`) {
+      Object.defineProperty(proxy, propKey, {
+        get: async function () {
+          const fileDetails = data.value?.[
+            propKey as keyof typeof data.value
+          ] as any;
+
+          if (exists(fileDetails)) {
+            if (
+              exists(fileDetails) &&
+              `local` in fileDetails &&
+              exists(fileDetails.local)
+            ) {
+              try {
+                const result = await readFileFromIndexedDB(
+                  `MX_FilesToUpload`,
+                  `${fileDetails.local}.txt`,
+                );
+                return result;
+                // const result = await Filesystem.readFile({
+                //   path: `MX_FilesToUpload/${fileDetails}.txt`,
+                //   directory: Directory.Data,
+                //   encoding: Encoding.UTF8,
+                // });
+                // return result.data;
+              } catch (err) {
+                try {
+                  const result = await readFileFromIndexedDB(
+                    `MX_Files`,
+                    `${fileDetails.remote}.txt`,
+                  );
+                  return result;
+                  // const result = await Filesystem.readFile({
+                  //   path: `MX_Files/${fileDetails}.txt`,
+                  //   directory: Directory.Data,
+                  //   encoding: Encoding.UTF8,
+                  // });
+                  // return result.data;
+                } catch (err) {
+                  return null;
+                }
+              }
+            } else {
+              try {
+                const result = await readFileFromIndexedDB(
+                  `MX_Files`,
+                  `${fileDetails.remote}.txt`,
+                );
+                return result;
+                // const result = await Filesystem.readFile({
+                //   path: `MX_Files/${fileDetails}.txt`,
+                //   directory: Directory.Data,
+                //   encoding: Encoding.UTF8,
+                // });
+                // return result.data;
+              } catch (err) {
+                return null;
+              }
+            }
+          } else {
+            return fileDetails;
+          }
+        },
+        set: async function (newValue: Promise<string | null> | string | null) {
+          const actualDocRef = proxy._firestoreRef;
+          if (exists(actualDocRef)) {
+            const newPropData = await newValue;
+            if (exists(newPropData)) {
+              const newFileId = await getUuid();
+
+              // Write newValue to local storage
+              await writeFileToIndexedDB(
+                `MX_FilesToUpload`,
+                `${newFileId}.txt`,
+                newPropData,
+              );
+              // await Filesystem.writeFile({
+              //   path: `MX_FilesToUpload/${newFileId}.txt`,
+              //   data: newPropData,
+              //   directory: Directory.Data,
+              //   encoding: Encoding.UTF8,
+              //   recursive: true,
+              // });
+
+              await writeFileToIndexedDB(
+                `MX_FilesToUpload`,
+                `${newFileId}.json`,
+                JSON.stringify({
+                  docRef: actualDocRef.path,
+                  propKey,
+                }),
+              );
+              // await Filesystem.writeFile({
+              //   path: `MX_FilesToUpload/${newFileId}.json`,
+              //   data: JSON.stringify({
+              //     docRef: actualDocRef.path,
+              //     propKey,
+              //   }),
+              //   directory: Directory.Data,
+              //   encoding: Encoding.UTF8,
+              //   recursive: true,
+              // });
+              const fileDetails =
+                data.value?.[propKey as keyof typeof data.value];
+              updateDoc(actualDocRef, {
+                [propKey]: {
+                  ...(fileDetails ?? { remote: null }),
+                  local: newFileId,
+                },
+              });
+              completeFileUpload({
+                docPath: actualDocRef.path,
+                propKey,
+                fileId: newFileId,
+                data: newPropData,
+                oldFileIdToDelete: ((fileDetails as any) ?? { remote: null })
+                  .remote,
+              });
+            } else {
+              updateDoc(actualDocRef, {
+                [propKey]: {
+                  local: null,
+                  remote: null,
+                },
+              });
+            }
+          }
+        },
       });
     } else {
       Object.defineProperty(proxy, propKey, {
@@ -222,7 +426,7 @@ function listProx<
   typeName: TypeName,
   objFormats: F,
   isChild: boolean = false,
-  mx_parent?: DocumentReference,
+  mx_parent?: Promise<DocumentReference | null | undefined> | DocumentReference,
 ) {
   const chars = genRandomChars(10);
   const collectionRef = collection(firebaseDb, typeName);
@@ -230,15 +434,18 @@ function listProx<
     const collectionList = ref<T[]>([]);
     if (isChild) {
       if (mx_parent) {
-        onSnapshot(
-          // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
-          query(collectionRef, where(PARENT_KEY, "==", mx_parent)),
-          (querySnapshot) => {
-            collectionList.value = querySnapshot.docs.map((doc) => {
-              return docProx(doc.ref, typeName, objFormats);
-            });
-          },
-        );
+        (async () => {
+          const unpromisedParent = await mx_parent;
+          onSnapshot(
+            // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
+            query(collectionRef, where(PARENT_KEY, "==", unpromisedParent)),
+            (querySnapshot) => {
+              collectionList.value = querySnapshot.docs.map((doc) => {
+                return docProx(doc.ref, typeName, objFormats);
+              });
+            },
+          );
+        })();
       }
     } else {
       onSnapshot(collectionRef, (querySnapshot) => {
@@ -252,7 +459,9 @@ function listProx<
   return vueRefToList(collectionList, mx_parent);
   function vueRefToList<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
-    mx_parent?: DocumentReference,
+    mx_parent?:
+      | Promise<DocumentReference | null | undefined>
+      | DocumentReference,
   ): List<T> {
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
@@ -268,13 +477,48 @@ function listProx<
         return collectionList.value.map(mapFn);
       },
       add(createParams) {
-        const newDoc = {
-          ...getDefaultProps(),
-          ...createParams,
-          ...(mx_parent === undefined ? {} : { mx_parent }),
-        };
         return docProx<TypeName, F>(
-          addDoc(collectionRef, newDoc),
+          (async () => {
+            const parent = await mx_parent;
+
+            const defaultProps: { [key: string]: any } = getDefaultProps();
+            const fileDefaults: { [key: string]: any } = {};
+            for (const [key, prop] of Object.entries(objFormats[typeName])) {
+              if (prop.format === `file`) {
+                if (exists(createParams[key as keyof typeof createParams])) {
+                  fileDefaults[key] =
+                    createParams[key as keyof typeof createParams];
+                } else {
+                  const init = prop.init;
+                  if (typeof init === `function`) {
+                    fileDefaults[key] = init();
+                  } else {
+                    fileDefaults[key] = init;
+                  }
+                }
+              } else if (
+                prop.format === `prim` &&
+                exists(createParams[key as keyof typeof createParams])
+              ) {
+                defaultProps[key] =
+                  createParams[key as keyof typeof createParams];
+              }
+            }
+            const newDocRef = await addDoc(collectionRef, {
+              // ...getDefaultProps(),
+              // ...createParams,
+              ...defaultProps,
+              ...(exists(parent) ? { mx_parent: parent } : {}),
+            });
+            for (const [key, initValue] of Object.entries(fileDefaults)) {
+              if (exists(initValue)) {
+                console.log(`initValue`, initValue);
+                (docProx(newDocRef, typeName, objFormats) as any)[key] =
+                  initValue;
+              }
+            }
+            return newDocRef;
+          })(),
           typeName,
           objFormats,
         ) as T;
@@ -290,6 +534,11 @@ function listProx<
               } else {
                 defaultProps[key] = init;
               }
+            } else if (prop.format === `file`) {
+              defaultProps[key] = {
+                local: null,
+                remote: null,
+              };
             }
           }
           return defaultProps;
@@ -334,6 +583,13 @@ export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
             propFormats[propName] = {
               format: `one`,
               typeName: prop.type,
+              init: prop.init,
+              primType: undefined,
+            };
+          } else if (prop.type === `file`) {
+            propFormats[propName] = {
+              format: `file`,
+              typeName: undefined,
               init: prop.init,
               primType: undefined,
             };

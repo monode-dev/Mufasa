@@ -14,7 +14,7 @@ import {
 } from "vue";
 import { isDefined, isNum, isString } from "./utils";
 
-export interface Sty {
+export type Sty = {
   width: number | string | FlexSize;
   height: number | string | FlexSize;
   cornerRadius: number | string | [number, number, number, number];
@@ -23,12 +23,19 @@ export interface Sty {
   background: string;
   shadowSize: number;
   shadowDirection: Align;
+  // { padAround: num, padBetween: num }
   padding:
     | `css ${string}`
     | number
     | `${number}`
     | `${number} ${number}`
     | `${number} ${number} ${number} ${number}`;
+  // AlignX: isColumn ? BasicAlignAxisX : (BasicAlignAxisX | AdditionalMainAxisAlign)
+  // type BasicAlignAxisX: left | center | right;
+  // AlignY: isColumn ? (BasicAlignAxisY | AdditionalMainAxisAlign) : BasicAlignAxisY
+  // type BasicAlignAxisY: top | center | bottom;
+  // type AdditionalMainAxisAlign: spaceBetween | spaceAround | spaceEvenly
+  // Note: Align only makes sense if the size on this axis is not "shrink"
   align: Align;
   axis: Axis;
   overflowX: Overflow;
@@ -43,12 +50,39 @@ export interface Sty {
   zIndex: number;
   shouldLog: boolean;
   debugName: string;
-}
+} /**& ({
+  axis: `row`
+  alignX: AlignX | AdditionalMainAxisAlign;
+  alignY: AlignY;
+} | {
+  axis: `column`
+  alignX: AlignX;
+  alignY: AlignY | AdditionalMainAxisAlign;
+})*/;
 export type Axis = (typeof Axis)[keyof typeof Axis];
 export const Axis = {
   row: `row`,
   column: `column`,
   stack: `stack`,
+} as const;
+export type AlignX = (typeof AlignX)[keyof typeof AlignX];
+export const AlignX = {
+  left: `left`,
+  center: `center`,
+  right: `right`,
+} as const;
+export type AlignY = (typeof AlignY)[keyof typeof AlignY];
+export const AlignY = {
+  top: `top`,
+  center: `center`,
+  bottom: `bottom`,
+} as const;
+export type AdditionalMainAxisAlign =
+  | (typeof AdditionalMainAxisAlign)[keyof typeof AdditionalMainAxisAlign];
+export const AdditionalMainAxisAlign = {
+  spaceBetween: `space-between`,
+  spaceAround: `space-around`,
+  spaceEvenly: `space-evenly`,
 } as const;
 export type Overflow = (typeof Overflow)[keyof typeof Overflow];
 export const Overflow = {
@@ -129,6 +163,7 @@ export const mdColors = {
   red: `#f44336ff`,
   orange: `#ff9800ff`,
   yellow: `#ffea00ff`,
+  dataplateyellow: "#f2b212", // Added by Jorge to Dataplate project.
   green: `#4caf50ff`,
   teal: `#009688ff`,
   blue: `#2196f3ff`,
@@ -189,7 +224,8 @@ function computeSizeInfo({
       ? sizeToCss(size)
       : sizeIsFlex
       ? undefined
-      : `fit-content`;
+      : //: `fit-content`;
+        `auto`;
   const minSize = sizeIsFlex
     ? isShrink
       ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
@@ -199,9 +235,10 @@ function computeSizeInfo({
     : exactSize;
   const maxSize = sizeIsFlex
     ? isShrink
-      ? `fit-content`
+      ? //? `fit-content`
+        `auto`
       : size.max === Infinity
-      ? exactSize ?? `100%`
+      ? undefined // ?? `100%` // I turned (maxSize: 100%) off because a 100% caps the element at the height of its parent which doesn't work if the parent scrolls its content
       : sizeToCss(size.max)
     : exactSize;
   return [exactSize, minSize, maxSize, sizeIsFlex] as const;
@@ -424,7 +461,7 @@ export default defineComponent({
         //       : undefined,
 
         // Box Style
-        background: this.sty.background,
+        // background: this.sty.background,
         borderRadius: isDefined(this.sty.cornerRadius)
           ? Array.isArray(this.sty.cornerRadius)
             ? this.sty.cornerRadius.map(sizeToCss).join(` `)
@@ -437,7 +474,13 @@ export default defineComponent({
         outlineOffset: isDefined(this.sty.outlineSize)
           ? `-${sizeToCss(this.sty.outlineSize)}`
           : undefined,
-        backgroundColor: this.sty.background,
+        backgroundColor: this.sty.background?.startsWith(`data:image`)
+          ? undefined
+          : this.sty.background,
+        backgroundImage: this.sty.background?.startsWith(`data:image`)
+          ? `url('${this.sty.background}')`
+          : undefined,
+        backgroundSize: `cover`,
         // Add background images
         boxShadow: isDefined(this.sty.shadowSize)
           ? `${sizeToCss(
@@ -572,7 +615,7 @@ export default defineComponent({
     },
   },
   methods: {
-    updateFromHtml(divRef: Element | undefined) {
+    updateFromHtml(divRef: HTMLElement | undefined) {
       // Update parent axis
       (() => {
         const parent = divRef?.parentElement;
@@ -583,12 +626,14 @@ export default defineComponent({
           ? (this.parentAxis = Axis.column)
           : (this.parentAxis = Axis.stack);
       })();
+
       // Update Child Count
       (() => {
         if (!divRef) return;
         const children = Array.from(divRef.childNodes);
         this.childCount = children.length;
       })();
+
       // Update Child Size Grows
       (() => {
         if (!divRef) return;

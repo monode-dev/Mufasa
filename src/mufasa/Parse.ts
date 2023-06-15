@@ -1,11 +1,18 @@
-import { DefMany, DefObj, DefOne, DefPrim, PrimTsType } from "./Define";
+import {
+  DefFile,
+  DefMany,
+  DefObj,
+  DefOne,
+  DefPrim,
+  PrimTsType,
+} from "./Define";
 import { Doc, List } from "./Implement";
 
 // App Data Structure
 export type ObjFormats = {
   [typeName: string]: {
     [propName: string]: {
-      format: `prim` | `one` | `many`;
+      format: `prim` | `one` | `many` | `file`;
       typeName: string | undefined;
       primType: PrimTsType | undefined;
       init: any;
@@ -18,6 +25,8 @@ export type FormatToTsType<
 > = Doc<{
   -readonly [K in keyof F[TypeName]]: F[TypeName][K][`format`] extends `prim`
     ? F[TypeName][K][`primType`]
+    : F[TypeName][K][`format`] extends `file`
+    ? Promise<string | null> | null | string
     : F[TypeName][K][`format`] extends `one`
     ? F[TypeName][K][`typeName`] extends string
       ? FormatToTsType<F[TypeName][K][`typeName`], F>
@@ -57,6 +66,13 @@ export type ObjToFormat<T extends DefObj> = {
     ? {
         format: `many`;
         typeName: T["props"][K]["type"]["typeName"];
+        primType: undefined;
+        init: any;
+      }
+    : T["props"][K] extends DefFile
+    ? {
+        format: `file`;
+        typeName: undefined;
         primType: undefined;
         init: any;
       }

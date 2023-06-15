@@ -6,8 +6,9 @@ import {
   ref,
   VNodeRef,
   watchEffect,
+  onMounted,
 } from "vue";
-import Box, { Sty, mdColors, Axis, numToFontSize } from "./Box.vue";
+import Box, { Sty, mdColors, Axis, numToFontSize, Overflow } from "./Box.vue";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -39,7 +40,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  disabled: {
+  title: {
+    type: Boolean,
+    default: false,
+  },
+  heading: {
     type: Boolean,
     default: false,
   },
@@ -82,6 +87,14 @@ const detailColor = computed(() =>
     ? mdColors.grey
     : mdColors.black,
 );
+
+const scale = computed(() => (props.heading ? 1.5 : props.title ? 1.25 : 1));
+
+onMounted(() => {
+  if (props.hasFocus) {
+    inputRef.value?.focus();
+  }
+});
 </script>
 
 <template>
@@ -93,7 +106,9 @@ const detailColor = computed(() =>
       textColor: mdColors.black,
       axis: Axis.row,
       spacing: 0.25,
+      overflowY: Overflow.visible,
       ...sty,
+      scale: scale,
     }"
   >
     <Icon v-if="icon !== ``" :icon="icon" :color="detailColor" />
@@ -102,7 +117,7 @@ const detailColor = computed(() =>
       v-if="underlined"
       :sty="{
         width: `1f`,
-        height: 1,
+        height: scale,
       }"
     >
       <!-- Input -->
@@ -124,24 +139,22 @@ const detailColor = computed(() =>
 
           <Box :sty="{ width: `1f` }">
             <input
-              :ref="inputRef"
+              ref="inputRef"
               type="text"
               :value="value"
-              :autofocus="hasFocus"
               @input="handleInput"
               @focus="handleFocus"
               @blur="handleBlur"
               :placeholder="hint"
               class="field"
-              :disabled="disabled"
               :style="{
                 padding: 0,
                 margin: 0,
                 height: numToFontSize(
-                  typeof sty.scale === `string` ? 1 : sty.scale ?? 1,
+                  typeof sty.scale === `string` ? 1 : scale,
                 ),
                 [`--placeholder-color`]: hintColor,
-                caretColor: mdColors.green,
+                caretColor: `#f2b212ff`,
               }"
             />
           </Box>
@@ -164,7 +177,7 @@ const detailColor = computed(() =>
     <!-- Blank -->
     <input
       v-else
-      :ref="inputRef"
+      ref="inputRef"
       type="text"
       :value="value"
       @input="handleInput"
@@ -172,15 +185,13 @@ const detailColor = computed(() =>
       @blur="handleBlur"
       :placeholder="hint"
       class="field"
-      :disabled="disabled"
       :style="{
         padding: 0,
         margin: 0,
-        height: numToFontSize(
-          typeof sty.scale === `string` ? 1 : sty.scale ?? 1,
-        ),
+        overflowY: `visible`,
+        height: numToFontSize(typeof sty.scale === `string` ? 1 : scale),
         [`--placeholder-color`]: hintColor,
-        caretColor: mdColors.green,
+        caretColor: `#f2b212ff`,
       }"
     />
   </Box>

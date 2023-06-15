@@ -4,12 +4,11 @@
   "webDir": "dist",
   "bundledWebRuntime": false,
   "plugins": {
-		"CapacitorUpdater": {
+    "CapacitorUpdater": {
       "autoUpdate": false,
-			"updateUrl": "https://us-central1-tke-ota.cloudfunctions.net/checkLatestOtaPatch"
-		},
+      "updateUrl": "https://us-central1-tke-ota.cloudfunctions.net/checkLatestOtaPatch"
+    },
     "SplashScreen": {
-      "launchShowDuration": 250,
       "launchAutoHide": false,
       "backgroundColor": "#4caf50",
       "androidSplashResourceName": "splash",

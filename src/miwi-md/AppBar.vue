@@ -25,7 +25,7 @@ const props = defineProps({
       width: `1f`,
       height: `env(safe-area-inset-top)`,
       background: sty.background ?? mdColors.green,
-      zIndex: 1,
+      zIndex: 2,
     }"
   />
 
@@ -38,6 +38,7 @@ const props = defineProps({
       shadowDirection: Align.bottomCenter,
       align: Align.bottomCenter,
       textColor: mdColors.white,
+      zIndex: 1,
       ...sty,
     }"
   >

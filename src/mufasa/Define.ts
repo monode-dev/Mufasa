@@ -2,7 +2,11 @@
 export type DefObj = {
   typeName: string;
   props: {
-    [key: string]: DefPrim | DefOne<string> | DefMany /* | One | Many */;
+    [key: string]:
+      | DefPrim
+      | DefOne<string>
+      | DefMany
+      | DefFile /* | One | Many */;
   };
 };
 export function defObj<T extends DefObj>(objDef: T) {
@@ -25,6 +29,17 @@ export function defPrim<T extends PrimTsType>(
 ): DefPrim<T> {
   return {
     type: `primitive`,
+    init,
+  };
+}
+
+export type DefFile = {
+  type: `file`;
+  init: null | string | (() => string);
+};
+export function defFile(init: null | string | (() => string) = null): DefFile {
+  return {
+    type: `file`,
     init,
   };
 }

@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { pageTransitions } from "@/Nav";
-import { appVersion } from "@/AppDetails";
 import { getAppData } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box.vue";
+import { ref } from "vue";
+import { CapacitorUpdater } from "@capgo/capacitor-updater";
 
 function openTkeWebsite() {
   window.open(`https://www.tke.us`, `_blank`);
 }
 
 const appData = getAppData();
+
+const appVersion = (() => {
+  const appVersion = ref("-.-.-");
+  (async () => {
+    const currentVersionInfo = await CapacitorUpdater.current();
+    appVersion.value = currentVersionInfo.bundle.version;
+  })();
+  return appVersion;
+})();
 </script>
 
 <script lang="ts">

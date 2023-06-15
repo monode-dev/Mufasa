@@ -16,18 +16,13 @@ const props = defineProps({
       width: `100%`,
       height: `100%`,
       background: `#f9fafdff`,
+      align: Align.topCenter,
+      overflowX: $Overflow.crop,
+      overflowY: $Overflow.crop,
       ...sty,
     }"
   >
     <!-- Content -->
-    <Box
-      :sty="{
-        width: `1f`,
-        height: `1f`,
-        align: Align.center,
-      }"
-    >
-      <slot />
-    </Box>
+    <slot />
   </Box>
 </template>
