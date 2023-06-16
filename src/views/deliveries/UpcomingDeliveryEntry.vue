@@ -38,7 +38,7 @@ const tank = ref("Tank B");
         }"
       >
         <Field :sty="{ height: 1 }" v-model:value="amount" hint="Amount" />
-        <Text :sty="{ height: 1, background: `#00ff00` }">of:</Text>
+        <Text :sty="{ height: 1 }">of:</Text>
       </Row>
       <Row
         :sty="{

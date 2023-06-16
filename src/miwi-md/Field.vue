@@ -78,7 +78,8 @@ const handleBlur = (e: FocusEvent) => {
 };
 
 watchEffect(() => {
-  if (inputElementHasFocus.value !== props.hasFocus) {
+  console.log(`about to update focus`);
+  if (props.hasFocus !== (inputRef.value === document.activeElement)) {
     if (props.hasFocus) {
       inputRef.value?.focus();
     } else {
@@ -102,11 +103,16 @@ onMounted(() => {
     inputRef.value?.focus();
   }
 });
+
+function tryFocus() {
+  console.log(`tryFocus`);
+  inputRef.value?.focus();
+}
 </script>
 
 <template>
   <Box
-    @click="inputRef?.focus()"
+    @click="tryFocus()"
     :sty="{
       width: `1f`,
       height: underlined ? undefined : 1,
@@ -227,10 +233,10 @@ onMounted(() => {
   margin: 0;
   width: 100%;
   overflow: visible;
-  background-color: #ff0000;
-  display: flex;
-  justify-content: start;
-  align-items: start;
+  /* background-color: #ff0000; */
+  /* display: flex; */
+  /* justify-content: start; */
+  /* align-items: start; */
 }
 
 .field::placeholder {

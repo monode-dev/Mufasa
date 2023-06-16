@@ -28,6 +28,8 @@ export function getTankShapeName(shape: TankShape) {
 }
 export type Tank = (typeof mufasaTypes)["Tank"];
 export type FuelType = (typeof mufasaTypes)["FuelType"];
+export type UpcomingDelivery = (typeof mufasaTypes)["UpcomingDelivery"];
+export type CompletedDelivery = (typeof mufasaTypes)["CompletedDelivery"];
 
 // App Data Structure
 export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
@@ -66,21 +68,12 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
       },
     } as const),
   ),
-  autoUpcomingDeliveries: defMany(
+  upcomingDeliveries: defMany(
     defObj({
-      typeName: `AutoUpcomingDelivery`,
-      props: {
-        client: defOne(`Client`, null),
-        tank: defOne(`Tank`, null),
-        amount: defPrim<number>(0),
-      },
-    } as const),
-  ),
-  manualUpcomingDeliveries: defMany(
-    defObj({
-      typeName: `ManualUpcomingDelivery`,
+      typeName: `UpcomingDelivery`,
       props: {
         clientName: defPrim<string>(``),
+        tankName: defPrim<string>(``),
         fuelType: defOne(`FuelType`, null),
         amount: defPrim<number>(0),
       },
@@ -90,13 +83,11 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
     defObj({
       typeName: `CompletedDelivery`,
       props: {
-        client: defOne(`Client`, null),
         clientName: defPrim<string>(``),
-        tank: defOne(`Tank`, null),
-        fuelType: defOne(`FuelType`, null),
+        tankName: defPrim<string>(``),
         fuelTypeName: defPrim<string>(``),
-        amount: defPrim<number>(0),
         rate: defPrim<number>(0),
+        amount: defPrim<number>(0),
         completedDate: defPrim<number>(0),
       },
     } as const),
