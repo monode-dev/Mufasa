@@ -91,7 +91,7 @@ function selectOption(option: Option) {
       ...sty,
     }"
   >
-    <Text>{{ label }}:</Text>
+    <Text v-if="label !== ``">{{ label }}:</Text>
 
     <Box
       :sty="{
@@ -106,7 +106,7 @@ function selectOption(option: Option) {
       >
         <!-- Text -->
         <Row
-          @click.stop="(e) => (dropDownIsOpen = !dropDownIsOpen)"
+          @click.stop="() => (dropDownIsOpen = !dropDownIsOpen)"
           ref="openDropDownRef"
           :sty="{
             width: `1f`,

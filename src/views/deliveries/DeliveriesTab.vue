@@ -9,21 +9,9 @@ import {
 import { ref } from "vue";
 import { pushPage } from "@/Nav";
 import CreateDeliveryDialog from "./CreateDelivery.dialog.vue";
-// import { exists } from "@/utils";
+import { exists } from "@/utils";
 
-// const appData = getAppData();
-const isLookUp = ref(true);
-
-// Look Up
-const client = ref<Client | null>(null);
-const tank = ref<Tank | null>(null);
-
-// Use Dimensions
-const dimTankShape = ref(tankShape.none);
-const dimLength = ref(0);
-const dimDepth = ref(0);
-const dimHeight = ref(0);
-const dimShortHeight = ref(0);
+const appData = getAppData();
 </script>
 
 <template>
@@ -35,13 +23,26 @@ const dimShortHeight = ref(0);
         <Icon
           icon="plus"
           :scale="1.25"
-          @click.stop="pushPage(CreateDeliveryDialog)"
+          @click.stop="appData.upcomingDeliveries?.add({})"
         />
       </Box>
     </Row>
-    <UpcomingDeliveryEntry :isAuto="true" />
-    <UpcomingDeliveryEntry :isAuto="true" />
-    <UpcomingDeliveryEntry :isAuto="false" />
+
+    <UpcomingDeliveryEntry
+      v-for="(delivery, index) in [...(appData.upcomingDeliveries ?? [])].sort(
+        (a, b) => {
+          if (!a.isLoaded || !exists(a.creationTimePosix)) {
+            return 1;
+          } else if (!b.isLoaded || !exists(b.creationTimePosix)) {
+            return -1;
+          } else {
+            return a.creationTimePosix - b.creationTimePosix;
+          }
+        },
+      )"
+      :key="delivery._firestoreRef?.path ?? index"
+      :delivery="delivery"
+    />
     <Box />
     <Text title>Completed Deliveries</Text>
     <CompletedDeliveryEntry />

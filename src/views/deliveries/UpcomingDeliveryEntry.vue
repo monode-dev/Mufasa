@@ -1,18 +1,16 @@
 <script setup lang="ts">
+import { getAppData, FuelType, UpcomingDelivery } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box.vue";
-import { ref } from "vue";
+import { PropType, ref } from "vue";
 
 const props = defineProps({
-  isAuto: {
-    type: Boolean,
+  delivery: {
+    type: Object as PropType<UpcomingDelivery>,
     required: true,
   },
 });
 
-const clientName = ref("12345 - Client A");
-const amount = ref(10.5);
-const fuelType = ref("GAULyp");
-const tank = ref("Tank B");
+const appData = getAppData();
 </script>
 
 <template>
@@ -23,7 +21,7 @@ const tank = ref("Tank B");
         spacing: $Spacing.spaceBetween,
       }"
     >
-      <Field v-model:value="clientName" hint="Client Name" />
+      <Field v-model:value="props.delivery.clientName" hint="Client Name" />
       <DeleteOptionsButton />
     </Row>
     <Row
@@ -35,26 +33,44 @@ const tank = ref("Tank B");
       <Row
         :sty="{
           width: `1f`,
+          spacing: 0.25,
         }"
       >
-        <Field :sty="{ height: 1 }" v-model:value="amount" hint="Amount" />
+        <Field
+          :sty="{ height: 1 }"
+          v-model:value="props.delivery.amount"
+          hint="Amount"
+        />
         <Text :sty="{ height: 1 }">of:</Text>
       </Row>
       <Row
         :sty="{
           width: `1f`,
+          spacing: 0.25,
         }"
       >
-        <Field :sty="{ height: 1 }" v-model:value="fuelType" hint="Fuel" />
+        <DropDown
+          v-model:selected="props.delivery.fuelType"
+          :getKeyFromData="(data: FuelType | null) => {
+            return data?._firestoreRef?.path;
+          }"
+          :options="[
+            { label: `Fuel`, data: undefined },
+            ...appData.fuelTypes
+              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
+              .map((x) => ({ label: x.name!, data: x })),
+          ]"
+        />
         <Text :sty="{ height: 1 }">to:</Text>
       </Row>
       <Row
         :sty="{
           width: `1f`,
           align: $Align.centerLeft,
+          spacing: 0.25,
         }"
       >
-        <Field v-model:value="tank" hint="Tank" />
+        <Field v-model:value="props.delivery.tankName" hint="Tank" />
       </Row>
     </Row>
   </Card>

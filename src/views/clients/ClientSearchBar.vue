@@ -25,6 +25,7 @@ const emit = defineEmits(["update:filterString", "close"]);
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
       spacing: 0.5,
+      zIndex: 1,
       ...sty,
     }"
   >

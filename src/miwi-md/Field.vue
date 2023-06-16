@@ -78,7 +78,6 @@ const handleBlur = (e: FocusEvent) => {
 };
 
 watchEffect(() => {
-  console.log(`about to update focus`);
   if (props.hasFocus !== (inputRef.value === document.activeElement)) {
     if (props.hasFocus) {
       inputRef.value?.focus();
@@ -105,7 +104,6 @@ onMounted(() => {
 });
 
 function tryFocus() {
-  console.log(`tryFocus`);
   inputRef.value?.focus();
 }
 </script>
