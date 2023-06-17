@@ -52,6 +52,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
               depth: defPrim<number>(0),
               height: defPrim<number>(0),
               shortHeight: defPrim<number>(0),
+              creationTimePosix: defPrim<number>(() => Date.now()),
             },
           } as const),
         ),
@@ -72,8 +73,8 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
     defObj({
       typeName: `UpcomingDelivery`,
       props: {
-        clientName: defPrim<string>(``),
-        tankName: defPrim<string>(``),
+        client: defOne(`Client`, null),
+        tank: defOne(`Tank`, null),
         fuelType: defOne(`FuelType`, null),
         amount: defPrim<number>(0),
         creationTimePosix: defPrim<number>(() => Date.now()),

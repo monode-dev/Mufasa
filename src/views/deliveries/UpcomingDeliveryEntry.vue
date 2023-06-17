@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { getAppData, FuelType, UpcomingDelivery } from "@/AppData";
+import { pushPage } from "@/Nav";
 import { mdColors } from "@/miwi-md/Box.vue";
 import { PropType, ref } from "vue";
+import DeleteDialog from "../components/DeleteDialog.vue";
+import { orderDocs } from "@/utils";
 
 const props = defineProps({
   delivery: {
@@ -11,6 +14,13 @@ const props = defineProps({
 });
 
 const appData = getAppData();
+
+function handleDelete() {
+  pushPage(DeleteDialog, {
+    obj: props.delivery,
+    message: `Are you sure you want to permanently delete this delivery?`,
+  });
+}
 </script>
 
 <template>
@@ -21,8 +31,19 @@ const appData = getAppData();
         spacing: $Spacing.spaceBetween,
       }"
     >
-      <Field v-model:value="props.delivery.clientName" hint="Client Name" />
-      <DeleteOptionsButton />
+      <DropDown
+        v-model:selected="props.delivery.client"
+        :getKeyFromData="(data: FuelType | null) => {
+            return data?._firestoreRef?.path;
+          }"
+        :options="[
+            { label: `No Client Selected`, data: undefined },
+            ...orderDocs(appData.clients, (x) => x.name)
+              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
+              .map((x) => ({ label: x.name!, data: x })),
+          ]"
+      />
+      <DeleteOptionsButton @delete="handleDelete" />
     </Row>
     <Row
       :sty="{
@@ -41,9 +62,9 @@ const appData = getAppData();
           v-model:value="props.delivery.amount"
           hint="Amount"
         />
-        <Text :sty="{ height: 1 }">of:</Text>
+        <Text :sty="{ height: 1 }">to:</Text>
       </Row>
-      <Row
+      <!-- <Row
         :sty="{
           width: `1f`,
           spacing: 0.25,
@@ -62,7 +83,7 @@ const appData = getAppData();
           ]"
         />
         <Text :sty="{ height: 1 }">to:</Text>
-      </Row>
+      </Row> -->
       <Row
         :sty="{
           width: `1f`,
@@ -70,7 +91,19 @@ const appData = getAppData();
           spacing: 0.25,
         }"
       >
-        <Field v-model:value="props.delivery.tankName" hint="Tank" />
+        <DropDown
+          v-model:selected="props.delivery.tank"
+          :getKeyFromData="(data: FuelType | null) => {
+            return data?._firestoreRef?.path;
+          }"
+          :options="[
+            { label: `No Tank Selected`, data: undefined },
+            ...orderDocs(
+              props.delivery?.client?.tanks ?? [],
+              (x) => x.creationTimePosix,
+            ).map((x, index) => ({ label: `#${index}`, data: x })),
+          ]"
+        />
       </Row>
     </Row>
   </Card>

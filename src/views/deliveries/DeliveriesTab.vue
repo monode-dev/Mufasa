@@ -9,7 +9,7 @@ import {
 import { ref } from "vue";
 import { pushPage } from "@/Nav";
 import CreateDeliveryDialog from "./CreateDelivery.dialog.vue";
-import { exists } from "@/utils";
+import { exists, orderDocs } from "@/utils";
 
 const appData = getAppData();
 </script>
@@ -29,16 +29,9 @@ const appData = getAppData();
     </Row>
 
     <UpcomingDeliveryEntry
-      v-for="(delivery, index) in [...(appData.upcomingDeliveries ?? [])].sort(
-        (a, b) => {
-          if (!a.isLoaded || !exists(a.creationTimePosix)) {
-            return 1;
-          } else if (!b.isLoaded || !exists(b.creationTimePosix)) {
-            return -1;
-          } else {
-            return a.creationTimePosix - b.creationTimePosix;
-          }
-        },
+      v-for="(delivery, index) in orderDocs(
+        appData.upcomingDeliveries,
+        (x) => x.creationTimePosix,
       )"
       :key="delivery._firestoreRef?.path ?? index"
       :delivery="delivery"
