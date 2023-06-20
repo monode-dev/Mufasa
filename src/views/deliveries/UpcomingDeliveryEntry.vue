@@ -2,7 +2,7 @@
 import { getAppData, FuelType, UpcomingDelivery } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { mdColors } from "@/miwi-md/Box.vue";
-import { PropType, ref } from "vue";
+import { PropType, ref, watchEffect } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import { orderDocs } from "@/utils";
 
@@ -21,6 +21,13 @@ function handleDelete() {
     message: `Are you sure you want to permanently delete this delivery?`,
   });
 }
+
+watchEffect(() => {
+  console.log(`${props.delivery?.client} changed.`);
+  // console.log(
+  //   `${props.delivery?.client?._firestoreRef?.path} has ${props.delivery?.client?.tanks?.length} tanks.`,
+  // );
+});
 </script>
 
 <template>

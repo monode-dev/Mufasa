@@ -14,6 +14,8 @@ import {
   query,
   getDocs,
   doc,
+  QuerySnapshot,
+  DocumentData,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -164,6 +166,14 @@ export function docProx<
   typeName: TypeName,
   objFormats: F,
 ): T {
+  if (typeName === `Client` && Date.now() - start < logDurrationFromStart) {
+    const error = new Error();
+    const stackTrace = error.stack!.split("\n");
+    const callerLine = stackTrace[2]; // The line number of the calling function
+
+    console.log("Caller:", callerLine);
+  }
+  const chars = genRandomChars(10);
   const data = ref<T | null | undefined>(null);
 
   // Add standard props
@@ -191,7 +201,9 @@ export function docProx<
             const docs = await getDocs(
               query(collectionRef, where(`mx_parent`, "==", actualDocRef)),
             );
-            docs.forEach((doc) => deleteDoc(doc.ref));
+            docs.forEach((doc) =>
+              docProx(doc.ref, format.typeName!, objFormats).deleteDoc(),
+            );
           }
         }
         await deleteDoc(actualDocRef);
@@ -200,11 +212,28 @@ export function docProx<
   };
   (async () => {
     const unpromisedDocRef = await docRef;
+    let lastData: DocumentData | null = null;
+    function hasChanged(newData: DocumentData | null) {
+      if (lastData === null) return true;
+      if (newData === null) return true;
+      for (const key of Object.keys(newData)) {
+        if (lastData[key] !== newData[key]) return true;
+      }
+      for (const key of Object.keys(lastData)) {
+        if (lastData[key] !== newData[key]) return true;
+      }
+      return false;
+    }
     if (!exists(unpromisedDocRef)) {
       data.value = undefined;
     } else {
       onSnapshot(unpromisedDocRef, (doc) => {
-        data.value = doc.data() as UnwrapRef<T> | null | undefined;
+        if (Date.now() - start < logDurrationFromStart)
+          console.log(`Snapshot: ${chars} - ${typeName} = ${doc.ref.path}`);
+        if (hasChanged(doc.data() ?? null)) {
+          lastData = doc.data() ?? null;
+          data.value = doc.data() as UnwrapRef<T> | null | undefined;
+        }
       });
     }
   })();
@@ -226,7 +255,10 @@ export function docProx<
         set: function (newValue: any) {
           (async () => {
             const actualDocRef = proxy._firestoreRef;
-            if (exists(actualDocRef)) {
+            if (
+              exists(actualDocRef) &&
+              proxy._firestoreRef?.path !== newValue?._firestoreRef?.path
+            ) {
               updateDoc(actualDocRef, {
                 [propKey]: newValue?._firestoreRef ?? null,
               });
@@ -383,7 +415,7 @@ export function docProx<
         },
         set: function (newValue: any) {
           const actualDocRef = proxy._firestoreRef;
-          if (exists(actualDocRef)) {
+          if (exists(actualDocRef) && proxy[propKey] !== newValue) {
             updateDoc(actualDocRef, {
               [propKey]: newValue,
             });
@@ -418,6 +450,8 @@ function genRandomChars(length: number) {
   return result;
 }
 const PARENT_KEY = `mx_parent`;
+const start = Date.now();
+const logDurrationFromStart = 2000;
 function listProx<
   TypeName extends string,
   F extends ObjFormats,
@@ -432,6 +466,16 @@ function listProx<
   const collectionRef = collection(firebaseDb, typeName);
   const collectionList = (() => {
     const collectionList = ref<T[]>([]);
+    let lastSnapshot: QuerySnapshot | null = null;
+    function hasChanged(querySnapshot: QuerySnapshot) {
+      if (lastSnapshot === null) return true;
+      if (querySnapshot.size !== lastSnapshot.size) return true;
+      for (let i = 0; i < querySnapshot.size; i++) {
+        if (querySnapshot.docs[i].ref.path !== lastSnapshot.docs[i].ref.path)
+          return true;
+      }
+      return false;
+    }
     if (isChild) {
       if (mx_parent) {
         (async () => {
@@ -440,18 +484,31 @@ function listProx<
             // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
             query(collectionRef, where(PARENT_KEY, "==", unpromisedParent)),
             (querySnapshot) => {
-              collectionList.value = querySnapshot.docs.map((doc) => {
-                return docProx(doc.ref, typeName, objFormats);
-              });
+              if (Date.now() - start < logDurrationFromStart)
+                console.log(
+                  `Snapshot: ${chars} - only ${typeName}s with parent: ${
+                    (mx_parent as any)?.path
+                  }`,
+                );
+              if (hasChanged(querySnapshot)) {
+                lastSnapshot = querySnapshot;
+                collectionList.value = querySnapshot.docs.map((doc) => {
+                  return docProx(doc.ref, typeName, objFormats);
+                });
+              }
             },
           );
         })();
       }
     } else {
       onSnapshot(collectionRef, (querySnapshot) => {
-        collectionList.value = querySnapshot.docs.map((doc) =>
-          docProx(doc.ref, typeName, objFormats),
-        );
+        if (Date.now() - start < logDurrationFromStart)
+          console.log(`Snapshot: ${chars} - all ${typeName}s`);
+        if (hasChanged(querySnapshot)) {
+          collectionList.value = querySnapshot.docs.map((doc) =>
+            docProx(doc.ref, typeName, objFormats),
+          );
+        }
       });
     }
     return collectionList;
@@ -466,6 +523,8 @@ function listProx<
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
       get length() {
+        if (typeName === `Tank` && Date.now() - start < logDurrationFromStart)
+          console.log(`${chars} ${(mx_parent as any)?.path}`);
         return collectionList.value.length;
       },
       filter(filterFn) {
