@@ -301,9 +301,6 @@ export function docProx<
         },
       });
     } else if (format.format === `many`) {
-      if (propKey === `tanks`) {
-        console.log(docRef);
-      }
       const newListProx = listProx(
         format.typeName!,
         objFormats,
@@ -787,7 +784,7 @@ function createCache(objFormats: ObjFormats) {
             const parentInfo = getParentOf(typeName);
             if (exists(parentInfo)) {
               const newParentsProp =
-                cache[parentInfo.parentType].docs[newPropPath][
+                cache[parentInfo.parentType]?.docs[newPropPath]?.[
                   parentInfo.propName
                 ];
               if (exists(newParentsProp)) {
