@@ -560,13 +560,25 @@ function listProx<
   //   return collectionList;
   // })();
   if (isChild) {
-    const collectionList: Ref<T[]> = ref([]);
+    const mx_parentPath: Ref<undefined | string> = ref(undefined);
     (async () => {
-      const mx_parentPath = (await mx_parent)?.path;
-      if (exists(mx_parentPath)) {
-        localCache.getPropValue(parentType!, mx_parentPath, propNameOnParent!);
-      }
+      mx_parentPath.value = (await mx_parent)?.path;
     })();
+    const collectionList = computed(() => {
+      if (exists(mx_parentPath.value)) {
+        return (
+          localCache.getPropValue(
+            parentType!,
+            mx_parentPath.value,
+            propNameOnParent!,
+          ) as DocumentReference[]
+        ).map((elementRef) =>
+          docProx(elementRef, typeName, objFormats, localCache),
+        );
+      } else {
+        return [];
+      }
+    });
     return vueRefToList(collectionList, mx_parent);
   } else {
     const collectionList = computed(() =>
