@@ -6,10 +6,10 @@ import { PropType, VNodeRef, computed, ref } from "vue";
 import ClientPage from "./Client.page.vue";
 
 const props = defineProps({
-  client: {
-    type: Object as PropType<Client>,
-    required: true,
-  },
+  // client: {
+  //   type: Object as PropType<Client>,
+  //   required: true,
+  // },
   // message: {
   //   type: String,
   //   required: true,

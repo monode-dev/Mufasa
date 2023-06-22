@@ -301,6 +301,9 @@ export function docProx<
         },
       });
     } else if (format.format === `many`) {
+      if (propKey === `tanks`) {
+        console.log(docRef);
+      }
       const newListProx = listProx(
         format.typeName!,
         objFormats,
@@ -560,16 +563,19 @@ function listProx<
   //   return collectionList;
   // })();
   if (isChild) {
-    const mx_parentPath: Ref<undefined | string> = ref(undefined);
-    (async () => {
-      mx_parentPath.value = (await mx_parent)?.path;
-    })();
+    // const mx_parentPath: Ref<undefined | string> = ref(undefined);
+    // (async () => {
+    //   const unawaitedParent = await mx_parent;
+    //   const path = (unawaitedParent as any)?.path;
+    //   console.log(`path`, path);
+    //   mx_parentPath.value = path;
+    // })();
     const collectionList = computed(() => {
-      if (exists(mx_parentPath.value)) {
+      if (exists((mx_parent as any)?.path)) {
         return (
           localCache.getPropValue(
             parentType!,
-            mx_parentPath.value,
+            (mx_parent as any)?.path!,
             propNameOnParent!,
           ) as DocumentReference[]
         ).map((elementRef) =>
@@ -776,6 +782,19 @@ function createCache(objFormats: ObjFormats) {
             objFormats[typeName],
           );
           cache[typeName].docsChanged.value += 1;
+          if (exists(docData.mx_parent)) {
+            const newPropPath = docData.mx_parent?.path;
+            const parentInfo = getParentOf(typeName);
+            if (exists(parentInfo)) {
+              const newParentsProp =
+                cache[parentInfo.parentType].docs[newPropPath][
+                  parentInfo.propName
+                ];
+              if (exists(newParentsProp)) {
+                (newParentsProp.value as number) += 1;
+              }
+            }
+          }
           // console.log(`added`, docPath, docData);
         } else if (change.type === "modified") {
           updateDocCache(
