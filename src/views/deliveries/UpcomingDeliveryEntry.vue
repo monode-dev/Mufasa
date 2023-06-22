@@ -23,7 +23,7 @@ function handleDelete() {
 }
 
 watchEffect(() => {
-  console.log(`${props.delivery?.client} changed.`);
+  // console.log(`${props.delivery?.client} changed.`);
   // console.log(
   //   `${props.delivery?.client?._firestoreRef?.path} has ${props.delivery?.client?.tanks?.length} tanks.`,
   // );

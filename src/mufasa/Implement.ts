@@ -23,7 +23,16 @@ import {
   uploadBytes,
   deleteObject,
 } from "firebase/storage";
-import { ComputedRef, Ref, UnwrapRef, computed, ref, watchEffect } from "vue";
+import {
+  ComputedRef,
+  Ref,
+  ShallowReactive,
+  UnwrapRef,
+  computed,
+  ref,
+  shallowReactive,
+  watchEffect,
+} from "vue";
 import { exists } from "../utils";
 import { DefMany, DefObj } from "./Define";
 import { Device } from "@capacitor/device";
@@ -165,18 +174,32 @@ export function docProx<
     | undefined,
   typeName: TypeName,
   objFormats: F,
+  localCache: ReturnType<typeof createCache>,
 ): T {
-  if (typeName === `Client` && Date.now() - start < logDurrationFromStart) {
-    const error = new Error();
-    const stackTrace = error.stack!.split("\n");
-    const callerLine = stackTrace[2]; // The line number of the calling function
+  // if (typeName === `Client` && Date.now() - start < logDurrationFromStart) {
+  //   const error = new Error();
+  //   const stackTrace = error.stack!.split("\n");
+  //   const callerLine = stackTrace[2]; // The line number of the calling function
 
-    console.log("Caller:", callerLine);
-  }
-  const chars = genRandomChars(10);
-  const data = ref<T | null | undefined>(null);
+  //   console.log("Caller:", callerLine);
+  // }
+  // const chars = genRandomChars(10);
+  // const data = ref<T | null | undefined>(null);
 
   // Add standard props
+  const hasBeenDeleted = ref(false);
+  let haveSetUpDeletionWatch = false;
+  watchEffect(() => {
+    if (exists(docRef) && `path` in docRef) {
+      const doesExist = localCache.checkDeletion(typeName, docRef.path);
+      // We skip the first run so we only watch for changes.
+      if (haveSetUpDeletionWatch) {
+        hasBeenDeleted.value = doesExist;
+      } else {
+        haveSetUpDeletionWatch = true;
+      }
+    }
+  });
   let proxy: Doc<{ [key: string]: any }> = {
     get _firestoreRef() {
       if (exists(docRef) && `path` in docRef) {
@@ -186,10 +209,14 @@ export function docProx<
       }
     },
     get isLoaded() {
-      return data.value !== null && data.value !== undefined;
+      if (exists(docRef) && `path` in docRef) {
+        return localCache.checkExists(typeName, docRef.path);
+      } else {
+        return false;
+      }
     },
     get isDeleted() {
-      return data.value === undefined;
+      return hasBeenDeleted.value;
     },
     async deleteDoc() {
       const actualDocRef = await docRef;
@@ -202,7 +229,12 @@ export function docProx<
               query(collectionRef, where(`mx_parent`, "==", actualDocRef)),
             );
             docs.forEach((doc) =>
-              docProx(doc.ref, format.typeName!, objFormats).deleteDoc(),
+              docProx(
+                doc.ref,
+                format.typeName!,
+                objFormats,
+                localCache,
+              ).deleteDoc(),
             );
           }
         }
@@ -210,33 +242,33 @@ export function docProx<
       }
     },
   };
-  (async () => {
-    const unpromisedDocRef = await docRef;
-    let lastData: DocumentData | null = null;
-    function hasChanged(newData: DocumentData | null) {
-      if (lastData === null) return true;
-      if (newData === null) return true;
-      for (const key of Object.keys(newData)) {
-        if (lastData[key] !== newData[key]) return true;
-      }
-      for (const key of Object.keys(lastData)) {
-        if (lastData[key] !== newData[key]) return true;
-      }
-      return false;
-    }
-    if (!exists(unpromisedDocRef)) {
-      data.value = undefined;
-    } else {
-      onSnapshot(unpromisedDocRef, (doc) => {
-        if (Date.now() - start < logDurrationFromStart)
-          console.log(`Snapshot: ${chars} - ${typeName} = ${doc.ref.path}`);
-        if (hasChanged(doc.data() ?? null)) {
-          lastData = doc.data() ?? null;
-          data.value = doc.data() as UnwrapRef<T> | null | undefined;
-        }
-      });
-    }
-  })();
+  // (async () => {
+  //   const unpromisedDocRef = await docRef;
+  //   let lastData: DocumentData | null = null;
+  //   function hasChanged(newData: DocumentData | null) {
+  //     if (lastData === null) return true;
+  //     if (newData === null) return true;
+  //     for (const key of Object.keys(newData)) {
+  //       if (lastData[key] !== newData[key]) return true;
+  //     }
+  //     for (const key of Object.keys(lastData)) {
+  //       if (lastData[key] !== newData[key]) return true;
+  //     }
+  //     return false;
+  //   }
+  //   if (!exists(unpromisedDocRef)) {
+  //     data.value = undefined;
+  //   } else {
+  //     onSnapshot(unpromisedDocRef, (doc) => {
+  //       // if (Date.now() - start < logDurrationFromStart)
+  //       //   console.log(`Snapshot: ${chars} - ${typeName} = ${doc.ref.path}`);
+  //       if (hasChanged(doc.data() ?? null)) {
+  //         lastData = doc.data() ?? null;
+  //         data.value = doc.data() as UnwrapRef<T> | null | undefined;
+  //       }
+  //     });
+  //   }
+  // })();
 
   // Add getters and setters for each property
   for (let [propKey, format] of Object.entries(objFormats[typeName])) {
@@ -244,12 +276,14 @@ export function docProx<
       Object.defineProperty(proxy, propKey, {
         get: function () {
           return docProx(
-            data.value?.[propKey as keyof typeof data.value] as
-              | DocumentReference
-              | null
-              | undefined,
+            localCache.getPropValue(
+              typeName,
+              proxy._firestoreRef?.path ?? ``,
+              propKey,
+            ) as DocumentReference | null | undefined,
             format.typeName!,
             objFormats,
+            localCache,
           );
         },
         set: function (newValue: any) {
@@ -270,8 +304,11 @@ export function docProx<
       const newListProx = listProx(
         format.typeName!,
         objFormats,
+        localCache,
         true,
+        typeName,
         docRef ?? undefined,
+        propKey,
       );
       Object.defineProperty(proxy, propKey, {
         get: function () {
@@ -279,139 +316,145 @@ export function docProx<
         },
         set: undefined,
       });
-    } else if (format.format === `file`) {
-      Object.defineProperty(proxy, propKey, {
-        get: async function () {
-          const fileDetails = data.value?.[
-            propKey as keyof typeof data.value
-          ] as any;
+    }
+    // else if (format.format === `file`) {
+    //   Object.defineProperty(proxy, propKey, {
+    //     get: async function () {
+    //       const fileDetails = data.value?.[
+    //         propKey as keyof typeof data.value
+    //       ] as any;
 
-          if (exists(fileDetails)) {
-            if (
-              exists(fileDetails) &&
-              `local` in fileDetails &&
-              exists(fileDetails.local)
-            ) {
-              try {
-                const result = await readFileFromIndexedDB(
-                  `MX_FilesToUpload`,
-                  `${fileDetails.local}.txt`,
-                );
-                return result;
-                // const result = await Filesystem.readFile({
-                //   path: `MX_FilesToUpload/${fileDetails}.txt`,
-                //   directory: Directory.Data,
-                //   encoding: Encoding.UTF8,
-                // });
-                // return result.data;
-              } catch (err) {
-                try {
-                  const result = await readFileFromIndexedDB(
-                    `MX_Files`,
-                    `${fileDetails.remote}.txt`,
-                  );
-                  return result;
-                  // const result = await Filesystem.readFile({
-                  //   path: `MX_Files/${fileDetails}.txt`,
-                  //   directory: Directory.Data,
-                  //   encoding: Encoding.UTF8,
-                  // });
-                  // return result.data;
-                } catch (err) {
-                  return null;
-                }
-              }
-            } else {
-              try {
-                const result = await readFileFromIndexedDB(
-                  `MX_Files`,
-                  `${fileDetails.remote}.txt`,
-                );
-                return result;
-                // const result = await Filesystem.readFile({
-                //   path: `MX_Files/${fileDetails}.txt`,
-                //   directory: Directory.Data,
-                //   encoding: Encoding.UTF8,
-                // });
-                // return result.data;
-              } catch (err) {
-                return null;
-              }
-            }
-          } else {
-            return fileDetails;
-          }
-        },
-        set: async function (newValue: Promise<string | null> | string | null) {
-          const actualDocRef = proxy._firestoreRef;
-          if (exists(actualDocRef)) {
-            const newPropData = await newValue;
-            if (exists(newPropData)) {
-              const newFileId = await getUuid();
+    //       if (exists(fileDetails)) {
+    //         if (
+    //           exists(fileDetails) &&
+    //           `local` in fileDetails &&
+    //           exists(fileDetails.local)
+    //         ) {
+    //           try {
+    //             const result = await readFileFromIndexedDB(
+    //               `MX_FilesToUpload`,
+    //               `${fileDetails.local}.txt`,
+    //             );
+    //             return result;
+    //             // const result = await Filesystem.readFile({
+    //             //   path: `MX_FilesToUpload/${fileDetails}.txt`,
+    //             //   directory: Directory.Data,
+    //             //   encoding: Encoding.UTF8,
+    //             // });
+    //             // return result.data;
+    //           } catch (err) {
+    //             try {
+    //               const result = await readFileFromIndexedDB(
+    //                 `MX_Files`,
+    //                 `${fileDetails.remote}.txt`,
+    //               );
+    //               return result;
+    //               // const result = await Filesystem.readFile({
+    //               //   path: `MX_Files/${fileDetails}.txt`,
+    //               //   directory: Directory.Data,
+    //               //   encoding: Encoding.UTF8,
+    //               // });
+    //               // return result.data;
+    //             } catch (err) {
+    //               return null;
+    //             }
+    //           }
+    //         } else {
+    //           try {
+    //             const result = await readFileFromIndexedDB(
+    //               `MX_Files`,
+    //               `${fileDetails.remote}.txt`,
+    //             );
+    //             return result;
+    //             // const result = await Filesystem.readFile({
+    //             //   path: `MX_Files/${fileDetails}.txt`,
+    //             //   directory: Directory.Data,
+    //             //   encoding: Encoding.UTF8,
+    //             // });
+    //             // return result.data;
+    //           } catch (err) {
+    //             return null;
+    //           }
+    //         }
+    //       } else {
+    //         return fileDetails;
+    //       }
+    //     },
+    //     set: async function (newValue: Promise<string | null> | string | null) {
+    //       const actualDocRef = proxy._firestoreRef;
+    //       if (exists(actualDocRef)) {
+    //         const newPropData = await newValue;
+    //         if (exists(newPropData)) {
+    //           const newFileId = await getUuid();
 
-              // Write newValue to local storage
-              await writeFileToIndexedDB(
-                `MX_FilesToUpload`,
-                `${newFileId}.txt`,
-                newPropData,
-              );
-              // await Filesystem.writeFile({
-              //   path: `MX_FilesToUpload/${newFileId}.txt`,
-              //   data: newPropData,
-              //   directory: Directory.Data,
-              //   encoding: Encoding.UTF8,
-              //   recursive: true,
-              // });
+    //           // Write newValue to local storage
+    //           await writeFileToIndexedDB(
+    //             `MX_FilesToUpload`,
+    //             `${newFileId}.txt`,
+    //             newPropData,
+    //           );
+    //           // await Filesystem.writeFile({
+    //           //   path: `MX_FilesToUpload/${newFileId}.txt`,
+    //           //   data: newPropData,
+    //           //   directory: Directory.Data,
+    //           //   encoding: Encoding.UTF8,
+    //           //   recursive: true,
+    //           // });
 
-              await writeFileToIndexedDB(
-                `MX_FilesToUpload`,
-                `${newFileId}.json`,
-                JSON.stringify({
-                  docRef: actualDocRef.path,
-                  propKey,
-                }),
-              );
-              // await Filesystem.writeFile({
-              //   path: `MX_FilesToUpload/${newFileId}.json`,
-              //   data: JSON.stringify({
-              //     docRef: actualDocRef.path,
-              //     propKey,
-              //   }),
-              //   directory: Directory.Data,
-              //   encoding: Encoding.UTF8,
-              //   recursive: true,
-              // });
-              const fileDetails =
-                data.value?.[propKey as keyof typeof data.value];
-              updateDoc(actualDocRef, {
-                [propKey]: {
-                  ...(fileDetails ?? { remote: null }),
-                  local: newFileId,
-                },
-              });
-              completeFileUpload({
-                docPath: actualDocRef.path,
-                propKey,
-                fileId: newFileId,
-                data: newPropData,
-                oldFileIdToDelete: ((fileDetails as any) ?? { remote: null })
-                  .remote,
-              });
-            } else {
-              updateDoc(actualDocRef, {
-                [propKey]: {
-                  local: null,
-                  remote: null,
-                },
-              });
-            }
-          }
-        },
-      });
-    } else {
+    //           await writeFileToIndexedDB(
+    //             `MX_FilesToUpload`,
+    //             `${newFileId}.json`,
+    //             JSON.stringify({
+    //               docRef: actualDocRef.path,
+    //               propKey,
+    //             }),
+    //           );
+    //           // await Filesystem.writeFile({
+    //           //   path: `MX_FilesToUpload/${newFileId}.json`,
+    //           //   data: JSON.stringify({
+    //           //     docRef: actualDocRef.path,
+    //           //     propKey,
+    //           //   }),
+    //           //   directory: Directory.Data,
+    //           //   encoding: Encoding.UTF8,
+    //           //   recursive: true,
+    //           // });
+    //           const fileDetails =
+    //             data.value?.[propKey as keyof typeof data.value];
+    //           updateDoc(actualDocRef, {
+    //             [propKey]: {
+    //               ...(fileDetails ?? { remote: null }),
+    //               local: newFileId,
+    //             },
+    //           });
+    //           completeFileUpload({
+    //             docPath: actualDocRef.path,
+    //             propKey,
+    //             fileId: newFileId,
+    //             data: newPropData,
+    //             oldFileIdToDelete: ((fileDetails as any) ?? { remote: null })
+    //               .remote,
+    //           });
+    //         } else {
+    //           updateDoc(actualDocRef, {
+    //             [propKey]: {
+    //               local: null,
+    //               remote: null,
+    //             },
+    //           });
+    //         }
+    //       }
+    //     },
+    //   });
+    // }
+    else {
       Object.defineProperty(proxy, propKey, {
         get: function () {
-          return data.value?.[propKey as keyof typeof data.value];
+          return localCache.getPropValue(
+            typeName,
+            proxy._firestoreRef?.path ?? ``,
+            propKey,
+          );
         },
         set: function (newValue: any) {
           const actualDocRef = proxy._firestoreRef;
@@ -440,15 +483,15 @@ export type List<T extends Doc> = {
   map<R>(mapFn: (doc: T) => R): Array<R>;
   add(params: CreateParamsFromDoc<T>): T;
 };
-function genRandomChars(length: number) {
-  let result = ``;
-  const characters = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`;
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
+// function genRandomChars(length: number) {
+//   let result = ``;
+//   const characters = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`;
+//   const charactersLength = characters.length;
+//   for (let i = 0; i < length; i++) {
+//     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+//   }
+//   return result;
+// }
 const PARENT_KEY = `mx_parent`;
 const start = Date.now();
 const logDurrationFromStart = 2000;
@@ -459,61 +502,82 @@ function listProx<
 >(
   typeName: TypeName,
   objFormats: F,
+  localCache: ReturnType<typeof createCache>,
   isChild: boolean = false,
+  parentType?: string,
   mx_parent?: Promise<DocumentReference | null | undefined> | DocumentReference,
+  propNameOnParent?: string,
 ) {
-  const chars = genRandomChars(10);
+  // const chars = genRandomChars(10);
   const collectionRef = collection(firebaseDb, typeName);
-  const collectionList = (() => {
-    const collectionList = ref<T[]>([]);
-    let lastSnapshot: QuerySnapshot | null = null;
-    function hasChanged(querySnapshot: QuerySnapshot) {
-      if (lastSnapshot === null) return true;
-      if (querySnapshot.size !== lastSnapshot.size) return true;
-      for (let i = 0; i < querySnapshot.size; i++) {
-        if (querySnapshot.docs[i].ref.path !== lastSnapshot.docs[i].ref.path)
-          return true;
+  // const collectionList = (() => {
+  //   const collectionList = ref<T[]>([]);
+  //   let lastSnapshot: QuerySnapshot | null = null;
+  //   function hasChanged(querySnapshot: QuerySnapshot) {
+  //     if (lastSnapshot === null) return true;
+  //     if (querySnapshot.size !== lastSnapshot.size) return true;
+  //     for (let i = 0; i < querySnapshot.size; i++) {
+  //       if (querySnapshot.docs[i].ref.path !== lastSnapshot.docs[i].ref.path)
+  //         return true;
+  //     }
+  //     return false;
+  //   }
+  //   if (isChild) {
+  //     if (mx_parent) {
+  //       (async () => {
+  //         const unpromisedParent = await mx_parent;
+  //         onSnapshot(
+  //           // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
+  //           query(collectionRef, where(PARENT_KEY, "==", unpromisedParent)),
+  //           (querySnapshot) => {
+  //             // if (Date.now() - start < logDurrationFromStart)
+  //             //   console.log(
+  //             //     `Snapshot: ${chars} - only ${typeName}s with parent: ${
+  //             //       (mx_parent as any)?.path
+  //             //     }`,
+  //             //   );
+  //             if (hasChanged(querySnapshot)) {
+  //               lastSnapshot = querySnapshot;
+  //               collectionList.value = querySnapshot.docs.map((doc) => {
+  //                 return docProx(doc.ref, typeName, objFormats, localCache);
+  //               });
+  //             }
+  //           },
+  //         );
+  //       })();
+  //     }
+  //   } else {
+  //     onSnapshot(collectionRef, (querySnapshot) => {
+  //       // if (Date.now() - start < logDurrationFromStart)
+  //       //   console.log(`Snapshot: ${chars} - all ${typeName}s`);
+  //       if (hasChanged(querySnapshot)) {
+  //         collectionList.value = querySnapshot.docs.map((doc) =>
+  //           docProx(doc.ref, typeName, objFormats, localCache),
+  //         );
+  //       }
+  //     });
+  //   }
+  //   return collectionList;
+  // })();
+  if (isChild) {
+    const collectionList: Ref<T[]> = ref([]);
+    (async () => {
+      const mx_parentPath = (await mx_parent)?.path;
+      if (exists(mx_parentPath)) {
+        localCache.getPropValue(parentType!, mx_parentPath, propNameOnParent!);
       }
-      return false;
-    }
-    if (isChild) {
-      if (mx_parent) {
-        (async () => {
-          const unpromisedParent = await mx_parent;
-          onSnapshot(
-            // If we used this for both children and non children, root lists would get all docs without a parent, which might be what we want.
-            query(collectionRef, where(PARENT_KEY, "==", unpromisedParent)),
-            (querySnapshot) => {
-              if (Date.now() - start < logDurrationFromStart)
-                console.log(
-                  `Snapshot: ${chars} - only ${typeName}s with parent: ${
-                    (mx_parent as any)?.path
-                  }`,
-                );
-              if (hasChanged(querySnapshot)) {
-                lastSnapshot = querySnapshot;
-                collectionList.value = querySnapshot.docs.map((doc) => {
-                  return docProx(doc.ref, typeName, objFormats);
-                });
-              }
-            },
-          );
-        })();
-      }
-    } else {
-      onSnapshot(collectionRef, (querySnapshot) => {
-        if (Date.now() - start < logDurrationFromStart)
-          console.log(`Snapshot: ${chars} - all ${typeName}s`);
-        if (hasChanged(querySnapshot)) {
-          collectionList.value = querySnapshot.docs.map((doc) =>
-            docProx(doc.ref, typeName, objFormats),
-          );
-        }
-      });
-    }
-    return collectionList;
-  })();
-  return vueRefToList(collectionList, mx_parent);
+    })();
+    return vueRefToList(collectionList, mx_parent);
+  } else {
+    const collectionList = computed(() =>
+      localCache
+        .listAllObjectsOfType(typeName)
+        .map((elementRef) =>
+          docProx(elementRef, typeName, objFormats, localCache),
+        ),
+    );
+    return vueRefToList(collectionList, mx_parent);
+  }
   function vueRefToList<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
     mx_parent?:
@@ -523,8 +587,8 @@ function listProx<
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
       get length() {
-        if (typeName === `Tank` && Date.now() - start < logDurrationFromStart)
-          console.log(`${chars} ${(mx_parent as any)?.path}`);
+        // if (typeName === `Tank` && Date.now() - start < logDurrationFromStart)
+        //   console.log(`${chars} ${(mx_parent as any)?.path}`);
         return collectionList.value.length;
       },
       filter(filterFn) {
@@ -571,15 +635,17 @@ function listProx<
             });
             for (const [key, initValue] of Object.entries(fileDefaults)) {
               if (exists(initValue)) {
-                console.log(`initValue`, initValue);
-                (docProx(newDocRef, typeName, objFormats) as any)[key] =
-                  initValue;
+                // console.log(`initValue`, initValue);
+                (docProx(newDocRef, typeName, objFormats, localCache) as any)[
+                  key
+                ] = initValue;
               }
             }
             return newDocRef;
           })(),
           typeName,
           objFormats,
+          localCache,
         ) as T;
         function getDefaultProps() {
           const defaultProps: { [key: string]: any } = {};
@@ -612,6 +678,170 @@ function listProx<
 //
 //
 // SECTION: Define
+function createCache(objFormats: ObjFormats) {
+  type DocCache = {
+    [propName: string]: Ref<
+      number | string | boolean | null | DocumentReference
+    >;
+  } & { mx_parentPath?: string; deletionCheck: Ref<boolean> };
+  const getParentOf = (() => {
+    const parentOfMap: {
+      [childType: string]: {
+        parentType: string;
+        propName: string;
+      };
+    } = {};
+    for (const typeName of Object.keys(objFormats)) {
+      // This obj is the parent of any of it's many props
+      const props = objFormats[typeName];
+      for (const [propName, propFormat] of Object.entries(props)) {
+        if (propFormat.format === `many`) {
+          parentOfMap[propFormat.typeName!] = {
+            parentType: typeName,
+            propName: propName,
+          };
+        }
+      }
+    }
+    return function (childType: string) {
+      return parentOfMap[childType];
+    };
+  })();
+  const cache: {
+    [collection: string]: {
+      docsChanged: Ref<number>;
+      docs: {
+        [docPath: string]: DocCache;
+      };
+    };
+  } = {};
+  function createDocCache(
+    initData: DocumentData,
+    docFormat: ObjFormats[string],
+  ) {
+    const docCache: DocCache = {
+      deletionCheck: ref(false),
+    };
+    for (const [propName, propFormat] of Object.entries(docFormat)) {
+      if (propFormat.format === `many`) {
+        docCache[propName] = ref(0);
+      } else {
+        docCache[propName] = ref(initData[propName]);
+      }
+    }
+    if (initData.mx_parent) {
+      docCache.mx_parentPath = initData.mx_parent.path;
+    }
+    return docCache;
+  }
+  function updateDocCache(
+    docCache: DocCache,
+    newData: DocumentData,
+    docFormat: ObjFormats[string],
+  ) {
+    for (const propName in docFormat) {
+      // console.log(propName);
+      const oldValue = docCache[propName].value;
+      const newValue = newData[propName];
+      if (oldValue !== newValue) {
+        docCache[propName].value = newData[propName];
+      }
+    }
+  }
+  for (const typeName in objFormats) {
+    const collectionRef = collection(firebaseDb, typeName);
+    cache[typeName] = {
+      docsChanged: ref(0),
+      docs: {},
+    };
+    onSnapshot(collectionRef, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const docPath = change.doc.ref.path;
+        const docData = change.doc.data();
+        if (change.type === "added") {
+          cache[typeName].docs[docPath] = createDocCache(
+            docData,
+            objFormats[typeName],
+          );
+          cache[typeName].docsChanged.value += 1;
+          // console.log(`added`, docPath, docData);
+        } else if (change.type === "modified") {
+          updateDocCache(
+            cache[typeName].docs[docPath],
+            docData,
+            objFormats[typeName],
+          );
+          if (
+            docData.mx_parent?.path !==
+            cache[typeName].docs[docPath].mx_parentPath
+          ) {
+            const oldPropPath = cache[typeName].docs[docPath].mx_parentPath;
+            const newPropPath = docData.mx_parent?.path;
+            const parentInfo = getParentOf(typeName);
+            if (exists(parentInfo)) {
+              if (exists(oldPropPath)) {
+                const oldParentsProp =
+                  cache[parentInfo.parentType].docs[oldPropPath][
+                    parentInfo.propName
+                  ];
+                if (exists(oldParentsProp)) {
+                  (oldParentsProp.value as number) += 1;
+                }
+              }
+              const newParentsProp =
+                cache[parentInfo.parentType].docs[newPropPath][
+                  parentInfo.propName
+                ];
+              if (exists(newParentsProp)) {
+                (newParentsProp.value as number) += 1;
+              }
+            }
+          }
+          // console.log(`modified`, docPath, docData);
+        } else if (change.type === "removed") {
+          cache[typeName].docs[docPath].deletionCheck.value = true;
+          delete cache[typeName].docs[docPath];
+          cache[typeName].docsChanged.value += 1;
+          // console.log(`removed`, docPath, docData);
+        }
+      });
+    });
+  }
+  return {
+    listAllObjectsOfType(typeName: string) {
+      // Do this so that vue knows to update when the list changes
+      cache[typeName].docsChanged.value;
+      const objects: DocumentReference[] = [];
+      for (const docPath in cache[typeName].docs) {
+        objects.push(doc(firebaseDb, docPath));
+      }
+      return objects;
+    },
+    checkExists(typeName: string, objPath: string) {
+      return exists(cache[typeName].docs[objPath]);
+    },
+    checkDeletion(typeName: string, objPath: string) {
+      return cache[typeName].docs[objPath]?.deletionCheck.value;
+    },
+    getPropValue(typeName: string, objPath: string, propName: string) {
+      if (objFormats[typeName][propName].format === `many`) {
+        // Do this so that vue knows to update when the list changes
+        cache[typeName].docs[objPath]?.[propName].value;
+        const childType = objFormats[typeName][propName].typeName!;
+        const contents: DocumentReference[] = [];
+        for (const docPath in cache[childType].docs) {
+          const thisDoc = cache[childType].docs[docPath];
+          if (thisDoc.mx_parentPath === objPath) {
+            contents.push(doc(firebaseDb, docPath));
+          }
+        }
+        return contents;
+      } else {
+        return cache[typeName].docs[objPath]?.[propName].value;
+      }
+    },
+  };
+}
 export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
   modelName: string,
   modelDef: T,
@@ -667,8 +897,11 @@ export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
     return objFormats as any;
   }
   const objFormats = buildObjFormats<T, T>(modelDef);
+
   return {
     getAppData: defineStore(modelName, () => {
+      const localCache = createCache(objFormats);
+
       const manyCollections: {
         [K in keyof T]: ReturnType<
           typeof listProx<T[K][`type`][`typeName`], typeof objFormats>
@@ -680,6 +913,7 @@ export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
           manyCollections[key as keyof typeof manyCollections] = listProx(
             many.type.typeName,
             objFormats,
+            localCache,
           ) as any;
         }
       }
