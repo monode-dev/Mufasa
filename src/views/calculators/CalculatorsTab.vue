@@ -5,11 +5,12 @@ import {
   Tank,
   tankShape,
   getTankShapeName,
+  UpcomingDelivery,
 } from "@/AppData";
 import { computed, ref } from "vue";
-// import { exists } from "@/utils";
+import { orderDocs } from "@/utils";
 
-// const appData = getAppData();
+const appData = getAppData();
 const tabIndex = ref(0);
 const isDeliveryTab = computed(() => tabIndex.value === 0);
 const toDeliverTab = () => (tabIndex.value = 0);
@@ -19,11 +20,11 @@ const isDimensionsTab = computed(() => tabIndex.value === 2);
 const toDimensionsTab = () => (tabIndex.value = 2);
 
 // Delivery
-const delivery = ref<string>(`None`);
+const delivery = ref(null as UpcomingDelivery | null);
 
 // Client
-const client = ref<string>(`None`);
-const tank = ref<string>(`None`);
+const client = ref(null as Client | null);
+const tank = ref(null as Tank | null);
 
 // Dimensions
 const dimTankShape = ref(tankShape.none);
@@ -72,24 +73,18 @@ const stickedDepth = ref(0);
         <DropDown
           label="Delivery"
           v-model:selected="delivery"
-          :getKeyFromData="(data: any) => data"
+          :getKeyFromData="(data: UpcomingDelivery | null) => {
+            return data?._firestoreRef?.path;
+          }"
           :options="[
-            {
-              label: `None`,
-              data: `None`,
-            },
-            {
-              label: `Upcoming Delivery A`,
-              data: `Upcoming Delivery A`,
-            },
-            {
-              label: `Upcoming Delivery B`,
-              data: `Upcoming Delivery B`,
-            },
-            {
-              label: `Upcoming Delivery C`,
-              data: `Upcoming Delivery C`,
-            },
+            { label: `None`, data: undefined },
+            ...orderDocs(
+              appData.upcomingDeliveries,
+              (x) => x.creationTimePosix,
+            ).map((x) => ({
+              label: `${x.client?.name ?? `Unnamed`} - Tank - ${x.amount}`,
+              data: x,
+            })),
           ]"
         />
       </Box>
@@ -101,49 +96,27 @@ const stickedDepth = ref(0);
         }"
       >
         <DropDown
-          label="Client"
           v-model:selected="client"
-          :getKeyFromData="(data: any) => data"
+          :getKeyFromData="(data: Client | null) => {
+            return data?._firestoreRef?.path;
+          }"
           :options="[
-            {
-              label: `None`,
-              data: `None`,
-            },
-            {
-              label: `Client A`,
-              data: `Client A`,
-            },
-            {
-              label: `Client B`,
-              data: `Client B`,
-            },
-            {
-              label: `Client C`,
-              data: `Client C`,
-            },
+            { label: `None`, data: undefined },
+            ...orderDocs(appData.clients, (x) => x.name)
+              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
+              .map((x) => ({ label: x.name!, data: x })),
           ]"
         />
         <DropDown
-          label="Tank"
           v-model:selected="tank"
-          :getKeyFromData="(data: any) => data"
+          :getKeyFromData="(data: Tank | null) => {
+            return data?._firestoreRef?.path;
+          }"
           :options="[
-            {
-              label: `None`,
-              data: `None`,
-            },
-            {
-              label: `Tank A`,
-              data: `Tank A`,
-            },
-            {
-              label: `Tank B`,
-              data: `Tank B`,
-            },
-            {
-              label: `Tank C`,
-              data: `Tank C`,
-            },
+            { label: `None`, data: undefined },
+            ...orderDocs(client?.tanks ?? [], (x) => x.creationTimePosix).map(
+              (x, index) => ({ label: `#${index}`, data: x }),
+            ),
           ]"
         />
       </Row>
@@ -184,7 +157,10 @@ const stickedDepth = ref(0);
           /></Label>
         </Row>
       </Box>
-      <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label>
+      <Row :sty="{ spacing: 0.25 }">
+        <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label
+        >.in
+      </Row>
 
       <!-- <Box v-if="isTankTab || isDeliveryTab" :sty="{ height: 1 }" />
       <Box v-if="isDeliveryTab" :sty="{ height: 1 }" /> -->

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { getAppData, FuelType, UpcomingDelivery } from "@/AppData";
+import {
+  getAppData,
+  FuelType,
+  UpcomingDelivery,
+  Client,
+  Tank,
+} from "@/AppData";
 import { pushPage } from "@/Nav";
 import { mdColors } from "@/miwi-md/Box.vue";
 import { PropType, ref, watchEffect } from "vue";
@@ -40,7 +46,7 @@ watchEffect(() => {
     >
       <DropDown
         v-model:selected="props.delivery.client"
-        :getKeyFromData="(data: FuelType | null) => {
+        :getKeyFromData="(data: Client | null) => {
             return data?._firestoreRef?.path;
           }"
         :options="[
@@ -100,7 +106,7 @@ watchEffect(() => {
       >
         <DropDown
           v-model:selected="props.delivery.tank"
-          :getKeyFromData="(data: FuelType | null) => {
+          :getKeyFromData="(data: Tank | null) => {
             return data?._firestoreRef?.path;
           }"
           :options="[
