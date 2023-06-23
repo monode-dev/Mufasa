@@ -300,19 +300,36 @@ export function docProx<
         },
       });
     } else if (format.format === `many`) {
-      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
-      const newListProx = listProx(
-        format.typeName!,
-        objFormats,
-        localCache,
-        true,
-        typeName,
-        actualDocRef,
-        propKey,
-      );
+      /** NOTE: We use to have to instnatiate the list proxy here. I think it was beacuse
+       * of the infinite reactive refresh bug. I don't think we have to do this anymore. */
+      // const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      // const newListProx = listProx(
+      //   format.typeName!,
+      //   objFormats,
+      //   localCache,
+      //   true,
+      //   typeName,
+      //   actualDocRef,
+      //   propKey,
+      // );
+      // Object.defineProperty(proxy, propKey, {
+      //   get: function () {
+      //     return newListProx;
+      //   },
+      //   set: undefined,
+      // });
       Object.defineProperty(proxy, propKey, {
         get: function () {
-          return newListProx;
+          const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+          return listProx(
+            format.typeName!,
+            objFormats,
+            localCache,
+            true,
+            typeName,
+            actualDocRef,
+            propKey,
+          );
         },
         set: undefined,
       });
