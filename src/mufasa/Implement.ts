@@ -29,6 +29,7 @@ import {
   ShallowReactive,
   UnwrapRef,
   computed,
+  isRef,
   ref,
   shallowReactive,
   watchEffect,
@@ -169,7 +170,7 @@ export function docProx<
 >(
   docRef:
     | DocumentReference
-    | Promise<DocumentReference | null | undefined>
+    | Ref<DocumentReference | null | undefined>
     | null
     | undefined,
   typeName: TypeName,
@@ -190,27 +191,25 @@ export function docProx<
   const hasBeenDeleted = ref(false);
   let haveSetUpDeletionWatch = false;
   watchEffect(() => {
-    if (exists(docRef) && `path` in docRef) {
-      const doesExist = localCache.checkDeletion(typeName, docRef.path);
-      // We skip the first run so we only watch for changes.
-      if (haveSetUpDeletionWatch) {
-        hasBeenDeleted.value = doesExist;
-      } else {
-        haveSetUpDeletionWatch = true;
-      }
+    const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+    if (!exists(actualDocRef)) return;
+    const doesExist = localCache.checkDeletion(typeName, actualDocRef.path);
+    // We skip the first run so we only watch for changes.
+    if (haveSetUpDeletionWatch) {
+      hasBeenDeleted.value = doesExist;
+    } else {
+      haveSetUpDeletionWatch = true;
     }
   });
   let proxy: Doc<{ [key: string]: any }> = {
     get _firestoreRef() {
-      if (exists(docRef) && `path` in docRef) {
-        return docRef;
-      } else {
-        return undefined;
-      }
+      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      return actualDocRef ?? undefined;
     },
     get isLoaded() {
-      if (exists(docRef) && `path` in docRef) {
-        return localCache.checkExists(typeName, docRef.path);
+      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      if (exists(actualDocRef)) {
+        return localCache.checkExists(typeName, actualDocRef.path);
       } else {
         return false;
       }
@@ -219,7 +218,7 @@ export function docProx<
       return hasBeenDeleted.value;
     },
     async deleteDoc() {
-      const actualDocRef = await docRef;
+      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
       if (exists(actualDocRef)) {
         // Delete all sub docs
         for (const format of Object.values(objFormats[typeName])) {
@@ -301,13 +300,14 @@ export function docProx<
         },
       });
     } else if (format.format === `many`) {
+      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
       const newListProx = listProx(
         format.typeName!,
         objFormats,
         localCache,
         true,
         typeName,
-        docRef ?? undefined,
+        actualDocRef,
         propKey,
       );
       Object.defineProperty(proxy, propKey, {
@@ -505,7 +505,7 @@ function listProx<
   localCache: ReturnType<typeof createCache>,
   isChild: boolean = false,
   parentType?: string,
-  mx_parent?: Promise<DocumentReference | null | undefined> | DocumentReference,
+  mx_parent?: DocumentReference | null | undefined,
   propNameOnParent?: string,
 ) {
   // const chars = genRandomChars(10);
@@ -595,9 +595,7 @@ function listProx<
   }
   function vueRefToList<T extends Doc<{}>>(
     collectionList: ComputedRef<T[]> | Ref<T[]>,
-    mx_parent?:
-      | Promise<DocumentReference | null | undefined>
-      | DocumentReference,
+    mx_parent?: DocumentReference | null | undefined,
   ): List<T> {
     return {
       [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
@@ -616,46 +614,51 @@ function listProx<
       },
       add(createParams) {
         return docProx<TypeName, F>(
-          (async () => {
-            const parent = await mx_parent;
+          (() => {
+            const newDocRef = ref(null as null | DocumentReference);
 
-            const defaultProps: { [key: string]: any } = getDefaultProps();
-            const fileDefaults: { [key: string]: any } = {};
-            for (const [key, prop] of Object.entries(objFormats[typeName])) {
-              if (prop.format === `file`) {
-                if (exists(createParams[key as keyof typeof createParams])) {
-                  fileDefaults[key] =
-                    createParams[key as keyof typeof createParams];
-                } else {
-                  const init = prop.init;
-                  if (typeof init === `function`) {
-                    fileDefaults[key] = init();
+            (async () => {
+              const parent = mx_parent;
+
+              const defaultProps: { [key: string]: any } = getDefaultProps();
+              const fileDefaults: { [key: string]: any } = {};
+              for (const [key, prop] of Object.entries(objFormats[typeName])) {
+                if (prop.format === `file`) {
+                  if (exists(createParams[key as keyof typeof createParams])) {
+                    fileDefaults[key] =
+                      createParams[key as keyof typeof createParams];
                   } else {
-                    fileDefaults[key] = init;
+                    const init = prop.init;
+                    if (typeof init === `function`) {
+                      fileDefaults[key] = init();
+                    } else {
+                      fileDefaults[key] = init;
+                    }
                   }
+                } else if (
+                  prop.format === `prim` &&
+                  exists(createParams[key as keyof typeof createParams])
+                ) {
+                  defaultProps[key] =
+                    createParams[key as keyof typeof createParams];
                 }
-              } else if (
-                prop.format === `prim` &&
-                exists(createParams[key as keyof typeof createParams])
-              ) {
-                defaultProps[key] =
-                  createParams[key as keyof typeof createParams];
               }
-            }
-            const newDocRef = await addDoc(collectionRef, {
-              // ...getDefaultProps(),
-              // ...createParams,
-              ...defaultProps,
-              ...(exists(parent) ? { mx_parent: parent } : {}),
-            });
-            for (const [key, initValue] of Object.entries(fileDefaults)) {
-              if (exists(initValue)) {
-                // console.log(`initValue`, initValue);
-                (docProx(newDocRef, typeName, objFormats, localCache) as any)[
-                  key
-                ] = initValue;
+              newDocRef.value = await addDoc(collectionRef, {
+                // ...getDefaultProps(),
+                // ...createParams,
+                ...defaultProps,
+                ...(exists(parent) ? { mx_parent: parent } : {}),
+              });
+              for (const [key, initValue] of Object.entries(fileDefaults)) {
+                if (exists(initValue)) {
+                  // console.log(`initValue`, initValue);
+                  (docProx(newDocRef, typeName, objFormats, localCache) as any)[
+                    key
+                  ] = initValue;
+                }
               }
-            }
+            })();
+
             return newDocRef;
           })(),
           typeName,

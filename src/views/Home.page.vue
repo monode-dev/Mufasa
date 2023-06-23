@@ -6,7 +6,8 @@ const selectedTab = ref(1);
 
 <template>
   <Page>
-    <AppBar>
+    <!-- We adjust shadow size, because of stacking contexts we can't put the shadow above the body but below the action bar. -->
+    <AppBar :sty="{ shadowSize: selectedTab === 0 ? 0 : 1.25 }">
       Fuel Calculator
       <template #right>
         <SettingsButton />

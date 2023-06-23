@@ -45,7 +45,7 @@ const mode = ref(Mode.Home);
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
       spacing: $Spacing.spaceEvenly,
-      zIndex: 1,
+      zIndex: 2,
       ...sty,
     }"
   >
