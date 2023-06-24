@@ -48,6 +48,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
             props: {
               fuelType: defOne(`FuelType`, null),
               shape: defPrim<TankShape>(tankShape.none),
+              // Maybe record x, y, and z instead.
               length: defPrim<number>(0),
               depth: defPrim<number>(0),
               height: defPrim<number>(0),

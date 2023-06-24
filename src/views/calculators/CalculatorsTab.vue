@@ -9,6 +9,7 @@ import {
 } from "@/AppData";
 import { computed, ref } from "vue";
 import { orderDocs } from "@/utils";
+import { rectangleTankCalcs, gallonsToFillPercent } from "./ShapeUtils";
 
 const appData = getAppData();
 const tabIndex = ref(0);
@@ -35,6 +36,10 @@ const dimShortHeight = ref(0);
 
 // Other
 const stickedDepth = ref(0);
+
+// Estimates
+const estGallons = ref(0);
+const estPercent = ref(0);
 </script>
 
 <template>
@@ -158,7 +163,8 @@ const stickedDepth = ref(0);
         </Row>
       </Box>
       <Row :sty="{ spacing: 0.25 }">
-        <Label label="Sticked Depth"><Field v-model:value="dimLength" /></Label
+        <Label label="Sticked Depth"
+          ><Field v-model:value="stickedDepth" /></Label
         >.in
       </Row>
 
@@ -178,19 +184,115 @@ const stickedDepth = ref(0);
           width: `1f`,
         }"
       >
-        <Label label="70%" :sty="{ align: $Align.centerLeft }">5 Units</Label>
-        <Label label="80%" :sty="{ align: $Align.centerLeft }">10 Units</Label>
+        <Label label="70%" :sty="{ align: $Align.centerLeft }">
+          {{
+            Math.round(
+              gallonsToFillPercent(
+                rectangleTankCalcs.totalVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                }),
+                rectangleTankCalcs.stickedVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                  stickedDepth: stickedDepth,
+                }),
+                0.7,
+              ),
+            )
+          }}
+          Gallons</Label
+        >
+        <Label label="80%" :sty="{ align: $Align.centerLeft }">
+          {{
+            Math.round(
+              gallonsToFillPercent(
+                rectangleTankCalcs.totalVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                }),
+                rectangleTankCalcs.stickedVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                  stickedDepth: stickedDepth,
+                }),
+                0.8,
+              ),
+            )
+          }}
+          Gallons</Label
+        >
       </Row>
       <Row
         :sty="{
           width: `1f`,
         }"
       >
-        <Label label="90%" :sty="{ align: $Align.centerLeft }">50 Units</Label>
-        <Label label="100%" :sty="{ align: $Align.centerLeft }"
-          >100 Units</Label
+        <Label label="90%" :sty="{ align: $Align.centerLeft }"
+          >{{
+            Math.round(
+              gallonsToFillPercent(
+                rectangleTankCalcs.totalVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                }),
+                rectangleTankCalcs.stickedVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                  stickedDepth: stickedDepth,
+                }),
+                0.9,
+              ),
+            )
+          }}
+          Gallons</Label
+        >
+        <Label label="100%" :sty="{ align: $Align.centerLeft }">
+          {{
+            Math.round(
+              gallonsToFillPercent(
+                rectangleTankCalcs.totalVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                }),
+                rectangleTankCalcs.stickedVolume({
+                  length: delivery?.tank?.length ?? 0,
+                  depth: delivery?.tank?.depth ?? 0,
+                  height: delivery?.tank?.height ?? 0,
+                  shortHeight: delivery?.tank?.shortHeight ?? 0,
+                  stickedDepth: stickedDepth,
+                }),
+                1.0,
+              ),
+            )
+          }}
+          Gallons</Label
         >
       </Row>
+      <!-- <Row :sty="{ width: `1f`, spacing: 0.25}">
+        <Row :sty="{ width: `1f`, spacing: 0.25}">
+          <Field v-model:value="estGallons" hint="Gallons"></Field>
+          <Text>gal.</Text>
+        </Row>
+        <Row :sty="{ width: `1f`, spacing: 0.25}">
+          <Text :sty="{ width: `1f`}">0</Text>
+          <Text>%</Text>
+        </Row>
+      </Row>  -->
     </Card>
   </Body>
 </template>
