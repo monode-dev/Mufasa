@@ -39,8 +39,27 @@ const dimShortHeight = ref(0);
 const stickedDepth = ref(0);
 
 // Estimates
-const estGallons = ref(0);
-const estPercent = ref(0);
+const desiredFill = ref(0.9);
+const totalGallons = computed(() =>
+  rectangleTankCalcs.totalVolume({
+    length: delivery.value?.tank?.length ?? 0,
+    depth: delivery.value?.tank?.depth ?? 0,
+    height: delivery.value?.tank?.height ?? 0,
+    shortHeight: delivery.value?.tank?.shortHeight ?? 0,
+  }),
+);
+const currentGallons = computed(() =>
+  rectangleTankCalcs.stickedVolume({
+    length: delivery.value?.tank?.length ?? 0,
+    depth: delivery.value?.tank?.depth ?? 0,
+    height: delivery.value?.tank?.height ?? 0,
+    shortHeight: delivery.value?.tank?.shortHeight ?? 0,
+    stickedDepth: stickedDepth.value,
+  }),
+);
+const currentFill = computed(() =>
+  totalGallons.value === 0 ? 0 : currentGallons.value / totalGallons.value,
+);
 
 // Desired Fill: 90% // Desired Volume:
 // Gallons to Add: 105
@@ -179,13 +198,13 @@ const estPercent = ref(0);
           label="Current Fill"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          30%</Label
+          {{ Math.round(100 * currentFill) }}%</Label
         >
         <Label
           label="Current Gallons"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          25</Label
+          {{ Math.round(currentGallons) }}</Label
         >
       </Row>
 
@@ -206,22 +225,26 @@ const estPercent = ref(0);
           label="Desired Fill"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          90%</Label
+          {{ Math.round(desiredFill * 100) }}%</Label
         >
         <Label
           label="Gallons to Add"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          105</Label
+          {{
+            Math.round(
+              gallonsToFillPercent(totalGallons, currentGallons, desiredFill),
+            )
+          }}</Label
         >
       </Row>
 
-      <!-- <Slider /> -->
-      <Row :sty="{ spacing: 0.375 }">
+      <Slider :min="0.8" v-model:value="desiredFill" :max="1" />
+      <!-- <Row :sty="{ spacing: 0.375 }">
         <Box> 80%</Box>
-        <Slider />
+        <Slider :min="0.8" v-model:value="desiredFill" :max="1" />
         <Box> 100%</Box>
-      </Row>
+      </Row> -->
       <!-- <Button :sty="{ width: `1f` }"
         >Record Delivery</Button
       > -->
