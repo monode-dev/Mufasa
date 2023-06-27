@@ -56,7 +56,7 @@ watchEffect(() => {
               .map((x) => ({ label: x.name!, data: x })),
           ]"
       />
-      <DeleteOptionsButton @delete="handleDelete" />
+      <DeleteOptionsButton @delete="handleDelete" :shouldShowComplete="true" />
     </Row>
     <Row
       :sty="{

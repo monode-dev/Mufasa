@@ -9,6 +9,7 @@ import {
 } from "@/AppData";
 import { computed, ref } from "vue";
 import { orderDocs } from "@/utils";
+import { mdColors } from "@/miwi-md/Box.vue";
 import { rectangleTankCalcs, gallonsToFillPercent } from "./ShapeUtils";
 
 const appData = getAppData();
@@ -40,6 +41,10 @@ const stickedDepth = ref(0);
 // Estimates
 const estGallons = ref(0);
 const estPercent = ref(0);
+
+// Desired Fill: 90% // Desired Volume:
+// Gallons to Add: 105
+// |---------o------|
 </script>
 
 <template>
@@ -167,132 +172,56 @@ const estPercent = ref(0);
           ><Field v-model:value="stickedDepth" /></Label
         >.in
       </Row>
+      <!-- <Box /> -->
+      <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" />
+      <Row>
+        <Label
+          label="Current Fill"
+          :sty="{ align: $Align.centerLeft, width: `1f` }"
+        >
+          30%</Label
+        >
+        <Label
+          label="Current Gallons"
+          :sty="{ align: $Align.centerLeft, width: `1f` }"
+        >
+          25</Label
+        >
+      </Row>
 
       <!-- <Box v-if="isTankTab || isDeliveryTab" :sty="{ height: 1 }" />
       <Box v-if="isDeliveryTab" :sty="{ height: 1 }" /> -->
     </Card>
     <Box />
     <!-- <Box :sty="{ height: 1 }" /> -->
-    <Text title>Estimates</Text>
+    <Text title>Fill Details</Text>
     <Card
       :sty="{
         width: `1f`,
       }"
     >
-      <Row
-        :sty="{
-          width: `1f`,
-        }"
-      >
-        <Label label="70%" :sty="{ align: $Align.centerLeft }">
-          {{
-            Math.round(
-              gallonsToFillPercent(
-                rectangleTankCalcs.totalVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                }),
-                rectangleTankCalcs.stickedVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                  stickedDepth: stickedDepth,
-                }),
-                0.7,
-              ),
-            )
-          }}
-          Gallons</Label
+      <!-- <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" /> -->
+      <Row>
+        <Label
+          label="Desired Fill"
+          :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-        <Label label="80%" :sty="{ align: $Align.centerLeft }">
-          {{
-            Math.round(
-              gallonsToFillPercent(
-                rectangleTankCalcs.totalVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                }),
-                rectangleTankCalcs.stickedVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                  stickedDepth: stickedDepth,
-                }),
-                0.8,
-              ),
-            )
-          }}
-          Gallons</Label
+          90%</Label
+        >
+        <Label
+          label="Gallons to Add"
+          :sty="{ align: $Align.centerLeft, width: `1f` }"
+        >
+          105</Label
         >
       </Row>
-      <Row
-        :sty="{
-          width: `1f`,
-        }"
-      >
-        <Label label="90%" :sty="{ align: $Align.centerLeft }"
-          >{{
-            Math.round(
-              gallonsToFillPercent(
-                rectangleTankCalcs.totalVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                }),
-                rectangleTankCalcs.stickedVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                  stickedDepth: stickedDepth,
-                }),
-                0.9,
-              ),
-            )
-          }}
-          Gallons</Label
-        >
-        <Label label="100%" :sty="{ align: $Align.centerLeft }">
-          {{
-            Math.round(
-              gallonsToFillPercent(
-                rectangleTankCalcs.totalVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                }),
-                rectangleTankCalcs.stickedVolume({
-                  length: delivery?.tank?.length ?? 0,
-                  depth: delivery?.tank?.depth ?? 0,
-                  height: delivery?.tank?.height ?? 0,
-                  shortHeight: delivery?.tank?.shortHeight ?? 0,
-                  stickedDepth: stickedDepth,
-                }),
-                1.0,
-              ),
-            )
-          }}
-          Gallons</Label
-        >
+
+      <!-- <Slider /> -->
+      <Row :sty="{ spacing: 0.375 }">
+        <Box> 80%</Box>
+        <Slider />
+        <Box> 100%</Box>
       </Row>
-      <!-- <Row :sty="{ width: `1f`, spacing: 0.25}">
-        <Row :sty="{ width: `1f`, spacing: 0.25}">
-          <Field v-model:value="estGallons" hint="Gallons"></Field>
-          <Text>gal.</Text>
-        </Row>
-        <Row :sty="{ width: `1f`, spacing: 0.25}">
-          <Text :sty="{ width: `1f`}">0</Text>
-          <Text>%</Text>
-        </Row>
-      </Row>  -->
     </Card>
   </Body>
 </template>

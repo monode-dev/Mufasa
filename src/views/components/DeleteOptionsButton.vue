@@ -16,16 +16,24 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
-  options: {
-    type: Array as PropType<{ label: string; id: string }[]>,
-    default: [],
+  shouldShowComplete: {
+    type: Boolean,
+    default: false,
   },
+  // options: {
+  //   type: Array as PropType<{ label: string; id: string }[]>,
+  //   default: [],
+  // },
 });
 
-const emit = defineEmits(["delete"]);
+const emit = defineEmits([`delete`, `complete`]);
 function deletePressed() {
   dropDownIsOpen.value = false;
   emit(`delete`);
+}
+function completePressed() {
+  dropDownIsOpen.value = false;
+  emit(`complete`);
 }
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
@@ -87,16 +95,24 @@ onUnmounted(() => {
           background: mdColors.white,
         }"
       >
+        <Row @click.stop="dropDownIsOpen = false" :sty="{ spacing: 0.25 }">
+          <Text>Cancel</Text>
+          <Icon icon="close" />
+        </Row>
+        <Row
+          v-if="shouldShowComplete"
+          @click.stop="completePressed"
+          :sty="{ spacing: 0.25 }"
+        >
+          <Text>Complete</Text>
+          <Icon icon="check" />
+        </Row>
         <Row
           @click.stop="deletePressed"
           :sty="{ textColor: mdColors.red, spacing: 0.25 }"
         >
           <Text>Delete</Text>
           <Icon icon="delete" />
-        </Row>
-        <Row @click.stop="dropDownIsOpen = false" :sty="{ spacing: 0.25 }">
-          <Text>Cancel</Text>
-          <Icon icon="close" />
         </Row>
       </Box>
     </Box>
