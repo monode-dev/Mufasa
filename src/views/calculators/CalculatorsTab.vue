@@ -26,6 +26,7 @@ const delivery = ref(null as UpcomingDelivery | null);
 
 // Client
 const client = ref(null as Client | null);
+// TODO: Should go to null when client changes.
 const tank = ref(null as Tank | null);
 
 // Dimensions
@@ -39,21 +40,56 @@ const dimShortHeight = ref(0);
 const stickedDepth = ref(0);
 
 // Estimates
+const tankShapeCalc = computed(() =>
+  isDeliveryTab.value
+    ? delivery.value?.tank?.shape ?? tank.value?.shape ?? tankShape.none
+    : isTankTab.value
+    ? tank.value?.shape ?? tankShape.none
+    : dimTankShape.value ?? tankShape.none,
+);
+const tankLength = computed(() =>
+  isDeliveryTab.value
+    ? delivery.value?.tank?.length ?? 0
+    : isTankTab.value
+    ? tank.value?.length ?? 0
+    : dimLength.value ?? 0,
+);
+const tankDepth = computed(() =>
+  isDeliveryTab.value
+    ? delivery.value?.tank?.depth ?? 0
+    : isTankTab.value
+    ? tank.value?.depth ?? 0
+    : dimDepth.value ?? 0,
+);
+const tankHeight = computed(() =>
+  isDeliveryTab.value
+    ? delivery.value?.tank?.height ?? 0
+    : isTankTab.value
+    ? tank.value?.height ?? 0
+    : dimHeight.value ?? 0,
+);
+const tankShortHeight = computed(() =>
+  isDeliveryTab.value
+    ? delivery.value?.tank?.shortHeight ?? 0
+    : isTankTab.value
+    ? tank.value?.shortHeight ?? 0
+    : dimShortHeight.value ?? 0,
+);
 const desiredFill = ref(0.9);
 const totalGallons = computed(() =>
   rectangleTankCalcs.totalVolume({
-    length: delivery.value?.tank?.length ?? 0,
-    depth: delivery.value?.tank?.depth ?? 0,
-    height: delivery.value?.tank?.height ?? 0,
-    shortHeight: delivery.value?.tank?.shortHeight ?? 0,
+    length: tankLength.value,
+    depth: tankDepth.value,
+    height: tankHeight.value,
+    shortHeight: tankShortHeight.value,
   }),
 );
 const currentGallons = computed(() =>
   rectangleTankCalcs.stickedVolume({
-    length: delivery.value?.tank?.length ?? 0,
-    depth: delivery.value?.tank?.depth ?? 0,
-    height: delivery.value?.tank?.height ?? 0,
-    shortHeight: delivery.value?.tank?.shortHeight ?? 0,
+    length: tankLength.value,
+    depth: tankDepth.value,
+    height: tankHeight.value,
+    shortHeight: tankShortHeight.value,
     stickedDepth: stickedDepth.value,
   }),
 );
