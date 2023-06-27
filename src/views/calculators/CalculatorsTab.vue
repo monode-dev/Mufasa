@@ -222,6 +222,14 @@ const estPercent = ref(0);
         <Slider />
         <Box> 100%</Box>
       </Row>
+      <!-- <Button :sty="{ width: `1f` }"
+        >Record Delivery</Button
+      > -->
     </Card>
+    <Box />
+    <Box />
+    <Button :sty="{ width: `1f` }">Record Delivery</Button>
+    <!-- <Box :sty="{ height: `1f` }" />
+    <Button :sty="{ width: `1f` }">Record Delivery</Button> -->
   </Body>
 </template>
