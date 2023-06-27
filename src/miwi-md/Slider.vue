@@ -44,8 +44,8 @@
             height: thumbHeight,
             cornerRadius: thumbHeight / 2,
             background: mdColors.green,
-            shadowDirection: $Align.center,
-            shadowSize: thumbHeight,
+            // shadowDirection: $Align.center,
+            // shadowSize: thumbHeight,
           }"
         />
       </Box>
