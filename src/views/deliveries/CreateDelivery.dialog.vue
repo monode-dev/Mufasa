@@ -1,27 +1,94 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, getAppData } from "@/AppData";
+import { Client, Tank, FuelType, getAppData } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
+import { exists, orderDocs } from "@/utils";
+import { mdColors } from "@/miwi-md/Box.vue";
 
 const appData = getAppData();
 
 const cardRef = ref<VNodeRef | null>(null);
-const isAuto = ref(true);
 const amount = ref(0);
 
-// Auto
-const client = ref(`None`);
-const tank = ref(`None`);
+// Client
+const client = ref<Client | ClientState | undefined>(undefined);
+type ClientState = (typeof clientStates)[keyof typeof clientStates];
+const clientStates = {
+  none: `None`,
+  oneTime: `One Time Client`,
+  new: `New Client`,
+  existing: `Existing`,
+} as const;
+const clientState = computed((): ClientState => {
+  if (client.value === undefined) {
+    return clientStates.none;
+  } else if (typeof client.value === `string`) {
+    return client.value;
+  } else {
+    return clientStates.existing;
+  }
+});
+
+// Fuel Type
+const tank = ref<Tank | TankState | undefined>(undefined);
+type TankState = (typeof tankStates)[keyof typeof tankStates];
+const tankStates = {
+  none: `None`,
+  justFuel: `Just Fuel`,
+  new: `New Tank`,
+  existing: `Existing`,
+} as const;
+const tankState = computed((): TankState => {
+  if (tank.value === undefined) {
+    return tankStates.none;
+  } else if (typeof tank.value === `string`) {
+    return tank.value;
+  } else {
+    return tankStates.existing;
+  }
+});
+
+// Tank
+const fuelType = ref(undefined as FuelType | FuelTypeState | undefined);
+type FuelTypeState = (typeof fuelTypeStates)[keyof typeof fuelTypeStates];
+const fuelTypeStates = {
+  none: `None`,
+  oneTime: `One Time Fuel`,
+  new: `New Fuel Type`,
+  existing: `Existing`,
+} as const;
+const fuelTypeState = computed(() => {
+  if (fuelType.value === undefined) {
+    return fuelTypeStates.none;
+  } else if (typeof fuelType.value === `string`) {
+    return fuelType.value;
+  } else {
+    return fuelTypeStates.existing;
+  }
+});
+const fuelTypeName = ref(``);
+const fuelTypeRate = ref(0);
 
 // Manual
 const clientName = ref(``);
-const fuelType = ref(`None`);
 
+const deliveryIsValid = computed(() => {
+  if (clientState.value === `One Time Client`) {
+    return false;
+  } else if (clientState.value === `New Client`) {
+    return clientName.value !== `` && fuelType.value !== `None`;
+  } else if (clientState.value === `Existing`) {
+    return exists(client.value) && exists(tank.value);
+  } else {
+    return false;
+  }
+});
 function closePopUp() {
   popPage();
 }
 function handleYes() {
+  if (!deliveryIsValid.value) return;
   closePopUp();
   // TODO: Create Delivery
 }
@@ -47,123 +114,150 @@ export default {
     :sty="{
       width: `1f`,
       height: `1f`,
-      background: `#00000099`,
+      background: `#f9fafdaa`,
     }"
   >
     <Card
       ref="cardRef"
       :sty="{
         width: `75%`,
-        shadowSize: 0,
       }"
     >
       <Text title>Create Delivery</Text>
-      <Row
-        :sty="{
-          width: `1f`,
-          spacing: $Spacing.spaceAround,
-          align: $Align.centerLeft, //$Align.center,
-        }"
-      >
-        <Button pill :outlined="!isAuto" @click.stop="isAuto = true"
-          >Auto</Button
-        >
-        <Button pill :outlined="isAuto" @click.stop="isAuto = false"
-          >Manual</Button
-        >
-      </Row>
-      <Box
-        v-if="isAuto"
-        :sty="{
-          width: `1f`,
-          spacing: 1,
-        }"
-      >
+
+      <!-- Client -->
+      <Label label="Client">
         <DropDown
-          label="Client"
           v-model:selected="client"
-          :getKeyFromData="(data: any) => data"
-          :options="[
+          :getKeyFromData="(data: Client | ClientState | undefined) => {
+            if (typeof data === `string`) {
+              return data;
+            } else {
+              return data?._firestoreRef?.path;
+            }
+          }"
+          :speciaolOptions="[
             {
               label: `None`,
-              data: `None`,
+              data: undefined,
             },
             {
-              label: `Client A`,
-              data: `Client A`,
+              label: clientStates.oneTime,
+              data: clientStates.oneTime,
             },
             {
-              label: `Client B`,
-              data: `Client B`,
-            },
-            {
-              label: `Client C`,
-              data: `Client C`,
+              label: clientStates.new,
+              data: clientStates.new,
             },
           ]"
+          :options="[
+            ...orderDocs(appData.clients, (x) => x.name)
+              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
+              .map((x) => ({ label: x.name!, data: x })),
+          ]"
         />
+      </Label>
+
+      <!-- Tank -->
+      <Label label="Tank" v-if="clientState === clientStates.existing">
         <DropDown
-          label="Tank"
           v-model:selected="tank"
-          :getKeyFromData="(data: any) => data"
-          :options="[
+          :getKeyFromData="(data: Tank | TankState | undefined) => {
+            if (typeof data === `string`) {
+              return data;
+            } else {
+              return data?._firestoreRef?.path;
+            }
+          }"
+          :speciaolOptions="[
             {
               label: `None`,
-              data: `None`,
+              data: undefined,
             },
             {
-              label: `Tank A`,
-              data: `Tank A`,
+              label: tankStates.justFuel,
+              data: tankStates.justFuel,
             },
             {
-              label: `Tank B`,
-              data: `Tank B`,
-            },
-            {
-              label: `Tank C`,
-              data: `Tank C`,
+              label: tankStates.new,
+              data: tankStates.new,
             },
           ]"
+          :options="[
+            ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
+              (x, index) => ({ label: `#${index}`, data: x }),
+            ),
+          ]"
         />
-      </Box>
-      <Box
-        v-if="!isAuto"
-        :sty="{
-          width: `1f`,
-          spacing: 1,
-        }"
+      </Label>
+
+      <!-- Fuel -->
+      <Label
+        label="Fuel"
+        v-if="
+          clientState === clientStates.existing &&
+          tankState === tankStates.justFuel
+        "
       >
-        <Label label="Client Name"
-          ><Field v-model:value="clientName" hint="Client Name"
-        /></Label>
         <DropDown
-          label="Fuel Type"
           v-model:selected="fuelType"
-          :getKeyFromData="(data: any) => data"
-          :options="[
+          :getKeyFromData="(data: FuelType | FuelTypeState | undefined) => {
+            if (typeof data === `string`) {
+              return data;
+            } else {
+              return data?._firestoreRef?.path;
+            }
+          }"
+          :speciaolOptions="[
             {
               label: `None`,
-              data: `None`,
+              data: undefined,
             },
             {
-              label: `Fuel Type A`,
-              data: `Fuel Type A`,
+              label: fuelTypeStates.oneTime,
+              data: fuelTypeStates.oneTime,
             },
             {
-              label: `Fuel Type B`,
-              data: `Fuel Type B`,
-            },
-            {
-              label: `Fuel Type C`,
-              data: `Fuel Type C`,
+              label: fuelTypeStates.new,
+              data: fuelTypeStates.new,
             },
           ]"
+          :options="[
+          ...orderDocs(appData.fuelTypes ?? [], (x) => x.createdPosix).filter((x) => exists(x.name) && x.name !== ``).map(
+            (x, index) => ({ label: x.name!, data: x }),
+          ),
+        ]"
         />
-      </Box>
+      </Label>
+      <Row
+        v-if="
+          clientState === `Existing` &&
+          tankState === `Just Fuel` &&
+          [`One Time Fuel`, `New Fuel Type`].includes(fuelTypeState)
+        "
+        :sty="{ width: `1f`, spacing: 0.25 }"
+      >
+        <Label label="Name"
+          ><Field v-model:value="fuelTypeName" hint="Name"
+        /></Label>
+        <Label label="Rate"
+          ><Field v-model:value="fuelTypeRate" hint="Rate"
+        /></Label>
+      </Row>
+
+      <!-- Amount -->
       <Label label="Amount"><Field v-model:value="amount" /></Label>
+
+      <!-- Buttons -->
       <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
         <Button outlined @click.stop="closePopUp">Cancel</Button>
-        <Button @click.stop="handleYes">Create</Button>
+        <Button
+          @click.stop="handleYes"
+          :sty="{
+            background: deliveryIsValid ? mdColors.green : mdColors.grey,
+          }"
+          >Create</Button
+        >
       </Row>
     </Card>
   </Box>

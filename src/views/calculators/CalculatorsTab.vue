@@ -5,10 +5,10 @@ import {
   Tank,
   tankShape,
   getTankShapeName,
-  UpcomingDelivery,
+  UpcomingExistingDelivery,
 } from "@/AppData";
 import { computed, ref } from "vue";
-import { orderDocs } from "@/utils";
+import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box.vue";
 import {
   calcCurrentVolume,
@@ -26,12 +26,12 @@ const isDimensionsTab = computed(() => tabIndex.value === 2);
 const toDimensionsTab = () => (tabIndex.value = 2);
 
 // Delivery
-const delivery = ref(null as UpcomingDelivery | null);
+const delivery = ref(undefined as UpcomingExistingDelivery | undefined);
 
 // Client
-const client = ref(null as Client | null);
+const client = ref(undefined as Client | undefined);
 // TODO: Should go to null when client changes.
-const tank = ref(null as Tank | null);
+const tank = ref(undefined as Tank | undefined);
 
 // Dimensions
 const dimTankShape = ref(tankShape.none);
@@ -46,35 +46,37 @@ const stickedDepth = ref(0);
 // Estimates
 const tankShapeCalc = computed(() =>
   isDeliveryTab.value
-    ? delivery.value?.tank?.shape ?? tank.value?.shape ?? tankShape.none
+    ? delivery.value?.upcomingExistingTank?.shape ??
+      tank.value?.shape ??
+      tankShape.none
     : isTankTab.value
     ? tank.value?.shape ?? tankShape.none
     : dimTankShape.value ?? tankShape.none,
 );
 const tankLength = computed(() =>
   isDeliveryTab.value
-    ? delivery.value?.tank?.length ?? 0
+    ? delivery.value?.upcomingExistingTank?.length ?? 0
     : isTankTab.value
     ? tank.value?.length ?? 0
     : dimLength.value ?? 0,
 );
 const tankDepth = computed(() =>
   isDeliveryTab.value
-    ? delivery.value?.tank?.depth ?? 0
+    ? delivery.value?.upcomingExistingTank?.depth ?? 0
     : isTankTab.value
     ? tank.value?.depth ?? 0
     : dimDepth.value ?? 0,
 );
 const tankHeight = computed(() =>
   isDeliveryTab.value
-    ? delivery.value?.tank?.height ?? 0
+    ? delivery.value?.upcomingExistingTank?.height ?? 0
     : isTankTab.value
     ? tank.value?.height ?? 0
     : dimHeight.value ?? 0,
 );
 const tankShortHeight = computed(() =>
   isDeliveryTab.value
-    ? delivery.value?.tank?.shortHeight ?? 0
+    ? delivery.value?.upcomingExistingTank?.shortHeight ?? 0
     : isTankTab.value
     ? tank.value?.shortHeight ?? 0
     : dimShortHeight.value ?? 0,
@@ -137,7 +139,7 @@ const currentFill = computed(() =>
           spacing: 1,
         }"
       >
-        <DropDown
+        <!-- <DropDown
           label="Delivery"
           v-model:selected="delivery"
           :getKeyFromData="(data: UpcomingDelivery | null) => {
@@ -153,7 +155,7 @@ const currentFill = computed(() =>
               data: x,
             })),
           ]"
-        />
+        /> -->
       </Box>
       <Row
         v-if="isTankTab"
@@ -164,23 +166,24 @@ const currentFill = computed(() =>
       >
         <DropDown
           v-model:selected="client"
-          :getKeyFromData="(data: Client | null) => {
+          :getKeyFromData="(data: Client | undefined) => {
             return data?._firestoreRef?.path;
           }"
+          :speciaolOptions="[{ label: `None`, data: undefined }]"
           :options="[
-            { label: `None`, data: undefined },
             ...orderDocs(appData.clients, (x) => x.name)
               .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
               .map((x) => ({ label: x.name!, data: x })),
           ]"
         />
         <DropDown
+          v-if="exists(client)"
           v-model:selected="tank"
-          :getKeyFromData="(data: Tank | null) => {
+          :getKeyFromData="(data: Tank | undefined) => {
             return data?._firestoreRef?.path;
           }"
+          :speciaolOptions="[{ label: `None`, data: undefined }]"
           :options="[
-            { label: `None`, data: undefined },
             ...orderDocs(client?.tanks ?? [], (x) => x.creationTimePosix).map(
               (x, index) => ({ label: `#${index}`, data: x }),
             ),

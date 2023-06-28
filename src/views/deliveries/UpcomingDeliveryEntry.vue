@@ -2,7 +2,8 @@
 import {
   getAppData,
   FuelType,
-  UpcomingDelivery,
+  UpcomingOneTimeDelivery,
+  UpcomingExistingDelivery,
   Client,
   Tank,
 } from "@/AppData";
@@ -14,7 +15,9 @@ import { orderDocs } from "@/utils";
 
 const props = defineProps({
   delivery: {
-    type: Object as PropType<UpcomingDelivery>,
+    type: Object as PropType<
+      UpcomingOneTimeDelivery | UpcomingExistingDelivery
+    >,
     required: true,
   },
 });
@@ -38,7 +41,7 @@ watchEffect(() => {
 
 <template>
   <Card :sty="{ width: `1f` }">
-    <Row
+    <!-- <Row
       :sty="{
         width: `1f`,
         spacing: $Spacing.spaceBetween,
@@ -46,11 +49,16 @@ watchEffect(() => {
     >
       <DropDown
         v-model:selected="props.delivery.client"
-        :getKeyFromData="(data: Client | null) => {
-            return data?._firestoreRef?.path;
+        :getKeyFromData="(data: Client | null | number) => {
+            if (typeof data === `number`) {
+              return `custom`;
+            } else {
+              return data?._firestoreRef?.path;
+            }
           }"
         :options="[
-            { label: `No Client Selected`, data: undefined },
+            { label: `None`, data: undefined },
+            { label: `Custom`, data: 0 },
             ...orderDocs(appData.clients, (x) => x.name)
               .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
               .map((x) => ({ label: x.name!, data: x })),
@@ -77,26 +85,6 @@ watchEffect(() => {
         />
         <Text :sty="{ height: 1 }">to:</Text>
       </Row>
-      <!-- <Row
-        :sty="{
-          width: `1f`,
-          spacing: 0.25,
-        }"
-      >
-        <DropDown
-          v-model:selected="props.delivery.fuelType"
-          :getKeyFromData="(data: FuelType | null) => {
-            return data?._firestoreRef?.path;
-          }"
-          :options="[
-            { label: `Fuel`, data: undefined },
-            ...appData.fuelTypes
-              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
-              .map((x) => ({ label: x.name!, data: x })),
-          ]"
-        />
-        <Text :sty="{ height: 1 }">to:</Text>
-      </Row> -->
       <Row
         :sty="{
           width: `1f`,
@@ -118,6 +106,15 @@ watchEffect(() => {
           ]"
         />
       </Row>
+    </Row> -->
+    <Row
+      :sty="{
+        width: `1f`,
+        spacing: 0.25,
+      }"
+    >
+      <Button outlined :sty="{ width: `1f` }">Edit</Button>
+      <Button outlined :sty="{ width: `1f` }">Complete</Button>
     </Row>
   </Card>
 </template>

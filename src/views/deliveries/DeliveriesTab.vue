@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import {
-  getAppData,
-  Client,
-  Tank,
-  tankShape,
-  getTankShapeName,
-} from "@/AppData";
-import { ref } from "vue";
+import { getAppData, listUpcomingDeliveries } from "@/AppData";
 import { pushPage } from "@/Nav";
 import CreateDeliveryDialog from "./CreateDelivery.dialog.vue";
-import { exists, orderDocs } from "@/utils";
 
 const appData = getAppData();
 </script>
@@ -23,16 +15,13 @@ const appData = getAppData();
         <Icon
           icon="plus"
           :scale="1.25"
-          @click.stop="appData.upcomingDeliveries?.add({})"
+          @click.stop="pushPage(CreateDeliveryDialog)"
         />
       </Box>
     </Row>
 
     <UpcomingDeliveryEntry
-      v-for="(delivery, index) in orderDocs(
-        appData.upcomingDeliveries,
-        (x) => x.creationTimePosix,
-      )"
+      v-for="(delivery, index) in listUpcomingDeliveries(appData.deliveries)"
       :key="delivery._firestoreRef?.path ?? index"
       :delivery="delivery"
     />

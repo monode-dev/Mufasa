@@ -19,6 +19,10 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  speciaolOptions: {
+    type: Array as PropType<Option[]>,
+    default: [],
+  },
   options: {
     type: Array as PropType<Option[]>,
     default: [],
@@ -48,12 +52,16 @@ const props = defineProps({
 
 const emit = defineEmits(["update:selected"]);
 
+function getAllOptions() {
+  return [...props.options, ...props.speciaolOptions];
+}
+
 const dropDownModalRef = ref<VNodeRef | null>(null);
 const openDropDownRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
 const selectedOption = computed(() => {
   const selectedKey = props.getKeyFromData(props.selected) ?? undefined;
-  return props.options.find(
+  return getAllOptions().find(
     (x) => (props.getKeyFromData(x.data) ?? undefined) === selectedKey,
   );
 });
@@ -131,6 +139,17 @@ function selectOption(option: Option) {
               background: mdColors.white,
             }"
           >
+            <Text
+              v-for="(option, index) in speciaolOptions"
+              :key="index"
+              :sty="{ width: `1f`, align: $Align.centerLeft }"
+              @click.stop="selectOption(option)"
+              >{{ option.label }}</Text
+            >
+            <Box
+              v-if="speciaolOptions.length > 0 && options.length > 0"
+              :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }"
+            />
             <Text
               v-for="(option, index) in options"
               :key="index"
