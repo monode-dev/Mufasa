@@ -10,7 +10,11 @@ import {
 import { computed, ref } from "vue";
 import { orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box.vue";
-import { rectangleTankCalcs, gallonsToFillPercent } from "./ShapeUtils";
+import {
+  calcCurrentVolume,
+  calcTotalVolume,
+  calcGallonsToReachPercent,
+} from "./ShapeUtils";
 
 const appData = getAppData();
 const tabIndex = ref(0);
@@ -77,7 +81,8 @@ const tankShortHeight = computed(() =>
 );
 const desiredFill = ref(0.9);
 const totalGallons = computed(() =>
-  rectangleTankCalcs.totalVolume({
+  calcTotalVolume({
+    shape: tankShapeCalc.value,
     length: tankLength.value,
     depth: tankDepth.value,
     height: tankHeight.value,
@@ -85,7 +90,8 @@ const totalGallons = computed(() =>
   }),
 );
 const currentGallons = computed(() =>
-  rectangleTankCalcs.stickedVolume({
+  calcCurrentVolume({
+    shape: tankShapeCalc.value,
     length: tankLength.value,
     depth: tankDepth.value,
     height: tankHeight.value,
@@ -96,10 +102,6 @@ const currentGallons = computed(() =>
 const currentFill = computed(() =>
   totalGallons.value === 0 ? 0 : currentGallons.value / totalGallons.value,
 );
-
-// Desired Fill: 90% // Desired Volume:
-// Gallons to Add: 105
-// |---------o------|
 </script>
 
 <template>
@@ -222,11 +224,9 @@ const currentFill = computed(() =>
           /></Label>
         </Row>
       </Box>
-      <Row :sty="{ spacing: 0.25 }">
-        <Label label="Sticked Depth"
-          ><Field v-model:value="stickedDepth" /></Label
-        >.in
-      </Row>
+      <Label label="Sticked Inches"
+        ><Field v-model:value="stickedDepth"
+      /></Label>
       <!-- <Box /> -->
       <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" />
       <Row>
@@ -269,7 +269,11 @@ const currentFill = computed(() =>
         >
           {{
             Math.round(
-              gallonsToFillPercent(totalGallons, currentGallons, desiredFill),
+              calcGallonsToReachPercent(
+                totalGallons,
+                currentGallons,
+                desiredFill,
+              ),
             )
           }}</Label
         >
