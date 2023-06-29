@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { pageTransitions } from "@/Nav";
 import { getAppData } from "@/AppData";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { ref } from "vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 

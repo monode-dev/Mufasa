@@ -9,7 +9,7 @@ import {
 } from "@/AppData";
 import { computed, ref } from "vue";
 import { exists, orderDocs } from "@/utils";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import {
   calcCurrentVolume,
   calcTotalVolume,

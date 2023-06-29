@@ -1,15 +1,8 @@
 <script setup lang="ts">
-import {
-  ref,
-  onMounted,
-  onUnmounted,
-  watch,
-  CSSProperties,
-  defineProps,
-  PropType,
-  VNode,
-} from "vue";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { ref, defineProps, PropType } from "vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { Align, Axis } from "./Box/BoxLayout";
 
 const props = defineProps({
   sty: {
@@ -75,8 +68,8 @@ function stopDrag() {
     :sty="{
       width: `1f`,
       height: thumbHeight,
-      align: $Align.centerLeft,
-      axis: $Axis.stack,
+      align: Align.centerLeft,
+      axis: Axis.stack,
     }"
   >
     <Box
@@ -91,7 +84,7 @@ function stopDrag() {
       :sty="{
         width: `1f`,
         height: `1f`,
-        align: $Align.centerLeft,
+        align: Align.centerLeft,
       }"
     >
       <Box

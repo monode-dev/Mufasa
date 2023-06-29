@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { mdColors, sizeToCss } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
+import { sizeToCss } from "@/miwi-md/Box/BoxSize";
 import { Network } from "@capacitor/network";
 import { pageTransitions } from "@/Nav";
 

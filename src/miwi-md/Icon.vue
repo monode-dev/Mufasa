@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // https://pictogrammers.com/library/mdi/
 import { defineProps, PropType } from "vue";
-import Box, { FlexSize, mdColors } from "./Box.vue";
+import { FlexSize } from "./Box/BoxSize";
+import { mdColors } from "./Box/BoxDecoration";
 
 // Create a prop called size
 const props = defineProps({

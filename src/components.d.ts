@@ -1,10 +1,7 @@
 
 import App from "./App.vue";
 import AppBar from "./miwi-md/AppBar.vue";
-import B00 from "./miwi-md/B00.vue";
-import B2x from "./miwi-md/B2x.vue";
 import Body from "./miwi-md/Body.vue";
-import Box from "./miwi-md/Box.vue";
 import Button from "./miwi-md/Button.vue";
 import Card from "./miwi-md/Card.vue";
 import Column from "./miwi-md/Column.vue";
@@ -20,6 +17,7 @@ import TabView from "./miwi-md/TabView.vue";
 import Text from "./miwi-md/Text.vue";
 import Home from "./views/Home.page.vue";
 import CalculatorsTab from "./views/calculators/CalculatorsTab.vue";
+import Box from "./miwi-md/Box/Box.vue";
 import Client from "./views/clients/Client.page.vue";
 import ClientActionBar from "./views/clients/ClientActionBar.vue";
 import ClientEntry from "./views/clients/ClientEntry.vue";
@@ -45,10 +43,7 @@ declare module "@vue/runtime-core" {
   export interface GlobalComponents {
     App: typeof App;
 AppBar: typeof AppBar;
-B00: typeof B00;
-B2x: typeof B2x;
 Body: typeof Body;
-Box: typeof Box;
 Button: typeof Button;
 Card: typeof Card;
 Column: typeof Column;
@@ -64,6 +59,7 @@ TabView: typeof TabView;
 Text: typeof Text;
 Home: typeof Home;
 CalculatorsTab: typeof CalculatorsTab;
+Box: typeof Box;
 Client: typeof Client;
 ClientActionBar: typeof ClientActionBar;
 ClientEntry: typeof ClientEntry;

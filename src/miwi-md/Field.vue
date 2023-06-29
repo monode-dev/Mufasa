@@ -8,14 +8,11 @@ import {
   watchEffect,
   onMounted,
 } from "vue";
-import Box, {
-  Sty,
-  mdColors,
-  Axis,
-  numToFontSize,
-  Overflow,
-  sizeToCss,
-} from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { sizeToCss } from "./Box/BoxSize";
+import { numToFontSize } from "./Box/BoxText";
+import { Overflow, Axis, Align } from "./Box/BoxLayout";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -178,7 +175,7 @@ function tryFocus() {
       </Box>
 
       <!-- Underline -->
-      <Box :sty="{ width: `1f`, height: 0.25, align: $Align.bottomCenter }">
+      <Box :sty="{ width: `1f`, height: 0.25, align: Align.bottomCenter }">
         <Box
           :sty="{
             width: `1f`,

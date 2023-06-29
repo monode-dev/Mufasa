@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import Box, { Sty, Axis } from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { Align, Axis } from "./Box/BoxLayout";
 
 const props = defineProps({
   sty: {

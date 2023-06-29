@@ -1,13 +1,27 @@
 <script setup lang="ts">
-import { computed, getCurrentInstance, defineProps, PropType, ref } from "vue";
+import {
+  computed,
+  getCurrentInstance,
+  defineProps,
+  PropType,
+  ref,
+  App,
+} from "vue";
 import { isNum, isString } from "../utils";
 import { computeTextStyle, TextSty } from "./BoxText";
 import { computeBoxSize, SizeSty, sizeToCss } from "./BoxSize";
-import { Align, Axis, computeBoxLayout, LayoutSty } from "./BoxLayout";
-import { computeBoxDecoration, DecorationSty } from "./BoxDecoration";
+import {
+  Align,
+  Axis,
+  computeBoxLayout,
+  LayoutSty,
+  Overflow,
+  Spacing,
+} from "./BoxLayout";
+import { computeBoxDecoration, DecorationSty, mdColors } from "./BoxDecoration";
 import { computeBoxInteraction, InteractionSty } from "./BoxInteraction";
 
-export type Sty = SizeSty &
+export type _Sty = SizeSty &
   DecorationSty &
   LayoutSty &
   TextSty &

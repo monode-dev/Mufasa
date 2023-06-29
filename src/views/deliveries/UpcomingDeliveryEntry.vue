@@ -8,7 +8,7 @@ import {
   Tank,
 } from "@/AppData";
 import { pushPage } from "@/Nav";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { PropType, ref, watchEffect } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import { orderDocs } from "@/utils";

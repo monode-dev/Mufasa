@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import Box, { Sty, Align, mdColors } from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { Align, Overflow } from "./Box/BoxLayout";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -17,8 +18,8 @@ const props = defineProps({
       height: `100%`,
       background: `#f9fafdff`,
       align: Align.topCenter,
-      overflowX: $Overflow.crop,
-      overflowY: $Overflow.crop,
+      overflowX: Overflow.crop,
+      overflowY: Overflow.crop,
       ...sty,
     }"
   >

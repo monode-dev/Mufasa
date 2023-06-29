@@ -6,9 +6,8 @@ import {
   onMounted,
   onUnmounted,
   ref,
-  watchEffect,
 } from "vue";
-import { Overflow, mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 
 // Create a prop called size
 const props = defineProps({
@@ -66,7 +65,7 @@ onUnmounted(() => {
       width: sty.scale ?? 1,
       height: sty.scale ?? 1,
       align: $Align.topRight,
-      overflowY: Overflow.visible,
+      overflowY: $Overflow.visible,
     }"
   >
     <!-- Button -->

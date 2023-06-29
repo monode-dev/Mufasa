@@ -8,7 +8,9 @@ import {
   ref,
   VNodeRef,
 } from "vue";
-import Box, { Sty, mdColors, Axis, Align, Overflow } from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { Align, Axis, Overflow, Spacing } from "./Box/BoxLayout";
 // Allow overriding of the default sty
 type Option = {
   label: string;
@@ -110,7 +112,7 @@ function selectOption(option: Option) {
     >
       <!-- Button -->
       <Box
-        :sty="{ width: `1f`, height: sty.scale ?? 1, align: $Align.topCenter }"
+        :sty="{ width: `1f`, height: sty.scale ?? 1, align: Align.topCenter }"
       >
         <!-- Text -->
         <Row
@@ -119,14 +121,14 @@ function selectOption(option: Option) {
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
-            spacing: $Spacing.spaceBetween,
+            spacing: Spacing.spaceBetween,
           }"
         >
           <Text>{{ selectedOption?.label ?? `None` }}</Text>
           <Icon icon="menuDown" />
         </Row>
         <!-- Drop Down -->
-        <Box v-if="dropDownIsOpen" :sty="{ align: $Align.topCenter }">
+        <Box v-if="dropDownIsOpen" :sty="{ align: Align.topCenter }">
           <Box :sty="{ height: 0.25 }" />
           <Box
             ref="dropDownModalRef"
@@ -142,7 +144,7 @@ function selectOption(option: Option) {
             <Text
               v-for="(option, index) in speciaolOptions"
               :key="index"
-              :sty="{ width: `1f`, align: $Align.centerLeft }"
+              :sty="{ width: `1f`, align: Align.centerLeft }"
               @click.stop="selectOption(option)"
               >{{ option.label }}</Text
             >
@@ -153,7 +155,7 @@ function selectOption(option: Option) {
             <Text
               v-for="(option, index) in options"
               :key="index"
-              :sty="{ width: `1f`, align: $Align.centerLeft }"
+              :sty="{ width: `1f`, align: Align.centerLeft }"
               @click.stop="selectOption(option)"
               >{{ option.label }}</Text
             >

@@ -7,7 +7,8 @@ import {
   ref,
   onMounted,
 } from "vue";
-import Box, { Sty, Align, Axis, Overflow } from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { Align, Overflow } from "./Box/BoxLayout";
 import { gsap } from "gsap";
 
 // Allow overriding of the default sty

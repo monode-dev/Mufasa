@@ -3,7 +3,7 @@ import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
 import { Client } from "@/AppData";
-import { Overflow, mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import DeleteDialog from "../components/DeleteDialog.vue";
 
 // Create a prop called size
@@ -39,7 +39,7 @@ function clicked() {
       spacing: $Spacing.spaceBetween,
       textColor: 
               ([undefined, null] as any[]).includes(client.name) ? mdColors.grey : mdColors.black,
-      overflowY: Overflow.visible,
+      overflowY: $Overflow.visible,
     }"
   >
     <Text>{{ client.name ?? `Loading...` }}</Text>

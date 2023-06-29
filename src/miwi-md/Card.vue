@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { defineProps, PropType, useSlots } from "vue";
-import Box, { Align, mdColors, Axis, Sty } from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { Align, Axis } from "./Box/BoxLayout";
 import { computed } from "vue";
 
 // Allow overriding of the default sty

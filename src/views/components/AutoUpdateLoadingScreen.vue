@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { pushPage, useNav } from "@/Nav";

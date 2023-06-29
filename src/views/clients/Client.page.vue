@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PropType, watchEffect } from "vue";
 import { pageTransitions, popPage } from "@/Nav";
-import { Align, mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { Client } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { FuelType, getAppData } from "@/AppData";
@@ -117,7 +117,7 @@ export default {
         >{{ index + 1 }}</TankEntry
       >
     </Body>
-    <Body v-else :sty="{ align: Align.center }">
+    <Body v-else :sty="{ align: $Align.center }">
       <Text hint>Loading...</Text>
     </Body>
   </Page>

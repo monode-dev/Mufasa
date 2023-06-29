@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { PropType } from "vue";
-import Box, { Align, mdColors, Axis, Sty } from "./Box.vue";
 import { useNav } from "@/Nav";
 import Icon from "./Icon.vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { Align, Axis } from "./Box/BoxLayout";
 
 const nav = useNav();
 // We dont want this to be reactive since it should only change between loads.

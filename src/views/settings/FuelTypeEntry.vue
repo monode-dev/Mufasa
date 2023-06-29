@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import { Sty } from "@/miwi-md/Box.vue";
 import { FuelType } from "@/AppData";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { pushPage } from "@/Nav";
 import DeleteDialogVue from "../components/DeleteDialog.vue";
 // Allow overriding of the default sty

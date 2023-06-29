@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType, ref } from "vue";
-import { Sty } from "@/miwi-md/Box.vue";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { pushPage } from "@/Nav";
 import CreateClientDialog from "./CreateClient.dialog.vue";
 

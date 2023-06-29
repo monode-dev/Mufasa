@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import Box, { Sty, mdColors, Axis, Align } from "@/miwi-md/Box.vue";
+
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {

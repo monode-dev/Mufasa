@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, PropType, defineEmits } from "vue";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 
 const props = defineProps({
   filterString: {

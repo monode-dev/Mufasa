@@ -4,7 +4,7 @@ import { pageTransitions, popPage, pushPage } from "@/Nav";
 import { Client, Tank, FuelType, getAppData } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
 import { exists, orderDocs } from "@/utils";
-import { mdColors } from "@/miwi-md/Box.vue";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 
 const appData = getAppData();
 

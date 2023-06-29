@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import Box, { Sty, Axis } from "./Box.vue";
+import { Sty } from "./Box/Box.vue";
+import { mdColors } from "./Box/BoxDecoration";
+import { Align, Axis } from "./Box/BoxLayout";
 
 const props = defineProps({
   sty: {
@@ -11,10 +13,12 @@ const props = defineProps({
 </script>
 
 <template>
-  <Box :sty="{
-            axis: Axis.stack,
-            ...sty,
-          }">
+  <Box
+    :sty="{
+      axis: Axis.stack,
+      ...sty,
+    }"
+  >
     <slot />
   </Box>
 </template>
