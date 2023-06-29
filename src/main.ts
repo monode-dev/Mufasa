@@ -7,7 +7,7 @@ import {
   OrientationType,
 } from "@capawesome/capacitor-screen-orientation";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
-import { registerGlobalProperties } from "@/miwi-md/Box/BoxVueUtils";
+import { registerGlobalProperties } from "@/miwi-md/Box/Box";
 import mdiVue from "mdi-vue/v3";
 import * as mdijs from "@mdi/js";
 
@@ -29,8 +29,8 @@ import TabButtons from "./miwi-md/TabButtons.vue";
 import TabView from "./miwi-md/TabView.vue";
 import Text from "./miwi-md/Text.vue";
 import Home from "./views/Home.page.vue";
-import CalculatorsTab from "./views/calculators/CalculatorsTab.vue";
 import Box from "./miwi-md/Box/Box.vue";
+import CalculatorsTab from "./views/calculators/CalculatorsTab.vue";
 import Client from "./views/clients/Client.page.vue";
 import ClientActionBar from "./views/clients/ClientActionBar.vue";
 import ClientEntry from "./views/clients/ClientEntry.vue";
@@ -79,8 +79,8 @@ vueApp.component("TabButtons", TabButtons);
 vueApp.component("TabView", TabView);
 vueApp.component("Text", Text);
 vueApp.component("Home", Home);
-vueApp.component("CalculatorsTab", CalculatorsTab);
 vueApp.component("Box", Box);
+vueApp.component("CalculatorsTab", CalculatorsTab);
 vueApp.component("Client", Client);
 vueApp.component("ClientActionBar", ClientActionBar);
 vueApp.component("ClientEntry", ClientEntry);
