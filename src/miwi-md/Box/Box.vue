@@ -24,7 +24,7 @@ const parentAxis = ref<Axis>(Axis.column);
 const childCount = ref(0);
 const childWidthGrows = ref(false);
 const childHeightGrows = ref(false);
-const axis = computed(() => props.sty.axis ?? Axis.column);
+const axis = props.sty.axis ?? Axis.column;
 // const maxChildWidth = computed(() => {
 //   if (axis.value === Axis.stack) {
 //     return children.reduce((tot, curr) => {
@@ -69,7 +69,7 @@ const style = computed(() => {
       cssPadding,
       //this.$parent
       getCurrentInstance()?.parent,
-      axis.value,
+      axis,
       childCount.value,
     ),
     ...computeBoxDecoration(props.sty),
@@ -109,7 +109,7 @@ function updateFromHtml(divRef: HTMLElement | undefined) {
       if (!child.classList.contains(`b-x`)) return false;
       return (
         child.style.width === "100%" ||
-        (axis.value === Axis.row &&
+        (axis === Axis.row &&
           (getComputedStyle(child).flexBasis !== "auto" ||
             getComputedStyle(child).flexGrow !== "0"))
       );
@@ -118,7 +118,7 @@ function updateFromHtml(divRef: HTMLElement | undefined) {
       if (!child.classList.contains(`b-x`)) return false;
       return (
         child.style.height === "100%" ||
-        (axis.value === Axis.column &&
+        (axis === Axis.column &&
           (getComputedStyle(child).flexBasis !== "auto" ||
             getComputedStyle(child).flexGrow !== "0"))
       );

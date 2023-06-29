@@ -8,7 +8,6 @@ import {
   watchEffect,
   onMounted,
 } from "vue";
-import { Sty } from "./Box/Box.vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { sizeToCss } from "./Box/BoxSize";
 import { numToFontSize } from "./Box/BoxText";

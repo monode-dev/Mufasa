@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, Tank, FuelType, getAppData } from "@/AppData";
+import { Client, Tank, FuelType, getAppData, TankShape } from "@/AppData";
 import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
@@ -29,6 +29,11 @@ const clientState = computed((): ClientState => {
     return clientStates.existing;
   }
 });
+const manualClientName = ref(``);
+const manualClientId = ref(``);
+const manualClientPhone = ref(``);
+const manualClientAddress = ref(``);
+const manualClientNotes = ref(``);
 
 // Fuel Type
 const tank = ref<Tank | TankState | undefined>(undefined);
@@ -48,6 +53,11 @@ const tankState = computed((): TankState => {
     return tankStates.existing;
   }
 });
+const manualTankShape = ref<TankShape | undefined>(undefined);
+const manualTankLength = ref(0);
+const manualTankDepth = ref(0);
+const manualTankHeight = ref(0);
+const manualTankShortHeight = ref(0);
 
 // Tank
 const fuelType = ref(undefined as FuelType | FuelTypeState | undefined);
@@ -67,8 +77,8 @@ const fuelTypeState = computed(() => {
     return fuelTypeStates.existing;
   }
 });
-const fuelTypeName = ref(``);
-const fuelTypeRate = ref(0);
+const manualFuelTypeName = ref(``);
+const manualFuelTypeRate = ref(0);
 
 // Manual
 const clientName = ref(``);
@@ -134,13 +144,15 @@ export default {
       width: `1f`,
       height: `1f`,
       background: `#f9fafdce`,
+      align: $Align.topCenter,
     }"
   >
-    <Column
+    <Body
       :sty="{
         width: `1f`,
         height: `1f`,
         spacing: 1,
+        align: $Align.topCenter,
       }"
     >
       <Card
@@ -183,6 +195,17 @@ export default {
           ]"
           />
         </Label>
+        <ClientFields
+          v-if="
+            clientState === clientStates.new ||
+            clientState === clientStates.oneTime
+          "
+          v-model:name="manualClientName"
+          v-model:clientId="manualClientId"
+          v-model:phoneNumber="manualClientPhone"
+          v-model:address="manualClientAddress"
+          v-model:notes="manualClientNotes"
+        />
 
         <!-- Tank -->
         <Label
@@ -272,19 +295,34 @@ export default {
         </Label>
         <Row
           v-if="
-            clientState === `Existing` &&
-            tankState === `Just Fuel` &&
-            [`One Time Fuel`, `New Fuel Type`].includes(fuelTypeState)
+            (clientState === clientStates.oneTime ||
+              tankState === tankStates.justFuel ||
+              tankState === tankStates.new) &&
+            (fuelTypeState === fuelTypeStates.oneTime ||
+              fuelTypeState === fuelTypeStates.new)
           "
           :sty="{ width: `1f`, spacing: 0.25 }"
         >
-          <Label label="Name"
-            ><Field v-model:value="fuelTypeName" hint="Name"
+          <Label label="Fuel"
+            ><Field v-model:value="manualFuelTypeName" hint="Name"
           /></Label>
           <Label label="Rate"
-            ><Field v-model:value="fuelTypeRate" hint="Rate"
+            ><Field v-model:value="manualFuelTypeRate" hint="Rate"
           /></Label>
         </Row>
+
+        <!-- Tank Fields -->
+        <TankFields
+          v-if="
+            clientState !== clientStates.none &&
+            (tankState === tankStates.new || tankState === tankStates.existing)
+          "
+          v-model:shape="manualTankShape"
+          v-model:length="manualTankLength"
+          v-model:depth="manualTankDepth"
+          v-model:height="manualTankHeight"
+          v-model:shortHeight="manualTankShortHeight"
+        />
 
         <!-- Amount -->
         <Label label="Amount"><Field v-model:value="amount" /></Label>
@@ -305,6 +343,6 @@ export default {
       <Text title>Related Deliveries</Text>
       <CompletedDeliveryEntry :sty="{ width: `75%` }" />
       <CompletedDeliveryEntry :sty="{ width: `75%` }" />
-    </Column>
+    </Body>
   </Box>
 </template>

@@ -157,13 +157,7 @@ const currentFill = computed(() =>
           ]"
         /> -->
       </Box>
-      <Row
-        v-if="isTankTab"
-        :sty="{
-          width: `1f`,
-          spacing: 0.5,
-        }"
-      >
+      <Label label="Client" v-if="isTankTab">
         <DropDown
           v-model:selected="client"
           :getKeyFromData="(data: Client | undefined) => {
@@ -175,9 +169,9 @@ const currentFill = computed(() =>
               .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
               .map((x) => ({ label: x.name!, data: x })),
           ]"
-        />
+      /></Label>
+      <Label label="Tank" v-if="isTankTab && exists(client)">
         <DropDown
-          v-if="exists(client)"
           v-model:selected="tank"
           :getKeyFromData="(data: Tank | undefined) => {
             return data?._firestoreRef?.path;
@@ -188,8 +182,7 @@ const currentFill = computed(() =>
               (x, index) => ({ label: `#${index}`, data: x }),
             ),
           ]"
-        />
-      </Row>
+      /></Label>
       <Box
         v-if="isDimensionsTab"
         :sty="{

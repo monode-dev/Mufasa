@@ -52,34 +52,12 @@ function deletePressed() {
           .map((x) => ({ label: x.name!, data: x })),
       ]"
     />
-    <DropDown
-      label="Shape"
-      v-model:selected="tank.shape"
-      :getKeyFromData="(data: any) => data"
-      :options="[
-        ...Object.values(tankShape).map((x) => ({
-          label: getTankShapeName(x),
-          data: x,
-        })),
-      ]"
+    <TankFields
+      v-model:shape="tank.shape"
+      v-model:length="tank.length"
+      v-model:depth="tank.depth"
+      v-model:height="tank.height"
+      v-model:shortHeight="tank.shortHeight"
     />
-    <Row
-      :sty="{
-        width: `1f`,
-      }"
-    >
-      <Label label="Length"><Field v-model:value="tank.length" /></Label>
-      <Label label="Depth"><Field v-model:value="tank.depth" /></Label>
-    </Row>
-    <Row
-      :sty="{
-        width: `1f`,
-      }"
-    >
-      <Label label="Height"><Field v-model:value="tank.height" /></Label>
-      <Label label="Short Height"
-        ><Field v-model:value="tank.shortHeight"
-      /></Label>
-    </Row>
   </Card>
 </template>

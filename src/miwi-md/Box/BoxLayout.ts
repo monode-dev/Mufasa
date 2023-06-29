@@ -141,8 +141,7 @@ export function computeBoxLayout(
     padding: cssPadding,
 
     // Align: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
-    position:
-      (parent as any)?.sty?.axis === Axis.stack ? `absolute` : `relative`,
+    position: parent?.props?.sty?.axis === Axis.stack ? `absolute` : `relative`,
     //margin: 0,
     justifyContent:
       // Exact spacing is handled through grid gap

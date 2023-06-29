@@ -10,7 +10,7 @@ const appData = getAppData();
 
 const props = defineProps({
   client: {
-    type: Object as () => Client,
+    type: Object as PropType<Client>,
     required: true,
   },
 });
@@ -61,40 +61,12 @@ export default {
         <DeleteOptionsButton @delete="deletePressed" />
       </Row>
       <Card :sty="{ width: `1f` }">
-        <Field
-          underlined
-          hint="Name"
-          icon="account"
-          v-model:value="client.name"
-          :sty="{ width: `1f` }"
-        />
-        <Field
-          underlined
-          hint="Client ID"
-          icon="identifier"
-          v-model:value="client.clientId"
-          :sty="{ width: `1f` }"
-        />
-        <Field
-          underlined
-          hint="Phone"
-          icon="phone"
-          v-model:value="client.phoneNumber"
-          :sty="{ width: `1f` }"
-        />
-        <Field
-          underlined
-          hint="Address"
-          icon="mapMarker"
-          v-model:value="client.address"
-          :sty="{ width: `1f` }"
-        />
-        <Field
-          underlined
-          hint="Notes"
-          icon="textBox"
-          v-model:value="client.notes"
-          :sty="{ width: `1f` }"
+        <ClientFields
+          v-model:name="client.name"
+          v-model:clientId="client.clientId"
+          v-model:phoneNumber="client.phoneNumber"
+          v-model:address="client.address"
+          v-model:notes="client.notes"
         />
       </Card>
       <Box />

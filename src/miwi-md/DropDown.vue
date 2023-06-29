@@ -8,7 +8,6 @@ import {
   ref,
   VNodeRef,
 } from "vue";
-import { Sty } from "./Box/Box.vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { Align, Axis, Overflow, Spacing } from "./Box/BoxLayout";
 // Allow overriding of the default sty
