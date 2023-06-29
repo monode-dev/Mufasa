@@ -1,5 +1,5 @@
-<script lang="ts">
-import { CSSProperties, defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { computed, getCurrentInstance, defineProps, PropType, ref } from "vue";
 import { isNum, isString } from "../utils";
 import { computeTextStyle, TextSty } from "./BoxText";
 import { computeBoxSize, SizeSty, sizeToCss } from "./BoxSize";
@@ -13,128 +13,118 @@ export type Sty = SizeSty &
   TextSty &
   InteractionSty;
 
-export default defineComponent({
-  name: "Box",
-  props: {
-    sty: {
-      type: Object as PropType<Partial<Sty>>,
-      default: {},
-      required: false,
-    },
-  },
-  data() {
-    return {
-      parentAxis: Axis.column as Axis,
-      childCount: 0,
-      childWidthGrows: false,
-      childHeightGrows: false,
-    };
-  },
-  computed: {
-    axis(): Axis {
-      return this.sty.axis ?? Axis.column;
-    },
-    // maxChildWidth(): number {
-    //   if (this.axis === Axis.stack) {
-    //     return this.children.reduce((tot, curr) => {
-    //       return Math.max(tot, curr.el?.offsetWidth ?? 0);
-    //     }, 0);
-    //   } else {
-    //     return 0;
-    //   }
-    // },
-    // maxChildHeight(): number {
-    //   if (this.axis === Axis.stack) {
-    //     return this.children.reduce((tot, curr) => {
-    //       return Math.max(tot, curr.el?.offsetHeight ?? 0);
-    //     }, 0);
-    //   } else {
-    //     return 0;
-    //   }
-    // },
-    style(): CSSProperties {
-      const align = this.sty.align ?? Align.center;
-      const cssPadding =
-        isString(this.sty.padding) && this.sty.padding.startsWith(`css `)
-          ? this.sty.padding.split(`css `)[1]
-          : isNum(this.sty.padding)
-          ? sizeToCss(this.sty.padding)
-          : (this.sty.padding ?? ``)
-              .split(` `)
-              .map((p) => sizeToCss(Number(p)))
-              .join(` `);
-      return {
-        ...computeBoxSize(
-          this.sty,
-          this.childWidthGrows,
-          this.childHeightGrows,
-          this.parentAxis,
-          this.$parent,
-        ),
-        ...computeBoxLayout(
-          this.sty,
-          align,
-          cssPadding,
-          this.$parent,
-          this.axis,
-          this.childCount,
-        ),
-        ...computeBoxDecoration(this.sty),
-        ...computeTextStyle(this.sty, align),
-        ...computeBoxInteraction(this.sty),
-      };
-    },
-  },
-  methods: {
-    updateFromHtml(divRef: HTMLElement | undefined) {
-      // Update parent axis
-      (() => {
-        const parent = divRef?.parentElement;
-        if (!parent) return;
-        parent.style.flexDirection === `row`
-          ? (this.parentAxis = Axis.row)
-          : parent.style.flexDirection === `column`
-          ? (this.parentAxis = Axis.column)
-          : (this.parentAxis = Axis.stack);
-      })();
-
-      // Update Child Count
-      (() => {
-        if (!divRef) return;
-        const children = Array.from(divRef.childNodes);
-        this.childCount = children.length;
-      })();
-
-      // Update Child Size Grows
-      (() => {
-        if (!divRef) return;
-        if ((this.sty.width ?? -1 !== -1) && (this.sty.height ?? -1 !== -1))
-          return;
-        const children = Array.from(divRef.childNodes).filter(
-          (child) => child instanceof HTMLElement,
-        ) as HTMLElement[];
-        this.childWidthGrows = children.some((child) => {
-          if (!child.classList.contains(`b-x`)) return false;
-          return (
-            child.style.width === "100%" ||
-            (this.axis === Axis.row &&
-              (getComputedStyle(child).flexBasis !== "auto" ||
-                getComputedStyle(child).flexGrow !== "0"))
-          );
-        });
-        this.childHeightGrows = children.some((child) => {
-          if (!child.classList.contains(`b-x`)) return false;
-          return (
-            child.style.height === "100%" ||
-            (this.axis === Axis.column &&
-              (getComputedStyle(child).flexBasis !== "auto" ||
-                getComputedStyle(child).flexGrow !== "0"))
-          );
-        });
-      })();
-    },
+const props = defineProps({
+  sty: {
+    type: Object as PropType<Partial<Sty>>,
+    default: () => ({}),
+    required: false,
   },
 });
+const parentAxis = ref<Axis>(Axis.column);
+const childCount = ref(0);
+const childWidthGrows = ref(false);
+const childHeightGrows = ref(false);
+const axis = computed(() => props.sty.axis ?? Axis.column);
+// const maxChildWidth = computed(() => {
+//   if (axis.value === Axis.stack) {
+//     return children.reduce((tot, curr) => {
+//       return Math.max(tot, curr.el?.offsetWidth ?? 0);
+//     }, 0);
+//   } else {
+//     return 0;
+//   }
+// });
+// const maxChildHeight = computed(() => {
+//   if (axis.value === Axis.stack) {
+//     return children.reduce((tot, curr) => {
+//       return Math.max(tot, curr.el?.offsetHeight ?? 0);
+//     }, 0);
+//   } else {
+//     return 0;
+//   }
+// });
+const style = computed(() => {
+  const align = props.sty.align ?? Align.center;
+  const cssPadding =
+    isString(props.sty.padding) && props.sty.padding.startsWith(`css `)
+      ? props.sty.padding.split(`css `)[1]
+      : isNum(props.sty.padding)
+      ? sizeToCss(props.sty.padding)
+      : (props.sty.padding ?? ``)
+          .split(` `)
+          .map((p) => sizeToCss(Number(p)))
+          .join(` `);
+  return {
+    ...computeBoxSize(
+      props.sty,
+      childWidthGrows.value,
+      childHeightGrows.value,
+      parentAxis.value,
+      //this.$parent
+      getCurrentInstance()?.parent,
+    ),
+    ...computeBoxLayout(
+      props.sty,
+      align,
+      cssPadding,
+      //this.$parent
+      getCurrentInstance()?.parent,
+      axis.value,
+      childCount.value,
+    ),
+    ...computeBoxDecoration(props.sty),
+    ...computeTextStyle(props.sty, align),
+    ...computeBoxInteraction(props.sty),
+  };
+});
+
+function updateFromHtml(divRef: HTMLElement | undefined) {
+  // Update parent axis
+  (() => {
+    const parent = divRef?.parentElement;
+    if (!parent) return;
+    parent.style.flexDirection === `row`
+      ? (parentAxis.value = Axis.row)
+      : parent.style.flexDirection === `column`
+      ? (parentAxis.value = Axis.column)
+      : (parentAxis.value = Axis.stack);
+  })();
+
+  // Update Child Count
+  (() => {
+    if (!divRef) return;
+    const children = Array.from(divRef.childNodes);
+    childCount.value = children.length;
+  })();
+
+  // Update Child Size Grows
+  (() => {
+    if (!divRef) return;
+    if ((props.sty.width ?? -1 !== -1) && (props.sty.height ?? -1 !== -1))
+      return;
+    const children = Array.from(divRef.childNodes).filter(
+      (child) => child instanceof HTMLElement,
+    ) as HTMLElement[];
+    childWidthGrows.value = children.some((child) => {
+      if (!child.classList.contains(`b-x`)) return false;
+      return (
+        child.style.width === "100%" ||
+        (axis.value === Axis.row &&
+          (getComputedStyle(child).flexBasis !== "auto" ||
+            getComputedStyle(child).flexGrow !== "0"))
+      );
+    });
+    childHeightGrows.value = children.some((child) => {
+      if (!child.classList.contains(`b-x`)) return false;
+      return (
+        child.style.height === "100%" ||
+        (axis.value === Axis.column &&
+          (getComputedStyle(child).flexBasis !== "auto" ||
+            getComputedStyle(child).flexGrow !== "0"))
+      );
+    });
+  })();
+}
 </script>
 
 <template>
