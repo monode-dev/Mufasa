@@ -5,14 +5,13 @@ import { computeTextStyle, TextSty } from "./BoxText";
 import { computeBoxSize, SizeSty, sizeToCss } from "./BoxSize";
 import { Align, Axis, computeBoxLayout, LayoutSty } from "./BoxLayout";
 import { computeBoxDecoration, DecorationSty } from "./BoxDecoration";
+import { computeBoxInteraction, InteractionSty } from "./BoxInteraction";
 
 export type Sty = SizeSty &
   DecorationSty &
   LayoutSty &
-  TextSty & {
-    isInteractable: boolean;
-    zIndex: number;
-  };
+  TextSty &
+  InteractionSty;
 
 export default defineComponent({
   name: "Box",
@@ -72,7 +71,6 @@ export default defineComponent({
           this.parentAxis,
           this.$parent,
         ),
-        ...computeBoxDecoration(this.sty),
         ...computeBoxLayout(
           this.sty,
           align,
@@ -81,9 +79,9 @@ export default defineComponent({
           this.axis,
           this.childCount,
         ),
+        ...computeBoxDecoration(this.sty),
         ...computeTextStyle(this.sty, align),
-        pointerEvents: this.sty.isInteractable ?? true ? undefined : `none`,
-        zIndex: this.sty.zIndex,
+        ...computeBoxInteraction(this.sty),
       };
     },
   },

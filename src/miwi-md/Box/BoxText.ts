@@ -1,4 +1,4 @@
-import { isNum, exists } from "../utils";
+import { isNum, exists, CssProps } from "./BoxUtils";
 import { Align, isCenterX, isLeft } from "./BoxLayout";
 import { sizeToCss } from "./BoxSize";
 
@@ -18,9 +18,7 @@ export function numToFontSize(num: number) {
 export function computeTextStyle(
   sty: Partial<TextSty>,
   align: Align,
-): {
-  [key: string]: string | undefined;
-} {
+): CssProps {
   return {
     // Text Style
     fontFamily: `Roboto`, //sty.fontFamily ?? `Roboto` ?? `inherit`,

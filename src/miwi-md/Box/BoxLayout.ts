@@ -1,4 +1,4 @@
-import { exists, isString } from "../utils";
+import { CssProps, exists, isString } from "./BoxUtils";
 import { sizeToCss } from "./BoxSize";
 
 export type LayoutSty = {
@@ -134,9 +134,7 @@ export function computeBoxLayout(
   parent: any,
   axis: Axis,
   childCount: number,
-): {
-  [key: string]: string | undefined;
-} {
+): CssProps {
   return {
     // Padding
     // TODO: Default could maybe be based off of font size.

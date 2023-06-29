@@ -1,4 +1,4 @@
-import { exists } from "../utils";
+import { CssProps, exists } from "./BoxUtils";
 import { Align } from "./BoxLayout";
 import { sizeToCss } from "./BoxSize";
 
@@ -9,6 +9,7 @@ export type DecorationSty = {
   background: string;
   shadowSize: number;
   shadowDirection: Align;
+  zIndex: number;
 };
 
 export const mdColors = {
@@ -30,9 +31,7 @@ export const mdColors = {
   sameAsText: `currentColor`,
 } as const;
 
-export function computeBoxDecoration(sty: Partial<DecorationSty>): {
-  [key: string]: string | undefined;
-} {
+export function computeBoxDecoration(sty: Partial<DecorationSty>): CssProps {
   const shadowDirection = (() => {
     switch (sty.shadowDirection ?? Align.bottomRight) {
       case Align.topLeft:
@@ -86,5 +85,6 @@ export function computeBoxDecoration(sty: Partial<DecorationSty>): {
           7,
         )}cc`
       : undefined,
+    zIndex: sty.zIndex,
   };
 }

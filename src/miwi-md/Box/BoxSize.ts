@@ -1,4 +1,4 @@
-import { isNum, exists, isString } from "../utils";
+import { isNum, exists, isString, CssProps } from "./BoxUtils";
 import { Axis } from "./BoxLayout";
 
 export type SizeSty = {
@@ -73,9 +73,7 @@ export function computeBoxSize(
   childHeightGrows: boolean,
   parentAxis: Axis,
   parent: any,
-): {
-  [key: string]: string | undefined;
-} {
+): CssProps {
   let width =
     (sty.width ?? -1) === -1 ? (childWidthGrows ? `1f` : -1) : sty.width ?? -1;
   if (isString(width) && width.endsWith(`f`)) {
