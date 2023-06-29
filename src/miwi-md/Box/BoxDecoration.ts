@@ -31,6 +31,7 @@ export const mdColors = {
   sameAsText: `currentColor`,
 } as const;
 
+// We might be able to infer everything we need from these compute functions, which could make updates even easier to make. If we did this, then we'd want to use another function to generate these compute functions.
 export function computeBoxDecoration(sty: Partial<DecorationSty>): CssProps {
   const shadowDirection = (() => {
     switch (sty.shadowDirection ?? Align.bottomRight) {
