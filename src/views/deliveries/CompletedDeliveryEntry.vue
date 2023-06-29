@@ -1,7 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { PropType } from "vue";
+
+const props = defineProps({
+  sty: {
+    type: Object as PropType<Sty>,
+    default: {},
+  },
+});
+</script>
 
 <template>
-  <Card :sty="{ width: `1f` }">
+  <Card :sty="{ width: `1f`, ...props.sty }">
     <Row
       :sty="{
         width: `1f`,

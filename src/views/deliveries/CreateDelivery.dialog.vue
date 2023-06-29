@@ -2,7 +2,7 @@
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
 import { Client, Tank, FuelType, getAppData } from "@/AppData";
-import { PropType, VNodeRef, computed, ref } from "vue";
+import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 
@@ -73,6 +73,25 @@ const fuelTypeRate = ref(0);
 // Manual
 const clientName = ref(``);
 
+// Automation
+watchEffect(() => {
+  if (clientState.value !== clientStates.existing) {
+    if (tank.value === tankStates.existing) {
+      tank.value = undefined;
+    }
+  }
+});
+watchEffect(() => {
+  if (
+    tankState.value !== tankStates.justFuel &&
+    clientState.value !== clientStates.oneTime
+  ) {
+    if (fuelType.value === fuelTypeStates.oneTime) {
+      fuelType.value = undefined;
+    }
+  }
+});
+
 const deliveryIsValid = computed(() => {
   if (clientState.value === `One Time Client`) {
     return false;
@@ -114,151 +133,178 @@ export default {
     :sty="{
       width: `1f`,
       height: `1f`,
-      background: `#f9fafdaa`,
+      background: `#f9fafdce`,
     }"
   >
-    <Card
-      ref="cardRef"
+    <Column
       :sty="{
-        width: `75%`,
+        width: `1f`,
+        height: `1f`,
+        spacing: 1,
       }"
     >
-      <Text title>Create Delivery</Text>
+      <Card
+        ref="cardRef"
+        :sty="{
+          width: `75%`,
+        }"
+      >
+        <Text title>Create Delivery</Text>
 
-      <!-- Client -->
-      <Label label="Client">
-        <DropDown
-          v-model:selected="client"
-          :getKeyFromData="(data: Client | ClientState | undefined) => {
+        <!-- Client -->
+        <Label label="Client">
+          <DropDown
+            v-model:selected="client"
+            :getKeyFromData="(data: Client | ClientState | undefined) => {
             if (typeof data === `string`) {
               return data;
             } else {
               return data?._firestoreRef?.path;
             }
           }"
-          :speciaolOptions="[
-            {
-              label: `None`,
-              data: undefined,
-            },
-            {
-              label: clientStates.oneTime,
-              data: clientStates.oneTime,
-            },
-            {
-              label: clientStates.new,
-              data: clientStates.new,
-            },
-          ]"
-          :options="[
+            :speciaolOptions="[
+              {
+                label: `None`,
+                data: undefined,
+              },
+              {
+                label: clientStates.oneTime,
+                data: clientStates.oneTime,
+              },
+              {
+                label: clientStates.new,
+                data: clientStates.new,
+              },
+            ]"
+            :options="[
             ...orderDocs(appData.clients, (x) => x.name)
               .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
               .map((x) => ({ label: x.name!, data: x })),
           ]"
-        />
-      </Label>
+          />
+        </Label>
 
-      <!-- Tank -->
-      <Label label="Tank" v-if="clientState === clientStates.existing">
-        <DropDown
-          v-model:selected="tank"
-          :getKeyFromData="(data: Tank | TankState | undefined) => {
-            if (typeof data === `string`) {
-              return data;
-            } else {
-              return data?._firestoreRef?.path;
-            }
-          }"
-          :speciaolOptions="[
-            {
-              label: `None`,
-              data: undefined,
-            },
-            {
-              label: tankStates.justFuel,
-              data: tankStates.justFuel,
-            },
-            {
-              label: tankStates.new,
-              data: tankStates.new,
-            },
-          ]"
-          :options="[
-            ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
-              (x, index) => ({ label: `#${index}`, data: x }),
-            ),
-          ]"
-        />
-      </Label>
-
-      <!-- Fuel -->
-      <Label
-        label="Fuel"
-        v-if="
-          clientState === clientStates.existing &&
-          tankState === tankStates.justFuel
-        "
-      >
-        <DropDown
-          v-model:selected="fuelType"
-          :getKeyFromData="(data: FuelType | FuelTypeState | undefined) => {
-            if (typeof data === `string`) {
-              return data;
-            } else {
-              return data?._firestoreRef?.path;
-            }
-          }"
-          :speciaolOptions="[
-            {
-              label: `None`,
-              data: undefined,
-            },
-            {
-              label: fuelTypeStates.oneTime,
-              data: fuelTypeStates.oneTime,
-            },
-            {
-              label: fuelTypeStates.new,
-              data: fuelTypeStates.new,
-            },
-          ]"
-          :options="[
-          ...orderDocs(appData.fuelTypes ?? [], (x) => x.createdPosix).filter((x) => exists(x.name) && x.name !== ``).map(
-            (x, index) => ({ label: x.name!, data: x }),
-          ),
-        ]"
-        />
-      </Label>
-      <Row
-        v-if="
-          clientState === `Existing` &&
-          tankState === `Just Fuel` &&
-          [`One Time Fuel`, `New Fuel Type`].includes(fuelTypeState)
-        "
-        :sty="{ width: `1f`, spacing: 0.25 }"
-      >
-        <Label label="Name"
-          ><Field v-model:value="fuelTypeName" hint="Name"
-        /></Label>
-        <Label label="Rate"
-          ><Field v-model:value="fuelTypeRate" hint="Rate"
-        /></Label>
-      </Row>
-
-      <!-- Amount -->
-      <Label label="Amount"><Field v-model:value="amount" /></Label>
-
-      <!-- Buttons -->
-      <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
-        <Button outlined @click.stop="closePopUp">Cancel</Button>
-        <Button
-          @click.stop="handleYes"
-          :sty="{
-            background: deliveryIsValid ? mdColors.green : mdColors.grey,
-          }"
-          >Create</Button
+        <!-- Tank -->
+        <Label
+          label="Tank"
+          v-if="
+            clientState !== clientStates.oneTime &&
+            clientState !== clientStates.none
+          "
         >
-      </Row>
-    </Card>
+          <DropDown
+            v-model:selected="tank"
+            :getKeyFromData="(data: Tank | TankState | undefined) => {
+            if (typeof data === `string`) {
+              return data;
+            } else {
+              return data?._firestoreRef?.path;
+            }
+          }"
+            :speciaolOptions="[
+              {
+                label: `None`,
+                data: undefined,
+              },
+              {
+                label: tankStates.justFuel,
+                data: tankStates.justFuel,
+              },
+              {
+                label: tankStates.new,
+                data: tankStates.new,
+              },
+            ]"
+            :options="clientState === clientStates.existing ? [
+              ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
+                (x, index) => ({ label: `#${index}`, data: x }),
+              ),
+            ] : []"
+          />
+        </Label>
+
+        <!-- Fuel -->
+        <Label
+          label="Fuel"
+          v-if="
+            clientState === clientStates.oneTime ||
+            (clientState === clientStates.new &&
+              tankState !== tankStates.none) ||
+            (clientState === clientStates.existing &&
+              tankState !== tankStates.existing &&
+              tankState !== tankStates.none)
+          "
+        >
+          <DropDown
+            v-model:selected="fuelType"
+            :getKeyFromData="(data: FuelType | FuelTypeState | undefined) => {
+            if (typeof data === `string`) {
+              return data;
+            } else {
+              return data?._firestoreRef?.path;
+            }
+          }"
+            :speciaolOptions="[
+              {
+                label: `None`,
+                data: undefined,
+              },
+              ...(tankState === tankStates.justFuel ||
+              clientState === clientStates.oneTime
+                ? [
+                    {
+                      label: fuelTypeStates.oneTime,
+                      data: fuelTypeStates.oneTime,
+                    },
+                  ]
+                : []),
+              {
+                label: fuelTypeStates.new,
+                data: fuelTypeStates.new,
+              },
+            ]"
+            :options="[
+              ...orderDocs(appData.fuelTypes ?? [], (x) => x.createdPosix).filter((x) => exists(x.name) && x.name !== ``).map(
+                (x, index) => ({ label: x.name!, data: x }),
+              ),
+            ]"
+          />
+        </Label>
+        <Row
+          v-if="
+            clientState === `Existing` &&
+            tankState === `Just Fuel` &&
+            [`One Time Fuel`, `New Fuel Type`].includes(fuelTypeState)
+          "
+          :sty="{ width: `1f`, spacing: 0.25 }"
+        >
+          <Label label="Name"
+            ><Field v-model:value="fuelTypeName" hint="Name"
+          /></Label>
+          <Label label="Rate"
+            ><Field v-model:value="fuelTypeRate" hint="Rate"
+          /></Label>
+        </Row>
+
+        <!-- Amount -->
+        <Label label="Amount"><Field v-model:value="amount" /></Label>
+
+        <!-- Buttons -->
+        <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
+          <Button outlined @click.stop="closePopUp">Cancel</Button>
+          <Button
+            @click.stop="handleYes"
+            :sty="{
+              background: deliveryIsValid ? mdColors.green : mdColors.grey,
+            }"
+            >Create</Button
+          >
+        </Row>
+      </Card>
+      <Box />
+      <Text title>Related Deliveries</Text>
+      <CompletedDeliveryEntry :sty="{ width: `75%` }" />
+      <CompletedDeliveryEntry :sty="{ width: `75%` }" />
+    </Column>
   </Box>
 </template>
