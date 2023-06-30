@@ -658,6 +658,13 @@ function listProx<
                 ) {
                   defaultProps[key] =
                     createParams[key as keyof typeof createParams];
+                } else if (
+                  prop.format === `one` &&
+                  exists(createParams[key as keyof typeof createParams])
+                ) {
+                  defaultProps[key] = (
+                    createParams[key as keyof typeof createParams] as Doc
+                  )?._firestoreRef;
                 }
               }
               newDocRef.value = await addDoc(collectionRef, {

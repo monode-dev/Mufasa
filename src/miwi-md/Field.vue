@@ -12,6 +12,7 @@ import { mdColors } from "./Box/BoxDecoration";
 import { sizeToCss } from "./Box/BoxSize";
 import { numToFontSize } from "./Box/BoxText";
 import { Overflow, Axis, Align } from "./Box/BoxLayout";
+import { exists } from "./utils";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -23,7 +24,7 @@ const props = defineProps({
     default: false,
   },
   value: {
-    type: [String, Number] as PropType<string | number | undefined | null>,
+    type: String as PropType<string | undefined | null>,
     optional: true,
     default: "",
   },
@@ -51,13 +52,47 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  validateNextInput: {
+    type: Function as PropType<(nextInput: string) => boolean>,
+    default: undefined,
+  },
 });
-const emit = defineEmits(["update:value", "update:hasFocus"]);
+const emit = defineEmits<{
+  (event: "update:value", newValue: string): void;
+  (event: "update:hasFocus", newHasFocus: boolean): void;
+}>();
 const inputRef = ref<VNodeRef | null>(null);
 
 // Input
 function handleInput(event: Event) {
   emit("update:value", (event.target as any)?.value ?? "");
+}
+function handleKeyPress(event: KeyboardEvent) {
+  const nextInput = predictNextInput(event.key);
+  if (exists(nextInput) && exists(props.validateNextInput)) {
+    return props.validateNextInput(nextInput);
+  } else {
+    return true;
+  }
+}
+function handlePaste(event: ClipboardEvent) {
+  const nextInput = predictNextInput(
+    event.clipboardData?.getData("text") ?? ``,
+  );
+  if (exists(nextInput) && exists(props.validateNextInput)) {
+    return props.validateNextInput(nextInput);
+  } else {
+    return true;
+  }
+}
+function predictNextInput(newText: string) {
+  const input = inputRef.value;
+  if (!exists(input)) return;
+  return (
+    input.value.slice(0, input.selectionStart) +
+    newText +
+    input.value.slice(input.selectionEnd)
+  );
 }
 
 // Focus
@@ -153,6 +188,8 @@ function tryFocus() {
               @focus="handleFocus"
               @blur="handleBlur"
               :placeholder="hint"
+              :onkeypress="handleKeyPress"
+              :on-paste="handlePaste"
               class="field"
               :style="{
                 padding: 0,
@@ -195,6 +232,8 @@ function tryFocus() {
       @focus="handleFocus"
       @blur="handleBlur"
       :placeholder="hint"
+      :onkeypress="handleKeyPress"
+      :on-paste="handlePaste"
       class="field"
       :style="{
         padding: 0,

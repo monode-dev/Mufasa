@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { defineProps, PropType, ref, VNodeRef, watchEffect } from "vue";
-import { Sty } from "./Box/Box.vue";
+import { PropType } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { computed } from "vue";
 // Allow overriding of the default sty
@@ -33,6 +32,7 @@ const scale = computed(
       textColor: hint ? mdColors.grey : undefined,
       scale: scale,
       height: scale,
+      align: $Align.centerLeft,
       ...sty,
     }"
   >

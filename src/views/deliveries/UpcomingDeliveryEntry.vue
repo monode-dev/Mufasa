@@ -6,18 +6,18 @@ import {
   UpcomingExistingDelivery,
   Client,
   Tank,
+  getClientLabel,
+  getTankLabel,
 } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
-import { PropType, ref, watchEffect } from "vue";
+import { PropType, computed, ref, watchEffect } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import { orderDocs } from "@/utils";
 
 const props = defineProps({
   delivery: {
-    type: Object as PropType<
-      UpcomingOneTimeDelivery | UpcomingExistingDelivery
-    >,
+    type: Object as PropType<UpcomingExistingDelivery>,
     required: true,
   },
 });
@@ -41,80 +41,45 @@ watchEffect(() => {
 
 <template>
   <Card :sty="{ width: `1f` }">
+    <Row
+      :sty="{
+        width: `1f`,
+        spacing: 0.25,
+      }"
+    >
+      <Text :sty="{ width: `1f` }">{{
+        getClientLabel(props.delivery.upcomingExistingClient)
+      }}</Text>
+      <!-- <DeleteOptionsButton @delete="handleDelete" :shouldShowEdit="true" /> -->
+      <DeleteOptionsButton
+        @delete="handleDelete"
+        shouldShowEdit
+        shouldShowComplete
+      />
+    </Row>
+    <Row :sty="{ width: `1f`, spacing: 0.25 }">
+      <Row :sty="{ width: `2f`, spacing: 0.25 }">
+        <Text :sty="{ width: `1f` }"
+          >{{ props.delivery.quantity }} Gallons</Text
+        >
+        to</Row
+      >
+      <Text :sty="{ width: `3f` }">{{
+        getTankLabel(props.delivery.upcomingExistingTank)
+      }}</Text>
+    </Row>
     <!-- <Row
       :sty="{
         width: `1f`,
-        spacing: $Spacing.spaceBetween,
-      }"
-    >
-      <DropDown
-        v-model:selected="props.delivery.client"
-        :getKeyFromData="(data: Client | null | number) => {
-            if (typeof data === `number`) {
-              return `custom`;
-            } else {
-              return data?._firestoreRef?.path;
-            }
-          }"
-        :options="[
-            { label: `None`, data: undefined },
-            { label: `Custom`, data: 0 },
-            ...orderDocs(appData.clients, (x) => x.name)
-              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
-              .map((x) => ({ label: x.name!, data: x })),
-          ]"
-      />
-      <DeleteOptionsButton @delete="handleDelete" :shouldShowComplete="true" />
-    </Row>
-    <Row
-      :sty="{
-        width: `1f`,
         spacing: 0.25,
       }"
     >
-      <Row
-        :sty="{
-          width: `1f`,
-          spacing: 0.25,
-        }"
+      <Button outlined :sty="{ width: `1f`, textColor: $mdColors.grey }"
+        >Edit</Button
       >
-        <Field
-          :sty="{ height: 1 }"
-          v-model:value="props.delivery.amount"
-          hint="Amount"
-        />
-        <Text :sty="{ height: 1 }">to:</Text>
-      </Row>
-      <Row
-        :sty="{
-          width: `1f`,
-          align: $Align.centerLeft,
-          spacing: 0.25,
-        }"
+      <Button outlined :sty="{ width: `1f`, textColor: $mdColors.grey }"
+        >Complete</Button
       >
-        <DropDown
-          v-model:selected="props.delivery.tank"
-          :getKeyFromData="(data: Tank | null) => {
-            return data?._firestoreRef?.path;
-          }"
-          :options="[
-            { label: `No Tank Selected`, data: undefined },
-            ...orderDocs(
-              props.delivery?.client?.tanks ?? [],
-              (x) => x.creationTimePosix,
-            ).map((x, index) => ({ label: `#${index}`, data: x })),
-          ]"
-        />
-      </Row>
     </Row> -->
-    <Row
-      :sty="{
-        width: `1f`,
-        spacing: 0.25,
-      }"
-    >
-      <Button outlined :sty="{ width: `1f` }">Edit</Button>
-      <Button outlined :sty="{ width: `1f` }">Complete</Button>
-    </Row>
   </Card>
 </template>

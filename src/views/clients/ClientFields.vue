@@ -7,7 +7,7 @@ const props = defineProps({
     required: true,
   },
   clientId: {
-    type: [Number, String] as PropType<number | string | null | undefined>,
+    type: Number as PropType<number | null | undefined>,
     required: true,
   },
   phoneNumber: {
@@ -41,7 +41,7 @@ const emit = defineEmits([
     @update:value="emit(`update:name`, $event)"
     :sty="{ width: `1f` }"
   />
-  <Field
+  <NumField
     underlined
     hint="Client ID"
     icon="identifier"

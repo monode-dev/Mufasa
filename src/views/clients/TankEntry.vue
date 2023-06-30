@@ -4,8 +4,6 @@ import {
   FuelType,
   Tank,
   getAppData,
-  tankShape,
-  getTankShapeName,
 } from "@/AppData";
 import { popPage, pushPage } from "@/Nav";
 import DeleteDialogVue from "../components/DeleteDialog.vue";

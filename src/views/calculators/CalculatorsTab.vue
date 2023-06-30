@@ -1,19 +1,13 @@
 <script setup lang="ts">
-import {
-  getAppData,
-  Client,
-  Tank,
-  tankShape,
-  getTankShapeName,
-  UpcomingExistingDelivery,
-} from "@/AppData";
+import { getAppData, Client, Tank, UpcomingExistingDelivery } from "@/AppData";
 import { computed, ref } from "vue";
 import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import {
-  calcCurrentVolume,
-  calcTotalVolume,
   calcGallonsToReachPercent,
+  TankShapeId,
+  TANK_SHAPE_IDS,
+  getTankShape,
 } from "./ShapeUtils";
 
 const appData = getAppData();
@@ -34,24 +28,22 @@ const client = ref(undefined as Client | undefined);
 const tank = ref(undefined as Tank | undefined);
 
 // Dimensions
-const dimTankShape = ref(tankShape.none);
+const dimTankShape = ref<TankShapeId | undefined>(undefined);
 const dimLength = ref(0);
 const dimDepth = ref(0);
 const dimHeight = ref(0);
 const dimShortHeight = ref(0);
 
 // Other
-const stickedDepth = ref(0);
+const stickedInches = ref(0);
 
 // Estimates
 const tankShapeCalc = computed(() =>
   isDeliveryTab.value
-    ? delivery.value?.upcomingExistingTank?.shape ??
-      tank.value?.shape ??
-      tankShape.none
+    ? delivery.value?.upcomingExistingTank?.shape ?? tank.value?.shape
     : isTankTab.value
-    ? tank.value?.shape ?? tankShape.none
-    : dimTankShape.value ?? tankShape.none,
+    ? tank.value?.shape
+    : dimTankShape.value,
 );
 const tankLength = computed(() =>
   isDeliveryTab.value
@@ -83,8 +75,7 @@ const tankShortHeight = computed(() =>
 );
 const desiredFill = ref(0.9);
 const totalGallons = computed(() =>
-  calcTotalVolume({
-    shape: tankShapeCalc.value,
+  getTankShape(tankShapeCalc.value)?.calcTotalVolume({
     length: tankLength.value,
     depth: tankDepth.value,
     height: tankHeight.value,
@@ -92,18 +83,36 @@ const totalGallons = computed(() =>
   }),
 );
 const currentGallons = computed(() =>
-  calcCurrentVolume({
-    shape: tankShapeCalc.value,
-    length: tankLength.value,
-    depth: tankDepth.value,
-    height: tankHeight.value,
-    shortHeight: tankShortHeight.value,
-    stickedDepth: stickedDepth.value,
-  }),
+  getTankShape(tankShapeCalc.value)?.calcFilledVolume(
+    {
+      length: tankLength.value,
+      depth: tankDepth.value,
+      height: tankHeight.value,
+      shortHeight: tankShortHeight.value,
+    },
+    stickedInches.value,
+  ),
 );
-const currentFill = computed(() =>
-  totalGallons.value === 0 ? 0 : currentGallons.value / totalGallons.value,
+const currentFillPercent = computed(() =>
+  exists(totalGallons.value) && exists(currentGallons.value)
+    ? totalGallons.value === 0
+      ? 0
+      : currentGallons.value / totalGallons.value
+    : undefined,
 );
+const gallonsToReachDesiredFill = computed(() => {
+  const estimate = calcGallonsToReachPercent(
+    {
+      length: tankLength.value,
+      depth: tankDepth.value,
+      height: tankHeight.value,
+      shortHeight: tankShortHeight.value,
+    },
+    stickedInches.value,
+    desiredFill.value,
+  );
+  return exists(estimate) ? Math.round(estimate).toString() : `-`;
+});
 </script>
 
 <template>
@@ -195,8 +204,8 @@ const currentFill = computed(() =>
           v-model:selected="dimTankShape"
           :getKeyFromData="(data: any) => data"
           :options="[
-            ...Object.values(tankShape).map((x) => ({
-              label: getTankShapeName(x),
+            ...Object.values(TANK_SHAPE_IDS).map((x) => ({
+              label: getTankShape(x).nameLong,
               data: x,
             })),
           ]"
@@ -206,22 +215,22 @@ const currentFill = computed(() =>
             width: `1f`,
           }"
         >
-          <Label label="Length"><Field v-model:value="dimLength" /></Label>
-          <Label label="Depth"><Field v-model:value="dimDepth" /></Label>
+          <Label label="Length"><NumField v-model:value="dimLength" /></Label>
+          <Label label="Depth"><NumField v-model:value="dimDepth" /></Label>
         </Row>
         <Row
           :sty="{
             width: `1f`,
           }"
         >
-          <Label label="Height"><Field v-model:value="dimHeight" /></Label>
+          <Label label="Height"><NumField v-model:value="dimHeight" /></Label>
           <Label label="Short Height"
-            ><Field v-model:value="dimShortHeight"
+            ><NumField v-model:value="dimShortHeight"
           /></Label>
         </Row>
       </Box>
       <Label label="Sticked Inches"
-        ><Field v-model:value="stickedDepth"
+        ><NumField v-model:value="stickedInches"
       /></Label>
       <!-- <Box /> -->
       <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" />
@@ -230,13 +239,17 @@ const currentFill = computed(() =>
           label="Current Fill"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          {{ Math.round(100 * currentFill) }}%</Label
+          {{
+            exists(currentFillPercent)
+              ? Math.round(100 * currentFillPercent)
+              : `-`
+          }}%</Label
         >
         <Label
           label="Current Gallons"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          {{ Math.round(currentGallons) }}</Label
+          {{ exists(currentGallons) ? Math.round(currentGallons) : `-` }}</Label
         >
       </Row>
 
@@ -262,16 +275,7 @@ const currentFill = computed(() =>
         <Label
           label="Gallons to Add"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
-        >
-          {{
-            Math.round(
-              calcGallonsToReachPercent(
-                totalGallons,
-                currentGallons,
-                desiredFill,
-              ),
-            )
-          }}</Label
+          >{{ gallonsToReachDesiredFill }}</Label
         >
       </Row>
 

@@ -15,6 +15,10 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  shouldShowEdit: {
+    type: Boolean,
+    default: false,
+  },
   shouldShowComplete: {
     type: Boolean,
     default: false,
@@ -25,10 +29,14 @@ const props = defineProps({
   // },
 });
 
-const emit = defineEmits([`delete`, `complete`]);
+const emit = defineEmits([`delete`, `edit`, `complete`]);
 function deletePressed() {
   dropDownIsOpen.value = false;
   emit(`delete`);
+}
+function editPressed() {
+  dropDownIsOpen.value = false;
+  emit(`edit`);
 }
 function completePressed() {
   dropDownIsOpen.value = false;
@@ -92,11 +100,20 @@ onUnmounted(() => {
           shadowSize: 1,
           zIndex: 10000,
           background: mdColors.white,
+          align: $Align.centerRight,
         }"
       >
         <Row @click.stop="dropDownIsOpen = false" :sty="{ spacing: 0.25 }">
           <Text>Cancel</Text>
           <Icon icon="close" />
+        </Row>
+        <Row
+          v-if="shouldShowEdit"
+          @click.stop="editPressed"
+          :sty="{ spacing: 0.25 }"
+        >
+          <Text>Edit</Text>
+          <Icon icon="pencil" />
         </Row>
         <Row
           v-if="shouldShowComplete"
@@ -108,7 +125,10 @@ onUnmounted(() => {
         </Row>
         <Row
           @click.stop="deletePressed"
-          :sty="{ textColor: mdColors.red, spacing: 0.25 }"
+          :sty="{
+            textColor: mdColors.red,
+            spacing: 0.25,
+          }"
         >
           <Text>Delete</Text>
           <Icon icon="delete" />

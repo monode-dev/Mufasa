@@ -1,33 +1,36 @@
 import { Doc, List, defineAppDataStructure } from "./mufasa/Implement";
 import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 import { exists, orderDocs } from "./utils";
+import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
 
 export type ClientId = `${number}` | ``;
 export type Client = (typeof mufasaTypes)["Client"];
+export function getClientLabel(client: Client | null | undefined): string {
+  const nameExists = exists(client?.name) && client?.name !== ``;
+  const clientIdExists = exists(client?.clientId);
+  if (nameExists && clientIdExists) {
+    return `${client?.clientId} - ${client?.name}`;
+  } else if (nameExists) {
+    return client?.name!;
+  } else if (clientIdExists) {
+    return `${client?.clientId}`;
+  } else {
+    return `Unnamed Client`;
+  }
+}
 // const a = {} as Client;
 // a.fuelType;
-export type TankShape = (typeof tankShape)[keyof typeof tankShape];
-export const tankShape = {
-  none: 0,
-  horizontalCylinder: 1,
-  verticalCylinder: 2,
-  oval: 3,
-  rectangle: 4,
-  ellipse: 5,
-  truckBedTank: 6,
-} as const;
-export function getTankShapeName(shape: TankShape) {
-  return {
-    [tankShape.none]: `None`,
-    [tankShape.horizontalCylinder]: `Horizontal Cylinder`,
-    [tankShape.verticalCylinder]: `Vertical Cylinder`,
-    [tankShape.oval]: `Oval`,
-    [tankShape.rectangle]: `Rectangle`,
-    [tankShape.ellipse]: `Ellipse`,
-    [tankShape.truckBedTank]: `Truck Bed Tank`,
-  }[shape];
-}
 export type Tank = (typeof mufasaTypes)["Tank"];
+export function getTankLabel(tank: Tank | null | undefined): string {
+  // TODO: Fuel - Volume - Shape - Label
+  const fuelName = tank?.fuelType?.name;
+  const shapeName = getTankShape(tank?.shape)?.nameShort;
+  if (exists(fuelName) && exists(shapeName)) {
+    return `${fuelName} - ${shapeName}`;
+  } else {
+    return `Incomplete Tank`;
+  }
+}
 export type FuelType = (typeof mufasaTypes)["FuelType"];
 export type Delivery = (typeof mufasaTypes)["Delivery"];
 export type UpcomingExistingDelivery = Doc<{
@@ -115,7 +118,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
             typeName: `Tank`,
             props: {
               fuelType: defOne(`FuelType`, null),
-              shape: defPrim<TankShape>(tankShape.none),
+              shape: defPrim<TankShapeId>(undefined),
               // Maybe record x, y, and z instead.
               length: defPrim<number>(0),
               depth: defPrim<number>(0),

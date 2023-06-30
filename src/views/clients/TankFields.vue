@@ -1,25 +1,29 @@
 <script setup lang="ts">
-import { tankShape, getTankShapeName, TankShape } from "@/AppData";
 import { PropType } from "vue";
+import {
+  TANK_SHAPE_IDS,
+  TankShapeId,
+  getTankShape,
+} from "../calculators/ShapeUtils";
 const props = defineProps({
   shape: {
-    type: Number as PropType<TankShape | null | undefined>,
+    type: String as PropType<TankShapeId | null | undefined>,
     required: true,
   },
   length: {
-    type: [Number, String] as PropType<number | string | null | undefined>,
+    type: Number as PropType<number | null | undefined>,
     required: true,
   },
   depth: {
-    type: [Number, String] as PropType<number | string | null | undefined>,
+    type: Number as PropType<number | null | undefined>,
     required: true,
   },
   height: {
-    type: [Number, String] as PropType<number | string | null | undefined>,
+    type: Number as PropType<number | null | undefined>,
     required: true,
   },
   shortHeight: {
-    type: [Number, String] as PropType<number | string | null | undefined>,
+    type: Number as PropType<number | null | undefined>,
     required: true,
   },
 });
@@ -40,8 +44,8 @@ const emit = defineEmits([
     @update:selected="emit(`update:shape`, $event)"
     :getKeyFromData="(data: any) => data"
     :options="[
-      ...Object.values(tankShape).map((x) => ({
-        label: getTankShapeName(x),
+      ...TANK_SHAPE_IDS.map((x) => ({
+        label: getTankShape(x).nameLong,
         data: x,
       })),
     ]"
@@ -52,14 +56,14 @@ const emit = defineEmits([
     }"
   >
     <Label label="Length">
-      <Field
+      <NumField
         hint="0"
         :value="length"
         @update:value="emit(`update:length`, $event)"
       />
     </Label>
     <Label label="Depth">
-      <Field
+      <NumField
         hint="0"
         :value="depth"
         @update:value="emit(`update:depth`, $event)"
@@ -72,13 +76,13 @@ const emit = defineEmits([
     }"
   >
     <Label label="Height"
-      ><Field
+      ><NumField
         hint="0"
         :value="height"
         @update:value="emit(`update:height`, $event)"
     /></Label>
     <Label label="Short Height"
-      ><Field
+      ><NumField
         hint="0"
         :value="shortHeight"
         @update:value="emit(`update:shortHeight`, $event)"

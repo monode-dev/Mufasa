@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { getAppData, listUpcomingDeliveries } from "@/AppData";
+import {
+  UpcomingExistingDelivery,
+  getAppData,
+  listUpcomingDeliveries,
+} from "@/AppData";
 import { pushPage } from "@/Nav";
 import CreateDeliveryDialog from "./CreateDelivery.dialog.vue";
 
@@ -23,7 +27,7 @@ const appData = getAppData();
     <UpcomingDeliveryEntry
       v-for="(delivery, index) in listUpcomingDeliveries(appData.deliveries)"
       :key="delivery._firestoreRef?.path ?? index"
-      :delivery="delivery"
+      :delivery="(delivery as UpcomingExistingDelivery)"
     />
     <Box />
     <Text title>Completed Deliveries</Text>
