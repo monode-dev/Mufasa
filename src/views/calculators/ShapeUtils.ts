@@ -9,10 +9,10 @@ export type TankShapeDatails = {
   readonly nameShort: string;
   readonly dimensions: (keyof Tank)[];
   calcFilledVolume(
-    tank: Partial<Tank>,
+    tank: Partial<Tank> | null | undefined,
     stickedInches: number | undefined,
   ): number | undefined;
-  calcTotalVolume(tank: Partial<Tank>): number | undefined;
+  calcTotalVolume(tank: Partial<Tank> | null | undefined): number | undefined;
 };
 const _tankShapes: {
   readonly [Key in TankShapeId]: TankShapeDatails;
@@ -23,21 +23,27 @@ const _tankShapes: {
     dimensions: [`length`, `depth`, `height`],
     calcFilledVolume(tank, stickedInches) {
       if (
-        !exists(tank.length) ||
-        !exists(tank.depth) ||
+        !exists(tank?.length) ||
+        !exists(tank?.depth) ||
         !exists(stickedInches)
       ) {
         return undefined;
       }
       return (
-        (tank.length * tank.depth * stickedInches) / CUBIC_INCHES_PER_GALLON
+        (tank?.length! * tank?.depth! * stickedInches) / CUBIC_INCHES_PER_GALLON
       );
     },
     calcTotalVolume(tank) {
-      if (!exists(tank.length) || !exists(tank.depth) || !exists(tank.height)) {
+      if (
+        !exists(tank?.length) ||
+        !exists(tank?.depth) ||
+        !exists(tank?.height)
+      ) {
         return undefined;
       }
-      return (tank.length * tank.depth * tank.height) / CUBIC_INCHES_PER_GALLON;
+      return (
+        (tank?.length! * tank?.depth! * tank?.height!) / CUBIC_INCHES_PER_GALLON
+      );
     },
   },
 };

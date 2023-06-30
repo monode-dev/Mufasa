@@ -54,6 +54,7 @@ import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue"
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
+import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 // End Generated Imports
 CapacitorUpdater.notifyAppReady();
 
@@ -107,6 +108,7 @@ vueApp.component("UpcomingDeliveryEntry", UpcomingDeliveryEntry);
 vueApp.component("FuelTypeEntry", FuelTypeEntry);
 vueApp.component("Settings", Settings);
 vueApp.component("SettingsButton", SettingsButton);
+vueApp.component("CompleteDelivery", CompleteDelivery);
 // End Generated Components
 // vueApp.config.globalProperties.$align = Align;
 

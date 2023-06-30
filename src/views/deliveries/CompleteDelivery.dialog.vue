@@ -1,17 +1,22 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, getAppData } from "@/AppData";
+import {
+  Delivery,
+  UpcomingExistingDelivery,
+  completeDelivery,
+  getAppData,
+} from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
-import ClientPage from "./Client.page.vue";
 import { exists } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
+import { canCompleteDelivery } from "@/AppData";
 
 const props = defineProps({
-  // client: {
-  //   type: Object as PropType<Client>,
-  //   required: true,
-  // },
+  delivery: {
+    type: Object as PropType<UpcomingExistingDelivery>,
+    required: true,
+  },
   // message: {
   //   type: String,
   //   required: true,
@@ -19,32 +24,19 @@ const props = defineProps({
 });
 
 const appData = getAppData();
-
 const cardRef = ref<VNodeRef | null>(null);
-const name = ref(``);
-const clientId = ref<number | null>(null);
-const phoneNumber = ref(``);
-const address = ref(``);
-const notes = ref(``);
 
 function closePopUp() {
   popPage();
 }
 
-const clientIsValid = computed(() => {
-  return name.value.length > 0 || clientId.value !== null;
+const deliveryIsValid = computed(() => {
+  return canCompleteDelivery(props.delivery as Delivery);
 });
-function handleYes() {
-  if (!clientIsValid.value) return;
+function handleComplete() {
+  if (!deliveryIsValid.value) return;
   closePopUp();
-  const newClient = appData.clients.add({
-    name: name.value,
-    clientId: clientId.value,
-    phoneNumber: phoneNumber.value,
-    address: address.value,
-    notes: notes.value,
-  });
-  pushPage(ClientPage, { client: newClient });
+  completeDelivery(props.delivery as Delivery);
 }
 
 // Close the pop up when the user clicks outside of it
@@ -78,22 +70,15 @@ export default {
         shadowSize: 0,
       }"
     >
-      <Text title>Create Client</Text>
-      <ClientFields
-        v-model:name="name"
-        v-model:clientId="clientId"
-        v-model:phoneNumber="phoneNumber"
-        v-model:address="address"
-        v-model:notes="notes"
-      />
+      <Text title>Complete Delivery</Text>
       <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
         <Button outlined @click.stop="closePopUp">Cancel</Button>
         <Button
-          @click.stop="handleYes"
+          @click.stop="handleComplete"
           :sty="{
-            background: clientIsValid ? $mdColors.green : $mdColors.grey,
+            background: deliveryIsValid ? $mdColors.green : $mdColors.grey,
           }"
-          >Create</Button
+          >Complete</Button
         >
       </Row>
     </Card>

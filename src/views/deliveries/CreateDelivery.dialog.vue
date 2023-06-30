@@ -1,10 +1,18 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, Tank, FuelType, getAppData } from "@/AppData";
+import {
+  Client,
+  Tank,
+  FuelType,
+  getAppData,
+  getTankLabel,
+  getClientLabel,
+} from "@/AppData";
 import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
+import { getTankShape } from "../calculators/ShapeUtils";
 
 const appData = getAppData();
 
@@ -76,24 +84,17 @@ export default {
         <Label label="Client">
           <DropDown
             v-model:selected="client"
-            :getKeyFromData="(data: Client | undefined) => {
-            if (typeof data === `string`) {
-              return data;
-            } else {
-              return data?._firestoreRef?.path;
-            }
-          }"
-            :speciaolOptions="[
-              {
-                label: `None`,
-                data: undefined,
-              },
-            ]"
+            :getKeyFromData="(data: Client | null) => {
+                return data?._firestoreRef?.path;
+            }"
             :options="[
-            ...orderDocs(appData.clients, (x) => x.name)
-              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
-              .map((x) => ({ label: x.name!, data: x })),
-          ]"
+              ...orderDocs(appData.clients, (x) => getClientLabel(x))
+                .filter(
+                  (x) =>
+                    (exists(x.name) && x.name.length > 0) || exists(x.clientId),
+                )
+                .map((x) => ({ label: getClientLabel(x), data: x })),
+            ]"
           />
         </Label>
 
@@ -101,22 +102,12 @@ export default {
         <Label label="Tank" v-if="exists(client)">
           <DropDown
             v-model:selected="tank"
-            :getKeyFromData="(data: Tank | undefined) => {
-            if (typeof data === `string`) {
-              return data;
-            } else {
-              return data?._firestoreRef?.path;
-            }
-          }"
-            :speciaolOptions="[
-              {
-                label: `None`,
-                data: undefined,
-              },
-            ]"
+            :getKeyFromData="(data: Tank | null) => {
+                return data?._firestoreRef?.path;
+            }"
             :options="[
               ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
-                (x, index) => ({ label: `#${index}`, data: x }),
+                (x, index) => ({ label: getTankLabel(x), data: x }),
               ),
             ]"
           />

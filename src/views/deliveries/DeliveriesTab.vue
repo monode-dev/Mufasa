@@ -2,6 +2,7 @@
 import {
   UpcomingExistingDelivery,
   getAppData,
+  listCompletedDeliveries,
   listUpcomingDeliveries,
 } from "@/AppData";
 import { pushPage } from "@/Nav";
@@ -31,11 +32,10 @@ const appData = getAppData();
     />
     <Box />
     <Text title>Completed Deliveries</Text>
-    <CompletedDeliveryEntry />
-    <CompletedDeliveryEntry />
-    <CompletedDeliveryEntry />
-    <CompletedDeliveryEntry />
-    <CompletedDeliveryEntry />
-    <CompletedDeliveryEntry />
+    <CompletedDeliveryEntry
+      v-for="(delivery, index) in listCompletedDeliveries(appData.deliveries)"
+      :key="delivery._firestoreRef?.path ?? index"
+      :delivery="delivery"
+    />
   </Body>
 </template>

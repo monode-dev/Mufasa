@@ -14,6 +14,7 @@ import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { PropType, computed, ref, watchEffect } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import { orderDocs } from "@/utils";
+import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
 
 const props = defineProps({
   delivery: {
@@ -28,6 +29,12 @@ function handleDelete() {
   pushPage(DeleteDialog, {
     obj: props.delivery,
     message: `Are you sure you want to permanently delete this delivery?`,
+  });
+}
+
+function handleComplete() {
+  pushPage(CompleteDeliveryDialog, {
+    delivery: props.delivery,
   });
 }
 
@@ -55,6 +62,7 @@ watchEffect(() => {
         @delete="handleDelete"
         shouldShowEdit
         shouldShowComplete
+        @complete="handleComplete"
       />
     </Row>
     <Row :sty="{ width: `1f`, spacing: 0.25 }">

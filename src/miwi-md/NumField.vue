@@ -12,6 +12,7 @@ import { mdColors } from "./Box/BoxDecoration";
 import { sizeToCss } from "./Box/BoxSize";
 import { numToFontSize } from "./Box/BoxText";
 import { Overflow, Axis, Align } from "./Box/BoxLayout";
+import { exists } from "@/utils";
 // Allow overriding of the default sty
 const props = defineProps({
   sty: {
@@ -19,7 +20,7 @@ const props = defineProps({
     default: {},
   },
   value: {
-    type: Number as PropType<number | undefined | null>,
+    type: [Number, null] as PropType<number | null>,
     optional: true,
     default: "",
   },
@@ -53,13 +54,13 @@ const props = defineProps({
   },
 });
 const emit = defineEmits<{
-  (event: "update:value", newValue: number): void;
+  (event: "update:value", newValue: number | null): void;
   (event: "update:hasFocus", newHasFocus: boolean): void;
 }>();
 
-function textToNumber(text: string) {
+function textToNumber(text: string): number | null {
   const withoutCommas = text.replaceAll(",", "");
-  return Number(withoutCommas);
+  return withoutCommas.length > 0 ? Number(withoutCommas) : null;
 }
 
 function updateValue(newText: string) {
@@ -67,7 +68,8 @@ function updateValue(newText: string) {
 }
 
 function allowOnlyNumbers(newInput: string) {
-  return !Number.isNaN(textToNumber(newInput));
+  const asNumber = textToNumber(newInput);
+  return !exists(asNumber) || !Number.isNaN(asNumber);
 }
 </script>
 

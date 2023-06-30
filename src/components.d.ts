@@ -41,6 +41,7 @@ import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue"
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
+import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
@@ -86,5 +87,6 @@ UpcomingDeliveryEntry: typeof UpcomingDeliveryEntry;
 FuelTypeEntry: typeof FuelTypeEntry;
 Settings: typeof Settings;
 SettingsButton: typeof SettingsButton;
+CompleteDelivery: typeof CompleteDelivery;
   }
 }

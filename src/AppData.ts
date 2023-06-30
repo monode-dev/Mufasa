@@ -2,6 +2,7 @@ import { Doc, List, defineAppDataStructure } from "./mufasa/Implement";
 import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 import { exists, orderDocs } from "./utils";
 import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
+import { FormatToTsType, ObjToFormat } from "./mufasa/Parse";
 
 export type ClientId = `${number}` | ``;
 export type Client = (typeof mufasaTypes)["Client"];
@@ -23,10 +24,12 @@ export function getClientLabel(client: Client | null | undefined): string {
 export type Tank = (typeof mufasaTypes)["Tank"];
 export function getTankLabel(tank: Tank | null | undefined): string {
   // TODO: Fuel - Volume - Shape - Label
+  const shapeUtils = getTankShape(tank?.shape);
   const fuelName = tank?.fuelType?.name;
-  const shapeName = getTankShape(tank?.shape)?.nameShort;
-  if (exists(fuelName) && exists(shapeName)) {
-    return `${fuelName} - ${shapeName}`;
+  const volume = shapeUtils?.calcTotalVolume(tank);
+  const shapeName = shapeUtils?.nameShort;
+  if (exists(fuelName) && exists(volume) && exists(shapeName)) {
+    return `${fuelName} - ${Math.round(volume)} Gal. - ${shapeName}`;
   } else {
     return `Incomplete Tank`;
   }
@@ -37,20 +40,19 @@ export type UpcomingExistingDelivery = Doc<{
   deliveryFormat: `upcomingFromExisting`;
   upcomingExistingClient: Client | null;
   upcomingExistingTank: Tank | null;
-  createdPosix: number;
+  creationTimePosix: number;
   quantity: number;
 }>;
 export type UpcomingOneTimeDelivery = Doc<{
   deliveryFormat: `upcomingFromOneTime`;
   upcomingOneTimeClientName: string;
   upcomingOneTimeFuelType: FuelType | null;
-  createdPosix: number;
+  creationTimePosix: number;
   quantity: number;
 }>;
 export type CompletedDelivery = Doc<{
   deliveryFormat: `completed`;
-  completedClient: Client | null;
-  completedClientName: string;
+  completedClientLabel: string;
   completedDate: number;
   completedFuelTypeName: string;
   completedRate: number;
@@ -77,16 +79,19 @@ export function canCompleteDelivery(delivery: Delivery): boolean {
 export function completeDelivery(delivery: Delivery): void {
   if (!canCompleteDelivery(delivery)) return;
   if (delivery.deliveryFormat === `upcomingFromExisting`) {
-    delivery.completedClient = delivery.upcomingExistingClient;
-    delivery.completedClientName = delivery.completedClient!.name;
+    delivery.completedClientLabel = getClientLabel(
+      delivery.upcomingExistingClient,
+    );
     delivery.completedFuelTypeName =
-      delivery.upcomingExistingTank!.fuelType!.name;
-    delivery.completedRate = delivery.upcomingExistingTank!.fuelType!.rate;
+      delivery.upcomingExistingTank!.fuelType!.name!;
+    delivery.completedRate = delivery.upcomingExistingTank!.fuelType!.rate!;
+    delivery.completedTimePosix = Date.now();
+    delivery.deliveryFormat = `completed`;
   }
   if (delivery.deliveryFormat === `upcomingFromOneTime`) {
-    delivery.completedClientName = delivery.upcomingOneTimeClientName;
-    delivery.completedFuelTypeName = delivery.upcomingOneTimeFuelType!.name;
-    delivery.completedRate = delivery.upcomingOneTimeFuelType!.rate;
+    delivery.completedClientLabel = delivery.upcomingOneTimeClientName;
+    delivery.completedFuelTypeName = delivery.upcomingOneTimeFuelType!.name!;
+    delivery.completedRate = delivery.upcomingOneTimeFuelType!.rate!;
   }
 }
 export function listUpcomingDeliveries(allDeliveries: List<Delivery>) {
@@ -95,11 +100,13 @@ export function listUpcomingDeliveries(allDeliveries: List<Delivery>) {
     (x) => x.creationTimePosix,
   ) as any as (UpcomingExistingDelivery | UpcomingOneTimeDelivery)[];
 }
-export function listCompletedDeliveries(allDeliveries: List<Delivery>) {
+export function listCompletedDeliveries(
+  allDeliveries: List<Delivery>,
+): Delivery[] {
   return orderDocs(
     allDeliveries.filter((delivery) => delivery.deliveryFormat === `completed`),
     (x) => x.completedTimePosix,
-  ) as any as CompletedDelivery[];
+  );
 }
 
 // App Data Structure
@@ -118,7 +125,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
             typeName: `Tank`,
             props: {
               fuelType: defOne(`FuelType`, null),
-              shape: defPrim<TankShapeId>(undefined),
+              shape: defPrim<TankShapeId | null>(null),
               // Maybe record x, y, and z instead.
               length: defPrim<number>(0),
               depth: defPrim<number>(0),
@@ -135,7 +142,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
     defObj({
       typeName: `FuelType`,
       props: {
-        name: defPrim<string>(undefined),
+        name: defPrim<string | null>(null),
         rate: defPrim<number | null>(null),
         createdPosix: defPrim<number>(() => Date.now()),
       },
@@ -160,9 +167,8 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
         upcomingOneTimeFuelType: defOne(`FuelType`, null),
 
         // Completed
-        completedClient: defOne(`Client`, null),
-        completedClientName: defPrim<string>(``),
-        completedTimePosix: defPrim<number>(-1),
+        completedClientLabel: defPrim<string>(``),
+        completedTimePosix: defPrim<number | null>(null),
         completedFuelTypeName: defPrim<string>(``),
         completedRate: defPrim<number>(0),
       },

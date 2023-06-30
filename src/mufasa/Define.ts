@@ -19,10 +19,7 @@ export type DefPrim<T extends PrimTsType = PrimTsType> = {
   type: `primitive`;
   init: PrimInitTsType<T>;
 };
-export type PrimInitTsType<T extends PrimTsType> =
-  | T
-  | (() => PrimTsType)
-  | undefined;
+export type PrimInitTsType<T extends PrimTsType> = T | (() => PrimTsType);
 // TODO: We need a type has no surounding whitespace.
 export function defPrim<T extends PrimTsType>(
   init: PrimInitTsType<T>,

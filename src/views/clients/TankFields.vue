@@ -7,7 +7,7 @@ import {
 } from "../calculators/ShapeUtils";
 const props = defineProps({
   shape: {
-    type: String as PropType<TankShapeId | null | undefined>,
+    type: [String, null, undefined] as PropType<TankShapeId | null | undefined>,
     required: true,
   },
   length: {

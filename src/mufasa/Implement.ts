@@ -155,7 +155,7 @@ async function completeFileUpload({
 //
 // SECTION: Doc
 export type Doc<T extends {} = {}> = {
-  [K in keyof T]: T[K] | null | undefined;
+  [K in keyof T]: T[K] | undefined;
 } & DocSpecificProps;
 export type DocSpecificProps = {
   readonly _firestoreRef: DocumentReference | null | undefined;

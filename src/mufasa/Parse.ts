@@ -29,7 +29,7 @@ export type FormatToTsType<
     ? Promise<string | null> | null | string
     : F[TypeName][K][`format`] extends `one`
     ? F[TypeName][K][`typeName`] extends string
-      ? FormatToTsType<F[TypeName][K][`typeName`], F>
+      ? FormatToTsType<F[TypeName][K][`typeName`], F> | null
       : never
     : F[TypeName][K][`format`] extends `many`
     ? F[TypeName][K][`typeName`] extends string
@@ -39,7 +39,7 @@ export type FormatToTsType<
 }>;
 export type CreateParamsFromDoc<T extends Doc> = T extends Doc<infer R>
   ? {
-      [K in keyof R]?: R[K];
+      [K in keyof R]?: R[K]; // Null is now gone
     }
   : never;
 export type UnionToIntersection<U> = (

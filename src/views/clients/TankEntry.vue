@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
-import {
-  FuelType,
-  Tank,
-  getAppData,
-} from "@/AppData";
+import { FuelType, Tank, getAppData } from "@/AppData";
 import { popPage, pushPage } from "@/Nav";
 import DeleteDialogVue from "../components/DeleteDialog.vue";
 const appData = getAppData();

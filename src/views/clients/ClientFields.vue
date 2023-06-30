@@ -3,23 +3,23 @@ import { PropType } from "vue";
 
 const props = defineProps({
   name: {
-    type: String as PropType<string | null | undefined>,
+    type: [String, null, undefined] as PropType<string | null | undefined>,
     required: true,
   },
   clientId: {
-    type: Number as PropType<number | null | undefined>,
+    type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
   phoneNumber: {
-    type: String as PropType<string | null | undefined>,
+    type: [String, null, undefined] as PropType<string | null | undefined>,
     required: true,
   },
   address: {
-    type: String as PropType<string | null | undefined>,
+    type: [String, null, undefined] as PropType<string | null | undefined>,
     required: true,
   },
   notes: {
-    type: String as PropType<string | null | undefined>,
+    type: [String, null, undefined] as PropType<string | null | undefined>,
     required: true,
   },
 });

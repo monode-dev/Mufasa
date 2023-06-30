@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { getAppData, Client, Tank, UpcomingExistingDelivery } from "@/AppData";
+import {
+  getAppData,
+  Client,
+  Tank,
+  UpcomingExistingDelivery,
+  getTankLabel,
+  getClientLabel,
+} from "@/AppData";
 import { computed, ref } from "vue";
 import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
@@ -20,15 +27,15 @@ const isDimensionsTab = computed(() => tabIndex.value === 2);
 const toDimensionsTab = () => (tabIndex.value = 2);
 
 // Delivery
-const delivery = ref(undefined as UpcomingExistingDelivery | undefined);
+const delivery = ref<UpcomingExistingDelivery | null>(null);
 
 // Client
-const client = ref(undefined as Client | undefined);
+const client = ref<Client | null>(null);
 // TODO: Should go to null when client changes.
-const tank = ref(undefined as Tank | undefined);
+const tank = ref<Tank | null>(null);
 
 // Dimensions
-const dimTankShape = ref<TankShapeId | undefined>(undefined);
+const dimTankShape = ref<TankShapeId | null>(null);
 const dimLength = ref(0);
 const dimDepth = ref(0);
 const dimHeight = ref(0);
@@ -169,28 +176,29 @@ const gallonsToReachDesiredFill = computed(() => {
       <Label label="Client" v-if="isTankTab">
         <DropDown
           v-model:selected="client"
-          :getKeyFromData="(data: Client | undefined) => {
-            return data?._firestoreRef?.path;
-          }"
-          :speciaolOptions="[{ label: `None`, data: undefined }]"
+          :getKeyFromData="(data: Client | null) => {
+                return data?._firestoreRef?.path;
+            }"
           :options="[
-            ...orderDocs(appData.clients, (x) => x.name)
-              .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
-              .map((x) => ({ label: x.name!, data: x })),
+            ...orderDocs(appData.clients, (x) => getClientLabel(x))
+              .filter(
+                (x) =>
+                  (exists(x.name) && x.name.length > 0) || exists(x.clientId),
+              )
+              .map((x) => ({ label: getClientLabel(x), data: x })),
           ]"
       /></Label>
       <Label label="Tank" v-if="isTankTab && exists(client)">
         <DropDown
           v-model:selected="tank"
-          :getKeyFromData="(data: Tank | undefined) => {
-            return data?._firestoreRef?.path;
-          }"
-          :speciaolOptions="[{ label: `None`, data: undefined }]"
+          :getKeyFromData="(data: Tank | null) => {
+                return data?._firestoreRef?.path;
+            }"
           :options="[
-            ...orderDocs(client?.tanks ?? [], (x) => x.creationTimePosix).map(
-              (x, index) => ({ label: `#${index}`, data: x }),
-            ),
-          ]"
+              ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
+                (x, index) => ({ label: getTankLabel(x), data: x }),
+              ),
+            ]"
       /></Label>
       <Box
         v-if="isDimensionsTab"
