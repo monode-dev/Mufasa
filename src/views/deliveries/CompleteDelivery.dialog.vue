@@ -1,54 +1,58 @@
 <script setup lang="ts">
-// import { PropType } from "vue";
-import { pageTransitions, popPage, pushPage } from "@/Nav";
-import {
-  Delivery,
-  UpcomingExistingDelivery,
-  completeDelivery,
-  getAppData,
-} from "@/AppData";
+import { pageTransitions, popPage } from "@/Nav";
+import { Delivery, getClientLabel } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
-import { exists } from "@/utils";
-import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { canCompleteDelivery } from "@/AppData";
 
 const props = defineProps({
   delivery: {
-    type: Object as PropType<UpcomingExistingDelivery>,
+    type: Object as PropType<Delivery>,
     required: true,
   },
-  // message: {
-  //   type: String,
-  //   required: true,
-  // },
+  dialogType: {
+    type: String as PropType<`complete` | `edit`>,
+    default: `complete`,
+  },
 });
 
-const appData = getAppData();
 const cardRef = ref<VNodeRef | null>(null);
-const clientName = ref(props.delivery.upcomingExistingClient!.name!);
-const quantity = ref(props.delivery.quantity ?? 0);
-const completedFuelTypeName = ref(
-  props.delivery.upcomingExistingTank!.fuelType!.name!,
+const clientNameLabel = ref(
+  props.dialogType === `complete`
+    ? getClientLabel(props.delivery.upcomingExistingClient)
+    : props.delivery.completedClientLabel,
 );
-const completedRate = ref(props.delivery.upcomingExistingTank!.fuelType!.rate!);
-
-function closePopUp() {
-  popPage();
-}
+const quantity = ref(props.delivery.quantity ?? 0);
+const fuelTypeName = ref(
+  props.dialogType === `complete`
+    ? props.delivery.upcomingExistingTank?.fuelType?.name ?? `Unnamed`
+    : props.delivery.completedFuelTypeName,
+);
+const rate = ref(
+  props.dialogType === `complete`
+    ? props.delivery.upcomingExistingTank?.fuelType?.rate ?? 0
+    : props.delivery.completedRate,
+);
 
 const deliveryIsValid = computed(() => {
   return canCompleteDelivery(props.delivery as Delivery);
 });
 function handleComplete() {
-  if (!deliveryIsValid.value) return;
-  closePopUp();
-  completeDelivery(props.delivery as Delivery);
+  if (!deliveryIsValid.value && props.dialogType === `complete`) return;
+  popPage();
+  props.delivery.completedClientLabel = clientNameLabel.value;
+  props.delivery.quantity = quantity.value;
+  props.delivery.completedFuelTypeName = fuelTypeName.value;
+  props.delivery.completedRate = rate.value;
+  if (props.dialogType === `complete`) {
+    props.delivery.completedTimePosix = Date.now();
+    props.delivery.deliveryFormat = `completed`;
+  }
 }
 
 // Close the pop up when the user clicks outside of it
 function popOnClickOutside(e: MouseEvent) {
   if (!cardRef.value?.$el.contains(e.target)) {
-    closePopUp();
+    popPage();
     e.stopPropagation();
   }
 }
@@ -77,14 +81,27 @@ export default {
       }"
     >
       <Text title>Complete Delivery</Text>
+      <Label label="Client"
+        ><Field v-model:value="clientNameLabel" hint="Client"
+      /></Label>
+      <Label label="Fuel"
+        ><Field v-model:value="fuelTypeName" hint="Fuel"
+      /></Label>
+      <Label label="Amount"
+        ><NumField v-model:value="quantity" hint="Amount"
+      /></Label>
+      <Label label="Rate"><NumField v-model:value="rate" hint="Rate" /></Label>
       <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
-        <Button outlined @click.stop="closePopUp">Cancel</Button>
+        <Button outlined @click.stop="popPage">Cancel</Button>
         <Button
           @click.stop="handleComplete"
           :sty="{
-            background: deliveryIsValid ? $mdColors.green : $mdColors.grey,
+            background:
+              deliveryIsValid || dialogType === `edit`
+                ? $mdColors.green
+                : $mdColors.grey,
           }"
-          >Complete</Button
+          >{{ dialogType === `complete` ? `Complete` : `Save` }}</Button
         >
       </Row>
     </Card>

@@ -2,7 +2,6 @@ import { Doc, List, defineAppDataStructure } from "./mufasa/Implement";
 import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 import { exists, orderDocs } from "./utils";
 import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
-import { FormatToTsType, ObjToFormat } from "./mufasa/Parse";
 import { computed, isRef, ref, watchEffect } from "vue";
 
 export type ClientId = `${number}` | ``;
@@ -107,6 +106,7 @@ export function listCompletedDeliveries(
   return orderDocs(
     allDeliveries.filter((delivery) => delivery.deliveryFormat === `completed`),
     (x) => x.completedTimePosix,
+    { direction: `reverse` },
   );
 }
 

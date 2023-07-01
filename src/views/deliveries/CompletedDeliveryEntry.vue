@@ -2,6 +2,8 @@
 import { CompletedDelivery, Delivery, getClientLabel } from "@/AppData";
 import { PropType } from "vue";
 import { exists } from "@/utils";
+import { pushPage } from "@/Nav";
+import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
 
 const props = defineProps({
   sty: {
@@ -14,7 +16,14 @@ const props = defineProps({
   },
 });
 
-// Tue, March 10th 2021
+function handleEdit() {
+  pushPage(CompleteDeliveryDialog, {
+    dialogType: `edit`,
+    delivery: props.delivery,
+  });
+}
+
+// Tue, March 10th 2021 - 3:00 PM
 function formatPosixTime(posixTime: number) {
   // Create a new Date object from the posix time
   let date = new Date(posixTime);
@@ -42,6 +51,10 @@ function formatPosixTime(posixTime: number) {
   let dayOfWeek = days[date.getDay()];
   let month = months[date.getMonth()];
   let day = date.getDate();
+  let time = date.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
   // Add the ordinal suffix
   let suffix = "";
@@ -63,7 +76,7 @@ function formatPosixTime(posixTime: number) {
   let year = date.getFullYear();
 
   // Return the formatted string
-  return `${dayOfWeek}, ${month} ${day}${suffix} ${year}`;
+  return `${dayOfWeek}, ${month} ${day}${suffix} ${year} - ${time}`;
 }
 </script>
 
@@ -80,7 +93,7 @@ function formatPosixTime(posixTime: number) {
           ? formatPosixTime(delivery.completedTimePosix)
           : `Unknown Date`
       }}</Text>
-      <DeleteOptionsButton />
+      <DeleteOptionsButton shouldShowEdit @edit="handleEdit" />
     </Row>
 
     <Label label="Client">
@@ -120,9 +133,11 @@ function formatPosixTime(posixTime: number) {
       <Label label="Total"
         ><Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }"
           >${{
-            Math.round(
-              (delivery.quantity ?? 0) * (delivery.completedRate ?? 0) * 100,
-            ) / 100
+            (
+              Math.round(
+                (delivery.quantity ?? 0) * (delivery.completedRate ?? 0) * 100,
+              ) / 100
+            ).toFixed(2)
           }}</Text
         ></Label
       >
