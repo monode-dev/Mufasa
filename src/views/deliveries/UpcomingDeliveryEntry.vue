@@ -15,6 +15,7 @@ import { PropType, computed, ref, watchEffect } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import { orderDocs } from "@/utils";
 import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
+import UpcomingDeliveryDialog from "./UpcomingDelivery.dialog.vue";
 
 const props = defineProps({
   delivery: {
@@ -25,16 +26,23 @@ const props = defineProps({
 
 const appData = getAppData();
 
-function handleDelete() {
-  pushPage(DeleteDialog, {
-    obj: props.delivery,
-    message: `Are you sure you want to permanently delete this delivery?`,
+function handleEdit() {
+  pushPage(UpcomingDeliveryDialog, {
+    dialogType: `edit`,
+    delivery: props.delivery,
   });
 }
 
 function handleComplete() {
   pushPage(CompleteDeliveryDialog, {
     delivery: props.delivery,
+  });
+}
+
+function handleDelete() {
+  pushPage(DeleteDialog, {
+    obj: props.delivery,
+    message: `Are you sure you want to permanently delete this delivery?`,
   });
 }
 
@@ -62,6 +70,7 @@ watchEffect(() => {
         @delete="handleDelete"
         shouldShowEdit
         shouldShowComplete
+        @edit="handleEdit"
         @complete="handleComplete"
       />
     </Row>

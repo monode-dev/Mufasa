@@ -25,6 +25,12 @@ const props = defineProps({
 
 const appData = getAppData();
 const cardRef = ref<VNodeRef | null>(null);
+const clientName = ref(props.delivery.upcomingExistingClient!.name!);
+const quantity = ref(props.delivery.quantity ?? 0);
+const completedFuelTypeName = ref(
+  props.delivery.upcomingExistingTank!.fuelType!.name!,
+);
+const completedRate = ref(props.delivery.upcomingExistingTank!.fuelType!.rate!);
 
 function closePopUp() {
   popPage();

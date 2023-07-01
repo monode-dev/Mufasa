@@ -1,26 +1,45 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
-import { pageTransitions, popPage, pushPage } from "@/Nav";
+import { pageTransitions, popPage } from "@/Nav";
 import {
   Client,
   Tank,
-  FuelType,
   getAppData,
   getTankLabel,
   getClientLabel,
+  Delivery,
 } from "@/AppData";
-import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
+import { PropType, VNodeRef, computed, ref } from "vue";
 import { exists, orderDocs } from "@/utils";
-import { mdColors } from "@/miwi-md/Box/BoxDecoration";
-import { getTankShape } from "../calculators/ShapeUtils";
+
+const props = defineProps({
+  dialogType: {
+    type: String as PropType<`create` | `edit`>,
+    default: `create`,
+  },
+  delivery: {
+    type: Object as PropType<Delivery | undefined>,
+    default: undefined,
+    required: false,
+  },
+});
+const deliveryToEdit = computed(() =>
+  props.dialogType === `edit` && exists(props.delivery)
+    ? props.delivery
+    : undefined,
+);
 
 const appData = getAppData();
 
 const cardRef = ref<VNodeRef | null>(null);
 
-const client = ref<Client | undefined>(undefined);
-const tank = ref<Tank | undefined>(undefined);
-const amount = ref(0);
+const client = ref<Client | null>(
+  deliveryToEdit.value?.upcomingExistingClient ?? null,
+);
+const tank = ref<Tank | null>(
+  deliveryToEdit.value?.upcomingExistingTank ?? null,
+);
+const amount = ref(deliveryToEdit.value?.quantity ?? 0);
 
 const deliveryIsValid = computed(() => {
   return exists(client.value) && exists(tank.value); // && amount.value > 0;
@@ -32,11 +51,17 @@ function closePopUp() {
 function handleYes() {
   if (!deliveryIsValid.value) return;
   closePopUp();
-  appData.deliveries.add({
-    upcomingExistingClient: client.value!,
-    upcomingExistingTank: tank.value!,
-    quantity: amount.value,
-  });
+  if (props.dialogType === `create`) {
+    appData.deliveries.add({
+      upcomingExistingClient: client.value!,
+      upcomingExistingTank: tank.value!,
+      quantity: amount.value,
+    });
+  } else if (props.dialogType === `edit`) {
+    deliveryToEdit.value!.upcomingExistingClient = client.value!;
+    deliveryToEdit.value!.upcomingExistingTank = tank.value!;
+    deliveryToEdit.value!.quantity = amount.value;
+  }
 }
 
 // Close the pop up when the user clicks outside of it
@@ -61,7 +86,7 @@ export default {
       width: `1f`,
       height: `1f`,
       background: `#f9fafdce`,
-      align: $Align.topCenter,
+      align: $Align.center,
     }"
   >
     <Body
@@ -69,7 +94,7 @@ export default {
         width: `1f`,
         height: `1f`,
         spacing: 1,
-        align: $Align.topCenter,
+        align: $Align.center,
       }"
     >
       <Card
@@ -78,7 +103,9 @@ export default {
           width: `75%`,
         }"
       >
-        <Text title>Create Delivery</Text>
+        <Text title
+          >{{ dialogType === `create` ? `Create` : `Edit` }} Delivery</Text
+        >
 
         <!-- Client -->
         <Label label="Client">
@@ -122,9 +149,9 @@ export default {
           <Button
             @click.stop="handleYes"
             :sty="{
-              background: deliveryIsValid ? mdColors.green : mdColors.grey,
+              background: deliveryIsValid ? $mdColors.green : $mdColors.grey,
             }"
-            >Create</Button
+            >{{ dialogType === `create` ? `Create` : `Save` }}</Button
           >
         </Row>
       </Card>

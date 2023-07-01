@@ -6,7 +6,7 @@ import {
   listUpcomingDeliveries,
 } from "@/AppData";
 import { pushPage } from "@/Nav";
-import CreateDeliveryDialog from "./CreateDelivery.dialog.vue";
+import UpcomingDeliveryDialog from "./UpcomingDelivery.dialog.vue";
 
 const appData = getAppData();
 </script>
@@ -20,7 +20,7 @@ const appData = getAppData();
         <Icon
           icon="plus"
           :scale="1.25"
-          @click.stop="pushPage(CreateDeliveryDialog)"
+          @click.stop="pushPage(UpcomingDeliveryDialog)"
         />
       </Box>
     </Row>
