@@ -35,13 +35,13 @@ import DeleteOptionsButton from "./views/components/DeleteOptionsButton.vue";
 import Label from "./views/components/Label.vue";
 import OfflineWarning from "./views/components/OfflineWarning.vue";
 import CompletedDeliveryEntry from "./views/deliveries/CompletedDeliveryEntry.vue";
+import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 import CreateDelivery from "./views/deliveries/CreateDelivery.dialog.vue";
 import DeliveriesTab from "./views/deliveries/DeliveriesTab.vue";
 import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue";
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
-import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
@@ -81,12 +81,12 @@ DeleteOptionsButton: typeof DeleteOptionsButton;
 Label: typeof Label;
 OfflineWarning: typeof OfflineWarning;
 CompletedDeliveryEntry: typeof CompletedDeliveryEntry;
+CompleteDelivery: typeof CompleteDelivery;
 CreateDelivery: typeof CreateDelivery;
 DeliveriesTab: typeof DeliveriesTab;
 UpcomingDeliveryEntry: typeof UpcomingDeliveryEntry;
 FuelTypeEntry: typeof FuelTypeEntry;
 Settings: typeof Settings;
 SettingsButton: typeof SettingsButton;
-CompleteDelivery: typeof CompleteDelivery;
   }
 }

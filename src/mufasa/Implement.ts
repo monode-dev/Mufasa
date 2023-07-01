@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { initializeApp } from "firebase/app";
+import { initializeApp, FirebaseOptions } from "firebase/app";
 import {
   initializeFirestore,
   CACHE_SIZE_UNLIMITED,
@@ -16,6 +16,7 @@ import {
   doc,
   QuerySnapshot,
   DocumentData,
+  Firestore,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -56,98 +57,69 @@ import {
 //
 //
 // SECTION: Firestore
-const firebaseConfig = {
-  apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
-  authDomain: "ninety-percent.firebaseapp.com",
-  projectId: "ninety-percent",
-  storageBucket: "ninety-percent.appspot.com",
-  messagingSenderId: "341748622809",
-  appId: "1:341748622809:web:a114f74a7c325fc68de5c8",
-};
 
-const firebasApp = initializeApp(firebaseConfig);
-export const firebaseDb = initializeFirestore(firebasApp, {
-  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
-});
-try {
-  // TODO: Overide indexedDB persistence to use capacitor storage
-  enableIndexedDbPersistence(firebaseDb)
-    .then(() => {
-      // Offline persistence enabled successfully
-    })
-    .catch((err) => {
-      // Error enabling offline persistence
-    });
-  // initializeDb() {
-  //   this.indexedDB = new NgxIndexedDB(this.DB_NAME, this.DB_VERSION);
-  //   return this.indexedDB.openDatabase(this.DB_VERSION, evt => {
-  //      ...
-  //   });
-  // }
-} catch (err) {
-  // console.log(err);
-}
+let firebaseDb: Firestore;
 
 async function getUuid() {
   return `${(await Device.getId()).uuid}-${Date.now()}`;
 }
 
-async function completeFileUpload({
-  docPath,
-  propKey,
-  fileId,
-  data,
-  oldFileIdToDelete,
-}: {
-  docPath: string;
-  propKey: string;
-  fileId: string;
-  data: string;
-  oldFileIdToDelete: string | undefined;
-}) {
-  // Upload data to firebase storage
-  let haveUploaded = false;
-  while (!haveUploaded) {
-    try {
-      await uploadBytes(
-        storageRef(getStorage(firebasApp), `MX_Files/${fileId}.txt`),
-        new TextEncoder().encode(data),
-      );
-      haveUploaded = true;
-    } catch (err) {}
-  }
-  await writeFileToIndexedDB(`MX_Files`, `${fileId}.txt`, data);
-  // await Filesystem.writeFile({
-  //   path: `MX_Files/${fileId}.txt`,
-  //   data: data,
-  //   directory: Directory.Data,
-  //   encoding: Encoding.UTF8,
-  //   recursive: true,
-  // });
+// async function completeFileUpload({
+//   docPath,
+//   propKey,
+//   fileId,
+//   data,
+//   oldFileIdToDelete,
+// }: {
+//   docPath: string;
+//   propKey: string;
+//   fileId: string;
+//   data: string;
+//   oldFileIdToDelete: string | undefined;
+// }) {
+//   // Upload data to firebase storage
+//   let haveUploaded = false;
+//   while (!haveUploaded) {
+//     try {
+//       await uploadBytes(
+//         storageRef(getStorage(firebasApp), `MX_Files/${fileId}.txt`),
+//         new TextEncoder().encode(data),
+//       );
+//       haveUploaded = true;
+//     } catch (err) {}
+//   }
+//   await writeFileToIndexedDB(`MX_Files`, `${fileId}.txt`, data);
+//   // await Filesystem.writeFile({
+//   //   path: `MX_Files/${fileId}.txt`,
+//   //   data: data,
+//   //   directory: Directory.Data,
+//   //   encoding: Encoding.UTF8,
+//   //   recursive: true,
+//   // });
 
-  deleteFileFromIndexedDB(`MX_FilesToUpload`, `${fileId}.txt`);
-  // Filesystem.deleteFile({
-  //   path: `MX_FilesToUpload/${fileId}.txt`,
-  //   directory: Directory.Data,
-  // });
+//   deleteFileFromIndexedDB(`MX_FilesToUpload`, `${fileId}.txt`);
+//   // Filesystem.deleteFile({
+//   //   path: `MX_FilesToUpload/${fileId}.txt`,
+//   //   directory: Directory.Data,
+//   // });
 
-  deleteFileFromIndexedDB(`MX_FilesToUpload`, `${fileId}.json`);
-  // Filesystem.deleteFile({
-  //   path: `MX_FilesToUpload/${fileId}.json`,
-  //   directory: Directory.Data,
-  // });
-  updateDoc(doc(firebaseDb, docPath), {
-    [propKey]: {
-      local: null,
-      remote: fileId,
-    },
-  });
-  if (exists(oldFileIdToDelete)) {
-    deleteObject(
-      storageRef(getStorage(firebasApp), `MX_Files/${oldFileIdToDelete}.txt`),
-    );
-  }
-}
+//   deleteFileFromIndexedDB(`MX_FilesToUpload`, `${fileId}.json`);
+//   // Filesystem.deleteFile({
+//   //   path: `MX_FilesToUpload/${fileId}.json`,
+//   //   directory: Directory.Data,
+//   // });
+//   updateDoc(doc(firebaseDb, docPath), {
+//     [propKey]: {
+//       local: null,
+//       remote: fileId,
+//     },
+//   });
+//   if (exists(oldFileIdToDelete)) {
+//     deleteObject(
+//       storageRef(getStorage(firebasApp), `MX_Files/${oldFileIdToDelete}.txt`),
+//     );
+//   }
+// }
 
 //
 //
@@ -899,8 +871,34 @@ function createCache(objFormats: ObjFormats) {
 }
 export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
   modelName: string,
+  firebaseOptions: FirebaseOptions,
   modelDef: T,
 ) {
+  // Setup Firebase
+  const firebasApp = initializeApp(firebaseOptions);
+  firebaseDb = initializeFirestore(firebasApp, {
+    cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+  });
+  try {
+    // TODO: Overide indexedDB persistence to use capacitor storage
+    enableIndexedDbPersistence(firebaseDb)
+      .then(() => {
+        // Offline persistence enabled successfully
+      })
+      .catch((err) => {
+        // Error enabling offline persistence
+      });
+    // initializeDb() {
+    //   this.indexedDB = new NgxIndexedDB(this.DB_NAME, this.DB_VERSION);
+    //   return this.indexedDB.openDatabase(this.DB_VERSION, evt => {
+    //      ...
+    //   });
+    // }
+  } catch (err) {
+    // console.log(err);
+  }
+
+  // Setup Mufasa interface
   function buildObjFormats<
     T extends DefObj[`props`],
     D extends DefObj[`props`],

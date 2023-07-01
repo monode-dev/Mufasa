@@ -110,68 +110,79 @@ export function listCompletedDeliveries(
 }
 
 // App Data Structure
-export const { getAppData, mufasaTypes } = defineAppDataStructure(`firestore`, {
-  clients: defMany(
-    defObj({
-      typeName: `Client`,
-      props: {
-        name: defPrim<string>(``),
-        clientId: defPrim<number | null>(null),
-        phoneNumber: defPrim<string>(``),
-        address: defPrim<string>(``),
-        notes: defPrim<string>(``),
-        tanks: defMany(
-          defObj({
-            typeName: `Tank`,
-            props: {
-              fuelType: defOne(`FuelType`, null),
-              shape: defPrim<TankShapeId | null>(null),
-              // Maybe record x, y, and z instead.
-              length: defPrim<number>(0),
-              depth: defPrim<number>(0),
-              height: defPrim<number>(0),
-              shortHeight: defPrim<number>(0),
-              creationTimePosix: defPrim<number>(() => Date.now()),
-            },
-          } as const),
-        ),
-      },
-    } as const),
-  ),
-  fuelTypes: defMany(
-    defObj({
-      typeName: `FuelType`,
-      props: {
-        name: defPrim<string | null>(null),
-        rate: defPrim<number | null>(null),
-        createdPosix: defPrim<number>(() => Date.now()),
-      },
-    } as const),
-  ),
-  deliveries: defMany(
-    defObj({
-      typeName: `Delivery`,
-      props: {
-        deliveryFormat: defPrim<
-          `completed` | `upcomingFromExisting` | `upcomingFromOneTime`
-        >(`upcomingFromExisting`),
-        creationTimePosix: defPrim<number>(() => Date.now()),
-        quantity: defPrim<number>(0),
+export const { getAppData, mufasaTypes } = defineAppDataStructure(
+  `firestore`,
+  {
+    apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",
+    authDomain: "ninety-percent.firebaseapp.com",
+    projectId: "ninety-percent",
+    storageBucket: "ninety-percent.appspot.com",
+    messagingSenderId: "341748622809",
+    appId: "1:341748622809:web:a114f74a7c325fc68de5c8",
+  },
+  {
+    clients: defMany(
+      defObj({
+        typeName: `Client`,
+        props: {
+          name: defPrim<string>(``),
+          clientId: defPrim<number | null>(null),
+          phoneNumber: defPrim<string>(``),
+          address: defPrim<string>(``),
+          notes: defPrim<string>(``),
+          tanks: defMany(
+            defObj({
+              typeName: `Tank`,
+              props: {
+                fuelType: defOne(`FuelType`, null),
+                shape: defPrim<TankShapeId | null>(null),
+                // Maybe record x, y, and z instead.
+                length: defPrim<number>(0),
+                depth: defPrim<number>(0),
+                height: defPrim<number>(0),
+                shortHeight: defPrim<number>(0),
+                creationTimePosix: defPrim<number>(() => Date.now()),
+              },
+            } as const),
+          ),
+        },
+      } as const),
+    ),
+    fuelTypes: defMany(
+      defObj({
+        typeName: `FuelType`,
+        props: {
+          name: defPrim<string | null>(null),
+          rate: defPrim<number | null>(null),
+          createdPosix: defPrim<number>(() => Date.now()),
+        },
+      } as const),
+    ),
+    deliveries: defMany(
+      defObj({
+        typeName: `Delivery`,
+        props: {
+          deliveryFormat: defPrim<
+            `completed` | `upcomingFromExisting` | `upcomingFromOneTime`
+          >(`upcomingFromExisting`),
+          creationTimePosix: defPrim<number>(() => Date.now()),
+          quantity: defPrim<number>(0),
 
-        // Upcoming from existing client
-        upcomingExistingClient: defOne(`Client`, null),
-        upcomingExistingTank: defOne(`Tank`, null),
+          // Upcoming from existing client
+          upcomingExistingClient: defOne(`Client`, null),
+          upcomingExistingTank: defOne(`Tank`, null),
 
-        // Upcoming from one-time client
-        upcomingOneTimeClientName: defPrim<string>(``),
-        upcomingOneTimeFuelType: defOne(`FuelType`, null),
+          // Upcoming from one-time client
+          upcomingOneTimeClientName: defPrim<string>(``),
+          upcomingOneTimeFuelType: defOne(`FuelType`, null),
 
-        // Completed
-        completedClientLabel: defPrim<string>(``),
-        completedTimePosix: defPrim<number | null>(null),
-        completedFuelTypeName: defPrim<string>(``),
-        completedRate: defPrim<number>(0),
-      },
-    } as const),
-  ),
-});
+          // Completed
+          completedClientLabel: defPrim<string>(``),
+          completedTimePosix: defPrim<number | null>(null),
+          completedFuelTypeName: defPrim<string>(``),
+          completedRate: defPrim<number>(0),
+        },
+      } as const),
+    ),
+  },
+);

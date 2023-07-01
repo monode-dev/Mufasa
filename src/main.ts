@@ -48,13 +48,13 @@ import DeleteOptionsButton from "./views/components/DeleteOptionsButton.vue";
 import Label from "./views/components/Label.vue";
 import OfflineWarning from "./views/components/OfflineWarning.vue";
 import CompletedDeliveryEntry from "./views/deliveries/CompletedDeliveryEntry.vue";
+import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 import CreateDelivery from "./views/deliveries/CreateDelivery.dialog.vue";
 import DeliveriesTab from "./views/deliveries/DeliveriesTab.vue";
 import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue";
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
-import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 // End Generated Imports
 CapacitorUpdater.notifyAppReady();
 
@@ -102,13 +102,13 @@ vueApp.component("DeleteOptionsButton", DeleteOptionsButton);
 vueApp.component("Label", Label);
 vueApp.component("OfflineWarning", OfflineWarning);
 vueApp.component("CompletedDeliveryEntry", CompletedDeliveryEntry);
+vueApp.component("CompleteDelivery", CompleteDelivery);
 vueApp.component("CreateDelivery", CreateDelivery);
 vueApp.component("DeliveriesTab", DeliveriesTab);
 vueApp.component("UpcomingDeliveryEntry", UpcomingDeliveryEntry);
 vueApp.component("FuelTypeEntry", FuelTypeEntry);
 vueApp.component("Settings", Settings);
 vueApp.component("SettingsButton", SettingsButton);
-vueApp.component("CompleteDelivery", CompleteDelivery);
 // End Generated Components
 // vueApp.config.globalProperties.$align = Align;
 
