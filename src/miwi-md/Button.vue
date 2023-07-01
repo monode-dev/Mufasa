@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import { Sty } from "./Box/Box.vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { Align, Axis } from "./Box/BoxLayout";
 import { computed } from "@vue/reactivity";
