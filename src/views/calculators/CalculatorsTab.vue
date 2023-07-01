@@ -6,6 +6,8 @@ import {
   UpcomingExistingDelivery,
   getTankLabel,
   getClientLabel,
+  Delivery,
+  listUpcomingDeliveries,
 } from "@/AppData";
 import { computed, ref } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -110,6 +112,7 @@ const currentFillPercent = computed(() =>
 const gallonsToReachDesiredFill = computed(() => {
   const estimate = calcGallonsToReachPercent(
     {
+      shape: tankShapeCalc.value,
       length: tankLength.value,
       depth: tankDepth.value,
       height: tankHeight.value,
@@ -155,23 +158,22 @@ const gallonsToReachDesiredFill = computed(() => {
           spacing: 1,
         }"
       >
-        <!-- <DropDown
+        <DropDown
           label="Delivery"
           v-model:selected="delivery"
-          :getKeyFromData="(data: UpcomingDelivery | null) => {
+          :getKeyFromData="(data: Delivery | null) => {
             return data?._firestoreRef?.path;
           }"
           :options="[
-            { label: `None`, data: undefined },
-            ...orderDocs(
-              appData.upcomingDeliveries,
-              (x) => x.creationTimePosix,
-            ).map((x) => ({
-              label: `${x.client?.name ?? `Unnamed`} - Tank - ${x.amount}`,
+            //{ label: `None`, data: null },
+            ...listUpcomingDeliveries(appData.deliveries).map((x) => ({
+              label: `${getClientLabel((x as any)?.upcomingExistingClient)} - ${getTankLabel(
+                (x as any)?.upcomingExistingTank,
+              )}`,
               data: x,
             })),
           ]"
-        /> -->
+        />
       </Box>
       <Label label="Client" v-if="isTankTab">
         <DropDown
@@ -288,19 +290,11 @@ const gallonsToReachDesiredFill = computed(() => {
       </Row>
 
       <Slider :min="0.8" v-model:value="desiredFill" :max="1" />
-      <!-- <Row :sty="{ spacing: 0.375 }">
-        <Box> 80%</Box>
-        <Slider :min="0.8" v-model:value="desiredFill" :max="1" />
-        <Box> 100%</Box>
-      </Row> -->
-      <!-- <Button :sty="{ width: `1f` }"
-        >Record Delivery</Button
-      > -->
     </Card>
     <Box />
     <Box />
-    <Button :sty="{ width: `1f` }">Record Delivery</Button>
-    <!-- <Box :sty="{ height: `1f` }" />
-    <Button :sty="{ width: `1f` }">Record Delivery</Button> -->
+    <Button :sty="{ width: `1f`, background: $mdColors.grey }"
+      >Record Delivery</Button
+    >
   </Body>
 </template>
