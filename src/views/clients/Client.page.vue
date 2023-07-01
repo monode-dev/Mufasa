@@ -6,7 +6,7 @@ import { Client } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { FuelType, getAppData } from "@/AppData";
 import DeleteDialog from "../components/DeleteDialog.vue";
-const appData = getAppData();
+// const appData = getAppData();
 
 const props = defineProps({
   client: {

@@ -1,4 +1,3 @@
-import { defineStore } from "pinia";
 import { initializeApp, FirebaseOptions } from "firebase/app";
 import {
   initializeFirestore,
@@ -14,30 +13,18 @@ import {
   query,
   getDocs,
   doc,
-  QuerySnapshot,
   DocumentData,
   Firestore,
 } from "firebase/firestore";
-import {
-  getStorage,
-  ref as storageRef,
-  uploadBytes,
-  deleteObject,
-} from "firebase/storage";
-import {
-  ComputedRef,
-  Ref,
-  ShallowReactive,
-  UnwrapRef,
-  computed,
-  isRef,
-  ref,
-  shallowReactive,
-  watchEffect,
-} from "vue";
+// import {
+//   getStorage,
+//   ref as storageRef,
+//   uploadBytes,
+//   deleteObject,
+// } from "firebase/storage";
 import { exists } from "../utils";
 import { DefMany, DefObj } from "./Define";
-import { Device } from "@capacitor/device";
+// import { Device } from "@capacitor/device";
 import {
   CreateParamsFromDoc,
   FormatToTs,
@@ -45,24 +32,34 @@ import {
   ObjFormats,
   ObjPropsToObjFormats,
 } from "./Parse";
-import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import {
-  deleteFileFromIndexedDB,
-  readFileFromIndexedDB,
-  writeFileToIndexedDB,
-} from "./IndexedDBFileSystem";
+// import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+// import {
+//   deleteFileFromIndexedDB,
+//   readFileFromIndexedDB,
+//   writeFileToIndexedDB,
+// } from "./IndexedDBFileSystem";
 
 //
 //
 //
 //
-// SECTION: Firestore
+// SECTION: Reactivity & Firestore
+type Computed<T> = {
+  get value(): T;
+};
+type Signal<T> = {
+  set value(newValue: T);
+} & Computed<T>;
+let _computed: <T>(compute: () => T) => Computed<T>;
+let _signal: <T>(initialValue: T) => Signal<T>;
+let _isSignal: (obj: any) => obj is Signal<any>;
+let _watchEffect: (effect: () => void) => void;
+// Firebase
+let firestoreDb: Firestore;
 
-let firebaseDb: Firestore;
-
-async function getUuid() {
-  return `${(await Device.getId()).uuid}-${Date.now()}`;
-}
+// async function getUuid() {
+//   return `${(await Device.getId()).uuid}-${Date.now()}`;
+// }
 
 // async function completeFileUpload({
 //   docPath,
@@ -142,7 +139,7 @@ export function docProx<
 >(
   docRef:
     | DocumentReference
-    | Ref<DocumentReference | null | undefined>
+    | Signal<DocumentReference | null | undefined>
     | null
     | undefined,
   typeName: TypeName,
@@ -157,13 +154,13 @@ export function docProx<
   //   console.log("Caller:", callerLine);
   // }
   // const chars = genRandomChars(10);
-  // const data = ref<T | null | undefined>(null);
+  // const data = _signal<T | null | undefined>(null);
 
   // Add standard props
-  const hasBeenDeleted = ref(false);
+  const hasBeenDeleted = _signal(false);
   let haveSetUpDeletionWatch = false;
-  watchEffect(() => {
-    const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+  _watchEffect(() => {
+    const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
     if (!exists(actualDocRef)) return;
     const doesExist = localCache.checkDeletion(typeName, actualDocRef.path);
     // We skip the first run so we only watch for changes.
@@ -175,11 +172,11 @@ export function docProx<
   });
   let proxy: Doc<{ [key: string]: any }> = {
     get _firestoreRef() {
-      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
       return actualDocRef ?? undefined;
     },
     get isLoaded() {
-      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
       if (exists(actualDocRef)) {
         return localCache.checkExists(typeName, actualDocRef.path);
       } else {
@@ -190,12 +187,12 @@ export function docProx<
       return hasBeenDeleted.value;
     },
     async deleteDoc() {
-      const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
       if (exists(actualDocRef)) {
         // Delete all sub docs
         for (const format of Object.values(objFormats[typeName])) {
           if (format.format === `many`) {
-            const collectionRef = collection(firebaseDb, format.typeName!);
+            const collectionRef = collection(firestoreDb, format.typeName!);
             const docs = await getDocs(
               query(collectionRef, where(`mx_parent`, "==", actualDocRef)),
             );
@@ -274,7 +271,7 @@ export function docProx<
     } else if (format.format === `many`) {
       /** NOTE: We use to have to instnatiate the list proxy here. I think it was beacuse
        * of the infinite reactive refresh bug. I don't think we have to do this anymore. */
-      // const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+      // const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
       // const newListProx = listProx(
       //   format.typeName!,
       //   objFormats,
@@ -292,7 +289,7 @@ export function docProx<
       // });
       Object.defineProperty(proxy, propKey, {
         get: function () {
-          const actualDocRef = isRef(docRef) ? docRef.value : docRef;
+          const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
           return listProx(
             format.typeName!,
             objFormats,
@@ -498,7 +495,7 @@ function listProx<
   propNameOnParent?: string,
 ) {
   // const chars = genRandomChars(10);
-  const collectionRef = collection(firebaseDb, typeName);
+  const collectionRef = collection(firestoreDb, typeName);
   // const collectionList = (() => {
   //   const collectionList = ref<T[]>([]);
   //   let lastSnapshot: QuerySnapshot | null = null;
@@ -556,7 +553,7 @@ function listProx<
     //   console.log(`path`, path);
     //   mx_parentPath.value = path;
     // })();
-    const collectionList = computed(() => {
+    const collectionList = _computed(() => {
       if (exists((mx_parent as any)?.path)) {
         return (
           localCache.getPropValue(
@@ -573,7 +570,7 @@ function listProx<
     });
     return vueRefToList(collectionList, mx_parent);
   } else {
-    const collectionList = computed(() =>
+    const collectionList = _computed(() =>
       localCache
         .listAllObjectsOfType(typeName)
         .map((elementRef) =>
@@ -583,7 +580,7 @@ function listProx<
     return vueRefToList(collectionList, mx_parent);
   }
   function vueRefToList<T extends Doc<{}>>(
-    collectionList: ComputedRef<T[]> | Ref<T[]>,
+    collectionList: Computed<T[]> | Signal<T[]>,
     mx_parent?: DocumentReference | null | undefined,
   ): List<T> {
     return {
@@ -595,7 +592,7 @@ function listProx<
       },
       filter(filterFn) {
         return vueRefToList(
-          computed(() => collectionList.value.filter(filterFn)),
+          _computed(() => collectionList.value.filter(filterFn)),
         );
       },
       map(mapFn) {
@@ -604,7 +601,7 @@ function listProx<
       add(createParams) {
         return docProx<TypeName, F>(
           (() => {
-            const newDocRef = ref(null as null | DocumentReference);
+            const newDocRef = _signal(null as null | DocumentReference);
 
             (async () => {
               const parent = mx_parent;
@@ -694,10 +691,10 @@ function listProx<
 // SECTION: Define
 function createCache(objFormats: ObjFormats) {
   type DocCache = {
-    [propName: string]: Ref<
+    [propName: string]: Signal<
       number | string | boolean | null | DocumentReference
     >;
-  } & { mx_parentPath?: string; deletionCheck: Ref<boolean> };
+  } & { mx_parentPath?: string; deletionCheck: Signal<boolean> };
   const getParentOf = (() => {
     const parentOfMap: {
       [childType: string]: {
@@ -723,7 +720,7 @@ function createCache(objFormats: ObjFormats) {
   })();
   const cache: {
     [collection: string]: {
-      docsChanged: Ref<number>;
+      docsChanged: Signal<number>;
       docs: {
         [docPath: string]: DocCache;
       };
@@ -734,13 +731,13 @@ function createCache(objFormats: ObjFormats) {
     docFormat: ObjFormats[string],
   ) {
     const docCache: DocCache = {
-      deletionCheck: ref(false),
+      deletionCheck: _signal(false),
     };
     for (const [propName, propFormat] of Object.entries(docFormat)) {
       if (propFormat.format === `many`) {
-        docCache[propName] = ref(0);
+        docCache[propName] = _signal(0);
       } else {
-        docCache[propName] = ref(initData[propName]);
+        docCache[propName] = _signal(initData[propName]);
       }
     }
     if (initData.mx_parent) {
@@ -763,9 +760,9 @@ function createCache(objFormats: ObjFormats) {
     }
   }
   for (const typeName in objFormats) {
-    const collectionRef = collection(firebaseDb, typeName);
+    const collectionRef = collection(firestoreDb, typeName);
     cache[typeName] = {
-      docsChanged: ref(0),
+      docsChanged: _signal(0),
       docs: {},
     };
     onSnapshot(collectionRef, (snapshot) => {
@@ -840,7 +837,7 @@ function createCache(objFormats: ObjFormats) {
       cache[typeName].docsChanged.value;
       const objects: DocumentReference[] = [];
       for (const docPath in cache[typeName].docs) {
-        objects.push(doc(firebaseDb, docPath));
+        objects.push(doc(firestoreDb, docPath));
       }
       return objects;
     },
@@ -859,7 +856,7 @@ function createCache(objFormats: ObjFormats) {
         for (const docPath in cache[childType].docs) {
           const thisDoc = cache[childType].docs[docPath];
           if (thisDoc.mx_parentPath === objPath) {
-            contents.push(doc(firebaseDb, docPath));
+            contents.push(doc(firestoreDb, docPath));
           }
         }
         return contents;
@@ -869,19 +866,42 @@ function createCache(objFormats: ObjFormats) {
     },
   };
 }
+function defineMiwiDataStore<T>(
+  modelName: string,
+  defineStore: () => T,
+): () => T {
+  const storePropName = `miwi_dataStore_${modelName}`;
+  return function () {
+    if (!exists((window as any)[storePropName])) {
+      (window as any)[storePropName] = defineStore();
+    }
+    return (window as any)[storePropName];
+  };
+}
 export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
   modelName: string,
   firebaseOptions: FirebaseOptions,
+  reactivity: {
+    computed: typeof _computed;
+    signal: typeof _signal;
+    isSignal: typeof _isSignal;
+    watchEffect: typeof _watchEffect;
+  },
   modelDef: T,
 ) {
+  // Setup Reactivity
+  _computed = reactivity.computed;
+  _signal = reactivity.signal;
+  _isSignal = reactivity.isSignal;
+  _watchEffect = reactivity.watchEffect;
   // Setup Firebase
   const firebasApp = initializeApp(firebaseOptions);
-  firebaseDb = initializeFirestore(firebasApp, {
+  firestoreDb = initializeFirestore(firebasApp, {
     cacheSizeBytes: CACHE_SIZE_UNLIMITED,
   });
   try {
     // TODO: Overide indexedDB persistence to use capacitor storage
-    enableIndexedDbPersistence(firebaseDb)
+    enableIndexedDbPersistence(firestoreDb)
       .then(() => {
         // Offline persistence enabled successfully
       })
@@ -952,7 +972,7 @@ export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
   const objFormats = buildObjFormats<T, T>(modelDef);
 
   return {
-    getAppData: defineStore(modelName, () => {
+    getAppData: defineMiwiDataStore(modelName, () => {
       const localCache = createCache(objFormats);
 
       const manyCollections: {

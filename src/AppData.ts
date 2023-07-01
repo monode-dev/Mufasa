@@ -3,6 +3,7 @@ import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 import { exists, orderDocs } from "./utils";
 import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
 import { FormatToTsType, ObjToFormat } from "./mufasa/Parse";
+import { computed, isRef, ref, watchEffect } from "vue";
 
 export type ClientId = `${number}` | ``;
 export type Client = (typeof mufasaTypes)["Client"];
@@ -119,6 +120,12 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
     storageBucket: "ninety-percent.appspot.com",
     messagingSenderId: "341748622809",
     appId: "1:341748622809:web:a114f74a7c325fc68de5c8",
+  },
+  {
+    computed: computed,
+    signal: ref,
+    isSignal: isRef,
+    watchEffect: watchEffect,
   },
   {
     clients: defMany(
