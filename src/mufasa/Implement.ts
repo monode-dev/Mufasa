@@ -770,6 +770,7 @@ function createCache(objFormats: ObjFormats) {
         const docPath = change.doc.ref.path;
         const docData = change.doc.data();
         if (change.type === "added") {
+          // Create
           cache[typeName].docs[docPath] = createDocCache(
             docData,
             objFormats[typeName],
@@ -788,8 +789,8 @@ function createCache(objFormats: ObjFormats) {
               }
             }
           }
-          // console.log(`added`, docPath, docData);
         } else if (change.type === "modified") {
+          // Update
           updateDocCache(
             cache[typeName].docs[docPath],
             docData,
@@ -821,12 +822,24 @@ function createCache(objFormats: ObjFormats) {
               }
             }
           }
-          // console.log(`modified`, docPath, docData);
         } else if (change.type === "removed") {
+          // Delete
           cache[typeName].docs[docPath].deletionCheck.value = true;
           delete cache[typeName].docs[docPath];
           cache[typeName].docsChanged.value += 1;
-          // console.log(`removed`, docPath, docData);
+          if (exists(docData.mx_parent)) {
+            const newPropPath = docData.mx_parent?.path;
+            const parentInfo = getParentOf(typeName);
+            if (exists(parentInfo)) {
+              const newParentsProp =
+                cache[parentInfo.parentType]?.docs[newPropPath]?.[
+                  parentInfo.propName
+                ];
+              if (exists(newParentsProp)) {
+                (newParentsProp.value as number) += 1;
+              }
+            }
+          }
         }
       });
     });

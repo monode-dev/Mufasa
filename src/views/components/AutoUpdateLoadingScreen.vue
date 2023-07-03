@@ -2,15 +2,16 @@
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { pushPage, useNav } from "@/Nav";
+import { pushPage } from "@/Nav";
 import { App } from "@capacitor/app";
 import HomePage from "@/views/Home.page.vue";
 import { exists } from "@/utils";
-import { ref } from "vue";
+
 const textSize = 1.25;
 let haveCheckedForUpdates = false;
 let haveDownloadedUpdate = false;
 let appStartRequested = false;
+
 // Single thread app startup so we don't accidentally do it twice
 (async () => {
   let haveStartedTheApp = false;
@@ -45,7 +46,7 @@ setTimeout(() => {
 
     // If there is a patch available, download and apply it
     if (exists(latest.url) && latest.url !== ``) {
-      SplashScreen.hide(); //await SplashScreen.hide();
+      SplashScreen.hide();
 
       // Download the latest patch
       const patchData = await CapacitorUpdater.download({
@@ -54,6 +55,7 @@ setTimeout(() => {
       });
       haveDownloadedUpdate = true;
 
+      // Apply the update at the right time.
       if (!appStartRequested) {
         // Apply the patch on close
         App.addListener("appStateChange", async ({ isActive }) => {
