@@ -26,16 +26,16 @@ let appStartRequested = false;
 })();
 
 // If have not checked for updates after a short bit, then apply the update after start
-// setTimeout(() => {
-//   if (!haveCheckedForUpdates) {
-//     appStartRequested = true;
-//   }
-// }, 5 * 1000);
-// setTimeout(() => {
-//   if (!haveDownloadedUpdate) {
-//     appStartRequested = true;
-//   }
-// }, 10 * 1000);
+setTimeout(() => {
+  if (!haveCheckedForUpdates) {
+    appStartRequested = true;
+  }
+}, 5 * 1000);
+setTimeout(() => {
+  if (!haveDownloadedUpdate) {
+    appStartRequested = true;
+  }
+}, 10 * 1000);
 
 // Check for updates;
 (async () => {
