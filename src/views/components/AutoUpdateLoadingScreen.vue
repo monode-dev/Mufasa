@@ -30,12 +30,12 @@ setTimeout(() => {
   if (!haveCheckedForUpdates) {
     appStartRequested = true;
   }
-}, 5 * 1000);
+}, 6.5 * 1000);
 setTimeout(() => {
   if (!haveDownloadedUpdate) {
     appStartRequested = true;
   }
-}, 10 * 1000);
+}, 11 * 1000);
 
 // Check for updates;
 (async () => {
