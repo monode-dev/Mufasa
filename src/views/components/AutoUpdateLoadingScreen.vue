@@ -24,21 +24,20 @@ let appStartRequested = false;
   }
 })();
 
-// Check for updates
-getAndApplyPatch();
-async function getAndApplyPatch() {
-  // If have not checked for updates after a short bit, then apply the update after start
-  setTimeout(() => {
-    if (!appStartRequested && !haveCheckedForUpdates) {
-      appStartRequested = true;
-    }
-  }, 3 * 1000);
-  setTimeout(() => {
-    if (!appStartRequested && !haveDownloadedUpdate) {
-      appStartRequested = true;
-    }
-  }, 10 * 1000);
+// If have not checked for updates after a short bit, then apply the update after start
+setTimeout(() => {
+  if (!haveCheckedForUpdates) {
+    appStartRequested = true;
+  }
+}, 3 * 1000);
+setTimeout(() => {
+  if (!haveDownloadedUpdate) {
+    appStartRequested = true;
+  }
+}, 10 * 1000);
 
+// Check for updates;
+(async () => {
   try {
     // Check if there is a patch available
     const latest = await CapacitorUpdater.getLatest();
@@ -56,16 +55,16 @@ async function getAndApplyPatch() {
       haveDownloadedUpdate = true;
 
       if (!appStartRequested) {
-        CapacitorUpdater.set({ id: patchData.id });
-        // I don't know if this does anything, since CapacitorUpdater.set might refresh the whole app and reload this page.
-        appStartRequested = true;
-      } else {
         // Apply the patch on close
         App.addListener("appStateChange", async ({ isActive }) => {
           if (!isActive) {
             await CapacitorUpdater.set({ id: patchData.id });
           }
         });
+      } else {
+        CapacitorUpdater.set({ id: patchData.id });
+        // I don't know if this does anything, since CapacitorUpdater.set might refresh the whole app and reload this page.
+        appStartRequested = true;
       }
     } else {
       appStartRequested = true;
@@ -73,7 +72,7 @@ async function getAndApplyPatch() {
   } catch (e) {
     console.error(e);
   }
-}
+})();
 </script>
 
 <template>
