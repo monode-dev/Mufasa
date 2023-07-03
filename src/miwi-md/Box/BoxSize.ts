@@ -56,6 +56,7 @@ export function computeSizeInfo({
       ? exactSize
       : sizeToCss(size.min)
     : exactSize;
+  // TODO: If your parent's overflow is `hidden`, then max size should be `100%`
   const maxSize = sizeIsFlex
     ? isShrink
       ? //? `fit-content`

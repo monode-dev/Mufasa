@@ -2,9 +2,10 @@
 import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
-import { Client } from "@/AppData";
+import { Client, getClientLabel } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import DeleteDialog from "../components/DeleteDialog.vue";
+import { Overflow } from "@/miwi-md/Box/BoxLayout";
 
 // Create a prop called size
 const props = defineProps({
@@ -39,10 +40,25 @@ function clicked() {
       spacing: $Spacing.spaceBetween,
       textColor: 
               ([undefined, null] as any[]).includes(client.name) ? mdColors.grey : mdColors.black,
-      overflowY: $Overflow.visible,
+      // overflowY: $Overflow.forceStretchParent,
     }"
   >
-    <Text>{{ client.name ?? `Loading...` }}</Text>
+    <TruncatedText
+      :text="client.isLoaded ? getClientLabel(client) : `Loading...`"
+      :maxChars="35"
+    />
+    <!-- <Text :sty="{ overflowX: Overflow.crop }">
+      <div
+        style="
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        "
+      >
+        {{ client.isLoaded ? getClientLabel(client) : `Loading...` }}
+      </div>
+    </Text> -->
     <DeleteOptionsButton @delete="deletePressed" />
   </Row>
 </template>

@@ -1,5 +1,5 @@
 import { isNum, exists, CssProps } from "./BoxUtils";
-import { Align, isCenterX, isLeft } from "./BoxLayout";
+import { Align, Overflow, isCenterX, isLeft } from "./BoxLayout";
 import { sizeToCss } from "./BoxSize";
 
 export type TextSty = {
@@ -8,6 +8,20 @@ export type TextSty = {
   textIsBold: boolean;
   textIsItalic: boolean;
   textIsUnderlined: boolean;
+  /** NOTE: Flex container treats its children as flex items, and unfortunately, the
+   * text-overflow: ellipsis; doesn't apply to flex items. If you want to keep using
+   * flex for other properties, a solution is to wrap your text in an inner div (or
+   * other HTML element like p or span) and apply text-overflow: ellipsis; on that.
+   * Here is how you can do it:
+   * ```html
+   * <div style="...">
+   *   <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+   *     4273 - The Rv Doctor asdf asf a dasffda flkajdfdsdf adf aask afjs a
+   *   </div>
+   * </div>
+   * This should give you the desired behavior: text that is too long to fit inside
+   * the inner div will be truncated and an ellipsis will be added at the end. */
+  // useEllipsisForOverflow: boolean;
 };
 
 export function numToFontSize(num: number) {
@@ -18,6 +32,7 @@ export function numToFontSize(num: number) {
 export function computeTextStyle(
   sty: Partial<TextSty>,
   align: Align,
+  overflowX: Overflow,
 ): CssProps {
   return {
     // Text Style
@@ -40,6 +55,11 @@ export function computeTextStyle(
       : undefined,
     textAlign: isLeft(align) ? `left` : isCenterX(align) ? `center` : `right`,
     lineHeight: sty.scale === undefined ? undefined : sizeToCss(sty.scale),
+    whiteSpace:
+      overflowX === Overflow.crop || overflowX === Overflow.forceStretchParent
+        ? `nowrap`
+        : undefined,
+    // textOverflow: sty.useEllipsisForOverflow ?? false ? `ellipsis` : undefined,
     color: sty.textColor,
   };
 }

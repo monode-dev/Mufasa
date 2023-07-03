@@ -22,7 +22,7 @@ const appData = getAppData();
 
 const cardRef = ref<VNodeRef | null>(null);
 const name = ref(``);
-const clientId = ref<number | null>(null);
+const clientId = ref<string>(``);
 const phoneNumber = ref(``);
 const address = ref(``);
 const notes = ref(``);

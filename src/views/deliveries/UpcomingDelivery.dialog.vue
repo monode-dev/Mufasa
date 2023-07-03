@@ -111,6 +111,8 @@ export default {
         <Label label="Client">
           <DropDown
             v-model:selected="client"
+            :isWide="true"
+            :maxChars="17"
             :getKeyFromData="(data: Client | null) => {
                 return data?._firestoreRef?.path;
             }"
@@ -129,6 +131,8 @@ export default {
         <Label label="Tank" v-if="exists(client)">
           <DropDown
             v-model:selected="tank"
+            :isWide="true"
+            :maxChars="25"
             :getKeyFromData="(data: Tank | null) => {
                 return data?._firestoreRef?.path;
             }"

@@ -20,6 +20,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // useEllipsisForOverflow: {
+  //   type: Boolean,
+  //   default: false,
+  // },
 });
 const scale = computed(
   () => props.sty.scale ?? (props.heading ? 1.5 : props.title ? 1.25 : 1),
@@ -33,6 +37,7 @@ const scale = computed(
       scale: scale,
       height: scale,
       align: $Align.centerLeft,
+      // useEllipsisForOverflow: useEllipsisForOverflow,
       ...sty,
     }"
   >

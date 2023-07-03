@@ -4,11 +4,10 @@ import { exists, orderDocs } from "./utils";
 import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
 import { computed, isRef, ref, watchEffect } from "vue";
 
-export type ClientId = `${number}` | ``;
 export type Client = (typeof mufasaTypes)["Client"];
 export function getClientLabel(client: Client | null | undefined): string {
   const nameExists = exists(client?.name) && client?.name !== ``;
-  const clientIdExists = exists(client?.clientId);
+  const clientIdExists = exists(client?.clientId) && client?.clientId !== ``;
   if (nameExists && clientIdExists) {
     return `${client?.clientId} - ${client?.name}`;
   } else if (nameExists) {
@@ -133,7 +132,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
         typeName: `Client`,
         props: {
           name: defPrim<string>(``),
-          clientId: defPrim<number | null>(null),
+          clientId: defPrim<string>(``),
           phoneNumber: defPrim<string>(``),
           address: defPrim<string>(``),
           notes: defPrim<string>(``),

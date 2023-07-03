@@ -6,6 +6,11 @@ export type InteractionSty = {
 
 export function computeBoxInteraction(sty: Partial<InteractionSty>): CssProps {
   return {
-    pointerEvents: sty.isInteractable ?? true ? undefined : `none`,
+    pointerEvents:
+      sty.isInteractable === undefined
+        ? undefined
+        : sty.isInteractable
+        ? `auto`
+        : `none`,
   };
 }

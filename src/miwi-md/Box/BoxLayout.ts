@@ -56,11 +56,19 @@ export const AdditionalMainAxisAlign = {
 } as const;
 export type Overflow = (typeof Overflow)[keyof typeof Overflow];
 export const Overflow = {
-  visible: `visible`,
-  crop: `crop`,
+  /** TODO: A css overflow of `visible` doesn't behave like we want it to. We
+   * want it to behave like a spreadsheet, showing the overflow but not affecting
+   * layout. However, a css overflow of visible instead affect the layout of
+   * siblings and parents. We need to find a way to fix this. It would probabl
+   * involve spawing a sub div to wrap the children in. */
+  // visible: `visible`, // Maybe just call this "overflow"
+  forceStretchParent: `forceStretchParent`,
+  crop: `crop`, // Ellipsis should be a sub option of crop on overflowX
   wrap: `wrap`,
   scroll: `scroll`,
 } as const;
+export const defaultOveflowX = Overflow.forceStretchParent;
+export const defaultOveflowY = Overflow.forceStretchParent; // This is because otherwise text gets cut off.
 export type Spacing =
   | number
   | `css ${string}`
@@ -135,6 +143,8 @@ export function computeBoxLayout(
   axis: Axis,
   childCount: number,
 ): CssProps {
+  const overflowX = sty.overflowX ?? defaultOveflowX;
+  const overflowY = sty.overflowY ?? defaultOveflowY;
   return {
     // Padding
     // TODO: Default could maybe be based off of font size.
@@ -180,28 +190,28 @@ export function computeBoxLayout(
     // Overflow
     flexWrap:
       axis === Axis.row
-        ? sty.overflowX === Overflow.wrap
+        ? overflowX === Overflow.wrap
           ? `wrap`
           : undefined
-        : sty.overflowY === Overflow.wrap
+        : overflowY === Overflow.wrap
         ? `wrap`
         : undefined,
     overflowX:
-      sty.overflowX === Overflow.scroll
-        ? `auto` // Used to be `overlay` // Scroll when nesscary, and float above contents
-        : sty.overflowX === Overflow.crop
-        ? `hidden`
-        : `visible`, //`hidden`,
-    overflowY:
-      sty.overflowY === Overflow.scroll
+      overflowX === Overflow.scroll
         ? `auto` // Scroll when nesscary, and float above contents
-        : sty.overflowY === Overflow.crop
+        : overflowX === Overflow.crop
         ? `hidden`
-        : `visible`, //`hidden`,
-    scrollbarWidth: [sty.overflowX, sty.overflowY].includes(Overflow.scroll)
+        : `visible`,
+    overflowY:
+      overflowY === Overflow.scroll
+        ? `auto` // Scroll when nesscary, and float above contents
+        : overflowY === Overflow.crop
+        ? `hidden`
+        : `visible`,
+    scrollbarWidth: [overflowX, overflowY].includes(Overflow.scroll)
       ? `thin`
       : undefined,
-    scrollbarColor: [sty.overflowX, sty.overflowY].includes(Overflow.scroll)
+    scrollbarColor: [overflowX, overflowY].includes(Overflow.scroll)
       ? `#e3e3e3 transparent`
       : undefined,
 

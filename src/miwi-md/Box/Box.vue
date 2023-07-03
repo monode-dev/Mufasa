@@ -3,7 +3,14 @@ import { computed, getCurrentInstance, defineProps, PropType, ref } from "vue";
 import { isNum, isString } from "../utils";
 import { computeTextStyle, TextSty } from "./BoxText";
 import { computeBoxSize, SizeSty, sizeToCss } from "./BoxSize";
-import { Align, Axis, computeBoxLayout, LayoutSty } from "./BoxLayout";
+import {
+  Align,
+  Axis,
+  computeBoxLayout,
+  defaultOveflowX,
+  LayoutSty,
+  Overflow,
+} from "./BoxLayout";
 import { computeBoxDecoration, DecorationSty, mdColors } from "./BoxDecoration";
 import { computeBoxInteraction, InteractionSty } from "./BoxInteraction";
 
@@ -73,7 +80,12 @@ const style = computed(() => {
       childCount.value,
     ),
     ...computeBoxDecoration(props.sty),
-    ...computeTextStyle(props.sty, align),
+    // TODO: The default overflow realy should come from BoxLayout.ts
+    ...computeTextStyle(
+      props.sty,
+      align,
+      props.sty.overflowX ?? defaultOveflowX,
+    ),
     ...computeBoxInteraction(props.sty),
   };
 });

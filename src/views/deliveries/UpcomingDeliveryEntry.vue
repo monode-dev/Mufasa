@@ -62,9 +62,11 @@ watchEffect(() => {
         spacing: 0.25,
       }"
     >
-      <Text :sty="{ width: `1f` }">{{
-        getClientLabel(props.delivery.upcomingExistingClient)
-      }}</Text>
+      <TruncatedText
+        :sty="{ width: `1f` }"
+        :text="getClientLabel(props.delivery.upcomingExistingClient)"
+        :maxChars="35"
+      />
       <!-- <DeleteOptionsButton @delete="handleDelete" :shouldShowEdit="true" /> -->
       <DeleteOptionsButton
         @delete="handleDelete"
@@ -81,9 +83,11 @@ watchEffect(() => {
         >
         to</Row
       >
-      <Text :sty="{ width: `3f` }">{{
-        getTankLabel(props.delivery.upcomingExistingTank)
-      }}</Text>
+      <TruncatedText
+        :sty="{ width: `3f` }"
+        :text="getTankLabel(props.delivery.upcomingExistingTank)"
+        :maxChars="23"
+      />
     </Row>
     <!-- <Row
       :sty="{

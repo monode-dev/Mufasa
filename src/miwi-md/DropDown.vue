@@ -9,7 +9,6 @@ import {
   VNodeRef,
 } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
-import { Align, Axis, Overflow, Spacing } from "./Box/BoxLayout";
 // Allow overriding of the default sty
 type Option = {
   label: string;
@@ -19,6 +18,10 @@ const props = defineProps({
   sty: {
     type: Object as PropType<Partial<Sty>>,
     default: {},
+  },
+  isWide: {
+    type: Boolean,
+    default: false,
   },
   speciaolOptions: {
     type: Array as PropType<Option[]>,
@@ -48,6 +51,10 @@ const props = defineProps({
   underlined: {
     type: Boolean,
     default: false,
+  },
+  maxChars: {
+    type: Number,
+    default: Infinity,
   },
 });
 
@@ -97,6 +104,7 @@ function selectOption(option: Option) {
     :sty="{
       width: `1f`,
       spacing: 0.5,
+      // overflowX: $Overflow.crop,
       ...sty,
     }"
   >
@@ -106,12 +114,18 @@ function selectOption(option: Option) {
       :sty="{
         width: `1f`,
         height: sty.scale ?? 1,
-        overflowY: Overflow.visible,
+        overflowY: $Overflow.forceStretchParent,
+        // overflowX: $Overflow.crop,
       }"
     >
       <!-- Button -->
       <Box
-        :sty="{ width: `1f`, height: sty.scale ?? 1, align: Align.topCenter }"
+        :sty="{
+          width: `1f`,
+          height: sty.scale ?? 1,
+          align: $Align.topLeft,
+          axis: $Axis.stack,
+        }"
       >
         <!-- Text -->
         <Row
@@ -120,15 +134,27 @@ function selectOption(option: Option) {
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
-            spacing: Spacing.spaceBetween,
+            spacing: $Spacing.spaceBetween,
           }"
         >
-          <Text>{{ selectedOption?.label ?? `None` }}</Text>
+          <TruncatedText
+            :text="selectedOption?.label ?? `None`"
+            :maxChars="maxChars"
+          />
           <Icon icon="menuDown" />
         </Row>
         <!-- Drop Down -->
-        <Box v-if="dropDownIsOpen" :sty="{ align: Align.topCenter }">
-          <Box :sty="{ height: 0.25 }" />
+        <Box
+          v-if="dropDownIsOpen"
+          :sty="{
+            width: isWide ? `125%` : `100%`,
+            align: $Align.topLeft,
+            overflowY: $Overflow.forceStretchParent,
+            isInteractable: false,
+          }"
+        >
+          <Box :sty="{ height: sty.scale ?? 1, isInteractable: false }" />
+          <Box :sty="{ height: 0.25, isInteractable: false }" />
           <Box
             ref="dropDownModalRef"
             :sty="{
@@ -138,12 +164,14 @@ function selectOption(option: Option) {
               shadowSize: 1,
               zIndex: 10000,
               background: mdColors.white,
+              align: $Align.centerLeft,
+              isInteractable: true,
             }"
           >
             <Text
               v-for="(option, index) in speciaolOptions"
               :key="index"
-              :sty="{ width: `1f`, align: Align.centerLeft }"
+              :sty="{ width: `1f`, align: $Align.centerLeft }"
               @click.stop="selectOption(option)"
               >{{ option.label }}</Text
             >
@@ -151,13 +179,32 @@ function selectOption(option: Option) {
               v-if="speciaolOptions.length > 0 && options.length > 0"
               :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }"
             />
-            <Text
+            <TruncatedText
+              v-for="(option, index) in options"
+              @click.stop="selectOption(option)"
+              :text="option.label"
+              :maxChars="isWide ? Math.floor(maxChars * 1.25) + 1 : maxChars"
+            />
+            <!-- <Text
               v-for="(option, index) in options"
               :key="index"
-              :sty="{ width: `1f`, align: Align.centerLeft }"
+              :sty="{
+                align: $Align.centerLeft,
+                overflowX: $Overflow.crop,
+              }"
               @click.stop="selectOption(option)"
-              >{{ option.label }}</Text
             >
+              <div
+                style="
+                  width: 100%;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                "
+              >
+                {{ option.label }}
+              </div>
+            </Text> -->
           </Box>
         </Box>
       </Box>

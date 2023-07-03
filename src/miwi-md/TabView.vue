@@ -7,7 +7,6 @@ import {
   ref,
   onMounted,
 } from "vue";
-import { Sty } from "./Box/Box.vue";
 import { Align, Overflow } from "./Box/BoxLayout";
 import { gsap } from "gsap";
 
@@ -96,6 +95,7 @@ onMounted(() => {
       :sty="{
         width: `1f`,
         height: `1f`,
+        overflowX: Overflow.crop,
       }"
     >
       <slot name="tab0" />
@@ -104,6 +104,7 @@ onMounted(() => {
       :sty="{
         width: `1f`,
         height: `1f`,
+        overflowX: Overflow.crop,
       }"
     >
       <slot name="tab1" />
@@ -112,6 +113,7 @@ onMounted(() => {
       :sty="{
         width: `1f`,
         height: `1f`,
+        overflowX: Overflow.crop,
       }"
     >
       <slot name="tab2" />
