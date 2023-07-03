@@ -30,7 +30,7 @@ setTimeout(() => {
   if (!haveCheckedForUpdates) {
     appStartRequested = true;
   }
-}, 3 * 1000);
+}, 5 * 1000);
 setTimeout(() => {
   if (!haveDownloadedUpdate) {
     appStartRequested = true;

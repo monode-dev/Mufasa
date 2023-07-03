@@ -846,6 +846,9 @@ function createCache(objFormats: ObjFormats) {
   }
   return {
     listAllObjectsOfType(typeName: string) {
+      // if (typeName === `Client`) {
+      //   console.log(`listAllObjectsOfType Client called!`);
+      // }
       // Do this so that vue knows to update when the list changes
       cache[typeName].docsChanged.value;
       const objects: DocumentReference[] = [];
@@ -861,6 +864,10 @@ function createCache(objFormats: ObjFormats) {
       return cache[typeName].docs[objPath]?.deletionCheck.value;
     },
     getPropValue(typeName: string, objPath: string, propName: string) {
+      /** NOTE: I've debated handling many props in a separate function so
+       * that we can type check the return. However, I can't guarantee that
+       * we got the right paramaters. It probably is worth splittting up
+       * anyways, but if I do it I'll do it later. */
       if (objFormats[typeName][propName].format === `many`) {
         // Do this so that vue knows to update when the list changes
         cache[typeName].docs[objPath]?.[propName].value;
