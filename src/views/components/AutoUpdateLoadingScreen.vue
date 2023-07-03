@@ -10,12 +10,12 @@ import { ref } from "vue";
 const textSize = 1.25;
 let haveCheckedForUpdates = false;
 let haveDownloadedUpdate = false;
-let haveStartedTheApp = false;
-let appShouldBeRunning = false;
+let appStartRequested = false;
 // Single thread app startup so we don't accidentally do it twice
 (async () => {
+  let haveStartedTheApp = false;
   while (!haveStartedTheApp) {
-    if (appShouldBeRunning && !haveStartedTheApp) {
+    if (appStartRequested && !haveStartedTheApp) {
       haveStartedTheApp = true;
       pushPage(HomePage);
     } else {
@@ -29,15 +29,15 @@ getAndApplyPatch();
 async function getAndApplyPatch() {
   // If have not checked for updates after a short bit, then apply the update after start
   setTimeout(() => {
-    if (!haveStartedTheApp && !haveCheckedForUpdates) {
-      appShouldBeRunning = true;
+    if (!appStartRequested && !haveCheckedForUpdates) {
+      appStartRequested = true;
     }
-  }, 1500);
+  }, 3 * 1000);
   setTimeout(() => {
-    if (!haveStartedTheApp && !haveDownloadedUpdate) {
-      appShouldBeRunning = true;
+    if (!appStartRequested && !haveDownloadedUpdate) {
+      appStartRequested = true;
     }
-  }, 8000);
+  }, 10 * 1000);
 
   try {
     // Check if there is a patch available
@@ -55,9 +55,10 @@ async function getAndApplyPatch() {
       });
       haveDownloadedUpdate = true;
 
-      if (!haveStartedTheApp) {
+      if (!appStartRequested) {
         CapacitorUpdater.set({ id: patchData.id });
-        appShouldBeRunning = true;
+        // I don't know if this does anything, since CapacitorUpdater.set might refresh the whole app and reload this page.
+        appStartRequested = true;
       } else {
         // Apply the patch on close
         App.addListener("appStateChange", async ({ isActive }) => {
@@ -67,7 +68,7 @@ async function getAndApplyPatch() {
         });
       }
     } else {
-      appShouldBeRunning = true;
+      appStartRequested = true;
     }
   } catch (e) {
     console.error(e);
