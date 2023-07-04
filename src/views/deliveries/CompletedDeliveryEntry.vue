@@ -105,7 +105,7 @@ function formatPosixTime(posixTime: number) {
     <Row
       :sty="{
         width: `1f`,
-        spacing: 0.25,
+        padBetween: 0.25,
       }"
     >
       <Label label="Amount"
@@ -122,7 +122,7 @@ function formatPosixTime(posixTime: number) {
     <Row
       :sty="{
         width: `1f`,
-        spacing: 0.25,
+        padBetween: 0.25,
       }"
     >
       <Label label="Rate"

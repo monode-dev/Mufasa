@@ -2,7 +2,6 @@
 import { PropType } from "vue";
 import { useNav } from "@/Nav";
 import Icon from "./Icon.vue";
-import { Sty } from "./Box/Box.vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { Align, Axis } from "./Box/BoxLayout";
 
@@ -49,7 +48,7 @@ const props = defineProps({
       :sty="{
         width: `1f`,
         axis: Axis.row,
-        padding: 0.5,
+        pad: 0.5,
         scale: 1.5,
       }"
     >

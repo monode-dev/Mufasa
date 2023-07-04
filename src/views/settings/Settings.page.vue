@@ -79,7 +79,7 @@ export default {
       <!-- Should be pinned to the bottom -->
       <Column>
         <Box :sty="{ height: `1f` }" />
-        <Column :sty="{ spacing: 1 }">
+        <Column :sty="{ padBetween: 1 }">
           <Text hint>Version: {{ appVersion }}</Text>
           <Text hint
             ><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text

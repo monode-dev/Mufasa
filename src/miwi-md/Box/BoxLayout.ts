@@ -1,14 +1,13 @@
-import { CssProps, exists, isString } from "./BoxUtils";
+import { CssProps, exists, isNum, isString } from "./BoxUtils";
 import { sizeToCss } from "./BoxSize";
 
-export type LayoutSty = {
-  // { padAround: num, padBetween: num }
-  padding:
-    | `css ${string}`
-    | number
-    | `${number}`
-    | `${number} ${number}`
-    | `${number} ${number} ${number} ${number}`;
+export type LayoutSty = PadStyProps & {
+  // pad:
+  //   | `css ${string}`
+  //   | number
+  //   | `${number}`
+  //   | `${number} ${number}`
+  //   | `${number} ${number} ${number} ${number}`;
   // AlignX: isColumn ? BasicAlignAxisX : (BasicAlignAxisX | AdditionalMainAxisAlign)
   // type BasicAlignAxisX: left | center | right;
   // AlignY: isColumn ? (BasicAlignAxisY | AdditionalMainAxisAlign) : BasicAlignAxisY
@@ -29,12 +28,31 @@ export type LayoutSty = {
   axis: `column`
   alignX: AlignX;
   alignY: AlignY | AdditionalMainAxisAlign;
-})*/ export type Axis = (typeof Axis)[keyof typeof Axis];
+})*/
+type _PadUnit = number | string;
+type PadStyProps = {
+  // All
+  pad: _PadUnit;
+  // Around
+  padAround: _PadUnit;
+  padAroundX: _PadUnit;
+  padAroundY: _PadUnit;
+  padTop: _PadUnit;
+  padRight: _PadUnit;
+  padBottom: _PadUnit;
+  padLeft: _PadUnit;
+  // Between
+  padBetween: _PadUnit;
+  padBetweenRows: _PadUnit;
+  padBetweenColumns: _PadUnit;
+};
+export type Axis = (typeof Axis)[keyof typeof Axis];
 export const Axis = {
   row: `row`,
   column: `column`,
   stack: `stack`,
 } as const;
+// Align: { x: left | center | right, y: top | center | bottom } | { mainAxis: left | center | right | spaceBetween | spaceAround | spaceEvenly, crossAxis: top | center | bottom | spaceBetween | spaceAround | spaceEvenly }
 export type AlignX = (typeof AlignX)[keyof typeof AlignX];
 export const AlignX = {
   left: `left`,
@@ -69,10 +87,7 @@ export const Overflow = {
 } as const;
 export const defaultOveflowX = Overflow.forceStretchParent;
 export const defaultOveflowY = Overflow.forceStretchParent; // This is because otherwise text gets cut off.
-export type Spacing =
-  | number
-  | `css ${string}`
-  | (typeof Spacing)[keyof typeof Spacing];
+export type Spacing = (typeof Spacing)[keyof typeof Spacing];
 export const Spacing = {
   spaceBetween: `space-between`,
   spaceAround: `space-around`,
@@ -138,39 +153,58 @@ export function isBottom(align: Align) {
 export function computeBoxLayout(
   sty: Partial<LayoutSty>,
   align: Align,
-  cssPadding: string,
   parent: any,
   axis: Axis,
   childCount: number,
 ): CssProps {
   const overflowX = sty.overflowX ?? defaultOveflowX;
   const overflowY = sty.overflowY ?? defaultOveflowY;
+  const padTop = sizeToCss(
+    sty.padTop ?? sty.padAroundY ?? sty.padAround ?? sty.pad ?? 0,
+  );
+  const padRight = sizeToCss(
+    sty.padRight ?? sty.padAroundX ?? sty.padAround ?? sty.pad ?? 0,
+  );
+  const padBottom = sizeToCss(
+    sty.padBottom ?? sty.padAroundY ?? sty.padAround ?? sty.pad ?? 0,
+  );
+  const padLeft = sizeToCss(
+    sty.padLeft ?? sty.padAroundX ?? sty.padAround ?? sty.pad ?? 0,
+  );
+  const padBetweenRows = sizeToCss(
+    sty.padBetweenRows ?? sty.padBetween ?? sty.pad ?? 0,
+  );
+  const padBetweenColumns = sizeToCss(
+    sty.padBetweenColumns ?? sty.padBetween ?? sty.pad ?? 0,
+  );
   return {
-    // Padding
-    // TODO: Default could maybe be based off of font size.
-    padding: cssPadding,
+    position: parent?.props?.sty?.axis === Axis.stack ? `absolute` : `relative`,
+
+    // Pad
+    // NOTE: Default could maybe be based off of font size.
+    // NOTE: We might consider making padding and spacing cascade. I'm not sure if we want to, but it might reduce developer code.
+    padding: `${padTop} ${padRight} ${padBottom} ${padLeft}`,
+    rowGap: padBetweenRows,
+    columnGap: padBetweenColumns,
+    margin: 0,
 
     // Align: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
-    position: parent?.props?.sty?.axis === Axis.stack ? `absolute` : `relative`,
-    //margin: 0,
-    justifyContent:
-      // Exact spacing is handled through grid gap
-      Object.values(Spacing as any).includes(sty.spacing)
-        ? // For whatever reason, space-between with one item puts it at the start instead of centering it.
-          sty.spacing === Spacing.spaceBetween && childCount === 1
-          ? Spacing.spaceAround
-          : (sty.spacing as (typeof Spacing)[keyof typeof Spacing])
-        : axis === Axis.column
-        ? isTop(align)
-          ? `flex-start`
-          : isCenterY(align)
-          ? `safe center`
-          : `flex-end`
-        : isLeft(align)
+    // I've decided that space-between with one child should center it, instead of putting it at the start like CSS does.
+    justifyContent: Object.values(Spacing as any).includes(sty.spacing)
+      ? sty.spacing === Spacing.spaceBetween && childCount === 1
+        ? Spacing.spaceAround
+        : (sty.spacing as (typeof Spacing)[keyof typeof Spacing])
+      : axis === Axis.column
+      ? isTop(align)
         ? `flex-start`
-        : isCenterX(align)
+        : isCenterY(align)
         ? `safe center`
-        : `flex-end`,
+        : `flex-end`
+      : isLeft(align)
+      ? `flex-start`
+      : isCenterX(align)
+      ? `safe center`
+      : `flex-end`,
     alignItems:
       axis === Axis.column
         ? isLeft(align)
@@ -198,34 +232,22 @@ export function computeBoxLayout(
         : undefined,
     overflowX:
       overflowX === Overflow.scroll
-        ? `auto` // Scroll when nesscary, and float above contents
+        ? `auto` // Scroll when nesscary, and float above contents so we can make it invisible
         : overflowX === Overflow.crop
         ? `hidden`
         : `visible`,
     overflowY:
       overflowY === Overflow.scroll
-        ? `auto` // Scroll when nesscary, and float above contents
+        ? `auto` // Scroll when nesscary, and float above contents so we can make it invisible
         : overflowY === Overflow.crop
         ? `hidden`
         : `visible`,
+    // Scroll bar should be invisible
     scrollbarWidth: [overflowX, overflowY].includes(Overflow.scroll)
       ? `thin`
       : undefined,
     scrollbarColor: [overflowX, overflowY].includes(Overflow.scroll)
       ? `#e3e3e3 transparent`
-      : undefined,
-
-    // Spacing
-    // TODO: Default could maybe be based off of font size.
-    rowGap: exists(sty.spacing)
-      ? isString(sty.spacing) && sty.spacing.startsWith(`css `)
-        ? sty.spacing
-        : sizeToCss(sty.spacing)
-      : undefined,
-    columnGap: exists(sty.spacing)
-      ? isString(sty.spacing) && sty.spacing.startsWith(`css `)
-        ? sty.spacing
-        : sizeToCss(sty.spacing)
       : undefined,
   };
 }

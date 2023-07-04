@@ -6,7 +6,6 @@ import {
   ref,
   ComponentPublicInstance,
 } from "vue";
-import { Sty } from "./Box/Box.vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { Align, Axis, Spacing } from "./Box/BoxLayout";
 import { gsap } from "gsap";

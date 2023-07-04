@@ -73,7 +73,7 @@ onUnmounted(() => {
       width: sty.scale ?? 1,
       height: sty.scale ?? 1,
       align: $Align.topRight,
-      overflowY: $Overflow.visible,
+      overflowY: $Overflow.forceStretchParent,
     }"
   >
     <!-- Button -->
@@ -95,22 +95,21 @@ onUnmounted(() => {
       <Box
         ref="dropDownModalRef"
         :sty="{
-          padding: 0.75,
-          spacing: 0.75,
+          pad: 0.75,
           shadowSize: 1,
           zIndex: 10000,
           background: mdColors.white,
           align: $Align.centerRight,
         }"
       >
-        <Row @click.stop="dropDownIsOpen = false" :sty="{ spacing: 0.25 }">
+        <Row @click.stop="dropDownIsOpen = false" :sty="{ padBetween: 0.25 }">
           <Text>Cancel</Text>
           <Icon icon="close" />
         </Row>
         <Row
           v-if="shouldShowEdit"
           @click.stop="editPressed"
-          :sty="{ spacing: 0.25 }"
+          :sty="{ padBetween: 0.25 }"
         >
           <Text>Edit</Text>
           <Icon icon="pencil" />
@@ -118,7 +117,7 @@ onUnmounted(() => {
         <Row
           v-if="shouldShowComplete"
           @click.stop="completePressed"
-          :sty="{ spacing: 0.25 }"
+          :sty="{ padBetween: 0.25 }"
         >
           <Text>Complete</Text>
           <Icon icon="check" />
@@ -127,7 +126,7 @@ onUnmounted(() => {
           @click.stop="deletePressed"
           :sty="{
             textColor: mdColors.red,
-            spacing: 0.25,
+            padBetween: 0.25,
           }"
         >
           <Text>Delete</Text>

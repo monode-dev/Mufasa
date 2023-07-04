@@ -21,10 +21,9 @@ const emit = defineEmits(["update:filterString", "close"]);
     :sty="{
       width: `1f`,
       background: mdColors.green,
-      padding: 0.5,
+      pad: 0.5,
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
-      spacing: 0.5,
       zIndex: 1,
       ...sty,
     }"
@@ -32,7 +31,7 @@ const emit = defineEmits(["update:filterString", "close"]);
     <Row
       :sty="{
         width: `1f`,
-        padding: 0.25,
+        pad: 0.25,
         cornerRadius: 0.75,
         align: $Align.centerLeft,
         background: mdColors.white,

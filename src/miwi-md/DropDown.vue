@@ -104,7 +104,7 @@ function selectOption(option: Option) {
   <Row
     :sty="{
       width: `1f`,
-      spacing: 0.5,
+      padBetween: 0.5,
       // overflowX: $Overflow.crop,
       ...sty,
     }"
@@ -165,8 +165,7 @@ function selectOption(option: Option) {
             ref="dropDownModalRef"
             :sty="{
               width: `1f`,
-              padding: 0.75,
-              spacing: 0.75,
+              pad: 0.75,
               shadowSize: 1,
               zIndex: 10000,
               background: mdColors.white,

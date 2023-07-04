@@ -55,7 +55,7 @@ const emit = defineEmits([
     v-if="exists(shape)"
     :sty="{
       width: `1f`,
-      spacing: 1,
+      padBetween: 1,
     }"
   >
     <Label label="Length">
@@ -87,7 +87,7 @@ const emit = defineEmits([
     v-if="exists(shape)"
     :sty="{
       width: `1f`,
-      spacing: 1,
+      padBetween: 1,
     }"
   >
     <Label label="Height"

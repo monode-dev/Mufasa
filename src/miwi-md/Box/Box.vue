@@ -52,15 +52,6 @@ const axis = props.sty.axis ?? Axis.column;
 // });
 const style = computed(() => {
   const align = props.sty.align ?? Align.center;
-  const cssPadding =
-    isString(props.sty.padding) && props.sty.padding.startsWith(`css `)
-      ? props.sty.padding.split(`css `)[1]
-      : isNum(props.sty.padding)
-      ? sizeToCss(props.sty.padding)
-      : (props.sty.padding ?? ``)
-          .split(` `)
-          .map((p) => sizeToCss(Number(p)))
-          .join(` `);
   return {
     ...computeBoxSize(
       props.sty,
@@ -73,7 +64,6 @@ const style = computed(() => {
     ...computeBoxLayout(
       props.sty,
       align,
-      cssPadding,
       //this.$parent
       getCurrentInstance()?.parent,
       axis,

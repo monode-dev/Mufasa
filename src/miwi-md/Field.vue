@@ -149,7 +149,7 @@ const underlineHeight = computed(() =>
       width: `1f`,
       height: scale + underlineHeight,
       textColor: mdColors.black,
-      spacing: 0.25,
+      padBetween: 0.25,
       overflowY: $Overflow.forceStretchParent,
       align: $Align.topLeft,
       ...sty,

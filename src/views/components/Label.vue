@@ -15,7 +15,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <Row :sty="{ width: `1f`, spacing: 0.25, align: $Align.topLeft, ...sty }">
+  <Row :sty="{ width: `1f`, padBetween: 0.25, align: $Align.topLeft, ...sty }">
     <Text :style="{ whiteSpace: `nowrap` }">{{ label }}:</Text>
     <slot />
   </Row>

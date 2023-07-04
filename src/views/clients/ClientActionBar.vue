@@ -40,7 +40,7 @@ const mode = ref(Mode.Home);
     :sty="{
       width: `1f`,
       background: mdColors.green,
-      padding: `0.5 0`,
+      pad: `0.5 0`,
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
       spacing: $Spacing.spaceEvenly,

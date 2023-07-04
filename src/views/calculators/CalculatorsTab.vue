@@ -154,7 +154,7 @@ const gallonsToReachDesiredFill = computed(() => {
         v-if="isDeliveryTab"
         :sty="{
           width: `1f`,
-          spacing: 1,
+          padBetween: 1,
         }"
       >
         <DropDown
@@ -183,7 +183,7 @@ const gallonsToReachDesiredFill = computed(() => {
         v-if="isDimensionsTab"
         :sty="{
           width: `1f`,
-          spacing: 1,
+          padBetween: 1,
         }"
       >
         <DropDown

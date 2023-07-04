@@ -100,8 +100,8 @@ function stopDrag() {
         :sty="{
           width: 0,
           height: 0,
-          overflowX: `visible`,
-          overflowY: `visible`,
+          overflowX: $Overflow.forceStretchParent,
+          overflowY: $Overflow.forceStretchParent,
         }"
       >
         <Box

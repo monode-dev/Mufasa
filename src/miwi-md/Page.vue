@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import { Sty } from "./Box/Box.vue";
 import { Align, Overflow } from "./Box/BoxLayout";
 // Allow overriding of the default sty
 const props = defineProps({

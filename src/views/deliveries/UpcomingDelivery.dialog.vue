@@ -98,7 +98,7 @@ export default {
       :sty="{
         width: `1f`,
         height: `1f`,
-        spacing: 1,
+        padBetween: 1,
         align: $Align.center,
       }"
     >

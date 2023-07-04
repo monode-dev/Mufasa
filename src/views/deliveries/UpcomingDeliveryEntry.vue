@@ -59,7 +59,7 @@ watchEffect(() => {
     <Row
       :sty="{
         width: `1f`,
-        spacing: 0.25,
+        padBetween: 0.25,
       }"
     >
       <TruncatedText
@@ -76,8 +76,8 @@ watchEffect(() => {
         @complete="handleComplete"
       />
     </Row>
-    <Row :sty="{ width: `1f`, spacing: 0.25 }">
-      <Row :sty="{ width: `2f`, spacing: 0.25 }">
+    <Row :sty="{ width: `1f`, padBetween: 0.25 }">
+      <Row :sty="{ width: `2f`, padBetween: 0.25 }">
         <Text :sty="{ width: `1f` }"
           >{{ props.delivery.quantity }} Gallons</Text
         >

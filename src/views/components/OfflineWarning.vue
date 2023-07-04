@@ -40,7 +40,7 @@ const offlineWarningTransitions = pageTransitions.from({
         :sty="{
           width: `100%`,
           height: `100%`,
-          padding: 1,
+          pad: 1,
           align: $Align.bottomLeft,
         }"
       >
@@ -51,9 +51,8 @@ const offlineWarningTransitions = pageTransitions.from({
             cornerRadius: 1,
             shadowDirection: $Align.center,
             shadowSize: 2,
-            padding: 0.5,
+            pad: 0.5,
             axis: $Axis.row,
-            spacing: 0.5,
           }"
         >
           <Icon :scale="1" icon="wifiOff" />

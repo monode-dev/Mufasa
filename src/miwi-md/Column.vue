@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import { Sty } from "./Box/Box.vue";
-import { mdColors } from "./Box/BoxDecoration";
-import { Align, Axis } from "./Box/BoxLayout";
 
 const props = defineProps({
   sty: {
@@ -19,7 +16,7 @@ const props = defineProps({
 <template>
   <Box
     :sty="{
-      axis: Axis.column,
+      axis: $Axis.column,
       ...sty,
     }"
     :shouldLog="shouldLog"

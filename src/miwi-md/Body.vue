@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, PropType } from 'vue';
+import { defineProps, PropType } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { Align, Axis } from "./Box/BoxLayout";
 
@@ -13,19 +13,20 @@ const props = defineProps({
 </script>
 
 <template>
-  <Box :sty="{
-    width: `1f`,
-    height: `1f`,
-    axis: Axis.column,
-    align: Align.topCenter,
-    textColor: mdColors.black,
-    scale: 1,
-    padding: 1,
-    spacing: 1,
-    overflowY: `scroll`,
-    overflowX: `crop`,
-    ...sty,
-  }">
+  <Box
+    :sty="{
+      width: `1f`,
+      height: `1f`,
+      axis: Axis.column,
+      align: Align.topCenter,
+      textColor: mdColors.black,
+      scale: 1,
+      pad: 1,
+      overflowY: `scroll`,
+      overflowX: `crop`,
+      ...sty,
+    }"
+  >
     <slot />
   </Box>
 </template>
