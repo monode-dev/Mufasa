@@ -28,7 +28,7 @@ export type TextSty = {
 // const fontSizeToHtmlUnit = 0.9;
 export function numToFontSize(num: number) {
   // return sizeToCss(fontSizeToHtmlUnit * num);
-  return sizeToCss(num * 0.95);
+  return sizeToCss(num); // * 0.95);
 }
 
 export function computeTextStyle(
