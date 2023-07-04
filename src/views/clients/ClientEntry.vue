@@ -43,22 +43,17 @@ function clicked() {
       // overflowY: $Overflow.forceStretchParent,
     }"
   >
-    <TruncatedText
+    <!-- <TruncatedText
       :text="client.isLoaded ? getClientLabel(client) : `Loading...`"
       :maxChars="35"
-    />
-    <!-- <Text :sty="{ overflowX: Overflow.crop }">
-      <div
-        style="
-          width: 100%;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        "
-      >
-        {{ client.isLoaded ? getClientLabel(client) : `Loading...` }}
-      </div>
-    </Text> -->
+    /> -->
+    <Text
+      :sty="{
+        overflowX: Overflow.crop,
+      }"
+    >
+      {{ client.isLoaded ? getClientLabel(client) : `Loading...` }}
+    </Text>
     <DeleteOptionsButton @delete="deletePressed" />
   </Row>
 </template>

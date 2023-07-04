@@ -49,8 +49,8 @@ export const Overflow = {
   wrap: `wrap`,
   scroll: `scroll`,
 } as const;
-export const defaultOveflowX = Overflow.forceStretchParent;
-export const defaultOveflowY = Overflow.forceStretchParent; // This is because otherwise text gets cut off.
+export const defaultOveflowX = Overflow.forceStretchParent; // Overflow.crop;
+export const defaultOveflowY = Overflow.forceStretchParent; // Overflow.crop; // This is because otherwise text gets cut off.
 
 // Align
 // NOTE: Align only makes sense if the size on this axis is not "shrink"
@@ -119,7 +119,6 @@ export const Align = {
     alignY: _FlexAlign.end,
   },
 } as const;
-
 
 // Compute
 export function computeBoxLayout(

@@ -77,6 +77,7 @@ const tabButtonWidth = 4.75;
       width: `1f`,
       height: 0.375,
       alignX: Align.spaceAround,
+      alignY: Align.end,
     }"
   >
     <Box :sty="{ width: tabButtonWidth }" />

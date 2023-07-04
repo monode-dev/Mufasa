@@ -34,9 +34,9 @@ const shapeSty = computed(() => {
   if (props.round) {
     return { cornerRadius: `100%` };
   } else if (props.pill) {
-    return { cornerRadius: 1, padding: 0.5 };
+    return { cornerRadius: 1, pad: 0.5, padAroundX: 0.75 };
   } else {
-    return { cornerRadius: 0.25, padding: 0.5 };
+    return { cornerRadius: 0.25, pad: 0.5 };
   }
 });
 const colorSty = computed(() =>

@@ -37,10 +37,23 @@ const scale = computed(
       scale: scale,
       height: scale,
       align: $Align.centerLeft,
+      overflowX: $Overflow.wrap,
+      // overflowY: Overflow.overflow,
       // useEllipsisForOverflow: useEllipsisForOverflow,
       ...sty,
     }"
   >
-    <slot></slot>
+    <div
+      v-if="sty.overflowX === $Overflow.crop"
+      style="
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      "
+    >
+      <slot />
+    </div>
+    <slot v-else />
   </Box>
 </template>
