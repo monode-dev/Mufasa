@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
-import { getAppData, Client } from "@/AppData";
+import { getAppData } from "@/AppData";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
 import { exists } from "@/utils";

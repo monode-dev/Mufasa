@@ -1,5 +1,5 @@
 import { isNum, exists, CssProps } from "./BoxUtils";
-import { Align, Overflow, isCenterX, isLeft } from "./BoxLayout";
+import { Align, AlignSingleAxis, Overflow, _FlexAlign } from "./BoxLayout";
 import { sizeToCss } from "./BoxSize";
 
 export type TextSty = {
@@ -31,7 +31,7 @@ export function numToFontSize(num: number) {
 
 export function computeTextStyle(
   sty: Partial<TextSty>,
-  align: Align,
+  alignX: AlignSingleAxis,
   overflowX: Overflow,
 ): CssProps {
   return {
@@ -53,7 +53,13 @@ export function computeTextStyle(
         ? `underline`
         : `none`
       : undefined,
-    textAlign: isLeft(align) ? `left` : isCenterX(align) ? `center` : `right`,
+    textAlign:
+      alignX === _FlexAlign.start
+        ? `left`
+        : alignX === _FlexAlign.end
+        ? `right`
+        : // We assume for now that all other aligns cam be treated as center
+          `center`,
     lineHeight: sty.scale === undefined ? undefined : sizeToCss(sty.scale),
     whiteSpace:
       overflowX === Overflow.crop || overflowX === Overflow.forceStretchParent

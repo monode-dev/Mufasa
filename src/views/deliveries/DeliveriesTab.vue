@@ -13,7 +13,7 @@ const appData = getAppData();
 
 <template>
   <Body>
-    <Row :sty="{ width: `1f`, spacing: $Spacing.spaceBetween }">
+    <Row :sty="{ width: `1f`, align: $Align.spaceBetween }">
       <Box :sty="{ width: 1.75 }" />
       <Text title>Upcoming Deliveries</Text>
       <Box :sty="{ width: 1.75, align: $Align.centerLeft }">

@@ -37,7 +37,7 @@ function clicked() {
     :sty="{
       width: `1f`,
       height: 1,
-      spacing: $Spacing.spaceBetween,
+      align: $Align.spaceBetween,
       textColor: 
               ([undefined, null] as any[]).includes(client.name) ? mdColors.grey : mdColors.black,
       // overflowY: $Overflow.forceStretchParent,

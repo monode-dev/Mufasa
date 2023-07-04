@@ -1,5 +1,5 @@
 import { CssProps, exists } from "./BoxUtils";
-import { Align } from "./BoxLayout";
+import { Align, AlignTwoAxis, _FlexAlign, _SpaceAlign } from "./BoxLayout";
 import { sizeToCss } from "./BoxSize";
 
 export type DecorationSty = {
@@ -8,8 +8,12 @@ export type DecorationSty = {
   outlineSize: number;
   background: string;
   shadowSize: number;
-  shadowDirection: Align;
+  shadowDirection: ShadowDirection;
   zIndex: number;
+};
+
+export type ShadowDirection = {
+  [Key in keyof AlignTwoAxis]: Exclude<AlignTwoAxis[Key], _SpaceAlign>;
 };
 
 export const mdColors = {
@@ -34,26 +38,22 @@ export const mdColors = {
 // We might be able to infer everything we need from these compute functions, which could make updates even easier to make. If we did this, then we'd want to use another function to generate these compute functions.
 export function computeBoxDecoration(sty: Partial<DecorationSty>): CssProps {
   const shadowDirection = (() => {
-    switch (sty.shadowDirection ?? Align.bottomRight) {
-      case Align.topLeft:
-        return { x: -1, y: 1 };
-      case Align.topCenter:
-        return { x: 0, y: 1 };
-      case Align.topRight:
-        return { x: 1, y: 1 };
-      case Align.centerLeft:
-        return { x: -1, y: 0 };
-      case Align.center:
-        return { x: 0, y: 0 };
-      case Align.centerRight:
-        return { x: 1, y: 0 };
-      case Align.bottomLeft:
-        return { x: -1, y: -1 };
-      case Align.bottomCenter:
-        return { x: 0, y: -1 };
-      case Align.bottomRight:
-        return { x: 1, y: -1 };
-    }
+    const givenDirection: ShadowDirection =
+      sty.shadowDirection ?? Align.bottomRight;
+    return {
+      x:
+        givenDirection.alignX === _FlexAlign.start
+          ? -1
+          : givenDirection.alignX === _FlexAlign.center
+          ? 0
+          : 1,
+      y:
+        givenDirection.alignY === _FlexAlign.start
+          ? 1
+          : givenDirection.alignY === _FlexAlign.center
+          ? 0
+          : -1,
+    };
   })();
   return {
     // Box Style

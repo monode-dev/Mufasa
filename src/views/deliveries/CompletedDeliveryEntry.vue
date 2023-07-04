@@ -85,7 +85,7 @@ function formatPosixTime(posixTime: number) {
     <Row
       :sty="{
         width: `1f`,
-        spacing: $Spacing.spaceBetween,
+        align: $Align.spaceBetween,
       }"
     >
       <Text hint :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }">{{

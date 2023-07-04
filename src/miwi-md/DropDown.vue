@@ -135,7 +135,7 @@ function selectOption(option: Option) {
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
-            spacing: $Spacing.spaceBetween,
+            align: $Align.spaceBetween,
           }"
         >
           <TruncatedText

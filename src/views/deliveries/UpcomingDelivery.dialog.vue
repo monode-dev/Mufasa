@@ -121,7 +121,7 @@ export default {
         /></Label>
 
         <!-- Buttons -->
-        <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
+        <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
           <Button outlined @click.stop="closePopUp">Cancel</Button>
           <Button
             @click.stop="handleYes"

@@ -136,8 +136,7 @@ const gallonsToReachDesiredFill = computed(() => {
       <Row
         :sty="{
           width: `1f`,
-          spacing: $Spacing.spaceBetween,
-          align: $Align.centerLeft, //$Align.center,
+          align: $Align.spaceBetween,
         }"
       >
         <Button pill :outlined="!isDeliveryTab" @click.stop="toDeliverTab"

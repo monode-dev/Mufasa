@@ -53,8 +53,8 @@ export default {
       <Row
         :sty="{
           width: `1f`,
-          spacing: $Spacing.spaceBetween,
-          align: $Align.topCenter,
+          alignX: $Align.spaceBetween,
+          alignY: $Align.start,
         }"
       >
         <Icon icon="dotsVertical" :color="mdColors.transparent" />
@@ -74,7 +74,7 @@ export default {
       <Row
         :sty="{
           width: `1f`,
-          spacing: $Spacing.spaceBetween,
+          align: $Align.spaceBetween,
         }"
       >
         <Box :sty="{ width: 1.75 }" />

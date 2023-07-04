@@ -28,18 +28,17 @@ function deletePressed() {
 
 <template>
   <Card :sty="{ width: `1f` }">
-    <Box
+    <Row
       :sty="{
         width: `1f`,
-        spacing: $Spacing.spaceBetween,
-        axis: $Axis.row,
+        align: $Align.spaceBetween,
       }"
     >
       <!-- Hint should be toggled when the tank is complete -->
       <Text :hint="!tankIsValid(tank)">{{ getTankLabel(tank) }}</Text>
 
       <DeleteOptionsButton @delete="deletePressed" />
-    </Box>
+    </Row>
     <DropDown
       label="Fuel"
       v-model:selected="tank.fuelType"

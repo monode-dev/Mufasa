@@ -91,7 +91,7 @@ export default {
         ><NumField v-model:value="quantity" hint="Amount"
       /></Label>
       <Label label="Rate"><NumField v-model:value="rate" hint="Rate" /></Label>
-      <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
+      <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
         <Button outlined @click.stop="popPage">Cancel</Button>
         <Button
           @click.stop="handleComplete"

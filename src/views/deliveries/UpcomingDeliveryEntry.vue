@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import {
   getAppData,
-  FuelType,
-  UpcomingOneTimeDelivery,
   UpcomingExistingDelivery,
-  Client,
-  Tank,
   getClientLabel,
   getTankLabel,
 } from "@/AppData";
 import { pushPage } from "@/Nav";
-import { mdColors } from "@/miwi-md/Box/BoxDecoration";
-import { PropType, computed, ref, watchEffect } from "vue";
+import { PropType } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
-import { orderDocs } from "@/utils";
 import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
 import UpcomingDeliveryDialog from "./UpcomingDelivery.dialog.vue";
 
@@ -45,13 +39,6 @@ function handleDelete() {
     message: `Are you sure you want to permanently delete this delivery?`,
   });
 }
-
-watchEffect(() => {
-  // console.log(`${props.delivery?.client} changed.`);
-  // console.log(
-  //   `${props.delivery?.client?._firestoreRef?.path} has ${props.delivery?.client?.tanks?.length} tanks.`,
-  // );
-});
 </script>
 
 <template>
@@ -67,7 +54,6 @@ watchEffect(() => {
         :text="getClientLabel(props.delivery.upcomingExistingClient)"
         :maxChars="35"
       />
-      <!-- <DeleteOptionsButton @delete="handleDelete" :shouldShowEdit="true" /> -->
       <DeleteOptionsButton
         @delete="handleDelete"
         shouldShowEdit
@@ -89,18 +75,5 @@ watchEffect(() => {
         :maxChars="23"
       />
     </Row>
-    <!-- <Row
-      :sty="{
-        width: `1f`,
-        spacing: 0.25,
-      }"
-    >
-      <Button outlined :sty="{ width: `1f`, textColor: $mdColors.grey }"
-        >Edit</Button
-      >
-      <Button outlined :sty="{ width: `1f`, textColor: $mdColors.grey }"
-        >Complete</Button
-      >
-    </Row> -->
   </Card>
 </template>

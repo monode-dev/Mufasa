@@ -7,7 +7,7 @@ import {
   ComponentPublicInstance,
 } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
-import { Align, Axis, Spacing } from "./Box/BoxLayout";
+import { Align, Axis } from "./Box/BoxLayout";
 import { gsap } from "gsap";
 
 // Allow overriding of the default sty
@@ -55,12 +55,10 @@ const tabButtonWidth = 4.75;
 </script>
 
 <template>
-  <Box
+  <Row
     :sty="{
       width: `1f`,
-      axis: Axis.row,
-      align: Align.center,
-      spacing: Spacing.spaceAround,
+      alignX: Align.spaceAround,
       ...sty,
     }"
   >
@@ -73,14 +71,12 @@ const tabButtonWidth = 4.75;
     <Box :sty="{ width: tabButtonWidth }" ref="tab2Ref" @click="selectTab(2)">
       {{ labels[2] }}
     </Box>
-  </Box>
-  <Box
+  </Row>
+  <Row
     :sty="{
       width: `1f`,
       height: 0.375,
-      axis: Axis.row,
-      align: Align.bottomCenter,
-      spacing: Spacing.spaceAround,
+      alignX: Align.spaceAround,
     }"
   >
     <Box :sty="{ width: tabButtonWidth }" />
@@ -93,5 +89,5 @@ const tabButtonWidth = 4.75;
       ref="tabUnderline"
     />
     <Box :sty="{ width: tabButtonWidth }" />
-  </Box>
+  </Row>
 </template>

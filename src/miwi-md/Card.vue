@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { defineProps, PropType, useSlots } from "vue";
+import { defineProps, PropType } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { Align, Axis } from "./Box/BoxLayout";
-import { computed } from "vue";
 
 // Allow overriding of the default sty
 const props = defineProps({
@@ -11,9 +10,6 @@ const props = defineProps({
     default: {},
   },
 });
-
-const slots = useSlots();
-const contentSpacing = computed(() => props.sty.spacing ?? 1);
 </script>
 
 <template>

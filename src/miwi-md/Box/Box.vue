@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, defineProps, PropType, ref } from "vue";
-import { isNum, isString } from "../utils";
+import { isString } from "../utils";
 import { computeTextStyle, TextSty } from "./BoxText";
-import { computeBoxSize, SizeSty, sizeToCss } from "./BoxSize";
+import { computeBoxSize, SizeSty } from "./BoxSize";
 import {
   Align,
   Axis,
   computeBoxLayout,
   defaultOveflowX,
   LayoutSty,
-  Overflow,
 } from "./BoxLayout";
-import { computeBoxDecoration, DecorationSty, mdColors } from "./BoxDecoration";
+import { computeBoxDecoration, DecorationSty } from "./BoxDecoration";
 import { computeBoxInteraction, InteractionSty } from "./BoxInteraction";
 
 export type _Sty = SizeSty &
@@ -58,22 +57,19 @@ const style = computed(() => {
       childWidthGrows.value,
       childHeightGrows.value,
       parentAxis.value,
-      //this.$parent
       getCurrentInstance()?.parent,
     ),
     ...computeBoxLayout(
       props.sty,
       align,
-      //this.$parent
       getCurrentInstance()?.parent,
       axis,
       childCount.value,
     ),
     ...computeBoxDecoration(props.sty),
-    // TODO: The default overflow realy should come from BoxLayout.ts
     ...computeTextStyle(
       props.sty,
-      align,
+      isString(align) ? align : align.alignX,
       props.sty.overflowX ?? defaultOveflowX,
     ),
     ...computeBoxInteraction(props.sty),

@@ -59,7 +59,7 @@ export default {
       <Text :sty="{ height: -1, overflowY: $Overflow.wrap }">
         {{ message }}
       </Text>
-      <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">
+      <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
         <Button outlined @click.stop="handleYes">Yes</Button>
         <Button @click.stop="closePopUp">No</Button>
       </Row>

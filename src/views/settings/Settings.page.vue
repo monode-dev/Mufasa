@@ -43,7 +43,7 @@ export default {
         <Row
           :sty="{
             width: `1f`,
-            spacing: $Spacing.spaceBetween,
+            align: $Align.spaceBetween,
           }"
         >
           <Icon icon="plus" :color="mdColors.transparent" :scale="1.25" />
