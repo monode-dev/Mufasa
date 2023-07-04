@@ -31,17 +31,9 @@ const toDimensionsTab = () => (tabIndex.value = 2);
 // Delivery
 const delivery = ref<UpcomingExistingDelivery | null>(null);
 
-// Client
+// Tank
 const client = ref<Client | null>(null);
-// TODO: Should go to null when client changes.
 const tank = ref<Tank | null>(null);
-watchEffect(() => {
-  const clientPath = client.value?._firestoreRef?.path;
-  const tankParentPath = tank.value?.mx_parent?._firestoreRef?.path;
-  if (exists(tankParentPath) && tankParentPath !== clientPath) {
-    tank.value = null;
-  }
-});
 
 // Dimensions
 const dimTankShape = ref<TankShapeId | null>(null);
@@ -51,7 +43,7 @@ const dimHeight = ref(0);
 const dimShortHeight = ref(0);
 
 // Other
-const stickedInches = ref(0);
+const stickedInches = ref<number | null>(null);
 
 // Estimates
 const tankShapeCalc = computed(() =>
@@ -182,33 +174,11 @@ const gallonsToReachDesiredFill = computed(() => {
           ]"
         />
       </Box>
-      <Label label="Client" v-if="isTankTab">
-        <DropDown
-          v-model:selected="client"
-          :getKeyFromData="(data: Client | null) => {
-                return data?._firestoreRef?.path;
-            }"
-          :options="[
-            ...orderDocs(appData.clients, (x) => getClientLabel(x))
-              .filter(
-                (x) =>
-                  (exists(x.name) && x.name.length > 0) || exists(x.clientId),
-              )
-              .map((x) => ({ label: getClientLabel(x), data: x })),
-          ]"
-      /></Label>
-      <Label label="Tank" v-if="isTankTab && exists(client)">
-        <DropDown
-          v-model:selected="tank"
-          :getKeyFromData="(data: Tank | null) => {
-                return data?._firestoreRef?.path;
-            }"
-          :options="[
-              ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
-                (x, index) => ({ label: getTankLabel(x), data: x }),
-              ),
-            ]"
-      /></Label>
+      <ClientAndTankSelector
+        v-if="isTankTab"
+        v-model:client="client"
+        v-model:tank="tank"
+      />
       <Box
         v-if="isDimensionsTab"
         :sty="{
@@ -247,7 +217,7 @@ const gallonsToReachDesiredFill = computed(() => {
         </Row>
       </Box>
       <Label label="Sticked Inches"
-        ><NumField v-model:value="stickedInches"
+        ><NumField v-model:value="stickedInches" underlined hint="0"
       /></Label>
       <!-- <Box /> -->
       <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" />

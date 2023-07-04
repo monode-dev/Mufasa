@@ -6,6 +6,7 @@ import { Client } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { FuelType, getAppData } from "@/AppData";
 import DeleteDialog from "../components/DeleteDialog.vue";
+import { orderDocs } from "@/utils";
 // const appData = getAppData();
 
 const props = defineProps({
@@ -83,7 +84,10 @@ export default {
         </Box>
       </Row>
       <TankEntry
-        v-for="(tank, index) in client.tanks"
+        v-for="(tank, index) in orderDocs(
+          client.tanks ?? [],
+          (x) => x.creationTimePosix,
+        )"
         :key="index"
         :tank="tank"
         >{{ index + 1 }}</TankEntry

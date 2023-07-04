@@ -10,7 +10,7 @@ export type TankShapeDatails = {
   readonly dimensions: (keyof Tank)[];
   calcFilledVolume(
     tank: Partial<Tank> | null | undefined,
-    stickedInches: number | undefined,
+    stickedInches: number | null | undefined,
   ): number | undefined;
   calcTotalVolume(tank: Partial<Tank> | null | undefined): number | undefined;
 };
@@ -59,7 +59,7 @@ export function getTankShape<T extends TankShapeId | null | undefined>(
 
 export function calcGallonsToReachPercent(
   tank: Partial<Tank>,
-  stickedInches: number | undefined,
+  stickedInches: number | null | undefined,
   targetPercent: number,
 ): number | undefined {
   if (!exists(tank.shape)) return undefined;

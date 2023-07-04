@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
-import { FuelType, Tank, getAppData } from "@/AppData";
+import {
+  FuelType,
+  Tank,
+  getAppData,
+  getTankLabel,
+  tankIsValid,
+} from "@/AppData";
 import { popPage, pushPage } from "@/Nav";
 import DeleteDialogVue from "../components/DeleteDialog.vue";
 const appData = getAppData();
@@ -29,7 +35,8 @@ function deletePressed() {
         axis: $Axis.row,
       }"
     >
-      <Text>#<slot /></Text>
+      <!-- Hint should be toggled when the tank is complete -->
+      <Text :hint="!tankIsValid(tank)">{{ getTankLabel(tank) }}</Text>
 
       <DeleteOptionsButton @delete="deletePressed" />
     </Box>
@@ -40,7 +47,6 @@ function deletePressed() {
         return data?._firestoreRef?.path;
       }"
       :options="[
-        { label: `None`, data: undefined },
         ...appData.fuelTypes
           .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
           .map((x) => ({ label: x.name!, data: x })),
@@ -52,6 +58,12 @@ function deletePressed() {
       v-model:depth="tank.depth"
       v-model:height="tank.height"
       v-model:shortHeight="tank.shortHeight"
+    />
+    <Field
+      v-model:value="tank.optionalLabel"
+      hint="Optional Label"
+      icon="label"
+      underlined
     />
   </Card>
 </template>

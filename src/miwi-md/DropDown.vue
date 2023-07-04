@@ -9,6 +9,7 @@ import {
   VNodeRef,
 } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
+import { exists } from "./utils";
 // Allow overriding of the default sty
 type Option = {
   label: string;
@@ -140,6 +141,11 @@ function selectOption(option: Option) {
           <TruncatedText
             :text="selectedOption?.label ?? `None`"
             :maxChars="maxChars"
+            :sty="{
+              textColor: exists(selectedOption?.data)
+                ? mdColors.black
+                : mdColors.grey,
+            }"
           />
           <Icon icon="menuDown" />
         </Row>
@@ -171,7 +177,11 @@ function selectOption(option: Option) {
             <Text
               v-for="(option, index) in speciaolOptions"
               :key="index"
-              :sty="{ width: `1f`, align: $Align.centerLeft }"
+              :sty="{
+                width: `1f`,
+                align: $Align.centerLeft,
+                textColor: exists(option.data) ? mdColors.black : mdColors.grey,
+              }"
               @click.stop="selectOption(option)"
               >{{ option.label }}</Text
             >
@@ -184,6 +194,9 @@ function selectOption(option: Option) {
               @click.stop="selectOption(option)"
               :text="option.label"
               :maxChars="isWide ? Math.floor(maxChars * 1.25) + 1 : maxChars"
+              :sty="{
+                textColor: exists(option.data) ? mdColors.black : mdColors.grey,
+              }"
             />
             <!-- <Text
               v-for="(option, index) in options"

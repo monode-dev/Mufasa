@@ -39,17 +39,15 @@ const client = ref<Client | null>(
 const tank = ref<Tank | null>(
   deliveryToEdit.value?.upcomingExistingTank ?? null,
 );
-watchEffect(() => {
-  const clientPath = client.value?._firestoreRef?.path;
-  const tankParentPath = tank.value?.mx_parent?._firestoreRef?.path;
-  if (exists(tankParentPath) && tankParentPath !== clientPath) {
-    tank.value = null;
-  }
-});
-const amount = ref(deliveryToEdit.value?.quantity ?? 0);
+const amount = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
 
 const deliveryIsValid = computed(() => {
-  return exists(client.value) && exists(tank.value); // && amount.value > 0;
+  return (
+    exists(client.value) &&
+    exists(tank.value) &&
+    exists(amount.value) &&
+    amount.value > 0
+  ); // && amount.value > 0;
 });
 
 function closePopUp() {
@@ -62,12 +60,12 @@ function handleYes() {
     appData.deliveries.add({
       upcomingExistingClient: client.value!,
       upcomingExistingTank: tank.value!,
-      quantity: amount.value,
+      quantity: amount.value!,
     });
   } else if (props.dialogType === `edit`) {
     deliveryToEdit.value!.upcomingExistingClient = client.value!;
     deliveryToEdit.value!.upcomingExistingTank = tank.value!;
-    deliveryToEdit.value!.quantity = amount.value;
+    deliveryToEdit.value!.quantity = amount.value!;
   }
 }
 
@@ -114,45 +112,13 @@ export default {
           >{{ dialogType === `create` ? `Create` : `Edit` }} Delivery</Text
         >
 
-        <!-- Client -->
-        <Label label="Client">
-          <DropDown
-            v-model:selected="client"
-            :isWide="true"
-            :maxChars="17"
-            :getKeyFromData="(data: Client | null) => {
-                return data?._firestoreRef?.path;
-            }"
-            :options="[
-              ...orderDocs(appData.clients, (x) => getClientLabel(x))
-                .filter(
-                  (x) =>
-                    (exists(x.name) && x.name.length > 0) || exists(x.clientId),
-                )
-                .map((x) => ({ label: getClientLabel(x), data: x })),
-            ]"
-          />
-        </Label>
-
-        <!-- Tank -->
-        <Label label="Tank" v-if="exists(client)">
-          <DropDown
-            v-model:selected="tank"
-            :isWide="true"
-            :maxChars="25"
-            :getKeyFromData="(data: Tank | null) => {
-                return data?._firestoreRef?.path;
-            }"
-            :options="[
-              ...orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).map(
-                (x, index) => ({ label: getTankLabel(x), data: x }),
-              ),
-            ]"
-          />
-        </Label>
+        <!-- Client & Tank -->
+        <ClientAndTankSelector v-model:client="client" v-model:tank="tank" />
 
         <!-- Amount -->
-        <Label label="Amount"><NumField v-model:value="amount" /></Label>
+        <Label label="Amount"
+          ><NumField v-model:value="amount" underlined hint="0"
+        /></Label>
 
         <!-- Buttons -->
         <Row :sty="{ width: `1f`, spacing: $Spacing.spaceEvenly }">

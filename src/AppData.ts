@@ -21,14 +21,25 @@ export function getClientLabel(client: Client | null | undefined): string {
 // const a = {} as Client;
 // a.fuelType;
 export type Tank = (typeof mufasaTypes)["Tank"];
-export function getTankLabel(tank: Tank | null | undefined): string {
-  // TODO: Fuel - Volume - Shape - Label
+export function tankIsValid(tank: Tank | null | undefined): boolean {
   const shapeUtils = getTankShape(tank?.shape);
   const fuelName = tank?.fuelType?.name;
-  const volume = shapeUtils?.calcTotalVolume(tank);
   const shapeName = shapeUtils?.nameShort;
-  if (exists(fuelName) && exists(volume) && exists(shapeName)) {
-    return `${fuelName} - ${Math.round(volume)} Gal. - ${shapeName}`;
+  const volume = shapeUtils?.calcTotalVolume(tank);
+  return exists(fuelName) && exists(shapeName) && exists(volume) && volume > 0;
+}
+export function getTankLabel(tank: Tank | null | undefined): string {
+  if (tankIsValid(tank)) {
+    // TODO: Fuel - Volume - Shape - Label
+    const shapeUtils = getTankShape(tank?.shape);
+    const fuelName = tank?.fuelType?.name;
+    const volume = shapeUtils?.calcTotalVolume(tank);
+    const shapeName = shapeUtils?.nameShort;
+    return `${fuelName} - ${Math.round(volume!)} Gal. - ${shapeName}${
+      exists(tank?.optionalLabel) && tank?.optionalLabel?.trim() !== ``
+        ? ` - ${tank?.optionalLabel}`
+        : ``
+    }`;
   } else {
     return `Incomplete Tank`;
   }
@@ -140,13 +151,14 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
             defObj({
               typeName: `Tank`,
               props: {
+                optionalLabel: defPrim<string>(``),
                 fuelType: defOne(`FuelType`, null),
                 shape: defPrim<TankShapeId | null>(null),
                 // Maybe record x, y, and z instead.
-                length: defPrim<number>(0),
-                depth: defPrim<number>(0),
-                height: defPrim<number>(0),
-                shortHeight: defPrim<number>(0),
+                length: defPrim<number | null>(null),
+                depth: defPrim<number | null>(null),
+                height: defPrim<number | null>(null),
+                shortHeight: defPrim<number | null>(null),
                 creationTimePosix: defPrim<number>(() => Date.now()),
               },
             } as const),

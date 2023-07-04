@@ -11,7 +11,6 @@ import {
 import { mdColors } from "./Box/BoxDecoration";
 import { sizeToCss } from "./Box/BoxSize";
 import { numToFontSize } from "./Box/BoxText";
-import { Overflow, Axis, Align } from "./Box/BoxLayout";
 import { exists } from "./utils";
 // Allow overriding of the default sty
 const props = defineProps({
@@ -121,9 +120,9 @@ watchEffect(() => {
 const detailColor = computed(() =>
   inputElementHasFocus.value
     ? mdColors.green
-    : props.value === ``
+    : props.value === `` || !exists(props.value)
     ? mdColors.grey
-    : mdColors.black,
+    : props.sty?.textColor ?? mdColors.black,
 );
 
 const scale = computed(() => (props.heading ? 1.5 : props.title ? 1.25 : 1));
@@ -137,18 +136,22 @@ onMounted(() => {
 function tryFocus() {
   inputRef.value?.focus();
 }
+
+const underlineHeight = computed(() =>
+  props.underlined ? 0.25 * scale.value : 0,
+);
 </script>
 
 <template>
-  <Box
+  <Row
     @click="tryFocus()"
     :sty="{
       width: `1f`,
-      height: underlined ? undefined : 1,
+      height: scale + underlineHeight,
       textColor: mdColors.black,
-      axis: Axis.row,
       spacing: 0.25,
-      overflowY: Overflow.visible,
+      overflowY: $Overflow.forceStretchParent,
+      align: $Align.topLeft,
       ...sty,
       scale: scale,
     }"
@@ -159,7 +162,7 @@ function tryFocus() {
       v-if="underlined"
       :sty="{
         width: `1f`,
-        height: scale,
+        height: scale + underlineHeight,
       }"
     >
       <!-- Input -->
@@ -167,14 +170,14 @@ function tryFocus() {
         :sty="{
           width: `1f`,
           height: `1f`,
-          axis: Axis.column,
+          axis: $Axis.column,
         }"
       >
         <Box
           :sty="{
             width: `1f`,
             height: `1f`,
-            axis: Axis.row,
+            axis: $Axis.row,
           }"
         >
           <Box :sty="{ width: 0.25 }" />
@@ -202,7 +205,7 @@ function tryFocus() {
                     ? sty.scale
                     : sizeToCss(sty.scale ?? scale),
                 [`--placeholder-color`]: hintColor,
-                caretColor: `#f2b212ff`,
+                caretColor: $mdColors.green,
               }"
             />
           </Box>
@@ -211,7 +214,13 @@ function tryFocus() {
       </Box>
 
       <!-- Underline -->
-      <Box :sty="{ width: `1f`, height: 0.25, align: Align.bottomCenter }">
+      <Box
+        :sty="{
+          width: `1f`,
+          height: underlineHeight,
+          align: $Align.bottomCenter,
+        }"
+      >
         <Box
           :sty="{
             width: `1f`,
@@ -247,10 +256,10 @@ function tryFocus() {
             ? sty.scale
             : sizeToCss(sty.scale ?? scale),
         [`--placeholder-color`]: hintColor,
-        caretColor: `#f2b212ff`,
+        caretColor: $mdColors.green,
       }"
     />
-  </Box>
+  </Row>
 </template>
 
 <style scoped>
