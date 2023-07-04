@@ -5,6 +5,7 @@ import { sizeToCss } from "./BoxSize";
 export type TextSty = {
   scale: number | string;
   textColor: string;
+  // NOTE: Eventually we might want to make this a number so it can be granularly controlled. With presets for thin, normal, and bold.
   textIsBold: boolean;
   textIsItalic: boolean;
   textIsUnderlined: boolean;

@@ -9,7 +9,7 @@ export type LayoutSty = PadStyProps &
   };
 
 // Pad
-type _PadUnit = number; // | string;
+type _PadUnit = number | string;
 export type PadStyProps = {
   // All
   pad: _PadUnit;
@@ -59,6 +59,8 @@ export type AlignStyProps = {
   alignX: AlignSingleAxis;
   alignY: AlignSingleAxis;
 };
+// NOTE: At some point we probably want to crossout the align property if the size is shrink since it won't do anything.
+// NOTE: We probably eventually want to allow align to be a number between -1 and 1 so that contents can be precisely positioned.
 export type _FlexAlign = (typeof _FlexAlign)[keyof typeof _FlexAlign];
 export const _FlexAlign = {
   start: `flex-start`,
@@ -78,7 +80,6 @@ export type AlignTwoAxis = {
 };
 export type Align = AlignSingleAxis | AlignTwoAxis;
 export const Align = {
-  // There is an argument to make `align: Align.spaceBetween` apply to both x and y.
   ..._FlexAlign,
   ..._SpaceAlign,
   topLeft: {
@@ -119,6 +120,8 @@ export const Align = {
   },
 } as const;
 
+
+// Compute
 export function computeBoxLayout(
   sty: Partial<LayoutSty>,
   align: Align,
