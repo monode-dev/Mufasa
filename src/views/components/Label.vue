@@ -16,7 +16,8 @@ const props = defineProps({
 
 <template>
   <Row :sty="{ width: `1f`, padBetween: 0.25, align: $Align.topLeft, ...sty }">
-    <Text :style="{ whiteSpace: `nowrap` }">{{ label }}:</Text>
+    <!-- <Text :sty="{ overflowX: $Overflow.crop }">{{ label }}:</Text> -->
+    <Text>{{ label }}:</Text>
     <slot />
   </Row>
 </template>

@@ -49,6 +49,7 @@ function clicked() {
     /> -->
     <Text
       :sty="{
+        width: `1f`,
         overflowX: Overflow.crop,
       }"
     >

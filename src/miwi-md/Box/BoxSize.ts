@@ -1,5 +1,11 @@
 import { isNum, exists, isString, CssProps } from "./BoxUtils";
-import { Axis } from "./BoxLayout";
+import {
+  Axis,
+  LayoutSty,
+  Overflow,
+  defaultOveflowX,
+  defaultOveflowY,
+} from "./BoxLayout";
 
 export type SizeSty = {
   width: number | string | FlexSize;
@@ -32,9 +38,11 @@ export function isFlexSize(size: any): size is FlexSize {
 export function computeSizeInfo({
   size,
   isMainAxis,
+  overflow,
 }: {
   size: number | string | FlexSize;
   isMainAxis: boolean;
+  overflow: Overflow;
 }) {
   const isShrink = size === -1;
   const sizeIsFlex = isFlexSize(size);
@@ -48,20 +56,15 @@ export function computeSizeInfo({
       : sizeIsFlex
       ? undefined
       : //: `fit-content`;
-        `auto`;
+        `fit-content`; // This use to be auto, but that was allowing text to be cut off, so I'm trying fit-content again. I'm guessing I swapped to auto because fit-content was causing the parent to grow to fit the child even when we didnt' want it to. It seems to be working now, so I'm going to try it this way for a  bit.
   const minSize = sizeIsFlex
-    ? isShrink
-      ? `0` // We used `0` because a min of `fit-content` can overflow the parent which is not what we want
-      : size.min === Infinity
+    ? size.min === Infinity
       ? exactSize
       : sizeToCss(size.min)
     : exactSize;
   // TODO: If your parent's overflow is `hidden`, then max size should be `100%`
   const maxSize = sizeIsFlex
-    ? isShrink
-      ? //? `fit-content`
-        `auto`
-      : size.max === Infinity
+    ? size.max === Infinity
       ? undefined // ?? `100%` // I turned (maxSize: 100%) off because a 100% caps the element at the height of its parent which doesn't work if the parent scrolls its content
       : sizeToCss(size.max)
     : exactSize;
@@ -69,7 +72,7 @@ export function computeSizeInfo({
 }
 
 export function computeBoxSize(
-  sty: Partial<SizeSty>,
+  sty: Partial<SizeSty & LayoutSty>,
   childWidthGrows: boolean,
   childHeightGrows: boolean,
   parentAxis: Axis,
@@ -87,6 +90,7 @@ export function computeBoxSize(
   const [exactWidth, wMin, wMax, widthGrows] = computeSizeInfo({
     size: width,
     isMainAxis: parentAxis === Axis.row,
+    overflow: sty.overflowX ?? defaultOveflowX,
   });
   let height =
     (sty.height ?? -1) === -1
@@ -104,6 +108,7 @@ export function computeBoxSize(
   const [exactHeight, hMin, hMax, heightGrows] = computeSizeInfo({
     size: height,
     isMainAxis: parentAxis === Axis.column,
+    overflow: sty.overflowY ?? defaultOveflowY,
   });
   return {
     // Sizing

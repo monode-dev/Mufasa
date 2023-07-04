@@ -38,6 +38,7 @@ const scale = computed(
       height: scale,
       align: $Align.centerLeft,
       overflowX: $Overflow.wrap,
+      overflowY: $Overflow.crop,
       // overflowY: Overflow.overflow,
       // useEllipsisForOverflow: useEllipsisForOverflow,
       ...sty,
