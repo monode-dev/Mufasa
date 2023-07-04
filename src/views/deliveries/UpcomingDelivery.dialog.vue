@@ -9,7 +9,7 @@ import {
   getClientLabel,
   Delivery,
 } from "@/AppData";
-import { PropType, VNodeRef, computed, ref } from "vue";
+import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
 
 const props = defineProps({
@@ -39,6 +39,13 @@ const client = ref<Client | null>(
 const tank = ref<Tank | null>(
   deliveryToEdit.value?.upcomingExistingTank ?? null,
 );
+watchEffect(() => {
+  const clientPath = client.value?._firestoreRef?.path;
+  const tankParentPath = tank.value?.mx_parent?._firestoreRef?.path;
+  if (exists(tankParentPath) && tankParentPath !== clientPath) {
+    tank.value = null;
+  }
+});
 const amount = ref(deliveryToEdit.value?.quantity ?? 0);
 
 const deliveryIsValid = computed(() => {

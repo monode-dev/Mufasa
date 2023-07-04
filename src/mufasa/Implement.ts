@@ -56,6 +56,7 @@ let _isSignal: (obj: any) => obj is Signal<any>;
 let _watchEffect: (effect: () => void) => void;
 // Firebase
 let firestoreDb: Firestore;
+const MX_PARENT_KEY = `mx_parent`;
 
 // async function getUuid() {
 //   return `${(await Device.getId()).uuid}-${Date.now()}`;
@@ -130,6 +131,7 @@ export type DocSpecificProps = {
   readonly _firestoreRef: DocumentReference | null | undefined;
   readonly isLoaded: boolean;
   readonly isDeleted: boolean;
+  readonly mx_parent: Doc | null | undefined;
   deleteDoc(): Promise<void>;
 };
 export function docProx<
@@ -146,6 +148,7 @@ export function docProx<
   objFormats: F,
   localCache: ReturnType<typeof createCache>,
 ): T {
+  const getParentOf = createGetParentOf(objFormats);
   // if (typeName === `Client` && Date.now() - start < logDurrationFromStart) {
   //   const error = new Error();
   //   const stackTrace = error.stack!.split("\n");
@@ -186,6 +189,22 @@ export function docProx<
     get isDeleted() {
       return hasBeenDeleted.value;
     },
+    get mx_parent() {
+      const parentType = getParentOf(typeName)?.parentType;
+      if (!exists(parentType)) return undefined;
+      const parentPath = localCache.getPropValue(
+        typeName,
+        proxy._firestoreRef?.path ?? ``,
+        MX_PARENT_KEY,
+      ) as string | null | undefined;
+      if (!exists(parentPath)) return undefined;
+      return docProx(
+        doc(firestoreDb, parentPath),
+        parentType,
+        objFormats,
+        localCache,
+      );
+    },
     async deleteDoc() {
       const actualDocRef = _isSignal(docRef) ? docRef.value : docRef;
       if (exists(actualDocRef)) {
@@ -194,7 +213,7 @@ export function docProx<
           if (format.format === `many`) {
             const collectionRef = collection(firestoreDb, format.typeName!);
             const docs = await getDocs(
-              query(collectionRef, where(`mx_parent`, "==", actualDocRef)),
+              query(collectionRef, where(MX_PARENT_KEY, "==", actualDocRef)),
             );
             docs.forEach((doc) =>
               docProx(
@@ -478,7 +497,6 @@ export type List<T extends Doc> = {
 //   }
 //   return result;
 // }
-const PARENT_KEY = `mx_parent`;
 const start = Date.now();
 const logDurrationFromStart = 2000;
 function listProx<
@@ -689,35 +707,36 @@ function listProx<
 //
 //
 // SECTION: Define
+function createGetParentOf(objFormats: ObjFormats) {
+  const parentOfMap: {
+    [childType: string]: {
+      parentType: string;
+      propName: string;
+    };
+  } = {};
+  for (const typeName of Object.keys(objFormats)) {
+    // This obj is the parent of any of it's many props
+    const props = objFormats[typeName];
+    for (const [propName, propFormat] of Object.entries(props)) {
+      if (propFormat.format === `many`) {
+        parentOfMap[propFormat.typeName!] = {
+          parentType: typeName,
+          propName: propName,
+        };
+      }
+    }
+  }
+  return function (childType: string) {
+    return parentOfMap[childType] as (typeof parentOfMap)[string] | undefined;
+  };
+}
 function createCache(objFormats: ObjFormats) {
   type DocCache = {
     [propName: string]: Signal<
       number | string | boolean | null | DocumentReference
     >;
   } & { mx_parentPath?: string; deletionCheck: Signal<boolean> };
-  const getParentOf = (() => {
-    const parentOfMap: {
-      [childType: string]: {
-        parentType: string;
-        propName: string;
-      };
-    } = {};
-    for (const typeName of Object.keys(objFormats)) {
-      // This obj is the parent of any of it's many props
-      const props = objFormats[typeName];
-      for (const [propName, propFormat] of Object.entries(props)) {
-        if (propFormat.format === `many`) {
-          parentOfMap[propFormat.typeName!] = {
-            parentType: typeName,
-            propName: propName,
-          };
-        }
-      }
-    }
-    return function (childType: string) {
-      return parentOfMap[childType];
-    };
-  })();
+  const getParentOf = createGetParentOf(objFormats);
   const cache: {
     [collection: string]: {
       docsChanged: Signal<number>;
@@ -740,7 +759,7 @@ function createCache(objFormats: ObjFormats) {
         docCache[propName] = _signal(initData[propName]);
       }
     }
-    if (initData.mx_parent) {
+    if (exists(initData.mx_parent)) {
       docCache.mx_parentPath = initData.mx_parent.path;
     }
     return docCache;
@@ -750,7 +769,7 @@ function createCache(objFormats: ObjFormats) {
     newData: DocumentData,
     docFormat: ObjFormats[string],
   ) {
-    for (const propName in docFormat) {
+    for (const propName of Object.keys(docFormat)) {
       // console.log(propName);
       const oldValue = docCache[propName].value;
       const newValue = newData[propName];
@@ -864,6 +883,9 @@ function createCache(objFormats: ObjFormats) {
       return cache[typeName].docs[objPath]?.deletionCheck.value;
     },
     getPropValue(typeName: string, objPath: string, propName: string) {
+      if (propName === MX_PARENT_KEY) {
+        return cache[typeName].docs[objPath]?.mx_parentPath;
+      }
       /** NOTE: I've debated handling many props in a separate function so
        * that we can type check the return. However, I can't guarantee that
        * we got the right paramaters. It probably is worth splittting up

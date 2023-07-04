@@ -9,7 +9,7 @@ import {
   Delivery,
   listUpcomingDeliveries,
 } from "@/AppData";
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import {
@@ -35,6 +35,13 @@ const delivery = ref<UpcomingExistingDelivery | null>(null);
 const client = ref<Client | null>(null);
 // TODO: Should go to null when client changes.
 const tank = ref<Tank | null>(null);
+watchEffect(() => {
+  const clientPath = client.value?._firestoreRef?.path;
+  const tankParentPath = tank.value?.mx_parent?._firestoreRef?.path;
+  if (exists(tankParentPath) && tankParentPath !== clientPath) {
+    tank.value = null;
+  }
+});
 
 // Dimensions
 const dimTankShape = ref<TankShapeId | null>(null);
