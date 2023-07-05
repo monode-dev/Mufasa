@@ -1,3 +1,6 @@
+/** We should look into how drizzle orm handles definitions to get some inspiration for how to clean ours up. */
+// NOTE: It think this technically makes Mufasa an ORM, which means @miwi/orm might be a better spot for it.
+
 // Object
 export type DefObj = {
   typeName: string;

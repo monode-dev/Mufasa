@@ -6,6 +6,7 @@ import {
   getTankLabel,
   getClientLabel,
   tankIsValid,
+  listClients,
 } from "@/AppData";
 import { PropType, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -45,11 +46,10 @@ watchEffect(() => {
                 return data?._firestoreRef?.path;
             }"
       :options="
-        orderDocs(appData.clients, (x) => getClientLabel(x))
-          .filter(
-            (x) => (exists(x.name) && x.name.length > 0) || exists(x.clientId),
-          )
-          .map((x) => ({ label: getClientLabel(x), data: x }))
+        listClients(appData.clients, true).map((x) => ({
+          label: getClientLabel(x),
+          data: x,
+        }))
       "
   /></Label>
   <Label label="Tank" v-if="exists(client)">

@@ -2,7 +2,7 @@
 import { PropType, VNodeRef, defineProps, ref } from "vue";
 import { pushPage } from "@/Nav";
 import ClientPage from "./Client.page.vue";
-import { Client, getClientLabel } from "@/AppData";
+import { Client, clientIsValid, getClientLabel } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import DeleteDialog from "../components/DeleteDialog.vue";
 
@@ -37,14 +37,14 @@ function clicked() {
       width: `1f`,
       height: 1,
       align: $Align.spaceBetween,
-      textColor: 
-              ([undefined, null] as any[]).includes(client.name) ? mdColors.grey : mdColors.black,
+      textColor: client.isLoaded ? mdColors.black : mdColors.grey,
     }"
   >
     <Text
       :sty="{
         width: `1f`,
         overflowX: $Overflow.crop,
+        textColor: clientIsValid(client) ? mdColors.black : mdColors.grey,
       }"
     >
       {{ client.isLoaded ? getClientLabel(client) : `Loading...` }}

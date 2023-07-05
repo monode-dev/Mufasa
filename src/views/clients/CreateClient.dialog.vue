@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, getAppData } from "@/AppData";
+import { Client, clientIsValid, getAppData } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
 import ClientPage from "./Client.page.vue";
 import { exists } from "@/utils";
@@ -31,11 +31,21 @@ function closePopUp() {
   popPage();
 }
 
-const clientIsValid = computed(() => {
-  return name.value.length > 0 || clientId.value !== null;
+const clientInitFromFields = computed(() => {
+  return {
+    name: name.value,
+    clientId: clientId.value,
+    phoneNumber: phoneNumber.value,
+    address: address.value,
+    notes: notes.value,
+  };
 });
+const _clientIsValid = computed(() => {
+  return clientIsValid(clientInitFromFields.value);
+});
+
 function handleYes() {
-  if (!clientIsValid.value) return;
+  if (!_clientIsValid.value) return;
   closePopUp();
   const newClient = appData.clients.add({
     name: name.value,
@@ -91,7 +101,7 @@ export default {
         <Button
           @click.stop="handleYes"
           :sty="{
-            background: clientIsValid ? $mdColors.green : $mdColors.grey,
+            background: _clientIsValid ? $mdColors.green : $mdColors.grey,
           }"
           >Create</Button
         >

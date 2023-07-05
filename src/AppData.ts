@@ -5,9 +5,19 @@ import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
 import { computed, isRef, ref, watchEffect } from "vue";
 
 export type Client = (typeof mufasaTypes)["Client"];
+export function clientIsValid(
+  client: Partial<Client> | null | undefined,
+): boolean {
+  const clientIdExists =
+    exists(client?.clientId) && client?.clientId.trim() !== ``;
+  const nameExists = exists(client?.name) && client?.name.trim() !== ``;
+  return clientIdExists || nameExists;
+}
 export function getClientLabel(client: Client | null | undefined): string {
-  const nameExists = exists(client?.name) && client?.name !== ``;
-  const clientIdExists = exists(client?.clientId) && client?.clientId !== ``;
+  if (!clientIsValid(client)) return `Unnamed Client`;
+  const nameExists = exists(client?.name) && client?.name?.trim() !== ``;
+  const clientIdExists =
+    exists(client?.clientId) && client?.clientId?.trim() !== ``;
   if (nameExists && clientIdExists) {
     return `${client?.clientId} - ${client?.name}`;
   } else if (nameExists) {
@@ -18,31 +28,51 @@ export function getClientLabel(client: Client | null | undefined): string {
     return `Unnamed Client`;
   }
 }
+export function listClients(
+  clients: List<Client>,
+  excludeInvalidClients: boolean = false,
+): Client[] {
+  let result = orderDocs(clients, (x) => {
+    const name = x?.name?.trim().toLowerCase();
+    const nameExists = exists(name) && name !== ``;
+    const clientId = x?.clientId?.trim().toLowerCase();
+    const clientIdExists = exists(clientId) && clientId !== ``;
+    let sortName = name ?? ``;
+    if (nameExists && clientIdExists) {
+      sortName += ` - `;
+    }
+    sortName += clientId ?? ``;
+    return sortName;
+  });
+
+  if (excludeInvalidClients) {
+    result = result.filter(clientIsValid);
+  }
+
+  return result;
+}
+
 // const a = {} as Client;
 // a.fuelType;
 export type Tank = (typeof mufasaTypes)["Tank"];
-export function tankIsValid(tank: Tank | null | undefined): boolean {
+export function tankIsValid(tank: Partial<Tank> | null | undefined): boolean {
   const shapeUtils = getTankShape(tank?.shape);
   const fuelName = tank?.fuelType?.name;
   const shapeName = shapeUtils?.nameShort;
   const volume = shapeUtils?.calcTotalVolume(tank);
   return exists(fuelName) && exists(shapeName) && exists(volume) && volume > 0;
 }
-export function getTankLabel(tank: Tank | null | undefined): string {
-  if (tankIsValid(tank)) {
-    // TODO: Fuel - Volume - Shape - Label
-    const shapeUtils = getTankShape(tank?.shape);
-    const fuelName = tank?.fuelType?.name;
-    const volume = shapeUtils?.calcTotalVolume(tank);
-    const shapeName = shapeUtils?.nameShort;
-    return `${fuelName} - ${Math.round(volume!)} Gal. - ${shapeName}${
-      exists(tank?.optionalLabel) && tank?.optionalLabel?.trim() !== ``
-        ? ` - ${tank?.optionalLabel}`
-        : ``
-    }`;
-  } else {
-    return `Incomplete Tank`;
-  }
+export function getTankLabel(tank: Partial<Tank> | null | undefined): string {
+  if (!tankIsValid(tank)) return `Incomplete Tank`;
+  const shapeUtils = getTankShape(tank?.shape);
+  const fuelName = tank?.fuelType?.name;
+  const volume = shapeUtils?.calcTotalVolume(tank);
+  const shapeName = shapeUtils?.nameShort;
+  return `${fuelName} - ${Math.round(volume!)} Gal. - ${shapeName}${
+    exists(tank?.optionalLabel) && tank?.optionalLabel?.trim() !== ``
+      ? ` - ${tank?.optionalLabel}`
+      : ``
+  }`;
 }
 export type FuelType = (typeof mufasaTypes)["FuelType"];
 export type Delivery = (typeof mufasaTypes)["Delivery"];
