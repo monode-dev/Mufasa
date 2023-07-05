@@ -64,6 +64,7 @@ function deletePressed() {
       v-model:depth="tank.depth"
       v-model:height="tank.height"
       v-model:shortHeight="tank.shortHeight"
+      v-model:diameter="tank.diameter"
     />
     <Field
       v-model:value="tank.optionalLabel"

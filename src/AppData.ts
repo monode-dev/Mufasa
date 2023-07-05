@@ -201,6 +201,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
                 depth: defPrim<number | null>(null),
                 height: defPrim<number | null>(null),
                 shortHeight: defPrim<number | null>(null),
+                diameter: defPrim<number | null>(null),
                 creationTimePosix: defPrim<number>(() => Date.now()),
               },
             } as const),

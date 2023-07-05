@@ -1,13 +1,18 @@
 import { Tank } from "@/AppData";
+import { Doc } from "@/mufasa/Implement";
 import { exists } from "@/utils";
 
 export const CUBIC_INCHES_PER_GALLON = 231;
 
 export type TankShapeId = `rectangle`;
+export type TankDimension = Exclude<
+  keyof Tank,
+  `optionalLabel` | `fuelType` | `shape` | `creationTimePosix` | keyof Doc
+>;
 export type TankShapeDatails = {
   readonly nameLong: string;
   readonly nameShort: string;
-  readonly dimensions: (keyof Tank)[];
+  readonly dimensions: TankDimension[];
   calcFilledVolume(
     tank: Partial<Tank> | null | undefined,
     stickedInches: number | null | undefined,
@@ -55,6 +60,21 @@ export function getTankShape<T extends TankShapeId | null | undefined>(
   shapeId: T,
 ): T extends null | undefined ? undefined : TankShapeDatails {
   return (exists(shapeId) ? _tankShapes[shapeId] : undefined) as any;
+}
+
+export function getDimensionLabel(dimension: TankDimension): string {
+  switch (dimension) {
+    case `length`:
+      return `Length`;
+    case `depth`:
+      return `Depth`;
+    case `height`:
+      return `Height`;
+    case `diameter`:
+      return `Diameter`;
+    case `shortHeight`:
+      return `Short Height`;
+  }
 }
 
 export function calcGallonsToReachPercent(
