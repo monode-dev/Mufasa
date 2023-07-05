@@ -140,9 +140,9 @@ function updateFromHtml(divRef: HTMLElement | undefined) {
 .b-x::before {
   content: "";
   position: absolute;
-  top: -0.125rem;
-  right: -0.125rem;
-  bottom: -0.125rem;
-  left: -0.125rem;
+  top: -0.25rem;
+  right: -0.25rem;
+  bottom: -0.25rem;
+  left: -0.25rem;
 }
 </style>
