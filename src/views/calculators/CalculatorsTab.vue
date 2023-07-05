@@ -37,15 +37,25 @@ const tank = ref<Tank | null>(null);
 
 // Dimensions
 const dimTankShape = ref<TankShapeId | null>(null);
-const dimLength = ref(0);
-const dimDepth = ref(0);
-const dimHeight = ref(0);
-const dimShortHeight = ref(0);
+const dimLength = ref<number | null>(null);
+const dimDepth = ref<number | null>(null);
+const dimHeight = ref<number | null>(null);
+const dimShortHeight = ref<number | null>(null);
+const dimDiameter = ref<number | null>(null);
+const dimPseudoTank = computed(() => ({
+  shape: dimTankShape.value,
+  length: dimLength.value,
+  depth: dimDepth.value,
+  height: dimHeight.value,
+  shortHeight: dimShortHeight.value,
+  diameter: dimDiameter.value,
+}));
 
 // Other
 const stickedInches = ref<number | null>(null);
 
 // Estimates
+const emptyText = `--`;
 const tankShapeCalc = computed(() =>
   isDeliveryTab.value
     ? delivery.value?.upcomingExistingTank?.shape ?? tank.value?.shape
@@ -110,17 +120,11 @@ const currentFillPercent = computed(() =>
 );
 const gallonsToReachDesiredFill = computed(() => {
   const estimate = calcGallonsToReachPercent(
-    {
-      shape: tankShapeCalc.value,
-      length: tankLength.value,
-      depth: tankDepth.value,
-      height: tankHeight.value,
-      shortHeight: tankShortHeight.value,
-    },
+    dimPseudoTank.value,
     stickedInches.value,
     desiredFill.value,
   );
-  return exists(estimate) ? Math.round(estimate).toString() : `-`;
+  return exists(estimate) ? Math.round(estimate).toString() : emptyText;
 });
 </script>
 
@@ -178,45 +182,17 @@ const gallonsToReachDesiredFill = computed(() => {
         v-model:client="client"
         v-model:tank="tank"
       />
-      <Box
+      <TankFields
         v-if="isDimensionsTab"
-        :sty="{
-          width: `1f`,
-          padBetween: 1,
-        }"
-      >
-        <DropDown
-          label="Shape"
-          v-model:selected="dimTankShape"
-          :getKeyFromData="(data: any) => data"
-          :options="[
-            ...Object.values(TANK_SHAPE_IDS).map((x) => ({
-              label: getTankShape(x).nameLong,
-              data: x,
-            })),
-          ]"
-        />
-        <Row
-          :sty="{
-            width: `1f`,
-          }"
-        >
-          <Label label="Length"><NumField v-model:value="dimLength" /></Label>
-          <Label label="Depth"><NumField v-model:value="dimDepth" /></Label>
-        </Row>
-        <Row
-          :sty="{
-            width: `1f`,
-          }"
-        >
-          <Label label="Height"><NumField v-model:value="dimHeight" /></Label>
-          <Label label="Short Height"
-            ><NumField v-model:value="dimShortHeight"
-          /></Label>
-        </Row>
-      </Box>
+        v-model:shape="dimTankShape"
+        v-model:length="dimLength"
+        v-model:depth="dimDepth"
+        v-model:height="dimHeight"
+        v-model:shortHeight="dimShortHeight"
+        v-model:diameter="dimDiameter"
+      />
       <Label label="Sticked Inches"
-        ><NumField v-model:value="stickedInches" underlined hint="0"
+        ><NumField v-model:value="stickedInches" underlined :hint="emptyText"
       /></Label>
       <!-- <Box /> -->
       <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" />
@@ -227,15 +203,17 @@ const gallonsToReachDesiredFill = computed(() => {
         >
           {{
             exists(currentFillPercent)
-              ? Math.round(100 * currentFillPercent)
-              : `-`
-          }}%</Label
+              ? `${Math.round(100 * currentFillPercent)}%`
+              : emptyText
+          }}</Label
         >
         <Label
           label="Current Gallons"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          {{ exists(currentGallons) ? Math.round(currentGallons) : `-` }}</Label
+          {{
+            exists(currentGallons) ? Math.round(currentGallons) : emptyText
+          }}</Label
         >
       </Row>
 

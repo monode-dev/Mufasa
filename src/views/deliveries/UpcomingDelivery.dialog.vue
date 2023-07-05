@@ -117,7 +117,7 @@ export default {
 
         <!-- Amount -->
         <Label label="Amount"
-          ><NumField v-model:value="amount" underlined hint="0"
+          ><NumField v-model:value="amount" underlined hint="--"
         /></Label>
 
         <!-- Buttons -->

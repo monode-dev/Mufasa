@@ -82,15 +82,15 @@ export default {
     >
       <Text title>Complete Delivery</Text>
       <Label label="Client"
-        ><Field v-model:value="clientNameLabel" hint="Client"
+        ><Field v-model:value="clientNameLabel" hint="--"
       /></Label>
       <Label label="Fuel"
-        ><Field v-model:value="fuelTypeName" hint="Fuel"
+        ><Field v-model:value="fuelTypeName" hint="--"
       /></Label>
       <Label label="Amount"
-        ><NumField v-model:value="quantity" hint="Amount"
+        ><NumField v-model:value="quantity" hint="--"
       /></Label>
-      <Label label="Rate"><NumField v-model:value="rate" hint="Rate" /></Label>
+      <Label label="Rate"><NumField v-model:value="rate" hint="--" /></Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
         <Button outlined @click.stop="popPage">Cancel</Button>
         <Button

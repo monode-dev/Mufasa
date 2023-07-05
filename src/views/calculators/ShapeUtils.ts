@@ -27,24 +27,21 @@ const _tankShapes: {
     nameShort: `Rect.`,
     dimensions: [`length`, `depth`, `height`],
     calcFilledVolume(tank, stickedInches) {
-      if (
-        !exists(tank?.length) ||
-        !exists(tank?.depth) ||
-        !exists(stickedInches)
-      ) {
-        return undefined;
+      for (const dimension of [`length`, `depth`, `height`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
       }
+      if (!exists(stickedInches)) return undefined;
       return (
         (tank?.length! * tank?.depth! * stickedInches) / CUBIC_INCHES_PER_GALLON
       );
     },
     calcTotalVolume(tank) {
-      if (
-        !exists(tank?.length) ||
-        !exists(tank?.depth) ||
-        !exists(tank?.height)
-      ) {
-        return undefined;
+      for (const dimension of [`length`, `depth`, `height`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
       }
       return (
         (tank?.length! * tank?.depth! * tank?.height!) / CUBIC_INCHES_PER_GALLON
@@ -78,7 +75,9 @@ export function getDimensionLabel(dimension: TankDimension): string {
 }
 
 export function calcGallonsToReachPercent(
-  tank: Partial<Tank>,
+  tank: {
+    [Key in TankDimension | `shape`]: Tank[Key];
+  },
   stickedInches: number | null | undefined,
   targetPercent: number,
 ): number | undefined {

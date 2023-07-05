@@ -30,7 +30,7 @@ const props = defineProps({
   },
   hint: {
     type: String,
-    default: "Input text.",
+    default: "--",
   },
   hintColor: {
     type: String,

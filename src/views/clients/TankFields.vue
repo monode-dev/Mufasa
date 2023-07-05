@@ -76,7 +76,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[0])"
     >
       <NumField
-        hint="0"
+        hint="--"
         :value="length"
         @update:value="emit(`update:${dimensions[0]}`, $event)"
         underlined
@@ -92,7 +92,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[1])"
     >
       <NumField
-        hint="0"
+        hint="--"
         :value="depth"
         @update:value="emit(`update:${dimensions[1]}`, $event)"
         underlined
@@ -115,7 +115,7 @@ const dimensions = computed(() => {
       v-if="dimensions.length > 2"
       :label="getDimensionLabel(dimensions[2])"
       ><NumField
-        hint="0"
+        hint="--"
         :value="height"
         @update:value="emit(`update:${dimensions[2]}`, $event)"
         underlined
@@ -129,7 +129,7 @@ const dimensions = computed(() => {
       v-if="dimensions.length > 3"
       :label="dimensions.length < 4 ? `` : getDimensionLabel(dimensions[3])"
       ><NumField
-        hint="0"
+        hint="--"
         :value="shortHeight"
         @update:value="emit(`update:${dimensions[3]}`, $event)"
         underlined
