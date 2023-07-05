@@ -5,7 +5,6 @@ import ClientPage from "./Client.page.vue";
 import { Client, getClientLabel } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import DeleteDialog from "../components/DeleteDialog.vue";
-import { Overflow } from "@/miwi-md/Box/BoxLayout";
 
 // Create a prop called size
 const props = defineProps({
@@ -40,17 +39,12 @@ function clicked() {
       align: $Align.spaceBetween,
       textColor: 
               ([undefined, null] as any[]).includes(client.name) ? mdColors.grey : mdColors.black,
-      // overflowY: $Overflow.forceStretchParent,
     }"
   >
-    <!-- <TruncatedText
-      :text="client.isLoaded ? getClientLabel(client) : `Loading...`"
-      :maxChars="35"
-    /> -->
     <Text
       :sty="{
         width: `1f`,
-        overflowX: Overflow.crop,
+        overflowX: $Overflow.crop,
       }"
     >
       {{ client.isLoaded ? getClientLabel(client) : `Loading...` }}

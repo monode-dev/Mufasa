@@ -138,15 +138,18 @@ function selectOption(option: Option) {
             align: $Align.spaceBetween,
           }"
         >
-          <TruncatedText
-            :text="selectedOption?.label ?? `None`"
-            :maxChars="maxChars"
+          <Text
             :sty="{
+              width: `1f`,
+              overflowX: $Overflow.crop,
               textColor: exists(selectedOption?.data)
                 ? mdColors.black
                 : mdColors.grey,
             }"
-          />
+          >
+            {{ selectedOption?.label ?? `None` }}
+          </Text>
+
           <Icon icon="menuDown" />
         </Row>
         <!-- Drop Down -->
@@ -188,15 +191,17 @@ function selectOption(option: Option) {
               v-if="speciaolOptions.length > 0 && options.length > 0"
               :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }"
             />
-            <TruncatedText
+            <Text
               v-for="(option, index) in options"
               @click.stop="selectOption(option)"
-              :text="option.label"
-              :maxChars="isWide ? Math.floor(maxChars * 1.25) + 1 : maxChars"
               :sty="{
+                width: `1f`,
+                overflowX: $Overflow.crop,
                 textColor: exists(option.data) ? mdColors.black : mdColors.grey,
               }"
-            />
+            >
+              {{ option.label }}
+            </Text>
             <!-- <Text
               v-for="(option, index) in options"
               :key="index"

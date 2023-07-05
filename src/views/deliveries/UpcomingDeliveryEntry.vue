@@ -49,11 +49,14 @@ function handleDelete() {
         padBetween: 0.25,
       }"
     >
-      <TruncatedText
-        :sty="{ width: `1f` }"
-        :text="getClientLabel(props.delivery.upcomingExistingClient)"
-        :maxChars="35"
-      />
+      <Text
+        :sty="{
+          width: `1f`,
+          overflowX: $Overflow.crop,
+        }"
+      >
+        {{ getClientLabel(props.delivery.upcomingExistingClient) }}
+      </Text>
       <DeleteOptionsButton
         @delete="handleDelete"
         shouldShowEdit
@@ -69,11 +72,14 @@ function handleDelete() {
         >
         to</Row
       >
-      <TruncatedText
-        :sty="{ width: `3f` }"
-        :text="getTankLabel(props.delivery.upcomingExistingTank)"
-        :maxChars="23"
-      />
+      <Text
+        :sty="{
+          width: `1f`,
+          overflowX: $Overflow.crop,
+        }"
+      >
+        {{ getTankLabel(props.delivery.upcomingExistingTank) }}
+      </Text>
     </Row>
   </Card>
 </template>
