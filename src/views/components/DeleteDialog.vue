@@ -56,7 +56,7 @@ export default {
         shadowSize: 0,
       }"
     >
-      <Text :sty="{ height: -1, overflowY: $Overflow.wrap }">
+      <Text :sty="{ height: -1, width: `1f`, overflowX: $Overflow.wrap }">
         {{ message }}
       </Text>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">

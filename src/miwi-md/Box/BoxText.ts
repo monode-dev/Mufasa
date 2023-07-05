@@ -63,10 +63,10 @@ export function computeTextStyle(
         : // We assume for now that all other aligns cam be treated as center
           `center`,
     lineHeight: sty.scale === undefined ? undefined : sizeToCss(sty.scale),
-    whiteSpace:
+    whiteSpace: // whiteSapce casacdes, so we need to explicity set it.
       overflowX === Overflow.crop || overflowX === Overflow.forceStretchParent
         ? `nowrap`
-        : undefined,
+        : `normal`,
     // textOverflow: sty.useEllipsisForOverflow ?? false ? `ellipsis` : undefined,
     color: sty.textColor,
   };

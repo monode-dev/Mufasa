@@ -23,7 +23,7 @@ const filteredClients = computed(() =>
 </script>
 
 <template>
-  <Column :sty="{ width: `1f`, height: `1f` }">
+  <Column :sty="{ width: `1f`, height: `1f`, overflowY: $Overflow.crop }">
     <ClientActionBar v-model:filterString="filterString" />
 
     <Body>

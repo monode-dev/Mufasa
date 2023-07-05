@@ -130,3 +130,19 @@ function updateFromHtml(divRef: HTMLElement | undefined) {
     <slot />
   </div>
 </template>
+
+<style scoped>
+.b-x {
+  position: relative;
+}
+
+/* We might not want all elements to have an expanded touch radius, but we can try it for now. */
+.b-x::before {
+  content: "";
+  position: absolute;
+  top: -0.125rem;
+  right: -0.125rem;
+  bottom: -0.125rem;
+  left: -0.125rem;
+}
+</style>

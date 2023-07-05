@@ -13,31 +13,6 @@ const appData = getAppData();
 
 <template>
   <Body>
-    <!-- <Row
-      :sty="{
-        width: `1f`,
-        align: $Align.centerLeft,
-      }"
-    >
-      <Box
-        :sty="{
-          width: `1f`, //18
-          height: 1,
-          background: $mdColors.orange,
-          align: $Align.centerLeft,
-          overflowX: $Overflow.crop,
-        }"
-      >
-        <Text
-          :sty="{
-            overflowX: $Overflow.crop,
-          }"
-          >asfdasdgjfasdfasfdasdffasdfasdfasdfjkljsdfkjaskdfjaskdjfkadjsfkljadskfjkasjdfklajsdfkjasdkfjasdkf</Text
-        >
-      </Box>
-      <Box :sty="{ width: `1f`, height: 1, background: $mdColors.blue }" />
-    </Row> -->
-
     <!-- Upcoming Delvieries -->
     <Row :sty="{ width: `1f`, align: $Align.spaceBetween }">
       <Box :sty="{ width: 1.75 }" />
