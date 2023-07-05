@@ -51,7 +51,7 @@ watchEffect(() => {
     });
   }
 });
-const tabButtonWidth = 4.75;
+const tabButtonWidth = 5;
 </script>
 
 <template>
@@ -62,33 +62,73 @@ const tabButtonWidth = 4.75;
       ...sty,
     }"
   >
-    <Box :sty="{ width: tabButtonWidth }" ref="tab0Ref" @click="selectTab(0)">
+    <Box
+      :sty="{ width: tabButtonWidth }"
+      ref="tab0Ref"
+      @click.stop="selectTab(0)"
+    >
       {{ labels[0] }}
     </Box>
-    <Box :sty="{ width: tabButtonWidth }" ref="tab1Ref" @click="selectTab(1)">
+    <Box
+      :sty="{ width: tabButtonWidth }"
+      ref="tab1Ref"
+      @click.stop="selectTab(1)"
+    >
       {{ labels[1] }}
     </Box>
-    <Box :sty="{ width: tabButtonWidth }" ref="tab2Ref" @click="selectTab(2)">
+    <Box
+      :sty="{ width: tabButtonWidth }"
+      ref="tab2Ref"
+      @click.stop="selectTab(2)"
+    >
       {{ labels[2] }}
     </Box>
   </Row>
-  <Row
+  <Stack
     :sty="{
       width: `1f`,
       height: 0.375,
-      alignX: Align.spaceAround,
-      alignY: Align.end,
     }"
   >
-    <Box :sty="{ width: tabButtonWidth }" />
-    <Box
+    <Row
       :sty="{
-        width: tabButtonWidth,
-        height: 0.125,
-        background: mdColors.sameAsText,
+        width: `1f`,
+        height: 0.375,
+        alignX: Align.spaceAround,
+        alignY: Align.end,
       }"
-      ref="tabUnderline"
-    />
-    <Box :sty="{ width: tabButtonWidth }" />
-  </Row>
+    >
+      <Box :sty="{ width: tabButtonWidth }" />
+      <Box
+        :sty="{
+          width: tabButtonWidth,
+          height: 0.125,
+          background: mdColors.sameAsText,
+        }"
+        ref="tabUnderline"
+      />
+      <Box :sty="{ width: tabButtonWidth }" />
+    </Row>
+    <Row
+      :sty="{
+        width: `1f`,
+        height: 0.375,
+        alignX: Align.spaceAround,
+        alignY: Align.end,
+      }"
+    >
+      <Box
+        @click.stop="selectTab(0)"
+        :sty="{ width: tabButtonWidth, height: `1f` }"
+      />
+      <Box
+        @click.stop="selectTab(1)"
+        :sty="{ width: tabButtonWidth, height: `1f` }"
+      />
+      <Box
+        @click.stop="selectTab(2)"
+        :sty="{ width: tabButtonWidth, height: `1f` }"
+      />
+    </Row>
+  </Stack>
 </template>

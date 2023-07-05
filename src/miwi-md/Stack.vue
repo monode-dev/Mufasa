@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { defineProps, PropType } from "vue";
-import { Axis } from "./Box/BoxLayout";
 
 const props = defineProps({
   sty: {
@@ -13,7 +12,7 @@ const props = defineProps({
 <template>
   <Box
     :sty="{
-      axis: Axis.stack,
+      axis: $Axis.stack,
       ...sty,
     }"
   >

@@ -124,7 +124,8 @@ export const Align = {
 export function computeBoxLayout(
   sty: Partial<LayoutSty>,
   align: Align,
-  parent: any,
+  // parent: any,
+  parentAxis: Axis,
   axis: Axis,
   childCount: number,
 ): CssProps {
@@ -173,7 +174,8 @@ export function computeBoxLayout(
   const overflowX = sty.overflowX ?? defaultOveflowX;
   const overflowY = sty.overflowY ?? defaultOveflowY;
   return {
-    position: parent?.props?.sty?.axis === Axis.stack ? `absolute` : `relative`,
+    // position: parent?.props?.sty?.axis === Axis.stack ? `absolute` : `relative`,
+    position: parentAxis === Axis.stack ? `absolute` : `relative`,
 
     // Pad
     // NOTE: Default could maybe be based off of font size.

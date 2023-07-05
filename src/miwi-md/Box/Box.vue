@@ -62,7 +62,8 @@ const style = computed(() => {
     ...computeBoxLayout(
       props.sty,
       align,
-      getCurrentInstance()?.parent,
+      // getCurrentInstance()?.parent,
+      parentAxis.value,
       axis,
       childCount.value,
     ),
