@@ -74,6 +74,18 @@ export function getTankLabel(tank: Partial<Tank> | null | undefined): string {
       : ``
   }`;
 }
+export function listTanks(
+  tanks: List<Tank> | undefined,
+  excludeInvalidTanks: boolean = false,
+): Tank[] {
+  let result = orderDocs(tanks ?? [], (x) => x.creationTimePosix);
+
+  if (excludeInvalidTanks) {
+    result = result.filter(tankIsValid);
+  }
+
+  return result;
+}
 export type FuelType = (typeof mufasaTypes)["FuelType"];
 export type Delivery = (typeof mufasaTypes)["Delivery"];
 export type UpcomingExistingDelivery = Doc<{

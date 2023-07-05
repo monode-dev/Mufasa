@@ -7,6 +7,7 @@ import {
   getClientLabel,
   tankIsValid,
   listClients,
+  listTanks,
 } from "@/AppData";
 import { PropType, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -59,7 +60,7 @@ watchEffect(() => {
       :getKeyFromData="(data: Tank | null) => {
                 return data?._firestoreRef?.path;
             }"
-      :options="orderDocs((client as Client | undefined)?.tanks ?? [], (x) => x.creationTimePosix).filter(tankIsValid).map(
+      :options="listTanks((client as Client | undefined)?.tanks, true).map(
                 (x, index) => ({ label: getTankLabel(x), data: x }),
               )"
   /></Label>

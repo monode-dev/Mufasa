@@ -2,7 +2,7 @@
 import { PropType, watchEffect } from "vue";
 import { pageTransitions, popPage } from "@/Nav";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
-import { Client } from "@/AppData";
+import { Client, listTanks } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { FuelType, getAppData } from "@/AppData";
 import DeleteDialog from "../components/DeleteDialog.vue";
@@ -84,14 +84,10 @@ export default {
         </Box>
       </Row>
       <TankEntry
-        v-for="(tank, index) in orderDocs(
-          client.tanks ?? [],
-          (x) => x.creationTimePosix,
-        )"
-        :key="index"
+        v-for="(tank, index) in listTanks(client.tanks)"
+        :key="tank._firestoreRef?.path ?? index"
         :tank="tank"
-        >{{ index + 1 }}</TankEntry
-      >
+      />
     </Body>
     <Body v-else :sty="{ align: $Align.center }">
       <Text hint>Loading...</Text>

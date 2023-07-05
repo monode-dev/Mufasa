@@ -49,28 +49,22 @@ const props = defineProps({
     >,
     required: true,
   },
-  underlined: {
-    type: Boolean,
-    default: false,
-  },
-  maxChars: {
-    type: Number,
-    default: Infinity,
+  emptyListText: {
+    type: String,
+    default: "No Options",
   },
 });
 
 const emit = defineEmits(["update:selected"]);
 
-function getAllOptions() {
-  return [...props.options, ...props.speciaolOptions];
-}
+const allOptions = computed(() => [...props.options, ...props.speciaolOptions]);
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
 const openDropDownRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
 const selectedOption = computed(() => {
   const selectedKey = props.getKeyFromData(props.selected) ?? undefined;
-  return getAllOptions().find(
+  return allOptions.value.find(
     (x) => (props.getKeyFromData(x.data) ?? undefined) === selectedKey,
   );
 });
@@ -177,6 +171,16 @@ function selectOption(option: Option) {
             }"
           >
             <Text
+              v-if="allOptions.length === 0"
+              hint
+              @click.stop="dropDownIsOpen = false"
+              :sty="{
+                width: `1f`,
+                align: $Align.centerLeft,
+              }"
+              >{{ emptyListText }}</Text
+            >
+            <Text
               v-for="(option, index) in speciaolOptions"
               :key="index"
               :sty="{
@@ -202,44 +206,8 @@ function selectOption(option: Option) {
             >
               {{ option.label }}
             </Text>
-            <!-- <Text
-              v-for="(option, index) in options"
-              :key="index"
-              :sty="{
-                align: $Align.centerLeft,
-                overflowX: $Overflow.crop,
-              }"
-              @click.stop="selectOption(option)"
-            >
-              <div
-                style="
-                  width: 100%;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                "
-              >
-                {{ option.label }}
-              </div>
-            </Text> -->
           </Box>
         </Box>
-      </Box>
-      <!-- Underline -->
-      <Box
-        v-if="underlined"
-        :sty="{
-          width: `1f`,
-          height: 0.25,
-        }"
-      >
-        <Box
-          :sty="{
-            width: `1f`,
-            height: 0.0625,
-            background: mdColors.grey,
-          }"
-        />
       </Box>
     </Box>
   </Row>

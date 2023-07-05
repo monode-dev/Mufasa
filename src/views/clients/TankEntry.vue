@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
 import {
   FuelType,
   Tank,
@@ -7,7 +6,7 @@ import {
   getTankLabel,
   tankIsValid,
 } from "@/AppData";
-import { popPage, pushPage } from "@/Nav";
+import { pushPage } from "@/Nav";
 import DeleteDialogVue from "../components/DeleteDialog.vue";
 const appData = getAppData();
 
@@ -35,7 +34,15 @@ function deletePressed() {
       }"
     >
       <!-- Hint should be toggled when the tank is complete -->
-      <Text :hint="!tankIsValid(tank)">{{ getTankLabel(tank) }}</Text>
+      <Text
+        :hint="!tankIsValid(tank)"
+        :sty="{
+          width: `1f`,
+          overflowX: $Overflow.crop,
+        }"
+      >
+        {{ getTankLabel(tank) }}
+      </Text>
 
       <DeleteOptionsButton @delete="deletePressed" />
     </Row>
