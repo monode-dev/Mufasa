@@ -36,21 +36,28 @@ const scale = computed(
       textColor: hint ? mdColors.grey : undefined,
       scale: scale,
       height: scale,
-      align: $Align.centerLeft,
-      overflowX: $Overflow.wrap,
-      overflowY: $Overflow.crop,
+      align: $Align.topLeft,
+      overflowY: $Overflow.forceStretchParent,
+      // background: $mdColors.pink,
       // overflowY: Overflow.overflow,
       // useEllipsisForOverflow: useEllipsisForOverflow,
       ...sty,
+      overflowX:
+        sty.overflowX === $Overflow.crop
+          ? $Overflow.forceStretchParent
+          : sty.overflowX ?? $Overflow.wrap,
     }"
   >
     <div
       v-if="sty.overflowX === $Overflow.crop"
       style="
+        position: absolute;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
+        /* height: 200%; */
+        /* padding-top: 0.05rem; */
       "
     >
       <slot />

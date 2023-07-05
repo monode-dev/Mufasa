@@ -21,7 +21,7 @@ const emit = defineEmits(["update:filterString", "close"]);
     :sty="{
       width: `1f`,
       background: mdColors.green,
-      pad: 0.5,
+      pad: 0.75,
       shadowSize: 1.25,
       shadowDirection: $Align.bottomCenter,
       zIndex: 1,
