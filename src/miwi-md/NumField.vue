@@ -24,6 +24,10 @@ const props = defineProps({
     optional: true,
     default: "",
   },
+  negativesAreAllowed: {
+    type: Boolean,
+    default: true,
+  },
   hasFocus: {
     type: Boolean,
     default: false,
@@ -67,9 +71,12 @@ function updateValue(newText: string) {
   emit("update:value", textToNumber(newText));
 }
 
-function allowOnlyNumbers(newInput: string) {
+function validateInput(newInput: string) {
   const asNumber = textToNumber(newInput);
-  return !exists(asNumber) || !Number.isNaN(asNumber);
+  if (!exists(asNumber)) return true;
+  if (!props.negativesAreAllowed && asNumber < 0) return false;
+  if (Number.isNaN(asNumber)) return false;
+  return true;
 }
 </script>
 
@@ -86,6 +93,6 @@ function allowOnlyNumbers(newInput: string) {
     :underlined="underlined"
     :title="title"
     :heading="heading"
-    :validateNextInput="allowOnlyNumbers"
+    :validateNextInput="validateInput"
   />
 </template>

@@ -88,9 +88,14 @@ export default {
         ><Field v-model:value="fuelTypeName" hint="--"
       /></Label>
       <Label label="Amount"
-        ><NumField v-model:value="quantity" hint="--"
+        ><NumField
+          :negativesAreAllowed="false"
+          v-model:value="quantity"
+          hint="--"
       /></Label>
-      <Label label="Rate"><NumField v-model:value="rate" hint="--" /></Label>
+      <Label label="Rate"
+        ><NumField :negativesAreAllowed="false" v-model:value="rate" hint="--"
+      /></Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
         <Button outlined @click.stop="popPage">Cancel</Button>
         <Button

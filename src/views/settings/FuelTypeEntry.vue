@@ -41,7 +41,11 @@ function deletePressed() {
         width: `1f`,
       }"
     >
-      <NumField v-model:value="fuelType.rate" hint="$/Unit" />
+      <NumField
+        :negativesAreAllowed="false"
+        v-model:value="fuelType.rate"
+        hint="$/Unit"
+      />
     </Label>
     <DeleteOptionsButton @delete="deletePressed" />
   </Row>

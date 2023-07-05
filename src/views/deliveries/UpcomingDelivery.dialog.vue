@@ -117,7 +117,11 @@ export default {
 
         <!-- Amount -->
         <Label label="Amount"
-          ><NumField v-model:value="amount" underlined hint="--"
+          ><NumField
+            :negativesAreAllowed="false"
+            v-model:value="amount"
+            underlined
+            hint="--"
         /></Label>
 
         <!-- Buttons -->

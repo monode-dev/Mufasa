@@ -201,7 +201,11 @@ const gallonsToReachDesiredFill = computed(() => {
         v-model:diameter="dimDiameter"
       />
       <Label label="Sticked Inches"
-        ><NumField v-model:value="stickedInches" underlined :hint="emptyText"
+        ><NumField
+          v-model:value="stickedInches"
+          underlined
+          :hint="emptyText"
+          :negativesAreAllowed="false"
       /></Label>
       <!-- <Box /> -->
       <Box :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }" />

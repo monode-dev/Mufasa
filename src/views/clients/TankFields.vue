@@ -91,6 +91,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[0])"
     >
       <NumField
+        :negativesAreAllowed="false"
         hint="--"
         :value="props[dimensions[0]]"
         @update:value="emit(`update:${dimensions[0]}`, $event)"
@@ -107,6 +108,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[1])"
     >
       <NumField
+        :negativesAreAllowed="false"
         hint="--"
         :value="props[dimensions[1]]"
         @update:value="emit(`update:${dimensions[1]}`, $event)"
@@ -130,6 +132,7 @@ const dimensions = computed(() => {
       v-if="dimensions.length > 2"
       :label="getDimensionLabel(dimensions[2])"
       ><NumField
+        :negativesAreAllowed="false"
         hint="--"
         :value="props[dimensions[2]]"
         @update:value="emit(`update:${dimensions[2]}`, $event)"
@@ -144,6 +147,7 @@ const dimensions = computed(() => {
       v-if="dimensions.length > 3"
       :label="getDimensionLabel(dimensions[3])"
       ><NumField
+        :negativesAreAllowed="false"
         hint="--"
         :value="props[dimensions[3]]"
         @update:value="emit(`update:${dimensions[3]}`, $event)"
@@ -168,6 +172,7 @@ const dimensions = computed(() => {
       v-if="dimensions.length > 4"
       :label="getDimensionLabel(dimensions[4])"
       ><NumField
+        :negativesAreAllowed="false"
         hint="--"
         :value="props[dimensions[4]]"
         @update:value="emit(`update:${dimensions[4]}`, $event)"
@@ -182,6 +187,7 @@ const dimensions = computed(() => {
       v-if="dimensions.length > 5"
       :label="getDimensionLabel(dimensions[5])"
       ><NumField
+        :negativesAreAllowed="false"
         hint="--"
         :value="props[dimensions[5]]"
         @update:value="emit(`update:${dimensions[5]}`, $event)"
