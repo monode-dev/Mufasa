@@ -74,7 +74,7 @@ function handleDelete() {
       >
       <Text
         :sty="{
-          width: `1f`,
+          width: `3f`,
           overflowX: $Overflow.crop,
         }"
       >
