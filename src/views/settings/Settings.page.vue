@@ -54,6 +54,7 @@ export default {
             :scale="1.25"
           />
         </Row>
+        <!-- <Text v-if="filteredClients.length === 0" hint>No Clients</Text> -->
         <FuelTypeEntry
           v-for="fuelType in [...appData.fuelTypes].sort((a, b) => {
             //

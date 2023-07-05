@@ -20,7 +20,7 @@ const props = defineProps({
     default: {},
   },
   value: {
-    type: [Number, null] as PropType<number | null>,
+    type: [Number, undefined, null] as PropType<number | undefined | null>,
     optional: true,
     default: "",
   },
@@ -76,7 +76,7 @@ function allowOnlyNumbers(newInput: string) {
 <template>
   <Field
     :sty="sty"
-    :value="value?.toString()"
+    :value="(value ?? ``).toString()"
     @update:value="updateValue"
     :hasFocus="hasFocus"
     @update:hasFocus="emit('update:hasFocus', $event)"

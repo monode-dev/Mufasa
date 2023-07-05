@@ -8,8 +8,8 @@ import { exists } from "@/utils";
 const appData = getAppData();
 
 const filterString = ref("");
-const filteredClients = computed(() =>
-  appData.clients.filter((client) => {
+const filteredClients = computed(() => {
+  const filtered = appData.clients.filter((client) => {
     if (filterString.value.length === 0) return true;
     if (!clientIsValid(client)) return false;
     return (
@@ -20,8 +20,17 @@ const filteredClients = computed(() =>
         .includes(filterString.value.toLowerCase()) ??
         false)
     );
-  }),
-);
+  });
+  return [...filtered].sort((a, b) => {
+    if (!a.isLoaded || !exists(a.name)) {
+      return 1;
+    } else if (!b.isLoaded || !exists(b.name)) {
+      return -1;
+    } else {
+      return a.name.localeCompare(b.name);
+    }
+  });
+});
 </script>
 
 <template>
@@ -29,17 +38,9 @@ const filteredClients = computed(() =>
     <ClientActionBar v-model:filterString="filterString" />
 
     <Body>
+      <Text v-if="filteredClients.length === 0" hint>No Clients</Text>
       <ClientEntry
-        v-for="(client, index) in [...filteredClients].sort((a, b) => {
-          //
-          if (!a.isLoaded || !exists(a.name)) {
-            return 1;
-          } else if (!b.isLoaded || !exists(b.name)) {
-            return -1;
-          } else {
-            return a.name.localeCompare(b.name);
-          }
-        })"
+        v-for="(client, index) in filteredClients"
         :key="index"
         :client="client"
       />

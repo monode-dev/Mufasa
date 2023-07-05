@@ -8,11 +8,12 @@ import {
 } from "@/AppData";
 import { pushPage } from "@/Nav";
 import DeleteDialogVue from "../components/DeleteDialog.vue";
+import { PropType } from "vue";
 const appData = getAppData();
 
 const props = defineProps({
   tank: {
-    type: Object as () => Tank,
+    type: Object as PropType<Tank>,
     required: true,
   },
 });
@@ -62,8 +63,11 @@ function deletePressed() {
       v-model:shape="tank.shape"
       v-model:length="tank.length"
       v-model:depth="tank.depth"
+      v-model:shortDepth="tank.shortDepth"
+      v-model:fullDepth="tank.fullDepth"
       v-model:height="tank.height"
       v-model:shortHeight="tank.shortHeight"
+      v-model:fullHeight="tank.fullHeight"
       v-model:diameter="tank.diameter"
     />
     <Field

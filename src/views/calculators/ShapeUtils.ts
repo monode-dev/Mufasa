@@ -4,7 +4,7 @@ import { exists } from "@/utils";
 
 export const CUBIC_INCHES_PER_GALLON = 231;
 
-export type TankShapeId = `rectangle`;
+export type TankShapeId = `rectangle` | `truckBedTank`;
 export type TankDimension = Exclude<
   keyof Tank,
   `optionalLabel` | `fuelType` | `shape` | `creationTimePosix` | keyof Doc
@@ -48,6 +48,62 @@ const _tankShapes: {
       );
     },
   },
+  truckBedTank: {
+    nameLong: `Truck Bed Tank`,
+    nameShort: `Truck Bed`,
+    dimensions: [
+      `length`,
+      `shortDepth`,
+      `fullDepth`,
+      `shortHeight`,
+      `fullHeight`,
+    ],
+    calcFilledVolume(tank, stickedInches) {
+      for (const dimension of [
+        `length`,
+        `shortDepth`,
+        `fullDepth`,
+        `shortHeight`,
+        `fullHeight`,
+      ] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      if (!exists(stickedInches)) return undefined;
+      const levelInLowerPart = Math.min(tank?.shortHeight!, stickedInches);
+      const volumeInLowerPart =
+        levelInLowerPart * tank?.length! * tank?.fullDepth!;
+      const levelInUpperPart = Math.max(
+        0,
+        tank?.height! - tank?.shortHeight!,
+        stickedInches - tank?.shortHeight!,
+      );
+      const volumeInUpperPart =
+        levelInUpperPart * tank?.length! * tank?.shortDepth!;
+      return (volumeInLowerPart + volumeInUpperPart) / CUBIC_INCHES_PER_GALLON;
+    },
+    calcTotalVolume(tank) {
+      for (const dimension of [
+        `length`,
+        `shortDepth`,
+        `fullDepth`,
+        `shortHeight`,
+        `fullHeight`,
+      ] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      const volumeInLowerPart =
+        tank?.length! * tank?.fullDepth! * tank?.shortHeight!;
+      const volumeInUpperPart =
+        tank?.length! *
+        tank?.shortDepth! *
+        (tank?.height! - tank?.shortHeight!);
+      return (volumeInLowerPart + volumeInUpperPart) / CUBIC_INCHES_PER_GALLON;
+    },
+  },
 };
 export const TANK_SHAPE_IDS: readonly TankShapeId[] = Object.keys(
   _tankShapes,
@@ -65,12 +121,18 @@ export function getDimensionLabel(dimension: TankDimension): string {
       return `Length`;
     case `depth`:
       return `Depth`;
+    case `fullDepth`:
+      return `Full Depth`;
+    case `shortDepth`:
+      return `Short Depth`;
     case `height`:
       return `Height`;
-    case `diameter`:
-      return `Diameter`;
+    case `fullHeight`:
+      return `Full Height`;
     case `shortHeight`:
       return `Short Height`;
+    case `diameter`:
+      return `Diameter`;
   }
 }
 

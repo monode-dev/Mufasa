@@ -4,10 +4,7 @@ import { pageTransitions, popPage } from "@/Nav";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { Client, listTanks } from "@/AppData";
 import { pushPage } from "@/Nav";
-import { FuelType, getAppData } from "@/AppData";
 import DeleteDialog from "../components/DeleteDialog.vue";
-import { orderDocs } from "@/utils";
-// const appData = getAppData();
 
 const props = defineProps({
   client: {

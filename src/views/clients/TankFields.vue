@@ -21,11 +21,23 @@ const props = defineProps({
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
+  shortDepth: {
+    type: [Number, null, undefined] as PropType<number | null | undefined>,
+    required: true,
+  },
+  fullDepth: {
+    type: [Number, null, undefined] as PropType<number | null | undefined>,
+    required: true,
+  },
   height: {
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
   shortHeight: {
+    type: [Number, null, undefined] as PropType<number | null | undefined>,
+    required: true,
+  },
+  fullHeight: {
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
@@ -39,8 +51,11 @@ const emit = defineEmits([
   "update:shape",
   "update:length",
   "update:depth",
+  "update:shortDepth",
+  "update:fullDepth",
   "update:height",
   "update:shortHeight",
+  "update:fullHeight",
   "update:diameter",
 ]);
 
@@ -77,12 +92,12 @@ const dimensions = computed(() => {
     >
       <NumField
         hint="--"
-        :value="length"
+        :value="props[dimensions[0]]"
         @update:value="emit(`update:${dimensions[0]}`, $event)"
         underlined
         :sty="{
           textColor:
-            exists(length) && length > 0 ? $mdColors.black : $mdColors.grey,
+            exists(props[dimensions[0]]) && props[dimensions[0]]! > 0 ? $mdColors.black : $mdColors.grey,
         }"
       />
     </Label>
@@ -93,12 +108,12 @@ const dimensions = computed(() => {
     >
       <NumField
         hint="--"
-        :value="depth"
+        :value="props[dimensions[1]]"
         @update:value="emit(`update:${dimensions[1]}`, $event)"
         underlined
         :sty="{
           textColor:
-            exists(depth) && depth > 0 ? $mdColors.black : $mdColors.grey,
+            exists(props[dimensions[1]]) && props[dimensions[1]]! > 0 ? $mdColors.black : $mdColors.grey,
         }"
       />
     </Label>
@@ -116,26 +131,64 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[2])"
       ><NumField
         hint="--"
-        :value="height"
+        :value="props[dimensions[2]]"
         @update:value="emit(`update:${dimensions[2]}`, $event)"
         underlined
         :sty="{
           textColor:
-            exists(height) && height > 0 ? $mdColors.black : $mdColors.grey,
+            exists(props[dimensions[2]]) && props[dimensions[2]]! > 0 ? $mdColors.black : $mdColors.grey,
         }"
     /></Label>
     <Box v-else :sty="{ width: `1f` }" />
     <Label
       v-if="dimensions.length > 3"
-      :label="dimensions.length < 4 ? `` : getDimensionLabel(dimensions[3])"
+      :label="getDimensionLabel(dimensions[3])"
       ><NumField
         hint="--"
-        :value="shortHeight"
+        :value="props[dimensions[3]]"
         @update:value="emit(`update:${dimensions[3]}`, $event)"
         underlined
         :sty="{
           textColor:
-            exists(shortHeight) && shortHeight > 0
+            exists(props[dimensions[3]]) && props[dimensions[3]]! > 0
+              ? $mdColors.black
+              : $mdColors.grey,
+        }"
+    /></Label>
+    <Box v-else :sty="{ width: `1f` }" />
+  </Row>
+  <Row
+    v-if="exists(shape) && dimensions.length > 4"
+    :sty="{
+      width: `1f`,
+      padBetween: 1,
+    }"
+  >
+    <Label
+      v-if="dimensions.length > 4"
+      :label="getDimensionLabel(dimensions[4])"
+      ><NumField
+        hint="--"
+        :value="props[dimensions[4]]"
+        @update:value="emit(`update:${dimensions[4]}`, $event)"
+        underlined
+        :sty="{
+          textColor:
+            exists(props[dimensions[4]]) && props[dimensions[4]]! > 0 ? $mdColors.black : $mdColors.grey,
+        }"
+    /></Label>
+    <Box v-else :sty="{ width: `1f` }" />
+    <Label
+      v-if="dimensions.length > 5"
+      :label="getDimensionLabel(dimensions[5])"
+      ><NumField
+        hint="--"
+        :value="props[dimensions[5]]"
+        @update:value="emit(`update:${dimensions[5]}`, $event)"
+        underlined
+        :sty="{
+          textColor:
+            exists(props[dimensions[5]]) && props[dimensions[5]]! > 0
               ? $mdColors.black
               : $mdColors.grey,
         }"

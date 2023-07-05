@@ -903,6 +903,11 @@ function createCache(objFormats: ObjFormats) {
         }
         return contents;
       } else {
+        if (cache[typeName].docs[objPath]?.[propName].value === undefined) {
+          console.log(
+            `ERROR: Tried to get value of ${typeName}.${propName} but it was undefined!`,
+          );
+        }
         return cache[typeName].docs[objPath]?.[propName].value;
       }
     },

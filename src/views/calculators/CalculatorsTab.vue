@@ -39,15 +39,21 @@ const tank = ref<Tank | null>(null);
 const dimTankShape = ref<TankShapeId | null>(null);
 const dimLength = ref<number | null>(null);
 const dimDepth = ref<number | null>(null);
+const dimShortDepth = ref<number | null>(null);
+const dimFullDepth = ref<number | null>(null);
 const dimHeight = ref<number | null>(null);
 const dimShortHeight = ref<number | null>(null);
+const dimFullHeight = ref<number | null>(null);
 const dimDiameter = ref<number | null>(null);
 const dimPseudoTank = computed(() => ({
   shape: dimTankShape.value,
   length: dimLength.value,
   depth: dimDepth.value,
+  shortDepth: dimShortDepth.value,
+  fullDepth: dimFullDepth.value,
   height: dimHeight.value,
   shortHeight: dimShortHeight.value,
+  fullHeight: dimFullHeight.value,
   diameter: dimDiameter.value,
 }));
 
@@ -187,8 +193,11 @@ const gallonsToReachDesiredFill = computed(() => {
         v-model:shape="dimTankShape"
         v-model:length="dimLength"
         v-model:depth="dimDepth"
+        v-model:shortDepth="dimShortDepth"
+        v-model:fullDepth="dimFullDepth"
         v-model:height="dimHeight"
         v-model:shortHeight="dimShortHeight"
+        v-model:fullHeight="dimFullHeight"
         v-model:diameter="dimDiameter"
       />
       <Label label="Sticked Inches"
