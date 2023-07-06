@@ -84,16 +84,18 @@ const tabButtonWidth = 5;
       {{ labels[2] }}
     </Box>
   </Row>
-  <Stack
+  <Box
     :sty="{
       width: `1f`,
       height: 0.375,
+      axis: $Axis.stack,
     }"
   >
-    <Row
+    <Box
       :sty="{
         width: `1f`,
         height: 0.375,
+        axis: $Axis.row,
         alignX: Align.spaceAround,
         alignY: Align.end,
       }"
@@ -108,11 +110,12 @@ const tabButtonWidth = 5;
         ref="tabUnderline"
       />
       <Box :sty="{ width: tabButtonWidth }" />
-    </Row>
-    <Row
+    </Box>
+    <Box
       :sty="{
         width: `1f`,
         height: 0.375,
+        axis: $Axis.row,
         alignX: Align.spaceAround,
         alignY: Align.end,
       }"
@@ -129,6 +132,6 @@ const tabButtonWidth = 5;
         @click.stop="selectTab(2)"
         :sty="{ width: tabButtonWidth, height: `1f` }"
       />
-    </Row>
-  </Stack>
+    </Box>
+  </Box>
 </template>
