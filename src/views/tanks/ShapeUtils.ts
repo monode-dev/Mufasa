@@ -4,7 +4,11 @@ import { exists } from "@/utils";
 
 export const CUBIC_INCHES_PER_GALLON = 231;
 
-export type TankShapeId = `rectangle` | `truckBedTank`;
+export type TankShapeId =
+  | `horizontalCylinder`
+  | `rectangle`
+  | `verticalCylinder`
+  | `truckBedTank`;
 export type TankDimension = Exclude<
   keyof Tank,
   `optionalLabel` | `fuelType` | `shape` | `creationTimePosix` | keyof Doc
@@ -22,6 +26,37 @@ export type TankShapeDatails = {
 const _tankShapes: {
   readonly [Key in TankShapeId]: TankShapeDatails;
 } = {
+  horizontalCylinder: {
+    nameLong: `Horizontal Cylinder`,
+    nameShort: `H. Cyl.`,
+    dimensions: [`length`, `diameter`],
+    calcFilledVolume(tank, stickedInches) {
+      for (const dimension of [`length`, `diameter`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      if (!exists(stickedInches)) return undefined;
+      const radius = tank?.diameter! / 2;
+      const h = radius - stickedInches; // height from the liquid surface to the top of the tank
+      const area =
+        Math.pow(radius, 2) * Math.acos(h / radius) -
+        h * Math.sqrt(2 * radius * h - Math.pow(h, 2)); // area of the circular segment
+      return (tank?.length! * area) / CUBIC_INCHES_PER_GALLON;
+    },
+    calcTotalVolume(tank) {
+      for (const dimension of [`length`, `diameter`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      const radius = tank?.diameter! / 2;
+      return (
+        (Math.PI * Math.pow(radius, 2) * tank?.length!) /
+        CUBIC_INCHES_PER_GALLON
+      );
+    },
+  },
   rectangle: {
     nameLong: `Rectangle`,
     nameShort: `Rect.`,
@@ -45,6 +80,36 @@ const _tankShapes: {
       }
       return (
         (tank?.length! * tank?.depth! * tank?.height!) / CUBIC_INCHES_PER_GALLON
+      );
+    },
+  },
+  verticalCylinder: {
+    nameLong: `Vertical Cylinder`,
+    nameShort: `V. Cyl.`,
+    dimensions: [`height`, `diameter`],
+    calcFilledVolume(tank, stickedInches) {
+      for (const dimension of [`diameter`, `height`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      if (!exists(stickedInches)) return undefined;
+      const radius = tank?.diameter! / 2;
+      return (
+        (Math.PI * Math.pow(radius, 2) * stickedInches) /
+        CUBIC_INCHES_PER_GALLON
+      );
+    },
+    calcTotalVolume(tank) {
+      for (const dimension of [`diameter`, `height`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      const radius = tank?.diameter! / 2;
+      return (
+        (Math.PI * Math.pow(radius, 2) * tank?.height!) /
+        CUBIC_INCHES_PER_GALLON
       );
     },
   },
