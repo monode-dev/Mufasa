@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { computed, Component, shallowRef, ref } from "vue";
 import { gsap } from "gsap";
 import { SplashScreen } from "@capacitor/splash-screen";
+import { App } from "@capacitor/app";
 
 // Transitions
 export interface PageTransition {
@@ -62,6 +63,10 @@ export interface NavPage<T> {
 }
 export const useNav = defineStore("navigator", () => {
   const openedPages = shallowRef<(NavPage<any> & { props: any })[]>([]);
+  function popPage() {
+    openedPages.value = openedPages.value.slice(0, -1);
+  }
+  App.addListener("backButton", popPage);
 
   return {
     notchHeight: ref(`0px`),
@@ -82,9 +87,7 @@ export const useNav = defineStore("navigator", () => {
         SplashScreen.hide();
       }
     },
-    popPage() {
-      openedPages.value = openedPages.value.slice(0, -1);
-    },
+    popPage,
     currentPage: computed(
       () => openedPages.value[openedPages.value.length - 1],
     ),
