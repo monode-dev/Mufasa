@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { pageTransitions } from "@/Nav";
-import { getAppData } from "@/AppData";
+import { pageTransitions, pushPage } from "@/Nav";
+import { getAppData, listFuelTypes } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { ref } from "vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
+import CreateFuelTypeDialog from "./CreateFuelType.dialog.vue";
 
 function openTkeWebsite() {
   window.open(`https://www.tke.us`, `_blank`);
@@ -50,30 +51,13 @@ export default {
           <Text title>Fuel Types</Text>
           <Icon
             icon="plus"
-            @click.stop="appData.fuelTypes.add({})"
+            @click.stop="pushPage(CreateFuelTypeDialog)"
             :scale="1.25"
           />
         </Row>
-        <!-- <Text v-if="filteredClients.length === 0" hint>No Clients</Text> -->
+        <Text v-if="appData.fuelTypes.length === 0" hint>No Fuel Types</Text>
         <FuelTypeEntry
-          v-for="fuelType in [...appData.fuelTypes].sort((a, b) => {
-            //
-            if (!a.isLoaded) {
-              return 1;
-            } else if (!b.isLoaded) {
-              return -1;
-            } else if (
-              ([undefined, null] as any[]).includes(a.createdPosix)
-            ) {
-              return -1;
-            } else if (
-              ([undefined, null] as any[]).includes(b.createdPosix)
-            ) {
-              return 1;
-            } else {
-              return b.createdPosix! - a.createdPosix!;
-            }
-          })"
+          v-for="fuelType in listFuelTypes(appData.fuelTypes)"
           :fuelType="fuelType"
         />
       </Card>

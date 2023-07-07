@@ -26,25 +26,31 @@ function deletePressed() {
 </script>
 
 <template>
-  <Row v-if="fuelType.isLoaded">
+  <Row
+    v-if="fuelType.isLoaded"
+    :sty="{
+      padBetween: 1,
+    }"
+  >
     <Label
       label="Name"
       :sty="{
-        width: `1f`,
+        width: `4f`,
       }"
     >
-      <Field v-model:value="fuelType.name" hint="Unnamed" />
+      <Field v-model:value="fuelType.name" underlined hint="Unnamed" />
     </Label>
     <Label
       label="Rate"
       :sty="{
-        width: `1f`,
+        width: `3f`,
       }"
     >
       <NumField
         :negativesAreAllowed="false"
+        underlined
         v-model:value="fuelType.rate"
-        hint="$/Unit"
+        hint="$/Gal."
       />
     </Label>
     <DeleteOptionsButton @delete="deletePressed" />

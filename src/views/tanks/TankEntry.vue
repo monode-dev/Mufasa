@@ -47,18 +47,7 @@ function deletePressed() {
 
       <DeleteOptionsButton @delete="deletePressed" />
     </Row>
-    <DropDown
-      label="Fuel"
-      v-model:selected="tank.fuelType"
-      :getKeyFromData="(data: FuelType | null) => {
-        return data?._firestoreRef?.path;
-      }"
-      :options="[
-        ...appData.fuelTypes
-          .filter((x) => x.name !== `` && x.name !== null && x.name !== undefined)
-          .map((x) => ({ label: x.name!, data: x })),
-      ]"
-    />
+    <FuelTypeDropDown v-model:fuel-type="tank.fuelType" />
     <TankFields
       v-model:shape="tank.shape"
       v-model:length="tank.length"

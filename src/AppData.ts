@@ -86,7 +86,32 @@ export function listTanks(
 
   return result;
 }
+
+// Fuel Type
 export type FuelType = (typeof mufasaTypes)["FuelType"];
+export function isFuelTypeValid(
+  fuelType: Partial<FuelType> | null | undefined,
+) {
+  return (
+    exists(fuelType?.name) &&
+    exists(fuelType?.rate) &&
+    fuelType?.rate! > 0 &&
+    fuelType?.name?.trim() !== ``
+  );
+}
+export function listFuelTypes(
+  fuelTypes: List<FuelType> | undefined,
+  excludeInvalidFuelTypes: boolean = false,
+): FuelType[] {
+  let result = orderDocs(fuelTypes ?? [], (x) => x.createdPosix, {
+    // direction: `reverse`,
+  });
+  if (excludeInvalidFuelTypes) {
+    result = result.filter(isFuelTypeValid);
+  }
+  return result;
+}
+
 export type Delivery = (typeof mufasaTypes)["Delivery"];
 export type UpcomingExistingDelivery = Doc<{
   deliveryFormat: `upcomingFromExisting`;
