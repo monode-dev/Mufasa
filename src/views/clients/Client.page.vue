@@ -5,6 +5,7 @@ import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { Client, listTanks } from "@/AppData";
 import { pushPage } from "@/Nav";
 import DeleteDialog from "../components/DeleteDialog.vue";
+import CreateTankDialog from "../tanks/CreateTank.dialog.vue";
 
 const props = defineProps({
   client: {
@@ -77,7 +78,11 @@ export default {
         <Box :sty="{ width: 1.75 }" />
         <Text title>Tanks</Text>
         <Box :sty="{ width: 1.75, align: $Align.centerLeft }">
-          <Icon icon="plus" :scale="1.25" @click.stop="client.tanks?.add({})" />
+          <Icon
+            icon="plus"
+            :scale="1.25"
+            @click.stop="pushPage(CreateTankDialog, { client })"
+          />
         </Box>
       </Row>
       <TankEntry

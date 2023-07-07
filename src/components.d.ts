@@ -28,8 +28,6 @@ import ClientSearchBar from "./views/clients/ClientSearchBar.vue";
 import ClientsTab from "./views/clients/ClientsTab.vue";
 import CreateClient from "./views/clients/CreateClient.dialog.vue";
 import OutlinedActionButton from "./views/clients/OutlinedActionButton.vue";
-import TankEntry from "./views/clients/TankEntry.vue";
-import TankFields from "./views/clients/TankFields.vue";
 import AutoUpdateLoadingScreen from "./views/components/AutoUpdateLoadingScreen.vue";
 import DeleteDialog from "./views/components/DeleteDialog.vue";
 import DeleteOptionsButton from "./views/components/DeleteOptionsButton.vue";
@@ -43,6 +41,9 @@ import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue"
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
+import CreateTank from "./views/tanks/CreateTank.dialog.vue";
+import TankEntry from "./views/tanks/TankEntry.vue";
+import TankFields from "./views/tanks/TankFields.vue";
 
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
@@ -75,8 +76,6 @@ ClientSearchBar: typeof ClientSearchBar;
 ClientsTab: typeof ClientsTab;
 CreateClient: typeof CreateClient;
 OutlinedActionButton: typeof OutlinedActionButton;
-TankEntry: typeof TankEntry;
-TankFields: typeof TankFields;
 AutoUpdateLoadingScreen: typeof AutoUpdateLoadingScreen;
 DeleteDialog: typeof DeleteDialog;
 DeleteOptionsButton: typeof DeleteOptionsButton;
@@ -90,5 +89,8 @@ UpcomingDeliveryEntry: typeof UpcomingDeliveryEntry;
 FuelTypeEntry: typeof FuelTypeEntry;
 Settings: typeof Settings;
 SettingsButton: typeof SettingsButton;
+CreateTank: typeof CreateTank;
+TankEntry: typeof TankEntry;
+TankFields: typeof TankFields;
   }
 }

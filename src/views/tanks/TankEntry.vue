@@ -4,10 +4,10 @@ import {
   Tank,
   getAppData,
   getTankLabel,
-  tankIsValid,
+  isTankValid,
 } from "@/AppData";
 import { pushPage } from "@/Nav";
-import DeleteDialogVue from "../components/DeleteDialog.vue";
+import DeleteDialogVue from "@/views/components/DeleteDialog.vue";
 import { PropType } from "vue";
 const appData = getAppData();
 
@@ -36,7 +36,7 @@ function deletePressed() {
     >
       <!-- Hint should be toggled when the tank is complete -->
       <Text
-        :hint="!tankIsValid(tank)"
+        :hint="!isTankValid(tank)"
         :sty="{
           width: `1f`,
           overflowX: $Overflow.crop,

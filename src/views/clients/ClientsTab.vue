@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ClientEntry from "@/views/clients/ClientEntry.vue";
-import { clientIsValid, getAppData } from "@/AppData";
+import { isClientValid, getAppData } from "@/AppData";
 import { ref } from "vue";
 import { computed } from "@vue/reactivity";
 import { exists } from "@/utils";
@@ -11,7 +11,7 @@ const filterString = ref("");
 const filteredClients = computed(() => {
   const filtered = appData.clients.filter((client) => {
     if (filterString.value.length === 0) return true;
-    if (!clientIsValid(client)) return false;
+    if (!isClientValid(client)) return false;
     return (
       (client.name?.toLowerCase().includes(filterString.value.toLowerCase()) ??
         false) ||

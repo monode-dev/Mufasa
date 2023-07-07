@@ -5,7 +5,7 @@ import {
   Tank,
   getTankLabel,
   getClientLabel,
-  tankIsValid,
+  isTankValid,
   listClients,
   listTanks,
 } from "@/AppData";

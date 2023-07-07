@@ -1,11 +1,11 @@
 import { Doc, List, defineAppDataStructure } from "./mufasa/Implement";
 import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
 import { exists, orderDocs } from "./utils";
-import { TankShapeId, getTankShape } from "./views/calculators/ShapeUtils";
+import { TankShapeId, getTankShape } from "@/views/tanks/ShapeUtils";
 import { computed, isRef, ref, watchEffect } from "vue";
 
 export type Client = (typeof mufasaTypes)["Client"];
-export function clientIsValid(
+export function isClientValid(
   client: Partial<Client> | null | undefined,
 ): boolean {
   const clientIdExists =
@@ -14,7 +14,7 @@ export function clientIsValid(
   return clientIdExists || nameExists;
 }
 export function getClientLabel(client: Client | null | undefined): string {
-  if (!clientIsValid(client)) return `Unnamed Client`;
+  if (!isClientValid(client)) return `Unnamed Client`;
   const nameExists = exists(client?.name) && client?.name?.trim() !== ``;
   const clientIdExists =
     exists(client?.clientId) && client?.clientId?.trim() !== ``;
@@ -46,7 +46,7 @@ export function listClients(
   });
 
   if (excludeInvalidClients) {
-    result = result.filter(clientIsValid);
+    result = result.filter(isClientValid);
   }
 
   return result;
@@ -55,7 +55,7 @@ export function listClients(
 // const a = {} as Client;
 // a.fuelType;
 export type Tank = (typeof mufasaTypes)["Tank"];
-export function tankIsValid(tank: Partial<Tank> | null | undefined): boolean {
+export function isTankValid(tank: Partial<Tank> | null | undefined): boolean {
   const shapeUtils = getTankShape(tank?.shape);
   const fuelName = tank?.fuelType?.name;
   const shapeName = shapeUtils?.nameShort;
@@ -63,7 +63,7 @@ export function tankIsValid(tank: Partial<Tank> | null | undefined): boolean {
   return exists(fuelName) && exists(shapeName) && exists(volume) && volume > 0;
 }
 export function getTankLabel(tank: Partial<Tank> | null | undefined): string {
-  if (!tankIsValid(tank)) return `Incomplete Tank`;
+  if (!isTankValid(tank)) return `Incomplete Tank`;
   const shapeUtils = getTankShape(tank?.shape);
   const fuelName = tank?.fuelType?.name;
   const volume = shapeUtils?.calcTotalVolume(tank);
@@ -81,7 +81,7 @@ export function listTanks(
   let result = orderDocs(tanks ?? [], (x) => x.creationTimePosix);
 
   if (excludeInvalidTanks) {
-    result = result.filter(tankIsValid);
+    result = result.filter(isTankValid);
   }
 
   return result;

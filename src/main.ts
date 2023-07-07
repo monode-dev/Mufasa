@@ -41,8 +41,6 @@ import ClientSearchBar from "./views/clients/ClientSearchBar.vue";
 import ClientsTab from "./views/clients/ClientsTab.vue";
 import CreateClient from "./views/clients/CreateClient.dialog.vue";
 import OutlinedActionButton from "./views/clients/OutlinedActionButton.vue";
-import TankEntry from "./views/clients/TankEntry.vue";
-import TankFields from "./views/clients/TankFields.vue";
 import AutoUpdateLoadingScreen from "./views/components/AutoUpdateLoadingScreen.vue";
 import DeleteDialog from "./views/components/DeleteDialog.vue";
 import DeleteOptionsButton from "./views/components/DeleteOptionsButton.vue";
@@ -56,6 +54,9 @@ import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue"
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
+import CreateTank from "./views/tanks/CreateTank.dialog.vue";
+import TankEntry from "./views/tanks/TankEntry.vue";
+import TankFields from "./views/tanks/TankFields.vue";
 // End Generated Imports
 CapacitorUpdater.notifyAppReady();
 
@@ -96,8 +97,6 @@ vueApp.component("ClientSearchBar", ClientSearchBar);
 vueApp.component("ClientsTab", ClientsTab);
 vueApp.component("CreateClient", CreateClient);
 vueApp.component("OutlinedActionButton", OutlinedActionButton);
-vueApp.component("TankEntry", TankEntry);
-vueApp.component("TankFields", TankFields);
 vueApp.component("AutoUpdateLoadingScreen", AutoUpdateLoadingScreen);
 vueApp.component("DeleteDialog", DeleteDialog);
 vueApp.component("DeleteOptionsButton", DeleteOptionsButton);
@@ -111,6 +110,9 @@ vueApp.component("UpcomingDeliveryEntry", UpcomingDeliveryEntry);
 vueApp.component("FuelTypeEntry", FuelTypeEntry);
 vueApp.component("Settings", Settings);
 vueApp.component("SettingsButton", SettingsButton);
+vueApp.component("CreateTank", CreateTank);
+vueApp.component("TankEntry", TankEntry);
+vueApp.component("TankFields", TankFields);
 // End Generated Components
 // vueApp.config.globalProperties.$align = Align;
 

@@ -173,7 +173,6 @@ export function computeBoxLayout(
   // Overflow
   const overflowX = sty.overflowX ?? defaultOveflowX;
   const overflowY = sty.overflowY ?? defaultOveflowY;
-  console.log(parent?.props?.sty);
   return {
     position: parent?.props?.sty?.axis === Axis.stack ? `absolute` : `relative`,
     // position: parentAxis === Axis.stack ? `absolute` : `relative`,

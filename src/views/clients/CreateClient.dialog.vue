@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { PropType } from "vue";
 import { pageTransitions, popPage, pushPage } from "@/Nav";
-import { Client, clientIsValid, getAppData } from "@/AppData";
+import { Client, isClientValid, getAppData } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
 import ClientPage from "./Client.page.vue";
 import { exists } from "@/utils";
@@ -41,7 +41,7 @@ const clientInitFromFields = computed(() => {
   };
 });
 const _clientIsValid = computed(() => {
-  return clientIsValid(clientInitFromFields.value);
+  return isClientValid(clientInitFromFields.value);
 });
 
 function handleYes() {

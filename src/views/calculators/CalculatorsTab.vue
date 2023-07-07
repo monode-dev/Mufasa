@@ -17,7 +17,7 @@ import {
   TankShapeId,
   TANK_SHAPE_IDS,
   getTankShape,
-} from "./ShapeUtils";
+} from "@/views/tanks/ShapeUtils";
 
 const appData = getAppData();
 const tabIndex = ref(0);

@@ -5,7 +5,7 @@ import {
   TankShapeId,
   getDimensionLabel,
   getTankShape,
-} from "../calculators/ShapeUtils";
+} from "@/views/tanks/ShapeUtils";
 import { exists } from "@/utils";
 import { Tank } from "@/AppData";
 const props = defineProps({
