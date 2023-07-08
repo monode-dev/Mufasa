@@ -8,6 +8,7 @@ export type TankShapeId =
   | `horizontalCylinder`
   | `rectangle`
   | `verticalCylinder`
+  | `horizontalEllipse`
   | `truckBedTank`;
 export type TankDimension = Exclude<
   keyof Tank,
@@ -37,6 +38,7 @@ const _tankShapes: {
         }
       }
       if (!exists(stickedInches)) return undefined;
+      // See: https://www.mathsisfun.com/geometry/cylinder-horizontal-volume.html
       const radius = tank?.diameter! / 2;
       const shouldMeasureEmptySpaceInstead = stickedInches > radius;
       const segmentHeight = shouldMeasureEmptySpaceInstead
@@ -116,6 +118,47 @@ const _tankShapes: {
       const radius = tank?.diameter! / 2;
       return (
         (Math.PI * Math.pow(radius, 2) * tank?.height!) /
+        CUBIC_INCHES_PER_GALLON
+      );
+    },
+  },
+  horizontalEllipse: {
+    nameLong: `Ellipse`,
+    nameShort: `Ellipse`,
+    dimensions: [`length`, `height`, `depth`],
+    calcFilledVolume(tank, stickedInches) {
+      for (const dimension of [`length`, `height`, `depth`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      if (!exists(stickedInches)) return undefined;
+      // See: https://www.had2know.org/academics/ellipse-segment-tank-volume-calculator.html
+      const shouldMeasureEmptySpaceInstead = stickedInches > tank?.height! / 2;
+      const segmentHeight = shouldMeasureEmptySpaceInstead
+        ? tank?.height! - stickedInches
+        : stickedInches;
+      let area =
+        ((tank?.height! * tank?.depth!) / 4) *
+        (Math.acos(1 - (2 * segmentHeight) / tank?.height!) -
+          (1 - (2 * segmentHeight) / tank?.height!) *
+            Math.sqrt(
+              (4 * segmentHeight) / tank?.height! -
+                (4 * Math.pow(segmentHeight, 2)) / Math.pow(tank?.height!, 2),
+            ));
+      if (shouldMeasureEmptySpaceInstead) {
+        area = (Math.PI * tank?.height! * tank?.depth!) / 4 - area; // Area of the filled space
+      }
+      return (tank?.length! * area) / CUBIC_INCHES_PER_GALLON;
+    },
+    calcTotalVolume(tank) {
+      for (const dimension of [`length`, `height`, `depth`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      return (
+        (((Math.PI * tank?.height! * tank?.depth!) / 4) * tank?.length!) /
         CUBIC_INCHES_PER_GALLON
       );
     },
