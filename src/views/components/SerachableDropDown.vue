@@ -39,10 +39,6 @@ const props = defineProps({
     >,
     default: () => true,
   },
-  enabled: {
-    type: Boolean,
-    default: true,
-  },
   label: {
     type: String,
     default: "",
@@ -67,8 +63,16 @@ const emit = defineEmits(["update:selected"]);
 const allOptions = computed(() => [...props.options, ...props.specialOptions]);
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
-const openDropDownRef = ref<VNodeRef | null>(null);
+const openDropDownButtonRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
+const shouldOpenUpwards = ref(false);
+function openDropDown() {
+  if (dropDownIsOpen.value) return;
+  shouldOpenUpwards.value =
+    openDropDownButtonRef.value?.$el.getBoundingClientRect().top >
+    window.innerHeight * 0.6;
+  dropDownIsOpen.value = true;
+}
 const selectedOption = computed(() => {
   const selectedKey = props.getKeyFromData(props.selected) ?? undefined;
   return allOptions.value.find(
@@ -95,7 +99,7 @@ const filteredOptions = computed(() => {
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
   if (
     !dropDownModalRef.value?.$el.contains(e.target) &&
-    !openDropDownRef.value?.$el.contains(e.target)
+    !openDropDownButtonRef.value?.$el.contains(e.target)
   ) {
     dropDownIsOpen.value = false;
     //e.stopPropagation();
@@ -145,20 +149,14 @@ function selectOption(option: Option) {
         :sty="{
           width: `1f`,
           height: sty.scale ?? 1,
-          align: $Align.topLeft,
+          align: shouldOpenUpwards ? $Align.bottomLeft : $Align.topLeft,
           axis: $Axis.stack,
         }"
       >
         <!-- Text -->
         <Row
-          ref="openDropDownRef"
-          :onClick="
-            () => {
-              if (!dropDownIsOpen) {
-                dropDownIsOpen = true;
-              }
-            }
-          "
+          ref="openDropDownButtonRef"
+          :onClick="openDropDown"
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
@@ -177,7 +175,12 @@ function selectOption(option: Option) {
           >
             {{ selectedOption?.label ?? `None` }}
           </Text>
-          <Field v-else v-model:value="filterString" hint="Search" />
+          <Field
+            v-else
+            v-model:value="filterString"
+            hint="Search"
+            :has-focus="true"
+          />
 
           <Icon icon="menuDown" />
         </Row>
@@ -191,8 +194,14 @@ function selectOption(option: Option) {
             isInteractable: false,
           }"
         >
-          <Box :sty="{ height: sty.scale ?? 1, isInteractable: false }" />
-          <Box :sty="{ height: 0.5, isInteractable: false }" />
+          <Box
+            v-if="!shouldOpenUpwards"
+            :sty="{ height: sty.scale ?? 1, isInteractable: false }"
+          />
+          <Box
+            v-if="!shouldOpenUpwards"
+            :sty="{ height: 0.5, isInteractable: false }"
+          />
           <Box
             ref="dropDownModalRef"
             :sty="{
@@ -261,6 +270,14 @@ function selectOption(option: Option) {
               {{ option.label }}
             </Text>
           </Box>
+          <Box
+            v-if="shouldOpenUpwards"
+            :sty="{ height: 0.5, isInteractable: false }"
+          />
+          <Box
+            v-if="shouldOpenUpwards"
+            :sty="{ height: sty.scale ?? 1, isInteractable: false }"
+          />
         </Box>
       </Box>
     </Box>
