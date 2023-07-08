@@ -135,7 +135,16 @@ function updateFromHtml(divRef: HTMLElement | undefined) {
 
 <template>
   <div
+    v-if="exists(onClick)"
     @click.stop="onClick"
+    :class="`b-x${sty.bonusTouch ?? exists(onClick) ? ` b-x-bonus-touch` : ``}`"
+    :style="style"
+    :ref="(updateFromHtml as any)"
+  >
+    <slot />
+  </div>
+  <div
+    v-else
     :class="`b-x${sty.bonusTouch ?? exists(onClick) ? ` b-x-bonus-touch` : ``}`"
     :style="style"
     :ref="(updateFromHtml as any)"

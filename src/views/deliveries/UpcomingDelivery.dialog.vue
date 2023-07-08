@@ -116,6 +116,7 @@ export default {
       align: $Align.topCenter,
       padTop: 12,
       overflowY: $Overflow.scroll,
+      bonusTouch: false,
     }"
   >
     <Card

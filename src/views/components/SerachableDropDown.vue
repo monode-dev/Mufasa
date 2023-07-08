@@ -93,10 +93,6 @@ const filteredOptions = computed(() => {
 
 // Close the dropdown when the user clicks outside of it
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
-  if (openDropDownRef.value?.$el.contains(e.target) && !dropDownIsOpen.value) {
-    dropDownIsOpen.value = true;
-    e.stopPropagation();
-  }
   if (
     !dropDownModalRef.value?.$el.contains(e.target) &&
     !openDropDownRef.value?.$el.contains(e.target)
@@ -158,7 +154,9 @@ function selectOption(option: Option) {
           ref="openDropDownRef"
           :onClick="
             () => {
-              dropDownIsOpen = !dropDownIsOpen;
+              if (!dropDownIsOpen) {
+                dropDownIsOpen = true;
+              }
             }
           "
           :sty="{
@@ -199,7 +197,7 @@ function selectOption(option: Option) {
             ref="dropDownModalRef"
             :sty="{
               width: `1f`,
-              height: `40vh`,
+              height: 15.65,
               overflowY: $Overflow.scroll,
               pad: 0.75,
               shadowSize: 1,

@@ -79,6 +79,7 @@ export default {
       width: `1f`,
       height: `1f`,
       background: `#00000099`,
+      bonusTouch: false,
     }"
   >
     <Card

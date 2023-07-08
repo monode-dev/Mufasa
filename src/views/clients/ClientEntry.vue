@@ -31,11 +31,12 @@ function clicked() {
 </script>
 
 <template>
-  <Row
+  <Box
     :onClick="clicked"
     :sty="{
       width: `1f`,
       height: 1,
+      axis: $Axis.row,
       align: $Align.spaceBetween,
       textColor: client.isLoaded ? mdColors.black : mdColors.grey,
     }"
@@ -50,5 +51,5 @@ function clicked() {
       {{ client.isLoaded ? getClientLabel(client) : `Loading...` }}
     </Text>
     <DeleteOptionsButton @delete="deletePressed" />
-  </Row>
+  </Box>
 </template>

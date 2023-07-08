@@ -1,6 +1,6 @@
 {
   "name": "ninety_percent",
-  "version": "1.28.60",
+  "version": "1.28.61",
   "private": true,
   "scripts": {
     "dev": "vite",

@@ -81,7 +81,7 @@ export default {
           <Icon
             icon="plus"
             :scale="1.25"
-            :onClick="pushPage(CreateTankDialog, { client })"
+            :onClick="() => pushPage(CreateTankDialog, { client })"
           />
         </Box>
       </Row>
