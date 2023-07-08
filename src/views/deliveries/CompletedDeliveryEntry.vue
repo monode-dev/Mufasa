@@ -4,6 +4,7 @@ import { PropType } from "vue";
 import { exists } from "@/utils";
 import { pushPage } from "@/Nav";
 import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
+import DeleteDialogVue from "../components/DeleteDialog.vue";
 
 const props = defineProps({
   sty: {
@@ -14,12 +15,23 @@ const props = defineProps({
     type: Object as PropType<Delivery>,
     required: true,
   },
+  hideOptions: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 function handleEdit() {
   pushPage(CompleteDeliveryDialog, {
     dialogType: `edit`,
     delivery: props.delivery,
+  });
+}
+
+function handleDelete() {
+  pushPage(DeleteDialogVue, {
+    obj: props.delivery,
+    message: `Are you sure you want to permanently delete this delivery?`,
   });
 }
 
@@ -93,7 +105,12 @@ function formatPosixTime(posixTime: number) {
           ? formatPosixTime(delivery.completedTimePosix)
           : `Unknown Date`
       }}</Text>
-      <DeleteOptionsButton shouldShowEdit @edit="handleEdit" />
+      <DeleteOptionsButton
+        v-if="!hideOptions"
+        shouldShowEdit
+        @edit="handleEdit"
+        @delete="handleDelete"
+      />
     </Row>
 
     <Label label="Client">

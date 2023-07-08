@@ -178,7 +178,7 @@ export function listUpcomingDeliveries(allDeliveries: List<Delivery>) {
   return orderDocs(
     allDeliveries.filter((delivery) => delivery.deliveryFormat !== `completed`),
     (x) => x.creationTimePosix,
-  ) as any as (UpcomingExistingDelivery | UpcomingOneTimeDelivery)[];
+  ) as any as Delivery[];
 }
 export function isUpcomingDeliveryValid(
   delivery: Partial<Delivery> | null | undefined,

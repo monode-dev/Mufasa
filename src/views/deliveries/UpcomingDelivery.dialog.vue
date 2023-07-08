@@ -9,6 +9,8 @@ import {
   getClientLabel,
   Delivery,
   isUpcomingDeliveryValid,
+  listUpcomingDeliveries,
+  listCompletedDeliveries,
 } from "@/AppData";
 import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -50,6 +52,25 @@ const deliveryIsValid = computed(() =>
   }),
 );
 
+// Related Deliveries
+const relatedDeliveries = computed(() =>
+  listCompletedDeliveries(appData.deliveries).filter((d) => {
+    const deliveryClientPath = d.upcomingExistingClient?._firestoreRef?.path;
+    const selectedClientPath = client.value?._firestoreRef?.path;
+    const deliveryTankPath = d.upcomingExistingTank?._firestoreRef?.path;
+    const selectedTankPath = tank.value?._firestoreRef?.path;
+    return (
+      exists(deliveryClientPath) &&
+      exists(selectedClientPath) &&
+      deliveryClientPath === selectedClientPath &&
+      exists(deliveryTankPath) &&
+      exists(selectedTankPath) &&
+      deliveryTankPath === selectedTankPath
+    );
+  }),
+);
+const relatedDeliveriesCount = computed(() => relatedDeliveries.value.length);
+
 function closePopUp() {
   popPage();
 }
@@ -85,61 +106,60 @@ export default {
 </script>
 
 <template>
-  <Box
+  <Body
     @click="popOnClickOutside"
     :sty="{
       width: `1f`,
       height: `1f`,
-      background: `#f9fafdce`,
-      align: $Align.center,
+      padBetween: 1,
+      background: `#f9fafde8`,
+      align: $Align.topCenter,
+      padTop: 12,
+      overflowY: $Overflow.scroll,
     }"
   >
-    <Body
+    <Card
+      ref="cardRef"
       :sty="{
-        width: `1f`,
-        height: `1f`,
-        padBetween: 1,
-        align: $Align.center,
+        width: `85%`,
       }"
     >
-      <Card
-        ref="cardRef"
-        :sty="{
-          width: `75%`,
-        }"
+      <Text title
+        >{{ dialogType === `create` ? `Create` : `Edit` }} Delivery</Text
       >
-        <Text title
-          >{{ dialogType === `create` ? `Create` : `Edit` }} Delivery</Text
+
+      <!-- Client & Tank -->
+      <ClientAndTankSelector v-model:client="client" v-model:tank="tank" />
+
+      <!-- Amount -->
+      <Label label="Amount"
+        ><NumField
+          :negativesAreAllowed="false"
+          v-model:value="amount"
+          underlined
+          hint="gal."
+      /></Label>
+
+      <!-- Buttons -->
+      <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
+        <Button outlined @click.stop="closePopUp">Cancel</Button>
+        <Button
+          @click.stop="handleYes"
+          :sty="{
+            background: deliveryIsValid ? $mdColors.green : $mdColors.grey,
+          }"
+          >{{ dialogType === `create` ? `Create` : `Save` }}</Button
         >
-
-        <!-- Client & Tank -->
-        <ClientAndTankSelector v-model:client="client" v-model:tank="tank" />
-
-        <!-- Amount -->
-        <Label label="Amount"
-          ><NumField
-            :negativesAreAllowed="false"
-            v-model:value="amount"
-            underlined
-            hint="gal."
-        /></Label>
-
-        <!-- Buttons -->
-        <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
-          <Button outlined @click.stop="closePopUp">Cancel</Button>
-          <Button
-            @click.stop="handleYes"
-            :sty="{
-              background: deliveryIsValid ? $mdColors.green : $mdColors.grey,
-            }"
-            >{{ dialogType === `create` ? `Create` : `Save` }}</Button
-          >
-        </Row>
-      </Card>
-      <!-- <Box />
-      <Text title>Related Deliveries</Text>
-      <CompletedDeliveryEntry :sty="{ width: `75%` }" />
-      <CompletedDeliveryEntry :sty="{ width: `75%` }" /> -->
-    </Body>
-  </Box>
+      </Row>
+    </Card>
+    <Box />
+    <Text v-if="relatedDeliveriesCount > 0" title>Related Deliveries</Text>
+    <CompletedDeliveryEntry
+      v-for="delivery in relatedDeliveries"
+      :key="delivery._firestoreRef?.path"
+      :delivery="delivery"
+      hideOptions
+      :sty="{ width: `85%` }"
+    />
+  </Body>
 </template>
