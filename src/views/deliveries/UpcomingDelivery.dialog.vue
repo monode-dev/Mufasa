@@ -8,6 +8,7 @@ import {
   getTankLabel,
   getClientLabel,
   Delivery,
+isUpcomingDeliveryValid,
 } from "@/AppData";
 import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -41,14 +42,11 @@ const tank = ref<Tank | null>(
 );
 const amount = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
 
-const deliveryIsValid = computed(() => {
-  return (
-    exists(client.value) &&
-    exists(tank.value) &&
-    exists(amount.value) &&
-    amount.value > 0
-  ); // && amount.value > 0;
-});
+const deliveryIsValid = computed(() => isUpcomingDeliveryValid({
+  upcomingExistingClient: client.value,
+  upcomingExistingTank: tank.value,
+  quantity: amount.value ?? undefined,
+}));
 
 function closePopUp() {
   popPage();

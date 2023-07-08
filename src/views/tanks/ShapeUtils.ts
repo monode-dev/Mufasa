@@ -38,10 +38,17 @@ const _tankShapes: {
       }
       if (!exists(stickedInches)) return undefined;
       const radius = tank?.diameter! / 2;
-      const h = radius - stickedInches; // height from the liquid surface to the top of the tank
-      const area =
-        Math.pow(radius, 2) * Math.acos(h / radius) -
-        h * Math.sqrt(2 * radius * h - Math.pow(h, 2)); // area of the circular segment
+      const shouldMeasureEmptySpaceInstead = stickedInches > radius;
+      const segmentHeight = shouldMeasureEmptySpaceInstead
+        ? tank?.diameter! - stickedInches
+        : stickedInches;
+      let area =
+        Math.acos((radius - segmentHeight) / radius) * Math.pow(radius, 2) -
+        (radius - segmentHeight) *
+          Math.sqrt(2 * radius * segmentHeight - Math.pow(segmentHeight, 2));
+      if (shouldMeasureEmptySpaceInstead) {
+        area = Math.PI * Math.pow(radius, 2) - area; // Area of the filled space
+      }
       return (tank?.length! * area) / CUBIC_INCHES_PER_GALLON;
     },
     calcTotalVolume(tank) {
@@ -202,13 +209,16 @@ export function getDimensionLabel(dimension: TankDimension): string {
 }
 
 export function calcGallonsToReachPercent(
-  tank: {
-    [Key in TankDimension | `shape`]: Tank[Key];
-  },
+  tank:
+    | Partial<{
+        [Key in TankDimension | `shape`]: Tank[Key];
+      }>
+    | null
+    | undefined,
   stickedInches: number | null | undefined,
   targetPercent: number,
 ): number | undefined {
-  if (!exists(tank.shape)) return undefined;
+  if (!exists(tank) || !exists(tank?.shape)) return undefined;
   const tankShape = getTankShape(tank.shape);
   const currentFill = tankShape.calcFilledVolume(tank, stickedInches);
   if (!exists(currentFill)) return undefined;

@@ -45,17 +45,6 @@ const dimHeight = ref<number | null>(null);
 const dimShortHeight = ref<number | null>(null);
 const dimFullHeight = ref<number | null>(null);
 const dimDiameter = ref<number | null>(null);
-const dimPseudoTank = computed(() => ({
-  shape: dimTankShape.value,
-  length: dimLength.value,
-  depth: dimDepth.value,
-  shortDepth: dimShortDepth.value,
-  fullDepth: dimFullDepth.value,
-  height: dimHeight.value,
-  shortHeight: dimShortHeight.value,
-  fullHeight: dimFullHeight.value,
-  diameter: dimDiameter.value,
-}));
 
 // Other
 const stickedInches = ref<number | null>(null);
@@ -69,51 +58,30 @@ const tankShapeCalc = computed(() =>
     ? tank.value?.shape
     : dimTankShape.value,
 );
-const tankLength = computed(() =>
-  isDeliveryTab.value
-    ? delivery.value?.upcomingExistingTank?.length ?? 0
+const pseudoTank = computed(() => {
+  return isDeliveryTab.value
+    ? delivery.value?.upcomingExistingTank
     : isTankTab.value
-    ? tank.value?.length ?? 0
-    : dimLength.value ?? 0,
-);
-const tankDepth = computed(() =>
-  isDeliveryTab.value
-    ? delivery.value?.upcomingExistingTank?.depth ?? 0
-    : isTankTab.value
-    ? tank.value?.depth ?? 0
-    : dimDepth.value ?? 0,
-);
-const tankHeight = computed(() =>
-  isDeliveryTab.value
-    ? delivery.value?.upcomingExistingTank?.height ?? 0
-    : isTankTab.value
-    ? tank.value?.height ?? 0
-    : dimHeight.value ?? 0,
-);
-const tankShortHeight = computed(() =>
-  isDeliveryTab.value
-    ? delivery.value?.upcomingExistingTank?.shortHeight ?? 0
-    : isTankTab.value
-    ? tank.value?.shortHeight ?? 0
-    : dimShortHeight.value ?? 0,
-);
+    ? tank.value
+    : {
+        shape: dimTankShape.value,
+        length: dimLength.value,
+        depth: dimDepth.value,
+        shortDepth: dimShortDepth.value,
+        fullDepth: dimFullDepth.value,
+        height: dimHeight.value,
+        shortHeight: dimShortHeight.value,
+        fullHeight: dimFullHeight.value,
+        diameter: dimDiameter.value,
+      };
+});
 const desiredFill = ref(0.9);
 const totalGallons = computed(() =>
-  getTankShape(tankShapeCalc.value)?.calcTotalVolume({
-    length: tankLength.value,
-    depth: tankDepth.value,
-    height: tankHeight.value,
-    shortHeight: tankShortHeight.value,
-  }),
+  getTankShape(tankShapeCalc.value)?.calcTotalVolume(pseudoTank.value),
 );
 const currentGallons = computed(() =>
   getTankShape(tankShapeCalc.value)?.calcFilledVolume(
-    {
-      length: tankLength.value,
-      depth: tankDepth.value,
-      height: tankHeight.value,
-      shortHeight: tankShortHeight.value,
-    },
+    pseudoTank.value,
     stickedInches.value,
   ),
 );
@@ -124,14 +92,13 @@ const currentFillPercent = computed(() =>
       : currentGallons.value / totalGallons.value
     : undefined,
 );
-const gallonsToReachDesiredFill = computed(() => {
-  const estimate = calcGallonsToReachPercent(
-    dimPseudoTank.value,
+const gallonsToReachDesiredFill = computed(() =>
+  calcGallonsToReachPercent(
+    pseudoTank.value,
     stickedInches.value,
     desiredFill.value,
-  );
-  return exists(estimate) ? Math.round(estimate).toString() : emptyText;
-});
+  ),
+);
 </script>
 
 <template>
@@ -204,7 +171,7 @@ const gallonsToReachDesiredFill = computed(() => {
         ><NumField
           v-model:value="stickedInches"
           underlined
-          :hint="emptyText"
+          :hint="`${emptyText} in.`"
           :negativesAreAllowed="false"
       /></Label>
       <!-- <Box /> -->
@@ -215,7 +182,7 @@ const gallonsToReachDesiredFill = computed(() => {
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
           {{
-            exists(currentFillPercent)
+            exists(currentFillPercent) && !isNaN(currentFillPercent)
               ? `${Math.round(100 * currentFillPercent)}%`
               : emptyText
           }}</Label
@@ -225,7 +192,9 @@ const gallonsToReachDesiredFill = computed(() => {
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
           {{
-            exists(currentGallons) ? Math.round(currentGallons) : emptyText
+            exists(currentGallons) && !isNaN(currentGallons)
+              ? Math.round(currentGallons)
+              : emptyText
           }}</Label
         >
       </Row>
@@ -252,11 +221,16 @@ const gallonsToReachDesiredFill = computed(() => {
         <Label
           label="Gallons to Add"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
-          >{{ gallonsToReachDesiredFill }}</Label
+          >{{
+            exists(gallonsToReachDesiredFill) &&
+            !isNaN(gallonsToReachDesiredFill)
+              ? Math.round(gallonsToReachDesiredFill).toString()
+              : emptyText
+          }}</Label
         >
       </Row>
 
-      <Slider :min="0.8" v-model:value="desiredFill" :max="1" />
+      <Slider :min="0.75" v-model:value="desiredFill" :max="1" />
     </Card>
     <Box />
     <Box />

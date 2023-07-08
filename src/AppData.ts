@@ -57,10 +57,13 @@ export function listClients(
 export type Tank = (typeof mufasaTypes)["Tank"];
 export function isTankValid(tank: Partial<Tank> | null | undefined): boolean {
   const shapeUtils = getTankShape(tank?.shape);
-  const fuelName = tank?.fuelType?.name;
-  const shapeName = shapeUtils?.nameShort;
   const volume = shapeUtils?.calcTotalVolume(tank);
-  return exists(fuelName) && exists(shapeName) && exists(volume) && volume > 0;
+  return (
+    isFuelTypeValid(tank?.fuelType) &&
+    exists(shapeUtils?.nameShort) &&
+    exists(volume) &&
+    volume > 0
+  );
 }
 export function getTankLabel(tank: Partial<Tank> | null | undefined): string {
   if (!isTankValid(tank)) return `Incomplete Tank`;
@@ -176,6 +179,19 @@ export function listUpcomingDeliveries(allDeliveries: List<Delivery>) {
     allDeliveries.filter((delivery) => delivery.deliveryFormat !== `completed`),
     (x) => x.creationTimePosix,
   ) as any as (UpcomingExistingDelivery | UpcomingOneTimeDelivery)[];
+}
+export function isUpcomingDeliveryValid(
+  delivery: Partial<Delivery> | null | undefined,
+): boolean {
+  return (
+    exists(delivery) &&
+    exists(delivery.upcomingExistingClient) &&
+    exists(delivery.upcomingExistingTank) &&
+    // A simple way to make sure something important hasn't been deleted
+    isTankValid(delivery.upcomingExistingTank) &&
+    exists(delivery.quantity) &&
+    delivery.quantity > 0
+  );
 }
 export function listCompletedDeliveries(
   allDeliveries: List<Delivery>,
