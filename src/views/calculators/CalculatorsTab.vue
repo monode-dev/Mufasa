@@ -22,11 +22,17 @@ import {
 const appData = getAppData();
 const tabIndex = ref(0);
 const isDeliveryTab = computed(() => tabIndex.value === 0);
-const toDeliverTab = () => (tabIndex.value = 0);
+const toDeliverTab = () => {
+  tabIndex.value = 0;
+};
 const isTankTab = computed(() => tabIndex.value === 1);
-const toTankTab = () => (tabIndex.value = 1);
+const toTankTab = () => {
+  tabIndex.value = 1;
+};
 const isDimensionsTab = computed(() => tabIndex.value === 2);
-const toDimensionsTab = () => (tabIndex.value = 2);
+const toDimensionsTab = () => {
+  tabIndex.value = 2;
+};
 
 // Delivery
 const delivery = ref<UpcomingExistingDelivery | null>(null);
@@ -119,9 +125,7 @@ const gallonsToReachDesiredFill = computed(() =>
         <Button pill :outlined="!isDeliveryTab" :onClick="toDeliverTab"
           >Delivery</Button
         >
-        <Button pill :outlined="!isTankTab" :onClick="toTankTab"
-          >Tank</Button
-        >
+        <Button pill :outlined="!isTankTab" :onClick="toTankTab">Tank</Button>
         <Button pill :outlined="!isDimensionsTab" :onClick="toDimensionsTab"
           >Dimensions</Button
         >
