@@ -81,7 +81,7 @@ export default {
           :negativesAreAllowed="false"
           underlined
           v-model:value="rate"
-          hint="$/Gal."
+          hint="$/gal."
         />
       </Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">

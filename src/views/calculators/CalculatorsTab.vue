@@ -171,7 +171,7 @@ const gallonsToReachDesiredFill = computed(() =>
         ><NumField
           v-model:value="stickedInches"
           underlined
-          :hint="`${emptyText} in.`"
+          :hint="`in.`"
           :negativesAreAllowed="false"
       /></Label>
       <!-- <Box /> -->

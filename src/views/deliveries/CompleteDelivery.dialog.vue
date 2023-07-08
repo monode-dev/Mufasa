@@ -56,6 +56,7 @@ function popOnClickOutside(e: MouseEvent) {
     e.stopPropagation();
   }
 }
+const dimensionHintText = `-- in.`;
 </script>
 
 <script lang="ts">
@@ -91,13 +92,13 @@ export default {
         ><NumField
           :negativesAreAllowed="false"
           v-model:value="quantity"
-          hint="Gal."
+          hint="gal."
       /></Label>
       <Label label="Rate"
         ><NumField
           :negativesAreAllowed="false"
           v-model:value="rate"
-          hint="$/Gal."
+          hint="$/gal."
       /></Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
         <Button outlined @click.stop="popPage">Cancel</Button>

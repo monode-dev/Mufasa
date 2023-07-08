@@ -50,7 +50,7 @@ function deletePressed() {
         :negativesAreAllowed="false"
         underlined
         v-model:value="fuelType.rate"
-        hint="$/Gal."
+        hint="$/gal."
       />
     </Label>
     <DeleteOptionsButton @delete="deletePressed" />

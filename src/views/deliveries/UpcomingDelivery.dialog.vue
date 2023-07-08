@@ -8,7 +8,7 @@ import {
   getTankLabel,
   getClientLabel,
   Delivery,
-isUpcomingDeliveryValid,
+  isUpcomingDeliveryValid,
 } from "@/AppData";
 import { PropType, VNodeRef, computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -42,11 +42,13 @@ const tank = ref<Tank | null>(
 );
 const amount = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
 
-const deliveryIsValid = computed(() => isUpcomingDeliveryValid({
-  upcomingExistingClient: client.value,
-  upcomingExistingTank: tank.value,
-  quantity: amount.value ?? undefined,
-}));
+const deliveryIsValid = computed(() =>
+  isUpcomingDeliveryValid({
+    upcomingExistingClient: client.value,
+    upcomingExistingTank: tank.value,
+    quantity: amount.value ?? undefined,
+  }),
+);
 
 function closePopUp() {
   popPage();
@@ -119,7 +121,7 @@ export default {
             :negativesAreAllowed="false"
             v-model:value="amount"
             underlined
-            hint="--"
+            hint="gal."
         /></Label>
 
         <!-- Buttons -->

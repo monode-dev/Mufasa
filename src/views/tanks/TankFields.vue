@@ -64,6 +64,8 @@ const dimensions = computed(() => {
   if (!exists(tankShape)) return [];
   return tankShape.dimensions;
 });
+
+const dimensionHintText = `in.`;
 </script>
 
 <template>
@@ -92,7 +94,7 @@ const dimensions = computed(() => {
     >
       <NumField
         :negativesAreAllowed="false"
-        hint="--"
+        :hint="dimensionHintText"
         :value="props[dimensions[0]]"
         @update:value="emit(`update:${dimensions[0]}`, $event)"
         underlined
@@ -109,7 +111,7 @@ const dimensions = computed(() => {
     >
       <NumField
         :negativesAreAllowed="false"
-        hint="--"
+        :hint="dimensionHintText"
         :value="props[dimensions[1]]"
         @update:value="emit(`update:${dimensions[1]}`, $event)"
         underlined
@@ -133,7 +135,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[2])"
       ><NumField
         :negativesAreAllowed="false"
-        hint="--"
+        :hint="dimensionHintText"
         :value="props[dimensions[2]]"
         @update:value="emit(`update:${dimensions[2]}`, $event)"
         underlined
@@ -148,7 +150,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[3])"
       ><NumField
         :negativesAreAllowed="false"
-        hint="--"
+        :hint="dimensionHintText"
         :value="props[dimensions[3]]"
         @update:value="emit(`update:${dimensions[3]}`, $event)"
         underlined
@@ -173,7 +175,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[4])"
       ><NumField
         :negativesAreAllowed="false"
-        hint="--"
+        :hint="dimensionHintText"
         :value="props[dimensions[4]]"
         @update:value="emit(`update:${dimensions[4]}`, $event)"
         underlined
@@ -188,7 +190,7 @@ const dimensions = computed(() => {
       :label="getDimensionLabel(dimensions[5])"
       ><NumField
         :negativesAreAllowed="false"
-        hint="--"
+        :hint="dimensionHintText"
         :value="props[dimensions[5]]"
         @update:value="emit(`update:${dimensions[5]}`, $event)"
         underlined
