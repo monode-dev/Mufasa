@@ -196,7 +196,7 @@ export function getDimensionLabel(dimension: TankDimension): string {
     case `fullDepth`:
       return `Full Depth`;
     case `shortDepth`:
-      return `Short Depth`;
+      return `Tall Depth`;
     case `height`:
       return `Height`;
     case `fullHeight`:

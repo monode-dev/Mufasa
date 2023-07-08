@@ -81,6 +81,7 @@ const dimensionHintText = `in.`;
       })),
     ]"
   />
+  <!-- We need these to be one-per line for the tank dialog. -->
   <Row
     v-if="exists(shape) && dimensions.length > 0"
     :sty="{
