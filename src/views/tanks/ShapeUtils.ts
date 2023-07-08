@@ -6,6 +6,7 @@ export const CUBIC_INCHES_PER_GALLON = 231;
 
 export type TankShapeId =
   | `horizontalCylinder`
+  | `oval`
   | `rectangle`
   | `verticalCylinder`
   | `horizontalEllipse`
@@ -38,19 +39,7 @@ const _tankShapes: {
         }
       }
       if (!exists(stickedInches)) return undefined;
-      // See: https://www.mathsisfun.com/geometry/cylinder-horizontal-volume.html
-      const radius = tank?.diameter! / 2;
-      const shouldMeasureEmptySpaceInstead = stickedInches > radius;
-      const segmentHeight = shouldMeasureEmptySpaceInstead
-        ? tank?.diameter! - stickedInches
-        : stickedInches;
-      let area =
-        Math.acos((radius - segmentHeight) / radius) * Math.pow(radius, 2) -
-        (radius - segmentHeight) *
-          Math.sqrt(2 * radius * segmentHeight - Math.pow(segmentHeight, 2));
-      if (shouldMeasureEmptySpaceInstead) {
-        area = Math.PI * Math.pow(radius, 2) - area; // Area of the filled space
-      }
+      const area = calcCircleSegmentArea(tank?.diameter!, stickedInches);
       return (tank?.length! * area) / CUBIC_INCHES_PER_GALLON;
     },
     calcTotalVolume(tank) {
@@ -64,6 +53,57 @@ const _tankShapes: {
         (Math.PI * Math.pow(radius, 2) * tank?.length!) /
         CUBIC_INCHES_PER_GALLON
       );
+    },
+  },
+  oval: {
+    nameLong: `Oval`,
+    nameShort: `Oval`,
+    dimensions: [`length`, `depth`, `height`],
+    calcFilledVolume(tank, stickedInches) {
+      for (const dimension of [`length`, `depth`, `height`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      if (!exists(stickedInches)) return undefined;
+
+      // Compute relevant tank info
+      const radius = tank?.depth! / 2; // radius of the half-circles
+      const rectangularPartHeight = tank?.height! - tank?.depth!;
+
+      // Distribute the fuel between the parts
+      let undistributedFuel = stickedInches;
+      let inchesInCircle = Math.min(undistributedFuel, radius);
+      undistributedFuel = Math.max(undistributedFuel - inchesInCircle, 0);
+      const inchesInRectangle = Math.min(
+        undistributedFuel,
+        rectangularPartHeight,
+      );
+      undistributedFuel = Math.max(undistributedFuel - inchesInRectangle, 0);
+      inchesInCircle += Math.min(undistributedFuel, radius);
+      undistributedFuel = Math.max(undistributedFuel - inchesInCircle, 0);
+
+      // Calculate the volume of the filled parts
+      const circleArea = calcCircleSegmentArea(tank?.depth!, inchesInCircle);
+      const rectangleArea = inchesInRectangle * tank?.depth!;
+      const filledArea = circleArea + rectangleArea;
+      return (filledArea * tank?.length!) / CUBIC_INCHES_PER_GALLON;
+    },
+    calcTotalVolume(tank) {
+      for (const dimension of [`length`, `depth`, `height`] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+
+      const halfDepth = tank?.depth! / 2; // radius of the half-circles
+      const rectangularPartHeight = tank?.height! - tank?.depth!;
+      const totalVolume =
+        (Math.PI * Math.pow(halfDepth, 2) +
+          rectangularPartHeight * tank?.depth!) *
+        tank?.length!;
+
+      return totalVolume / CUBIC_INCHES_PER_GALLON;
     },
   },
   rectangle: {
@@ -268,4 +308,24 @@ export function calcGallonsToReachPercent(
   const totalVolume = tankShape.calcTotalVolume(tank);
   if (!exists(totalVolume)) return undefined;
   return Math.max(0, totalVolume * targetPercent - currentFill);
+}
+
+function calcCircleSegmentArea(
+  diameter: number,
+  stickedInches: number,
+): number {
+  // See: https://www.mathsisfun.com/geometry/cylinder-horizontal-volume.html
+  const radius = diameter / 2;
+  const shouldMeasureEmptySpaceInstead = stickedInches > radius;
+  const segmentHeight = shouldMeasureEmptySpaceInstead
+    ? diameter - stickedInches
+    : stickedInches;
+  let area =
+    Math.acos((radius - segmentHeight) / radius) * Math.pow(radius, 2) -
+    (radius - segmentHeight) *
+      Math.sqrt(2 * radius * segmentHeight - Math.pow(segmentHeight, 2));
+  if (shouldMeasureEmptySpaceInstead) {
+    area = Math.PI * Math.pow(radius, 2) - area; // Area of the filled space
+  }
+  return area;
 }
