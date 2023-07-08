@@ -33,11 +33,11 @@ const rate = ref(
     : props.delivery.completedRate,
 );
 
-const deliveryIsValid = computed(() => {
-  return canCompleteDelivery(props.delivery as Delivery);
-});
+// const deliveryIsValid = computed(() => {
+//   return canCompleteDelivery(props.delivery);
+// });
 function handleComplete() {
-  if (!deliveryIsValid.value && props.dialogType === `complete`) return;
+  // if (!deliveryIsValid.value && props.dialogType === `complete`) return;
   popPage();
   props.delivery.completedClientLabel = clientNameLabel.value;
   props.delivery.quantity = quantity.value;
@@ -91,20 +91,23 @@ export default {
         ><NumField
           :negativesAreAllowed="false"
           v-model:value="quantity"
-          hint="--"
+          hint="Gal."
       /></Label>
       <Label label="Rate"
-        ><NumField :negativesAreAllowed="false" v-model:value="rate" hint="--"
+        ><NumField
+          :negativesAreAllowed="false"
+          v-model:value="rate"
+          hint="$/Gal."
       /></Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
         <Button outlined @click.stop="popPage">Cancel</Button>
         <Button
           @click.stop="handleComplete"
           :sty="{
-            background:
-              deliveryIsValid || dialogType === `edit`
-                ? $mdColors.green
-                : $mdColors.grey,
+            background: $mdColors.green,
+            // deliveryIsValid || dialogType === `edit`
+            //   ? $mdColors.green
+            //   : $mdColors.grey,
           }"
           >{{ dialogType === `complete` ? `Complete` : `Save` }}</Button
         >
