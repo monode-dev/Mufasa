@@ -12,6 +12,7 @@ import {
 } from "./BoxLayout";
 import { computeBoxDecoration, DecorationSty } from "./BoxDecoration";
 import { computeBoxInteraction, InteractionSty } from "./BoxInteraction";
+import { exists } from "./BoxUtils";
 
 export type _Sty = SizeSty &
   DecorationSty &
@@ -24,6 +25,12 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: () => ({}),
     required: false,
+  },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
   },
 });
 const parentAxis = ref<Axis>(Axis.column);
@@ -127,18 +134,18 @@ function updateFromHtml(divRef: HTMLElement | undefined) {
 </script>
 
 <template>
-  <div class="b-x" :style="style" :ref="(updateFromHtml as any)">
+  <div
+    @click.stop="onClick"
+    :class="`b-x${sty.bonusTouch ?? exists(onClick) ? ` b-x-bonus-touch` : ``}`"
+    :style="style"
+    :ref="(updateFromHtml as any)"
+  >
     <slot />
   </div>
 </template>
 
 <style scoped>
-.b-x {
-  position: relative;
-}
-
-/* We might not want all elements to have an expanded touch radius, but we can try it for now. */
-.b-x::before {
+.b-x-bonus-touch::before {
   content: "";
   position: absolute;
   top: -0.375rem;

@@ -16,6 +16,12 @@ const props = defineProps({
     type: String,
     default: "alert",
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 </script>
 
@@ -23,6 +29,7 @@ const props = defineProps({
   <Button
     outlined
     pill
+    :onClick="onClick"
     :sty="{
       background: mdColors.green,
       textColor: mdColors.white,

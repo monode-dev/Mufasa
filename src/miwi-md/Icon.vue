@@ -18,11 +18,18 @@ const props = defineProps({
     type: [Number, String, Object] as PropType<number | string | FlexSize>,
     default: 1,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 </script>
 
 <template>
   <Box
+    :onClick="onClick"
     :sty="{
       width: scale,
       height: scale,

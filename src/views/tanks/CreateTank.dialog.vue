@@ -106,9 +106,9 @@ export default {
         underlined
       />
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
-        <Button outlined @click.stop="closePopUp">Cancel</Button>
+        <Button outlined :onClick="closePopUp">Cancel</Button>
         <Button
-          @click.stop="handleYes"
+          :onClick="handleYes"
           :sty="{
             background: tankIsValid ? $mdColors.green : $mdColors.grey,
           }"

@@ -48,7 +48,7 @@ export default {
 
 <template>
   <Box
-    @click="popOnClickOutside"
+    :onClick="popOnClickOutside"
     :sty="{
       width: `1f`,
       height: `1f`,
@@ -85,9 +85,9 @@ export default {
         />
       </Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
-        <Button outlined @click.stop="closePopUp">Cancel</Button>
+        <Button outlined :onClick="closePopUp">Cancel</Button>
         <Button
-          @click.stop="handleYes"
+          :onClick="handleYes"
           :sty="{
             background: fuelTypeIsValid ? $mdColors.green : $mdColors.grey,
           }"

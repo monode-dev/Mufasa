@@ -7,6 +7,7 @@ import {
   getClientLabel,
   listClients,
   listTanks,
+  isClientValid,
 } from "@/AppData";
 import { PropType, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -39,7 +40,7 @@ watchEffect(() => {
 
 <template>
   <Label label="Client">
-    <DropDown
+    <SerachableDropDown
       :selected="client"
       @update:selected="emit('update:client', $event)"
       :getKeyFromData="(data: Client | null) => {
@@ -51,6 +52,18 @@ watchEffect(() => {
           data: x,
         }))
       "
+      :filterOptions="(filterString: string, options: any) => {
+        if (filterString.length === 0) return true;
+        if (!isClientValid(options.data)) return false;
+        return (
+          (options.data.name?.toLowerCase().includes(filterString.toLowerCase()) ??
+            false) ||
+          (options.data.clientId
+            ?.toLowerCase()
+            .includes(filterString.toLowerCase()) ??
+            false)
+        );
+      }"
   /></Label>
   <Label label="Tank" v-if="exists(client)">
     <DropDown

@@ -47,13 +47,13 @@ const emit = defineEmits(["update:filterString", "close"]);
       <Box :sty="{ width: 0.25 }" />
     </Row>
     <Icon
-      @click="emit(`close`)"
+      :onClick="() => emit(`close`)"
       :scale="1.5"
       icon="close"
       :color="mdColors.white"
     />
     <!-- <Icon
-      @click="addPressed"
+      :onClick="addPressed"
       :scale="1.5"
       icon="plus"
       :color="mdColors.white"

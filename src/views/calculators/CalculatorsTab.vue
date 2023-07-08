@@ -116,13 +116,13 @@ const gallonsToReachDesiredFill = computed(() =>
           align: $Align.spaceBetween,
         }"
       >
-        <Button pill :outlined="!isDeliveryTab" @click.stop="toDeliverTab"
+        <Button pill :outlined="!isDeliveryTab" :onClick="toDeliverTab"
           >Delivery</Button
         >
-        <Button pill :outlined="!isTankTab" @click.stop="toTankTab"
+        <Button pill :outlined="!isTankTab" :onClick="toTankTab"
           >Tank</Button
         >
-        <Button pill :outlined="!isDimensionsTab" @click.stop="toDimensionsTab"
+        <Button pill :outlined="!isDimensionsTab" :onClick="toDimensionsTab"
           >Dimensions</Button
         >
       </Row>

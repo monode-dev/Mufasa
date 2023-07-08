@@ -20,6 +20,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
   // useEllipsisForOverflow: {
   //   type: Boolean,
   //   default: false,
@@ -32,6 +38,7 @@ const scale = computed(
 
 <template>
   <Box
+    :onClick="onClick"
     :sty="{
       textColor: hint ? mdColors.grey : undefined,
       scale: scale,

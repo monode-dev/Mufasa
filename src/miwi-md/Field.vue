@@ -55,6 +55,12 @@ const props = defineProps({
     type: Function as PropType<(nextInput: string) => boolean>,
     default: undefined,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 const emit = defineEmits<{
   (event: "update:value", newValue: string): void;
@@ -144,7 +150,7 @@ const underlineHeight = computed(() =>
 
 <template>
   <Row
-    @click="tryFocus()"
+    :onClick="onClick ?? (() => tryFocus())"
     :sty="{
       width: `1f`,
       height: scale + underlineHeight,

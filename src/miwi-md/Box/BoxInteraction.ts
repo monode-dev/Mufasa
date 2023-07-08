@@ -2,6 +2,7 @@ import { CssProps } from "./BoxUtils";
 
 export type InteractionSty = {
   isInteractable: boolean;
+  bonusTouch: boolean;
 };
 
 export function computeBoxInteraction(sty: Partial<InteractionSty>): CssProps {

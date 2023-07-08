@@ -56,6 +56,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 const emit = defineEmits<{
   (event: "update:value", newValue: number | null): void;
@@ -82,6 +88,7 @@ function validateInput(newInput: string) {
 
 <template>
   <Field
+    :onClick="onClick"
     :sty="sty"
     :value="(value ?? ``).toString()"
     @update:value="updateValue"

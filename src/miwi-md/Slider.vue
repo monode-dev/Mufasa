@@ -20,6 +20,12 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 
 const emit = defineEmits(["update:value"]);
@@ -62,6 +68,7 @@ function stopDrag() {
 
 <template>
   <Box
+    :onClick="onClick"
     ref="slider"
     :sty="{
       width: `1f`,

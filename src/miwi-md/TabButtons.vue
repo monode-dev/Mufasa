@@ -24,6 +24,12 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: ["Tab A", "Tab B", "Tab C"],
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 const emit = defineEmits(["update:selectedTab"]);
 function selectTab(newTab: number) {
@@ -56,6 +62,7 @@ const tabButtonWidth = 5;
 
 <template>
   <Row
+    :onClick="onClick"
     :sty="{
       width: `1f`,
       alignX: Align.spaceAround,
@@ -65,21 +72,21 @@ const tabButtonWidth = 5;
     <Box
       :sty="{ width: tabButtonWidth }"
       ref="tab0Ref"
-      @click.stop="selectTab(0)"
+      :onClick="() => selectTab(0)"
     >
       {{ labels[0] }}
     </Box>
     <Box
       :sty="{ width: tabButtonWidth }"
       ref="tab1Ref"
-      @click.stop="selectTab(1)"
+      :onClick="() => selectTab(1)"
     >
       {{ labels[1] }}
     </Box>
     <Box
       :sty="{ width: tabButtonWidth }"
       ref="tab2Ref"
-      @click.stop="selectTab(2)"
+      :onClick="() => selectTab(2)"
     >
       {{ labels[2] }}
     </Box>
@@ -121,15 +128,15 @@ const tabButtonWidth = 5;
       }"
     >
       <Box
-        @click.stop="selectTab(0)"
+        :onClick="() => selectTab(0)"
         :sty="{ width: tabButtonWidth, height: `1f` }"
       />
       <Box
-        @click.stop="selectTab(1)"
+        :onClick="() => selectTab(1)"
         :sty="{ width: tabButtonWidth, height: `1f` }"
       />
       <Box
-        @click.stop="selectTab(2)"
+        :onClick="() => selectTab(2)"
         :sty="{ width: tabButtonWidth, height: `1f` }"
       />
     </Box>

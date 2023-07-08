@@ -32,7 +32,7 @@ function clicked() {
 
 <template>
   <Row
-    @click.stop="clicked"
+    :onClick="clicked"
     :sty="{
       width: `1f`,
       height: 1,

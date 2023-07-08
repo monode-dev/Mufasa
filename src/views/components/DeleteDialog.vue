@@ -42,7 +42,7 @@ export default {
 
 <template>
   <Box
-    @click="popOnClickOutside"
+    :onClick="popOnClickOutside"
     :sty="{
       width: `1f`,
       height: `1f`,
@@ -60,8 +60,8 @@ export default {
         {{ message }}
       </Text>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
-        <Button outlined @click.stop="handleYes">Yes</Button>
-        <Button @click.stop="closePopUp">No</Button>
+        <Button outlined :onClick="handleYes">Yes</Button>
+        <Button :onClick="closePopUp">No</Button>
       </Row>
     </Card>
   </Box>

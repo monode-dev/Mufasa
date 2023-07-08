@@ -51,7 +51,7 @@ export default {
           <Text title>Fuel Types</Text>
           <Icon
             icon="plus"
-            @click.stop="pushPage(CreateFuelTypeDialog)"
+            :onClick="() => pushPage(CreateFuelTypeDialog)"
             :scale="1.25"
           />
         </Row>

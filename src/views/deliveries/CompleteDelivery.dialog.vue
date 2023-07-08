@@ -67,7 +67,7 @@ export default {
 
 <template>
   <Box
-    @click="popOnClickOutside"
+    :onClick="popOnClickOutside"
     :sty="{
       width: `1f`,
       height: `1f`,
@@ -101,9 +101,9 @@ export default {
           hint="$/gal."
       /></Label>
       <Row :sty="{ width: `1f`, align: $Align.spaceEvenly }">
-        <Button outlined @click.stop="popPage">Cancel</Button>
+        <Button outlined :onClick="popPage">Cancel</Button>
         <Button
-          @click.stop="handleComplete"
+          :onClick="handleComplete"
           :sty="{
             background: $mdColors.green,
             // deliveryIsValid || dialogType === `edit`

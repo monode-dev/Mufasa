@@ -7,11 +7,18 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 </script>
 
 <template>
   <Box
+    :onClick="onClick"
     :sty="{
       width: `100%`,
       height: `100%`,

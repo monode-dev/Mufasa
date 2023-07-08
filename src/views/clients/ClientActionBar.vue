@@ -52,12 +52,16 @@ const mode = ref(Mode.Home);
     <OutlinedActionButton
       label="Search"
       icon="magnify"
-      @click.stop="mode = Mode.Search"
+      :onClick="
+        () => {
+          mode = Mode.Search;
+        }
+      "
     />
     <OutlinedActionButton
       label="New"
       icon="plus"
-      @click.stop="pushPage(CreateClientDialog)"
+      :onClick="() => pushPage(CreateClientDialog)"
     />
     <OutlinedActionButton label="Import" icon="import" />
     <OutlinedActionButton label="Export" icon="export" />

@@ -10,11 +10,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 </script>
 
 <template>
   <Box
+    :onClick="onClick"
     :sty="{
       axis: $Axis.column,
       ...sty,

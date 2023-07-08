@@ -29,6 +29,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 const shapeSty = computed(() => {
   if (props.round) {
@@ -64,6 +70,7 @@ const shadowSty = computed(() =>
 
 <template>
   <Box
+    :onClick="onClick"
     :sty="{
       align: Align.center,
       axis: Axis.row,

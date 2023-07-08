@@ -84,7 +84,11 @@ onUnmounted(() => {
       }"
     >
       <Icon
-        @click.stop="(e) => (dropDownIsOpen = !dropDownIsOpen)"
+        :onClick="
+          () => {
+            dropDownIsOpen = !dropDownIsOpen;
+          }
+        "
         ref="openDropDownRef"
         icon="dotsVertical"
       />
@@ -102,13 +106,20 @@ onUnmounted(() => {
           align: $Align.centerRight,
         }"
       >
-        <Row @click.stop="dropDownIsOpen = false" :sty="{ padBetween: 0.25 }">
+        <Row
+          :onClick="
+            () => {
+              dropDownIsOpen = false;
+            }
+          "
+          :sty="{ padBetween: 0.25 }"
+        >
           <Text>Cancel</Text>
           <Icon icon="close" />
         </Row>
         <Row
           v-if="shouldShowEdit"
-          @click.stop="editPressed"
+          :onClick="editPressed"
           :sty="{ padBetween: 0.25 }"
         >
           <Text>Edit</Text>
@@ -116,14 +127,14 @@ onUnmounted(() => {
         </Row>
         <Row
           v-if="shouldShowComplete"
-          @click.stop="completePressed"
+          :onClick="completePressed"
           :sty="{ padBetween: 0.25 }"
         >
           <Text>Complete</Text>
           <Icon icon="check" />
         </Row>
         <Row
-          @click.stop="deletePressed"
+          :onClick="deletePressed"
           :sty="{
             textColor: mdColors.red,
             padBetween: 0.25,

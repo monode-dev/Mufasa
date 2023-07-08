@@ -16,12 +16,19 @@ const props = defineProps({
     type: Object as PropType<Partial<Sty>>,
     default: {},
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 </script>
 
 <template>
   <!-- Notch Spacer -->
   <Box
+    :onClick="onClick"
     :sty="{
       width: `1f`,
       height: `env(safe-area-inset-top)`,
@@ -62,7 +69,7 @@ const props = defineProps({
         <slot name="left">
           <Icon
             v-if="numOpenPages > 1"
-            @click="nav.popPage()"
+            :onClick="nav.popPage"
             :scale="1.25"
             icon="arrowLeft"
             alt="Back Icon"

@@ -29,7 +29,7 @@ const completedDeliveries = computed(() =>
         <Icon
           icon="plus"
           :scale="1.25"
-          @click.stop="pushPage(UpcomingDeliveryDialog)"
+          :onClick="() => pushPage(UpcomingDeliveryDialog)"
         />
       </Box>
     </Row>

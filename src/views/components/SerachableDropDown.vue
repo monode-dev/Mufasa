@@ -7,9 +7,10 @@ import {
   PropType,
   ref,
   VNodeRef,
+  watchEffect,
 } from "vue";
-import { mdColors } from "./Box/BoxDecoration";
-import { exists } from "./utils";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
+import { exists } from "@/utils";
 // Allow overriding of the default sty
 type Option = {
   label: string;
@@ -24,13 +25,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  speciaolOptions: {
+  specialOptions: {
     type: Array as PropType<Option[]>,
     default: [],
   },
   options: {
     type: Array as PropType<Option[]>,
     default: [],
+  },
+  filterOptions: {
+    type: Function as PropType<
+      (filterString: string, option: Option) => boolean
+    >,
+    default: () => true,
   },
   enabled: {
     type: Boolean,
@@ -53,17 +60,11 @@ const props = defineProps({
     type: String,
     default: "No Options",
   },
-  onClick: {
-    type: [Function, undefined, null] as PropType<
-      (e: MouseEvent) => void | undefined | null
-    >,
-    default: undefined,
-  },
 });
 
 const emit = defineEmits(["update:selected"]);
 
-const allOptions = computed(() => [...props.options, ...props.speciaolOptions]);
+const allOptions = computed(() => [...props.options, ...props.specialOptions]);
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
 const openDropDownRef = ref<VNodeRef | null>(null);
@@ -74,9 +75,28 @@ const selectedOption = computed(() => {
     (x) => (props.getKeyFromData(x.data) ?? undefined) === selectedKey,
   );
 });
+const filterString = ref(``);
+const filteredSpecialOptions = computed(() => {
+  // We need to access this once incase the list is empty.
+  filterString.value;
+  return props.specialOptions.filter((x) =>
+    props.filterOptions(filterString.value, x),
+  );
+});
+const filteredOptions = computed(() => {
+  // We need to access this once incase the list is empty.
+  filterString.value;
+  return props.options.filter((x) =>
+    props.filterOptions(filterString.value, x),
+  );
+});
 
 // Close the dropdown when the user clicks outside of it
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
+  if (openDropDownRef.value?.$el.contains(e.target) && !dropDownIsOpen.value) {
+    dropDownIsOpen.value = true;
+    e.stopPropagation();
+  }
   if (
     !dropDownModalRef.value?.$el.contains(e.target) &&
     !openDropDownRef.value?.$el.contains(e.target)
@@ -85,6 +105,11 @@ function closeOnClickOutside(e: MouseEvent | TouchEvent) {
     //e.stopPropagation();
   }
 }
+watchEffect(() => {
+  if (!dropDownIsOpen.value) {
+    filterString.value = ``;
+  }
+});
 onMounted(() => {
   document.addEventListener("click", closeOnClickOutside);
   document.addEventListener("touchend", closeOnClickOutside);
@@ -102,7 +127,6 @@ function selectOption(option: Option) {
 
 <template>
   <Row
-    :onClick="onClick"
     :sty="{
       width: `1f`,
       padBetween: 0.5,
@@ -131,12 +155,12 @@ function selectOption(option: Option) {
       >
         <!-- Text -->
         <Row
+          ref="openDropDownRef"
           :onClick="
             () => {
               dropDownIsOpen = !dropDownIsOpen;
             }
           "
-          ref="openDropDownRef"
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
@@ -144,6 +168,7 @@ function selectOption(option: Option) {
           }"
         >
           <Text
+            v-if="!dropDownIsOpen"
             :sty="{
               width: `1f`,
               overflowX: $Overflow.crop,
@@ -154,6 +179,7 @@ function selectOption(option: Option) {
           >
             {{ selectedOption?.label ?? `None` }}
           </Text>
+          <Field v-else v-model:value="filterString" hint="Search" />
 
           <Icon icon="menuDown" />
         </Row>
@@ -173,11 +199,13 @@ function selectOption(option: Option) {
             ref="dropDownModalRef"
             :sty="{
               width: `1f`,
+              height: `40vh`,
+              overflowY: $Overflow.scroll,
               pad: 0.75,
               shadowSize: 1,
               zIndex: 10000,
               background: mdColors.white,
-              align: $Align.centerLeft,
+              align: $Align.topLeft,
               isInteractable: true,
             }"
           >
@@ -196,7 +224,20 @@ function selectOption(option: Option) {
               >{{ emptyListText }}</Text
             >
             <Text
-              v-for="(option, index) in speciaolOptions"
+              hint
+              :onClick="
+                () => {
+                  dropDownIsOpen = false;
+                }
+              "
+              :sty="{
+                width: `1f`,
+                align: $Align.centerLeft,
+              }"
+              >Cancel</Text
+            >
+            <Text
+              v-for="(option, index) in filteredSpecialOptions"
               :key="index"
               :sty="{
                 width: `1f`,
@@ -207,11 +248,11 @@ function selectOption(option: Option) {
               >{{ option.label }}</Text
             >
             <Box
-              v-if="speciaolOptions.length > 0 && options.length > 0"
+              v-if="specialOptions.length > 0 && options.length > 0"
               :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }"
             />
             <Text
-              v-for="(option, index) in options"
+              v-for="(option, index) in filteredOptions"
               :onClick="() => selectOption(option)"
               :sty="{
                 width: `1f`,

@@ -20,6 +20,12 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  onClick: {
+    type: [Function, undefined, null] as PropType<
+      (e: MouseEvent) => void | undefined | null
+    >,
+    default: undefined,
+  },
 });
 const emit = defineEmits(["update:selectedTab"]);
 function selectTab(newTab: number) {
@@ -83,6 +89,7 @@ onMounted(() => {
 <template>
   <Row
     ref="tabBodiesParent"
+    :onClick="onClick"
     :sty="{
       width: `300%`,
       height: `1f`,
