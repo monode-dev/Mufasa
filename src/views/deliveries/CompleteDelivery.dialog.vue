@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { pageTransitions, popPage } from "@/Nav";
-import { Delivery, getClientLabel } from "@/AppData";
+import { Delivery, deliveryFormats, getClientLabel } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
 import { canCompleteDelivery } from "@/AppData";
 
@@ -9,41 +9,37 @@ const props = defineProps({
     type: Object as PropType<Delivery>,
     required: true,
   },
-  dialogType: {
-    type: String as PropType<`complete` | `edit`>,
-    default: `complete`,
-  },
 });
 
 const cardRef = ref<VNodeRef | null>(null);
-const clientNameLabel = ref(
-  props.dialogType === `complete`
+const deliveryLabel = ref(
+  props.delivery.deliveryFormat === deliveryFormats.upcomingFromExisting
     ? getClientLabel(props.delivery.upcomingExistingClient)
     : props.delivery.deliveryLabel,
 );
 const quantity = ref(props.delivery.quantity ?? 0);
 const fuelTypeName = ref(
-  props.dialogType === `complete`
+  props.delivery.deliveryFormat === deliveryFormats.upcomingFromExisting
     ? props.delivery.upcomingExistingTank?.fuelType?.name ?? `Unnamed`
-    : props.delivery.completedFuelTypeName,
+    : props.delivery.deliveryFormat === deliveryFormats.completed
+    ? props.delivery.completedFuelTypeName
+    : props.delivery.upcomingOneTimeFuelType?.name ?? `Unnamed`,
 );
 const rate = ref(
-  props.dialogType === `complete`
+  props.delivery.deliveryFormat === deliveryFormats.upcomingFromExisting
     ? props.delivery.upcomingExistingTank?.fuelType?.rate ?? 0
-    : props.delivery.completedRate,
+    : props.delivery.deliveryFormat === deliveryFormats.completed
+    ? props.delivery.completedRate
+    : props.delivery.upcomingOneTimeFuelType?.rate ?? 0,
 );
 
-// const deliveryIsValid = computed(() => {
-//   return canCompleteDelivery(props.delivery);
-// });
 function handleComplete() {
-  // if (!deliveryIsValid.value && props.dialogType === `complete`) return;
   popPage();
-  props.delivery.deliveryLabel = clientNameLabel.value;
+  props.delivery.deliveryLabel = deliveryLabel.value;
   props.delivery.quantity = quantity.value;
   props.delivery.completedFuelTypeName = fuelTypeName.value;
   props.delivery.completedRate = rate.value;
-  if (props.dialogType === `complete`) {
+  if (props.delivery.deliveryFormat !== deliveryFormats.completed) {
     props.delivery.completedTimePosix = Date.now();
     props.delivery.deliveryFormat = `completed`;
   }
@@ -56,7 +52,6 @@ function popOnClickOutside(e: MouseEvent) {
     e.stopPropagation();
   }
 }
-const dimensionHintText = `-- in.`;
 </script>
 
 <script lang="ts">
@@ -84,7 +79,7 @@ export default {
     >
       <Text title>Complete Delivery</Text>
       <Label label="Client"
-        ><Field v-model:value="clientNameLabel" hint="--"
+        ><Field v-model:value="deliveryLabel" hint="--"
       /></Label>
       <Label label="Fuel"
         ><Field v-model:value="fuelTypeName" hint="--"
@@ -107,11 +102,12 @@ export default {
           :onClick="handleComplete"
           :sty="{
             background: $mdColors.green,
-            // deliveryIsValid || dialogType === `edit`
-            //   ? $mdColors.green
-            //   : $mdColors.grey,
           }"
-          >{{ dialogType === `complete` ? `Complete` : `Save` }}</Button
+          >{{
+            props.delivery.deliveryFormat === deliveryFormats.completed
+              ? `Save`
+              : `Complete`
+          }}</Button
         >
       </Row>
     </Card>

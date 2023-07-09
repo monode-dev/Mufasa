@@ -116,28 +116,14 @@ export function listFuelTypes(
 }
 
 export type Delivery = (typeof mufasaTypes)["Delivery"];
-export type UpcomingExistingDelivery = Doc<{
-  deliveryFormat: `upcomingFromExisting`;
-  upcomingExistingClient: Client | null;
-  upcomingExistingTank: Tank | null;
-  creationTimePosix: number;
-  quantity: number;
-}>;
-export type UpcomingOneTimeDelivery = Doc<{
-  deliveryFormat: `upcomingFromOneTime`;
-  upcomingOneTimeClientName: string;
-  upcomingOneTimeFuelType: FuelType | null;
-  creationTimePosix: number;
-  quantity: number;
-}>;
-export type CompletedDelivery = Doc<{
-  deliveryFormat: `completed`;
-  completedClientLabel: string;
-  completedDate: number;
-  completedFuelTypeName: string;
-  completedRate: number;
-  quantity: number;
-}>;
+export type DeliveryFormat = Delivery["deliveryFormat"];
+export const deliveryFormats = {
+  upcomingFromExisting: `upcomingFromExisting`,
+  upcomingFromOneTime: `upcomingFromOneTime`,
+  completed: `completed`,
+} satisfies {
+  [key in Exclude<DeliveryFormat, null | undefined>]: DeliveryFormat;
+};
 export function canCompleteDelivery(delivery: Delivery): boolean {
   if (delivery.deliveryFormat === `completed`) return false;
   if (delivery.deliveryFormat === `upcomingFromExisting`) {

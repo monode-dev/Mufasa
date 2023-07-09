@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CompletedDelivery, Delivery, getClientLabel } from "@/AppData";
+import { Delivery } from "@/AppData";
 import { PropType } from "vue";
 import { exists } from "@/utils";
 import { pushPage } from "@/Nav";
@@ -23,7 +23,6 @@ const props = defineProps({
 
 function handleEdit() {
   pushPage(CompleteDeliveryDialog, {
-    dialogType: `edit`,
     delivery: props.delivery,
   });
 }

@@ -172,7 +172,7 @@ export default {
               isExistingDelivery = false;
             }
           "
-          >One Time</Button
+          >Manual</Button
         >
       </Row>
 
