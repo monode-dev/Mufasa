@@ -64,8 +64,8 @@ const deliveryIsValid = computed(() =>
 );
 
 // Related Deliveries
-const relatedDeliveries = computed(() =>
-  listCompletedDeliveries(appData.deliveries).filter((d) => {
+const relatedDeliveries = computed(() => {
+  const result = listCompletedDeliveries(appData.deliveries).filter((d) => {
     const deliveryClientPath = d.upcomingExistingClient?._firestoreRef?.path;
     const selectedClientPath = client.value?._firestoreRef?.path;
     const deliveryTankPath = d.upcomingExistingTank?._firestoreRef?.path;
@@ -78,8 +78,9 @@ const relatedDeliveries = computed(() =>
       exists(selectedTankPath) &&
       deliveryTankPath === selectedTankPath
     );
-  }),
-);
+  });
+  return result.slice(0, 10);
+});
 const relatedDeliveriesCount = computed(() => relatedDeliveries.value.length);
 
 function closePopUp() {

@@ -13,9 +13,10 @@ const appData = getAppData();
 const upcomingDeliveries = computed(() =>
   listUpcomingDeliveries(appData.deliveries),
 );
-const completedDeliveries = computed(() =>
-  listCompletedDeliveries(appData.deliveries),
-);
+const completedDeliveries = computed(() => {
+  const result = listCompletedDeliveries(appData.deliveries);
+  return result.slice(0, 10);
+});
 </script>
 
 <template>
