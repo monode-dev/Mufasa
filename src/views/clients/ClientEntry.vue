@@ -19,7 +19,7 @@ function deletePressed() {
     obj: props.client,
     message: `Are you sure you want to permanently delete "${
       props.client.clientId ?? ``
-    } ${props.client.clientId && props.client.name ? ` - ` : ``} ${
+    }${props.client.clientId && props.client.name ? ` - ` : ``}${
       props.client.name ?? ``
     }"?`,
   });

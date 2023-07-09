@@ -238,7 +238,7 @@ function selectOption(option: Option) {
               height: Math.min(
                 2.5 +
                   1.75 * allOptions.length -
-                  (!exists(filterOptions) ? 1.75 : 0),
+                  (!exists(filterOptions) && allOptions.length > 0 ? 1.75 : 0),
                 15.65,
               ),
               overflowY: $Overflow.scroll,

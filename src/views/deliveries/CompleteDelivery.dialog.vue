@@ -88,7 +88,7 @@ export default {
       <Label label="Fuel"
         ><Field v-model:value="fuelTypeName" hint="--"
       /></Label>
-      <Label label="Quantity"
+      <Label label="Gallons"
         ><NumField
           :negativesAreAllowed="false"
           v-model:value="quantity"

@@ -47,8 +47,11 @@ const tank = ref<Tank | null>(
   deliveryToEdit.value?.upcomingExistingTank ?? null,
 );
 const deliveryLabel = ref(deliveryToEdit.value?.deliveryLabel ?? ``);
-const fuelType = ref(tank.value?.fuelType ?? null);
+const selectedFuelType = ref(tank.value?.fuelType ?? null);
 const quantity = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
+const computedFuelType = computed(() =>
+  isExistingDelivery.value ? tank.value?.fuelType : selectedFuelType.value,
+);
 
 const deliveryIsValid = computed(() =>
   isUpcomingDeliveryValid({
@@ -58,7 +61,7 @@ const deliveryIsValid = computed(() =>
     upcomingExistingClient: client.value,
     upcomingExistingTank: tank.value,
     deliveryLabel: deliveryLabel.value,
-    fuelType: fuelType.value,
+    fuelType: computedFuelType.value,
     quantity: quantity.value ?? undefined,
   }),
 );
@@ -71,7 +74,7 @@ const relatedDeliveries = computed(() => {
     // const deliveryTankPath = d.upcomingExistingTank?._firestoreRef?.path;
     // const selectedTankPath = tank.value?._firestoreRef?.path;
     const deliveryFuelTypePath = d.fuelType?._firestoreRef?.path;
-    const selectedFuelTypePath = fuelType.value?._firestoreRef?.path;
+    const selectedFuelTypePath = computedFuelType.value?._firestoreRef?.path;
     return (
       exists(deliveryClientPath) &&
       exists(selectedClientPath) &&
@@ -102,14 +105,14 @@ function handleYes() {
       upcomingExistingClient: client.value,
       upcomingExistingTank: tank.value,
       deliveryLabel: deliveryLabel.value,
-      fuelType: fuelType.value,
+      fuelType: computedFuelType.value,
       quantity: quantity.value!,
     });
   } else if (props.dialogType === `edit`) {
     deliveryToEdit.value!.upcomingExistingClient = client.value;
     deliveryToEdit.value!.upcomingExistingTank = tank.value;
     deliveryToEdit.value!.deliveryLabel = deliveryLabel.value;
-    deliveryToEdit.value!.fuelType = fuelType.value;
+    deliveryToEdit.value!.fuelType = computedFuelType.value;
     deliveryToEdit.value!.quantity = quantity.value!;
   }
 }
@@ -195,11 +198,11 @@ export default {
       /></Label>
       <FuelTypeDropDown
         v-if="!isExistingDelivery"
-        v-model:fuelType="fuelType"
+        v-model:fuelType="selectedFuelType"
       />
 
-      <!-- Quantity -->
-      <Label label="Quantity"
+      <!-- Gallons -->
+      <Label label="Gallons"
         ><NumField
           :negativesAreAllowed="false"
           v-model:value="quantity"
