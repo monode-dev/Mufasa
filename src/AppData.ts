@@ -135,10 +135,7 @@ export function canCompleteDelivery(delivery: Delivery): boolean {
     );
   }
   if (delivery.deliveryFormat === `upcomingFromOneTime`) {
-    return (
-      exists(delivery.upcomingOneTimeFuelType) &&
-      exists(delivery.upcomingOneTimeFuelType?.rate)
-    );
+    return exists(delivery.fuelType) && exists(delivery.fuelType?.rate);
   }
   return false;
 }
@@ -151,8 +148,8 @@ export function completeDelivery(delivery: Delivery): void {
     delivery.completedRate = delivery.upcomingExistingTank!.fuelType!.rate!;
   }
   if (delivery.deliveryFormat === `upcomingFromOneTime`) {
-    delivery.completedFuelTypeName = delivery.upcomingOneTimeFuelType!.name!;
-    delivery.completedRate = delivery.upcomingOneTimeFuelType!.rate!;
+    delivery.completedFuelTypeName = delivery.fuelType!.name!;
+    delivery.completedRate = delivery.fuelType!.rate!;
   }
   delivery.completedTimePosix = Date.now();
   delivery.deliveryFormat = `completed`;
@@ -177,8 +174,8 @@ export function isUpcomingDeliveryValid(
       // A simple way to make sure something important hasn't been deleted
       isTankValid(delivery.upcomingExistingTank)) ||
       (delivery?.deliveryFormat === `upcomingFromOneTime` &&
-        exists(delivery.upcomingOneTimeFuelType) &&
-        isFuelTypeValid(delivery.upcomingOneTimeFuelType)))
+        exists(delivery.fuelType) &&
+        isFuelTypeValid(delivery.fuelType)))
   );
 }
 export function listCompletedDeliveries(
@@ -228,10 +225,11 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
                 // Maybe record x, y, and z instead.
                 length: defPrim<number | null>(null),
                 depth: defPrim<number | null>(null),
-                shortDepth: defPrim<number | null>(null),
+                topDepth: defPrim<number | null>(null),
                 fullDepth: defPrim<number | null>(null),
                 height: defPrim<number | null>(null),
-                shortHeight: defPrim<number | null>(null),
+                squareHeight: defPrim<number | null>(null),
+                wideHeight: defPrim<number | null>(null),
                 fullHeight: defPrim<number | null>(null),
                 diameter: defPrim<number | null>(null),
                 creationTimePosix: defPrim<number>(() => Date.now()),
@@ -266,7 +264,7 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
           upcomingExistingTank: defOne(`Tank`, null),
 
           // Upcoming from one-time client
-          upcomingOneTimeFuelType: defOne(`FuelType`, null),
+          fuelType: defOne(`FuelType`, null),
 
           // Completed
           deliveryLabel: defPrim<string>(``),

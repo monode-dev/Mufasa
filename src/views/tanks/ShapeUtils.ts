@@ -58,7 +58,7 @@ const _tankShapes: {
   oval: {
     nameLong: `Oval`,
     nameShort: `Oval`,
-    dimensions: [`length`, `depth`, `height`],
+    dimensions: [`length`, `depth`, `height`], //[`length`, `depth`, `fullHeight`, `squareHeight`]
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [`length`, `depth`, `height`] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -206,19 +206,13 @@ const _tankShapes: {
   truckBedTank: {
     nameLong: `Truck Bed Tank`,
     nameShort: `Truck Bed`,
-    dimensions: [
-      `length`,
-      `shortDepth`,
-      `fullDepth`,
-      `shortHeight`,
-      `fullHeight`,
-    ],
+    dimensions: [`length`, `topDepth`, `fullDepth`, `wideHeight`, `fullHeight`],
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [
         `length`,
-        `shortDepth`,
+        `topDepth`,
         `fullDepth`,
-        `shortHeight`,
+        `wideHeight`,
         `fullHeight`,
       ] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -226,24 +220,24 @@ const _tankShapes: {
         }
       }
       if (!exists(stickedInches)) return undefined;
-      const levelInLowerPart = Math.min(tank?.shortHeight!, stickedInches);
+      const levelInLowerPart = Math.min(tank?.wideHeight!, stickedInches);
       const volumeInLowerPart =
         levelInLowerPart * tank?.length! * tank?.fullDepth!;
       const levelInUpperPart = Math.max(
         0,
-        tank?.height! - tank?.shortHeight!,
-        stickedInches - tank?.shortHeight!,
+        tank?.height! - tank?.wideHeight!,
+        stickedInches - tank?.wideHeight!,
       );
       const volumeInUpperPart =
-        levelInUpperPart * tank?.length! * tank?.shortDepth!;
+        levelInUpperPart * tank?.length! * tank?.topDepth!;
       return (volumeInLowerPart + volumeInUpperPart) / CUBIC_INCHES_PER_GALLON;
     },
     calcTotalVolume(tank) {
       for (const dimension of [
         `length`,
-        `shortDepth`,
+        `topDepth`,
         `fullDepth`,
-        `shortHeight`,
+        `wideHeight`,
         `fullHeight`,
       ] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -251,11 +245,9 @@ const _tankShapes: {
         }
       }
       const volumeInLowerPart =
-        tank?.length! * tank?.fullDepth! * tank?.shortHeight!;
+        tank?.length! * tank?.fullDepth! * tank?.wideHeight!;
       const volumeInUpperPart =
-        tank?.length! *
-        tank?.shortDepth! *
-        (tank?.height! - tank?.shortHeight!);
+        tank?.length! * tank?.topDepth! * (tank?.height! - tank?.wideHeight!);
       return (volumeInLowerPart + volumeInUpperPart) / CUBIC_INCHES_PER_GALLON;
     },
   },
@@ -278,14 +270,16 @@ export function getDimensionLabel(dimension: TankDimension): string {
       return `Depth`;
     case `fullDepth`:
       return `Full Depth`;
-    case `shortDepth`:
-      return `Tall Depth`;
+    case `topDepth`:
+      return `Top Depth`;
     case `height`:
       return `Height`;
     case `fullHeight`:
       return `Full Height`;
-    case `shortHeight`:
-      return `Short Height`;
+    case `squareHeight`:
+      return `Square Height`;
+    case `wideHeight`:
+      return `Wide Height`;
     case `diameter`:
       return `Diameter`;
   }

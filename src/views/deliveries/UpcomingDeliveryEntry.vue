@@ -83,7 +83,7 @@ function handleDelete() {
         {{
           isExistingDelivery
             ? getTankLabel(props.delivery.upcomingExistingTank)
-            : props.delivery.upcomingOneTimeFuelType?.name ?? `Unknown Fuel`
+            : props.delivery.fuelType?.name ?? `Unknown Fuel`
         }}
       </Text>
     </Row>

@@ -186,7 +186,20 @@ function selectOption(option: Option) {
             :has-focus="true"
           />
 
-          <Icon icon="menuDown" />
+          <Icon
+            :icon="
+              exists(filterOptions) && dropDownIsOpen ? `close` : `menuDown`
+            "
+            :onClick="
+              () => {
+                if (dropDownIsOpen) {
+                  dropDownIsOpen = false;
+                } else {
+                  openDropDown();
+                }
+              }
+            "
+          />
         </Row>
         <!-- Drop Down -->
         <Box
@@ -210,7 +223,7 @@ function selectOption(option: Option) {
             ref="dropDownModalRef"
             :sty="{
               width: `1f`,
-              height: 15.65,
+              height: Math.min(2.5 + 1.75 * allOptions.length, 15.65),
               overflowY: $Overflow.scroll,
               pad: 0.75,
               shadowSize: 1,
@@ -235,7 +248,7 @@ function selectOption(option: Option) {
               >{{ emptyListText }}</Text
             >
             <Text
-              v-if="exists(filterOptions)"
+              v-if="exists(filterOptions) && allOptions.length > 0"
               hint
               :onClick="
                 () => {

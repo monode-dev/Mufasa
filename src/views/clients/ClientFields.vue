@@ -2,6 +2,10 @@
 import { PropType } from "vue";
 
 const props = defineProps({
+  autoFocus: {
+    type: Boolean,
+    default: false,
+  },
   name: {
     type: [String, null, undefined] as PropType<string | null | undefined>,
     required: true,
@@ -37,6 +41,7 @@ const emit = defineEmits([
     underlined
     hint="Name"
     icon="account"
+    :hasFocus="autoFocus"
     :value="name"
     @update:value="emit(`update:name`, $event)"
     :sty="{ width: `1f` }"

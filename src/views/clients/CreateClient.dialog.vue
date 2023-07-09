@@ -91,6 +91,7 @@ export default {
     >
       <Text title>Create Client</Text>
       <ClientFields
+      :autoFocus="true"
         v-model:name="name"
         v-model:clientId="clientId"
         v-model:phoneNumber="phoneNumber"

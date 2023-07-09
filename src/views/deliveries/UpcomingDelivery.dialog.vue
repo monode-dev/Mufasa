@@ -58,7 +58,7 @@ const deliveryIsValid = computed(() =>
     upcomingExistingClient: client.value,
     upcomingExistingTank: tank.value,
     deliveryLabel: deliveryLabel.value,
-    upcomingOneTimeFuelType: fuelType.value,
+    fuelType: fuelType.value,
     quantity: amount.value ?? undefined,
   }),
 );
@@ -68,15 +68,20 @@ const relatedDeliveries = computed(() => {
   const result = listCompletedDeliveries(appData.deliveries).filter((d) => {
     const deliveryClientPath = d.upcomingExistingClient?._firestoreRef?.path;
     const selectedClientPath = client.value?._firestoreRef?.path;
-    const deliveryTankPath = d.upcomingExistingTank?._firestoreRef?.path;
-    const selectedTankPath = tank.value?._firestoreRef?.path;
+    // const deliveryTankPath = d.upcomingExistingTank?._firestoreRef?.path;
+    // const selectedTankPath = tank.value?._firestoreRef?.path;
+    const deliveryFuelTypePath = d.fuelType?._firestoreRef?.path;
+    const selectedFuelTypePath = fuelType.value?._firestoreRef?.path;
     return (
       exists(deliveryClientPath) &&
       exists(selectedClientPath) &&
       deliveryClientPath === selectedClientPath &&
-      exists(deliveryTankPath) &&
-      exists(selectedTankPath) &&
-      deliveryTankPath === selectedTankPath
+      // exists(deliveryTankPath) &&
+      // exists(selectedTankPath) &&
+      // deliveryTankPath === selectedTankPath &&
+      exists(deliveryFuelTypePath) &&
+      exists(selectedFuelTypePath) &&
+      deliveryFuelTypePath === selectedFuelTypePath
     );
   });
   return result.slice(0, 10);
@@ -97,14 +102,14 @@ function handleYes() {
       upcomingExistingClient: client.value,
       upcomingExistingTank: tank.value,
       deliveryLabel: deliveryLabel.value,
-      upcomingOneTimeFuelType: fuelType.value,
+      fuelType: fuelType.value,
       quantity: amount.value!,
     });
   } else if (props.dialogType === `edit`) {
     deliveryToEdit.value!.upcomingExistingClient = client.value;
     deliveryToEdit.value!.upcomingExistingTank = tank.value;
     deliveryToEdit.value!.deliveryLabel = deliveryLabel.value;
-    deliveryToEdit.value!.upcomingOneTimeFuelType = fuelType.value;
+    deliveryToEdit.value!.fuelType = fuelType.value;
     deliveryToEdit.value!.quantity = amount.value!;
   }
 }

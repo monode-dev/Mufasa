@@ -18,25 +18,29 @@ const deliveryLabel = ref(
     : props.delivery.deliveryLabel,
 );
 const quantity = ref(props.delivery.quantity ?? 0);
-const fuelTypeName = ref(
+const fuelType = ref(
   props.delivery.deliveryFormat === deliveryFormats.upcomingFromExisting
-    ? props.delivery.upcomingExistingTank?.fuelType?.name ?? `Unnamed`
-    : props.delivery.deliveryFormat === deliveryFormats.completed
+    ? props.delivery.upcomingExistingTank?.fuelType ?? null
+    : props.delivery.fuelType,
+);
+const fuelTypeName = ref(
+  props.delivery.deliveryFormat === deliveryFormats.completed
     ? props.delivery.completedFuelTypeName
-    : props.delivery.upcomingOneTimeFuelType?.name ?? `Unnamed`,
+    : fuelType.value?.name ?? `Unnamed`,
 );
 const rate = ref(
   props.delivery.deliveryFormat === deliveryFormats.upcomingFromExisting
     ? props.delivery.upcomingExistingTank?.fuelType?.rate ?? 0
     : props.delivery.deliveryFormat === deliveryFormats.completed
     ? props.delivery.completedRate
-    : props.delivery.upcomingOneTimeFuelType?.rate ?? 0,
+    : props.delivery.fuelType?.rate ?? 0,
 );
 
 function handleComplete() {
   popPage();
   props.delivery.deliveryLabel = deliveryLabel.value;
   props.delivery.quantity = quantity.value;
+  props.delivery.fuelType = fuelType.value;
   props.delivery.completedFuelTypeName = fuelTypeName.value;
   props.delivery.completedRate = rate.value;
   if (props.delivery.deliveryFormat !== deliveryFormats.completed) {
