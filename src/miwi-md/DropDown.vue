@@ -7,9 +7,10 @@ import {
   PropType,
   ref,
   VNodeRef,
+  watchEffect,
 } from "vue";
-import { mdColors } from "./Box/BoxDecoration";
-import { exists } from "./utils";
+import { mdColors } from "@/miwi-md/Box/BoxDecoration";
+import { exists } from "@/utils";
 // Allow overriding of the default sty
 type Option = {
   label: string;
@@ -24,7 +25,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  speciaolOptions: {
+  specialOptions: {
     type: Array as PropType<Option[]>,
     default: [],
   },
@@ -32,9 +33,11 @@ const props = defineProps({
     type: Array as PropType<Option[]>,
     default: [],
   },
-  enabled: {
-    type: Boolean,
-    default: true,
+  filterOptions: {
+    type: [Function, undefined] as PropType<
+      undefined | ((filterString: string, option: Option) => boolean)
+    >,
+    default: undefined,
   },
   label: {
     type: String,
@@ -53,25 +56,46 @@ const props = defineProps({
     type: String,
     default: "No Options",
   },
-  onClick: {
-    type: [Function, undefined, null] as PropType<
-      (e: MouseEvent) => void | undefined | null
-    >,
-    default: undefined,
-  },
 });
 
 const emit = defineEmits(["update:selected"]);
 
-const allOptions = computed(() => [...props.options, ...props.speciaolOptions]);
+const allOptions = computed(() => [...props.options, ...props.specialOptions]);
 
 const dropDownModalRef = ref<VNodeRef | null>(null);
-const openDropDownRef = ref<VNodeRef | null>(null);
+const openDropDownButtonRef = ref<VNodeRef | null>(null);
 const dropDownIsOpen = ref(false);
+const shouldOpenUpwards = ref(false);
+function openDropDown() {
+  if (dropDownIsOpen.value) return;
+  shouldOpenUpwards.value =
+    openDropDownButtonRef.value?.$el.getBoundingClientRect().top >
+    window.innerHeight * 0.6;
+  dropDownIsOpen.value = true;
+}
 const selectedOption = computed(() => {
   const selectedKey = props.getKeyFromData(props.selected) ?? undefined;
   return allOptions.value.find(
     (x) => (props.getKeyFromData(x.data) ?? undefined) === selectedKey,
+  );
+});
+const filterString = ref(``);
+const filteredSpecialOptions = computed(() => {
+  // We need to access this once incase the list is empty.
+  filterString.value;
+  return props.specialOptions.filter((x) =>
+    exists(props.filterOptions)
+      ? props.filterOptions(filterString.value, x)
+      : true,
+  );
+});
+const filteredOptions = computed(() => {
+  // We need to access this once incase the list is empty.
+  filterString.value;
+  return props.options.filter((x) =>
+    exists(props.filterOptions)
+      ? props.filterOptions(filterString.value, x)
+      : true,
   );
 });
 
@@ -79,12 +103,17 @@ const selectedOption = computed(() => {
 function closeOnClickOutside(e: MouseEvent | TouchEvent) {
   if (
     !dropDownModalRef.value?.$el.contains(e.target) &&
-    !openDropDownRef.value?.$el.contains(e.target)
+    !openDropDownButtonRef.value?.$el.contains(e.target)
   ) {
     dropDownIsOpen.value = false;
     //e.stopPropagation();
   }
 }
+watchEffect(() => {
+  if (!dropDownIsOpen.value) {
+    filterString.value = ``;
+  }
+});
 onMounted(() => {
   document.addEventListener("click", closeOnClickOutside);
   document.addEventListener("touchend", closeOnClickOutside);
@@ -102,7 +131,6 @@ function selectOption(option: Option) {
 
 <template>
   <Row
-    :onClick="onClick"
     :sty="{
       width: `1f`,
       padBetween: 0.5,
@@ -125,18 +153,14 @@ function selectOption(option: Option) {
         :sty="{
           width: `1f`,
           height: sty.scale ?? 1,
-          align: $Align.topLeft,
+          align: shouldOpenUpwards ? $Align.bottomLeft : $Align.topLeft,
           axis: $Axis.stack,
         }"
       >
         <!-- Text -->
         <Row
-          :onClick="
-            () => {
-              dropDownIsOpen = !dropDownIsOpen;
-            }
-          "
-          ref="openDropDownRef"
+          ref="openDropDownButtonRef"
+          :onClick="openDropDown"
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
@@ -144,6 +168,7 @@ function selectOption(option: Option) {
           }"
         >
           <Text
+            v-if="!exists(filterOptions) || !dropDownIsOpen"
             :sty="{
               width: `1f`,
               overflowX: $Overflow.crop,
@@ -154,6 +179,12 @@ function selectOption(option: Option) {
           >
             {{ selectedOption?.label ?? `None` }}
           </Text>
+          <Field
+            v-else
+            v-model:value="filterString"
+            hint="Search"
+            :has-focus="true"
+          />
 
           <Icon icon="menuDown" />
         </Row>
@@ -167,17 +198,25 @@ function selectOption(option: Option) {
             isInteractable: false,
           }"
         >
-          <Box :sty="{ height: sty.scale ?? 1, isInteractable: false }" />
-          <Box :sty="{ height: 0.5, isInteractable: false }" />
+          <Box
+            v-if="!shouldOpenUpwards"
+            :sty="{ height: sty.scale ?? 1, isInteractable: false }"
+          />
+          <Box
+            v-if="!shouldOpenUpwards"
+            :sty="{ height: 0.5, isInteractable: false }"
+          />
           <Box
             ref="dropDownModalRef"
             :sty="{
               width: `1f`,
+              height: 15.65,
+              overflowY: $Overflow.scroll,
               pad: 0.75,
               shadowSize: 1,
               zIndex: 10000,
               background: mdColors.white,
-              align: $Align.centerLeft,
+              align: $Align.topLeft,
               isInteractable: true,
             }"
           >
@@ -196,7 +235,21 @@ function selectOption(option: Option) {
               >{{ emptyListText }}</Text
             >
             <Text
-              v-for="(option, index) in speciaolOptions"
+              v-if="exists(filterOptions)"
+              hint
+              :onClick="
+                () => {
+                  dropDownIsOpen = false;
+                }
+              "
+              :sty="{
+                width: `1f`,
+                align: $Align.centerLeft,
+              }"
+              >Cancel</Text
+            >
+            <Text
+              v-for="(option, index) in filteredSpecialOptions"
               :key="index"
               :sty="{
                 width: `1f`,
@@ -207,11 +260,11 @@ function selectOption(option: Option) {
               >{{ option.label }}</Text
             >
             <Box
-              v-if="speciaolOptions.length > 0 && options.length > 0"
+              v-if="specialOptions.length > 0 && options.length > 0"
               :sty="{ width: `1f`, height: 0.125, background: mdColors.grey }"
             />
             <Text
-              v-for="(option, index) in options"
+              v-for="(option, index) in filteredOptions"
               :onClick="() => selectOption(option)"
               :sty="{
                 width: `1f`,
@@ -222,6 +275,14 @@ function selectOption(option: Option) {
               {{ option.label }}
             </Text>
           </Box>
+          <Box
+            v-if="shouldOpenUpwards"
+            :sty="{ height: 0.5, isInteractable: false }"
+          />
+          <Box
+            v-if="shouldOpenUpwards"
+            :sty="{ height: sty.scale ?? 1, isInteractable: false }"
+          />
         </Box>
       </Box>
     </Box>

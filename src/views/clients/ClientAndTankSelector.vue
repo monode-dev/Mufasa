@@ -40,7 +40,7 @@ watchEffect(() => {
 
 <template>
   <Label label="Client">
-    <SerachableDropDown
+    <DropDown
       :selected="client"
       @update:selected="emit('update:client', $event)"
       :getKeyFromData="(data: Client | null) => {
