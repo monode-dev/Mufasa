@@ -15,7 +15,7 @@ const upcomingDeliveries = computed(() =>
 );
 const completedDeliveries = computed(() => {
   const result = listCompletedDeliveries(appData.deliveries);
-  return result.slice(0, 10);
+  return result.slice(0, 50);
 });
 </script>
 
