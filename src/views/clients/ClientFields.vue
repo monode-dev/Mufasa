@@ -68,6 +68,7 @@ const emit = defineEmits([
     icon="mapMarker"
     :value="address"
     @update:value="emit(`update:address`, $event)"
+    :lineCount="2"
     :sty="{ width: `1f` }"
   />
   <Field
@@ -75,6 +76,7 @@ const emit = defineEmits([
     hint="Notes"
     icon="textBox"
     :value="notes"
+    :lineCount="3"
     @update:value="emit(`update:notes`, $event)"
     :sty="{ width: `1f` }"
   />

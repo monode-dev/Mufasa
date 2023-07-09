@@ -61,6 +61,10 @@ const props = defineProps({
     >,
     default: undefined,
   },
+  lineCount: {
+    type: [Number, null] as PropType<number | null>,
+    default: 1,
+  },
 });
 const emit = defineEmits<{
   (event: "update:value", newValue: string): void;
@@ -153,7 +157,9 @@ const underlineHeight = computed(() =>
     :onClick="onClick ?? (() => tryFocus())"
     :sty="{
       width: `1f`,
-      height: scale + underlineHeight,
+      height: exists(lineCount)
+        ? scale * lineCount + underlineHeight
+        : undefined,
       textColor: mdColors.black,
       padBetween: 0.25,
       overflowY: $Overflow.forceStretchParent,
@@ -168,31 +174,33 @@ const underlineHeight = computed(() =>
       v-if="underlined"
       :sty="{
         width: `1f`,
-        height: scale + underlineHeight,
+        height: exists(lineCount)
+          ? scale * lineCount + underlineHeight
+          : undefined,
       }"
     >
       <!-- Input -->
       <Box
         :sty="{
           width: `1f`,
-          height: `1f`,
+          // height: `1f`,
           axis: $Axis.column,
         }"
       >
         <Box
           :sty="{
             width: `1f`,
-            height: `1f`,
+            // height: `1f`,
             axis: $Axis.row,
           }"
         >
           <Box :sty="{ width: 0.25 }" />
 
           <Box :sty="{ width: `1f` }">
-            <input
+            <textarea
               ref="inputRef"
               type="text"
-              :value="value"
+              :value="value ?? undefined"
               @input="handleInput"
               @focus="handleFocus"
               @blur="handleBlur"
@@ -200,12 +208,14 @@ const underlineHeight = computed(() =>
               :onkeypress="handleKeyPress"
               :on-paste="handlePaste"
               class="field"
+              :rows="exists(lineCount) ? lineCount : undefined"
+              :wrap="lineCount !== 1 ? `soft` : undefined"
               :style="{
                 padding: 0,
                 margin: 0,
-                height: numToFontSize(
-                  typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
-                ),
+                // height: numToFontSize(
+                //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
+                // ),
                 lineHeight:
                   typeof sty.scale === `string`
                     ? sty.scale
@@ -238,11 +248,11 @@ const underlineHeight = computed(() =>
     </Box>
 
     <!-- Blank -->
-    <input
+    <textarea
       v-else
       ref="inputRef"
       type="text"
-      :value="value"
+      :value="value ?? undefined"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -250,13 +260,15 @@ const underlineHeight = computed(() =>
       :onkeypress="handleKeyPress"
       :on-paste="handlePaste"
       class="field"
+      :rows="exists(lineCount) ? lineCount : undefined"
+      :wrap="lineCount !== 1 ? `soft` : undefined"
       :style="{
         padding: 0,
         margin: 0,
         overflowY: `visible`,
-        height: numToFontSize(
-          typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
-        ),
+        // height: numToFontSize(
+        //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
+        // ),
         lineHeight:
           typeof sty.scale === `string`
             ? sty.scale
