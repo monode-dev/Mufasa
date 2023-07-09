@@ -197,7 +197,8 @@ const underlineHeight = computed(() =>
           <Box :sty="{ width: 0.25 }" />
 
           <Box :sty="{ width: `1f` }">
-            <textarea
+            <input
+              v-if="lineCount === 1"
               ref="inputRef"
               type="text"
               :value="value ?? undefined"
@@ -213,6 +214,36 @@ const underlineHeight = computed(() =>
               :style="{
                 padding: 0,
                 margin: 0,
+                overflowY: `visible`,
+                // height: numToFontSize(
+                //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
+                // ),
+                lineHeight:
+                  typeof sty.scale === `string`
+                    ? sty.scale
+                    : sizeToCss(sty.scale ?? scale),
+                [`--placeholder-color`]: hintColor,
+                caretColor: $mdColors.green,
+              }"
+            />
+            <textarea
+              v-else
+              ref="inputRef"
+              type="text"
+              :value="value ?? undefined"
+              @input="handleInput"
+              @focus="handleFocus"
+              @blur="handleBlur"
+              :placeholder="hint"
+              :onkeypress="handleKeyPress"
+              :on-paste="handlePaste"
+              class="field"
+              :rows="exists(lineCount) ? lineCount : undefined"
+              :wrap="lineCount !== 1 ? `soft` : undefined"
+              :style="{
+                padding: 0,
+                margin: 0,
+                overflowY: `visible`,
                 // height: numToFontSize(
                 //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
                 // ),
@@ -248,35 +279,66 @@ const underlineHeight = computed(() =>
     </Box>
 
     <!-- Blank -->
-    <textarea
-      v-else
-      ref="inputRef"
-      type="text"
-      :value="value ?? undefined"
-      @input="handleInput"
-      @focus="handleFocus"
-      @blur="handleBlur"
-      :placeholder="hint"
-      :onkeypress="handleKeyPress"
-      :on-paste="handlePaste"
-      class="field"
-      :rows="exists(lineCount) ? lineCount : undefined"
-      :wrap="lineCount !== 1 ? `soft` : undefined"
-      :style="{
-        padding: 0,
-        margin: 0,
-        overflowY: `visible`,
-        // height: numToFontSize(
-        //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
-        // ),
-        lineHeight:
-          typeof sty.scale === `string`
-            ? sty.scale
-            : sizeToCss(sty.scale ?? scale),
-        [`--placeholder-color`]: hintColor,
-        caretColor: $mdColors.green,
-      }"
-    />
+    <template v-else>
+      <input
+        v-if="lineCount === 1"
+        ref="inputRef"
+        type="text"
+        :value="value ?? undefined"
+        @input="handleInput"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        :placeholder="hint"
+        :onkeypress="handleKeyPress"
+        :on-paste="handlePaste"
+        class="field"
+        :rows="exists(lineCount) ? lineCount : undefined"
+        :wrap="lineCount !== 1 ? `soft` : undefined"
+        :style="{
+          padding: 0,
+          margin: 0,
+          overflowY: `visible`,
+          // height: numToFontSize(
+          //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
+          // ),
+          lineHeight:
+            typeof sty.scale === `string`
+              ? sty.scale
+              : sizeToCss(sty.scale ?? scale),
+          [`--placeholder-color`]: hintColor,
+          caretColor: $mdColors.green,
+        }"
+      />
+      <textarea
+        v-else
+        ref="inputRef"
+        type="text"
+        :value="value ?? undefined"
+        @input="handleInput"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        :placeholder="hint"
+        :onkeypress="handleKeyPress"
+        :on-paste="handlePaste"
+        class="field"
+        :rows="exists(lineCount) ? lineCount : undefined"
+        :wrap="lineCount !== 1 ? `soft` : undefined"
+        :style="{
+          padding: 0,
+          margin: 0,
+          overflowY: `visible`,
+          // height: numToFontSize(
+          //   typeof sty.scale === `string` ? 1 : sty.scale ?? scale,
+          // ),
+          lineHeight:
+            typeof sty.scale === `string`
+              ? sty.scale
+              : sizeToCss(sty.scale ?? scale),
+          [`--placeholder-color`]: hintColor,
+          caretColor: $mdColors.green,
+        }"
+      />
+    </template>
   </Row>
 </template>
 
