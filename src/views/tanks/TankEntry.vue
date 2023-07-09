@@ -52,10 +52,11 @@ function deletePressed() {
       v-model:shape="tank.shape"
       v-model:length="tank.length"
       v-model:depth="tank.depth"
-      v-model:topDepth="tank.shortDepth"
+      v-model:topDepth="tank.topDepth"
       v-model:fullDepth="tank.fullDepth"
       v-model:height="tank.height"
-      v-model:wideHeight="tank.shortHeight"
+      v-model:squareHeight="tank.squareHeight"
+      v-model:wideHeight="tank.wideHeight"
       v-model:fullHeight="tank.fullHeight"
       v-model:diameter="tank.diameter"
     />

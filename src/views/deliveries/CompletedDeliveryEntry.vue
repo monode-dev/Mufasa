@@ -153,7 +153,7 @@ function formatPosixTime(posixTime: number) {
               Math.round(
                 (delivery.quantity ?? 0) * (delivery.completedRate ?? 0) * 100,
               ) / 100
-            ).toFixed(2)
+            ).toFixed(4)
           }}</Text
         ></Label
       >

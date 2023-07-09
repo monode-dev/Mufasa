@@ -58,9 +58,14 @@ const _tankShapes: {
   oval: {
     nameLong: `Oval`,
     nameShort: `Oval`,
-    dimensions: [`length`, `depth`, `height`], //[`length`, `depth`, `fullHeight`, `squareHeight`]
+    dimensions: [`length`, `depth`, `fullHeight`, `squareHeight`],
     calcFilledVolume(tank, stickedInches) {
-      for (const dimension of [`length`, `depth`, `height`] as const) {
+      for (const dimension of [
+        `length`,
+        `depth`,
+        `fullHeight`,
+        `squareHeight`,
+      ] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
           return undefined;
         }
@@ -68,42 +73,50 @@ const _tankShapes: {
       if (!exists(stickedInches)) return undefined;
 
       // Compute relevant tank info
-      const radius = tank?.depth! / 2; // radius of the half-circles
-      const rectangularPartHeight = tank?.height! - tank?.depth!;
+      const ellipseHeight = tank?.fullHeight! - tank?.squareHeight!;
 
       // Distribute the fuel between the parts
       let undistributedFuel = stickedInches;
-      let inchesInCircle = Math.min(undistributedFuel, radius);
-      undistributedFuel = Math.max(undistributedFuel - inchesInCircle, 0);
+      let inchesInEllipse = Math.min(undistributedFuel, ellipseHeight / 2);
+      undistributedFuel = Math.max(undistributedFuel - inchesInEllipse, 0);
       const inchesInRectangle = Math.min(
         undistributedFuel,
-        rectangularPartHeight,
+        tank?.squareHeight!,
       );
       undistributedFuel = Math.max(undistributedFuel - inchesInRectangle, 0);
-      inchesInCircle += Math.min(undistributedFuel, radius);
-      undistributedFuel = Math.max(undistributedFuel - inchesInCircle, 0);
+      inchesInEllipse += Math.min(undistributedFuel, ellipseHeight / 2);
+      undistributedFuel = Math.max(undistributedFuel - inchesInEllipse, 0);
 
       // Calculate the volume of the filled parts
-      const circleArea = calcCircleSegmentArea(tank?.depth!, inchesInCircle);
+      const ellipseArea = calcEllipseSegmentArea(
+        tank?.depth!,
+        ellipseHeight,
+        inchesInEllipse,
+      );
       const rectangleArea = inchesInRectangle * tank?.depth!;
-      const filledArea = circleArea + rectangleArea;
+      const filledArea = ellipseArea + rectangleArea;
       return (filledArea * tank?.length!) / CUBIC_INCHES_PER_GALLON;
     },
     calcTotalVolume(tank) {
-      for (const dimension of [`length`, `depth`, `height`] as const) {
+      for (const dimension of [
+        `length`,
+        `depth`,
+        `fullHeight`,
+        `squareHeight`,
+      ] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
           return undefined;
         }
       }
 
-      const halfDepth = tank?.depth! / 2; // radius of the half-circles
-      const rectangularPartHeight = tank?.height! - tank?.depth!;
-      const totalVolume =
-        (Math.PI * Math.pow(halfDepth, 2) +
-          rectangularPartHeight * tank?.depth!) *
-        tank?.length!;
+      const ellipseHeight = tank?.fullHeight! - tank?.squareHeight!;
+      const ellipseArea = calcEllipseArea(tank?.depth!, ellipseHeight);
+      const rectangleArea = tank?.squareHeight! * tank?.depth!;
 
-      return totalVolume / CUBIC_INCHES_PER_GALLON;
+      return (
+        ((rectangleArea + ellipseArea) * tank?.length!) /
+        CUBIC_INCHES_PER_GALLON
+      );
     },
   },
   rectangle: {
@@ -173,22 +186,11 @@ const _tankShapes: {
         }
       }
       if (!exists(stickedInches)) return undefined;
-      // See: https://www.had2know.org/academics/ellipse-segment-tank-volume-calculator.html
-      const shouldMeasureEmptySpaceInstead = stickedInches > tank?.height! / 2;
-      const segmentHeight = shouldMeasureEmptySpaceInstead
-        ? tank?.height! - stickedInches
-        : stickedInches;
-      let area =
-        ((tank?.height! * tank?.depth!) / 4) *
-        (Math.acos(1 - (2 * segmentHeight) / tank?.height!) -
-          (1 - (2 * segmentHeight) / tank?.height!) *
-            Math.sqrt(
-              (4 * segmentHeight) / tank?.height! -
-                (4 * Math.pow(segmentHeight, 2)) / Math.pow(tank?.height!, 2),
-            ));
-      if (shouldMeasureEmptySpaceInstead) {
-        area = (Math.PI * tank?.height! * tank?.depth!) / 4 - area; // Area of the filled space
-      }
+      const area = calcEllipseSegmentArea(
+        tank?.depth!,
+        tank?.height!,
+        stickedInches,
+      );
       return (tank?.length! * area) / CUBIC_INCHES_PER_GALLON;
     },
     calcTotalVolume(tank) {
@@ -198,7 +200,7 @@ const _tankShapes: {
         }
       }
       return (
-        (((Math.PI * tank?.height! * tank?.depth!) / 4) * tank?.length!) /
+        (calcEllipseArea(tank?.depth!, tank?.height!) * tank?.length!) /
         CUBIC_INCHES_PER_GALLON
       );
     },
@@ -277,7 +279,7 @@ export function getDimensionLabel(dimension: TankDimension): string {
     case `fullHeight`:
       return `Full Height`;
     case `squareHeight`:
-      return `Square Height`;
+      return `Rect. Height`;
     case `wideHeight`:
       return `Wide Height`;
     case `diameter`:
@@ -302,6 +304,34 @@ export function calcGallonsToReachPercent(
   const totalVolume = tankShape.calcTotalVolume(tank);
   if (!exists(totalVolume)) return undefined;
   return Math.max(0, totalVolume * targetPercent - currentFill);
+}
+
+function calcEllipseArea(depth: number, height: number): number {
+  return (Math.PI * height * depth) / 4;
+}
+
+function calcEllipseSegmentArea(
+  depth: number,
+  height: number,
+  stickedInches: number,
+): number {
+  // See: https://www.had2know.org/academics/ellipse-segment-tank-volume-calculator.html
+  const shouldMeasureEmptySpaceInstead = stickedInches > height / 2;
+  const segmentHeight = shouldMeasureEmptySpaceInstead
+    ? height - stickedInches
+    : stickedInches;
+  let area =
+    ((height * depth) / 4) *
+    (Math.acos(1 - (2 * segmentHeight) / height) -
+      (1 - (2 * segmentHeight) / height) *
+        Math.sqrt(
+          (4 * segmentHeight) / height -
+            (4 * Math.pow(segmentHeight, 2)) / Math.pow(height, 2),
+        ));
+  if (shouldMeasureEmptySpaceInstead) {
+    area = (Math.PI * height * depth) / 4 - area; // Area of the filled space
+  }
+  return area;
 }
 
 function calcCircleSegmentArea(

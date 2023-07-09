@@ -160,7 +160,19 @@ function selectOption(option: Option) {
         <!-- Text -->
         <Row
           ref="openDropDownButtonRef"
-          :onClick="openDropDown"
+          :onClick="
+            () => {
+              if (exists(filterOptions)) {
+                openDropDown();
+              } else {
+                if (dropDownIsOpen) {
+                  dropDownIsOpen = false;
+                } else {
+                  openDropDown();
+                }
+              }
+            }
+          "
           :sty="{
             width: `1f`,
             height: sty.scale ?? 1,
@@ -223,7 +235,12 @@ function selectOption(option: Option) {
             ref="dropDownModalRef"
             :sty="{
               width: `1f`,
-              height: Math.min(2.5 + 1.75 * allOptions.length, 15.65),
+              height: Math.min(
+                2.5 +
+                  1.75 * allOptions.length -
+                  (!exists(filterOptions) ? 1.75 : 0),
+                15.65,
+              ),
               overflowY: $Overflow.scroll,
               pad: 0.75,
               shadowSize: 1,
