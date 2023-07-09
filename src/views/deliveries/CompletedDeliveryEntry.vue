@@ -124,7 +124,7 @@ function formatPosixTime(posixTime: number) {
         padBetween: 0.25,
       }"
     >
-      <Label label="Amount"
+      <Label label="Quantity"
         ><Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }"
           >{{ delivery.quantity }} Gal.</Text
         ></Label

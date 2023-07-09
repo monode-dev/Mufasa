@@ -48,7 +48,7 @@ const tank = ref<Tank | null>(
 );
 const deliveryLabel = ref(deliveryToEdit.value?.deliveryLabel ?? ``);
 const fuelType = ref(tank.value?.fuelType ?? null);
-const amount = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
+const quantity = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
 
 const deliveryIsValid = computed(() =>
   isUpcomingDeliveryValid({
@@ -59,7 +59,7 @@ const deliveryIsValid = computed(() =>
     upcomingExistingTank: tank.value,
     deliveryLabel: deliveryLabel.value,
     fuelType: fuelType.value,
-    quantity: amount.value ?? undefined,
+    quantity: quantity.value ?? undefined,
   }),
 );
 
@@ -103,14 +103,14 @@ function handleYes() {
       upcomingExistingTank: tank.value,
       deliveryLabel: deliveryLabel.value,
       fuelType: fuelType.value,
-      quantity: amount.value!,
+      quantity: quantity.value!,
     });
   } else if (props.dialogType === `edit`) {
     deliveryToEdit.value!.upcomingExistingClient = client.value;
     deliveryToEdit.value!.upcomingExistingTank = tank.value;
     deliveryToEdit.value!.deliveryLabel = deliveryLabel.value;
     deliveryToEdit.value!.fuelType = fuelType.value;
-    deliveryToEdit.value!.quantity = amount.value!;
+    deliveryToEdit.value!.quantity = quantity.value!;
   }
 }
 
@@ -198,11 +198,11 @@ export default {
         v-model:fuelType="fuelType"
       />
 
-      <!-- Amount -->
-      <Label label="Amount"
+      <!-- Quantity -->
+      <Label label="Quantity"
         ><NumField
           :negativesAreAllowed="false"
-          v-model:value="amount"
+          v-model:value="quantity"
           underlined
           hint="gal."
       /></Label>
