@@ -159,20 +159,17 @@ export function canCompleteDelivery(delivery: Delivery): boolean {
 export function completeDelivery(delivery: Delivery): void {
   if (!canCompleteDelivery(delivery)) return;
   if (delivery.deliveryFormat === `upcomingFromExisting`) {
-    delivery.completedClientLabel = getClientLabel(
-      delivery.upcomingExistingClient,
-    );
+    delivery.deliveryLabel = getClientLabel(delivery.upcomingExistingClient);
     delivery.completedFuelTypeName =
       delivery.upcomingExistingTank!.fuelType!.name!;
     delivery.completedRate = delivery.upcomingExistingTank!.fuelType!.rate!;
-    delivery.completedTimePosix = Date.now();
-    delivery.deliveryFormat = `completed`;
   }
   if (delivery.deliveryFormat === `upcomingFromOneTime`) {
-    delivery.completedClientLabel = delivery.upcomingOneTimeClientName;
     delivery.completedFuelTypeName = delivery.upcomingOneTimeFuelType!.name!;
     delivery.completedRate = delivery.upcomingOneTimeFuelType!.rate!;
   }
+  delivery.completedTimePosix = Date.now();
+  delivery.deliveryFormat = `completed`;
 }
 export function listUpcomingDeliveries(allDeliveries: List<Delivery>) {
   return orderDocs(
@@ -185,12 +182,17 @@ export function isUpcomingDeliveryValid(
 ): boolean {
   return (
     exists(delivery) &&
-    exists(delivery.upcomingExistingClient) &&
-    exists(delivery.upcomingExistingTank) &&
-    // A simple way to make sure something important hasn't been deleted
-    isTankValid(delivery.upcomingExistingTank) &&
+    exists(delivery?.deliveryFormat) &&
     exists(delivery.quantity) &&
-    delivery.quantity > 0
+    delivery.quantity > 0 &&
+    ((delivery?.deliveryFormat === `upcomingFromExisting` &&
+      exists(delivery.upcomingExistingClient) &&
+      exists(delivery.upcomingExistingTank) &&
+      // A simple way to make sure something important hasn't been deleted
+      isTankValid(delivery.upcomingExistingTank)) ||
+      (delivery?.deliveryFormat === `upcomingFromOneTime` &&
+        exists(delivery.upcomingOneTimeFuelType) &&
+        isFuelTypeValid(delivery.upcomingOneTimeFuelType)))
   );
 }
 export function listCompletedDeliveries(
@@ -278,11 +280,10 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
           upcomingExistingTank: defOne(`Tank`, null),
 
           // Upcoming from one-time client
-          upcomingOneTimeClientName: defPrim<string>(``),
           upcomingOneTimeFuelType: defOne(`FuelType`, null),
 
           // Completed
-          completedClientLabel: defPrim<string>(``),
+          deliveryLabel: defPrim<string>(``),
           completedTimePosix: defPrim<number | null>(null),
           completedFuelTypeName: defPrim<string>(``),
           completedRate: defPrim<number>(0),

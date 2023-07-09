@@ -115,7 +115,7 @@ function formatPosixTime(posixTime: number) {
 
     <Label label="Client">
       <Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }">{{
-        delivery.completedClientLabel
+        delivery.deliveryLabel
       }}</Text>
     </Label>
 

@@ -36,18 +36,29 @@ const appData = getAppData();
 
 const cardRef = ref<VNodeRef | null>(null);
 
+const isExistingDelivery = ref(
+  (deliveryToEdit.value?.deliveryFormat ?? `upcomingFromExisting`) ===
+    `upcomingFromExisting`,
+);
 const client = ref<Client | null>(
   deliveryToEdit.value?.upcomingExistingClient ?? null,
 );
 const tank = ref<Tank | null>(
   deliveryToEdit.value?.upcomingExistingTank ?? null,
 );
+const deliveryLabel = ref(deliveryToEdit.value?.deliveryLabel ?? ``);
+const fuelType = ref(tank.value?.fuelType ?? null);
 const amount = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
 
 const deliveryIsValid = computed(() =>
   isUpcomingDeliveryValid({
+    deliveryFormat: isExistingDelivery.value
+      ? `upcomingFromExisting`
+      : `upcomingFromOneTime`,
     upcomingExistingClient: client.value,
     upcomingExistingTank: tank.value,
+    deliveryLabel: deliveryLabel.value,
+    upcomingOneTimeFuelType: fuelType.value,
     quantity: amount.value ?? undefined,
   }),
 );
@@ -79,13 +90,20 @@ function handleYes() {
   closePopUp();
   if (props.dialogType === `create`) {
     appData.deliveries.add({
-      upcomingExistingClient: client.value!,
-      upcomingExistingTank: tank.value!,
+      deliveryFormat: isExistingDelivery.value
+        ? `upcomingFromExisting`
+        : `upcomingFromOneTime`,
+      upcomingExistingClient: client.value,
+      upcomingExistingTank: tank.value,
+      deliveryLabel: deliveryLabel.value,
+      upcomingOneTimeFuelType: fuelType.value,
       quantity: amount.value!,
     });
   } else if (props.dialogType === `edit`) {
-    deliveryToEdit.value!.upcomingExistingClient = client.value!;
-    deliveryToEdit.value!.upcomingExistingTank = tank.value!;
+    deliveryToEdit.value!.upcomingExistingClient = client.value;
+    deliveryToEdit.value!.upcomingExistingTank = tank.value;
+    deliveryToEdit.value!.deliveryLabel = deliveryLabel.value;
+    deliveryToEdit.value!.upcomingOneTimeFuelType = fuelType.value;
     deliveryToEdit.value!.quantity = amount.value!;
   }
 }
@@ -129,8 +147,50 @@ export default {
         >{{ dialogType === `create` ? `Create` : `Edit` }} Delivery</Text
       >
 
+      <Row
+        :sty="{
+          width: `1f`,
+          align: $Align.spaceAround,
+          //align: $Align.spaceBetween,
+        }"
+      >
+        <Button
+          pill
+          :outlined="!isExistingDelivery"
+          :onClick="
+            () => {
+              isExistingDelivery = true;
+            }
+          "
+          >From Client</Button
+        >
+        <Button
+          pill
+          :outlined="isExistingDelivery"
+          :onClick="
+            () => {
+              isExistingDelivery = false;
+            }
+          "
+          >One Time</Button
+        >
+      </Row>
+
       <!-- Client & Tank -->
-      <ClientAndTankSelector v-model:client="client" v-model:tank="tank" />
+      <ClientAndTankSelector
+        v-if="isExistingDelivery"
+        v-model:client="client"
+        v-model:tank="tank"
+      />
+
+      <!-- Label & Fuel -->
+      <Label label="Label" v-if="!isExistingDelivery"
+        ><Field v-model:value="deliveryLabel" underlined hint="Optional Label"
+      /></Label>
+      <FuelTypeDropDown
+        v-if="!isExistingDelivery"
+        v-model:fuelType="fuelType"
+      />
 
       <!-- Amount -->
       <Label label="Amount"
@@ -153,9 +213,12 @@ export default {
         >
       </Row>
     </Card>
-    <Box />
-    <Text v-if="relatedDeliveriesCount > 0" title>Related Deliveries</Text>
+    <Box v-if="isExistingDelivery" />
+    <Text v-if="isExistingDelivery && relatedDeliveriesCount > 0" title
+      >Related Deliveries</Text
+    >
     <CompletedDeliveryEntry
+      v-if="isExistingDelivery"
       v-for="delivery in relatedDeliveries"
       :key="delivery._firestoreRef?.path"
       :delivery="delivery"

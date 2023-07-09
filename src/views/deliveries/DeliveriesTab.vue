@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  UpcomingExistingDelivery,
   getAppData,
   listCompletedDeliveries,
   listUpcomingDeliveries,
@@ -11,7 +10,7 @@ import { computed } from "vue";
 
 const appData = getAppData();
 
-const upcomiingDeliveries = computed(() =>
+const upcomingDeliveries = computed(() =>
   listUpcomingDeliveries(appData.deliveries),
 );
 const completedDeliveries = computed(() =>
@@ -33,13 +32,13 @@ const completedDeliveries = computed(() =>
         />
       </Box>
     </Row>
-    <Text v-if="upcomiingDeliveries.length === 0" hint
+    <Text v-if="upcomingDeliveries.length === 0" hint
       >No Upcoming Deliveries</Text
     >
     <UpcomingDeliveryEntry
-      v-for="(delivery, index) in upcomiingDeliveries"
+      v-for="(delivery, index) in upcomingDeliveries"
       :key="delivery._firestoreRef?.path ?? index"
-      :delivery="(delivery as UpcomingExistingDelivery)"
+      :delivery="delivery"
     />
 
     <!-- Competed Deliveries -->

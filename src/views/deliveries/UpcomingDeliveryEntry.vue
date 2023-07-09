@@ -1,24 +1,28 @@
 <script setup lang="ts">
-import {
-  getAppData,
-  UpcomingExistingDelivery,
-  getClientLabel,
-  getTankLabel,
-} from "@/AppData";
+import { getAppData, getClientLabel, getTankLabel, Delivery } from "@/AppData";
 import { pushPage } from "@/Nav";
-import { PropType } from "vue";
+import { PropType, computed, watchEffect } from "vue";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
 import UpcomingDeliveryDialog from "./UpcomingDelivery.dialog.vue";
 
 const props = defineProps({
   delivery: {
-    type: Object as PropType<UpcomingExistingDelivery>,
+    type: Object as PropType<Delivery>,
     required: true,
   },
 });
 
 const appData = getAppData();
+
+const isExistingDelivery = computed(
+  () => props.delivery.deliveryFormat === `upcomingFromExisting`,
+);
+const deliveryLabel = computed(() =>
+  isExistingDelivery.value
+    ? getClientLabel(props.delivery.upcomingExistingClient)
+    : props.delivery.deliveryLabel,
+);
 
 function handleEdit() {
   pushPage(UpcomingDeliveryDialog, {
@@ -55,7 +59,7 @@ function handleDelete() {
           overflowX: $Overflow.crop,
         }"
       >
-        {{ getClientLabel(props.delivery.upcomingExistingClient) }}
+        {{ deliveryLabel }}
       </Text>
       <DeleteOptionsButton
         @delete="handleDelete"
@@ -66,19 +70,21 @@ function handleDelete() {
       />
     </Row>
     <Row :sty="{ width: `1f`, padBetween: 0.25 }">
-      <Row :sty="{ width: `2f`, padBetween: 0.25 }">
-        <Text :sty="{ width: `1f` }"
-          >{{ props.delivery.quantity }} Gallons</Text
-        >
-        to</Row
+      <Row :sty="{ width: isExistingDelivery ? `2f` : `1f`, padBetween: 0.25 }">
+        <Text :sty="{ width: `1f` }">{{ props.delivery.quantity }} Gallons</Text
+        >{{ isExistingDelivery ? `to` : `of` }}</Row
       >
       <Text
         :sty="{
-          width: `3f`,
+          width: isExistingDelivery ? `3f` : `1f`,
           overflowX: $Overflow.crop,
         }"
       >
-        {{ getTankLabel(props.delivery.upcomingExistingTank) }}
+        {{
+          isExistingDelivery
+            ? getTankLabel(props.delivery.upcomingExistingTank)
+            : props.delivery.upcomingOneTimeFuelType?.name ?? `Unknown Fuel`
+        }}
       </Text>
     </Row>
   </Card>

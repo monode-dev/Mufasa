@@ -19,7 +19,7 @@ const cardRef = ref<VNodeRef | null>(null);
 const clientNameLabel = ref(
   props.dialogType === `complete`
     ? getClientLabel(props.delivery.upcomingExistingClient)
-    : props.delivery.completedClientLabel,
+    : props.delivery.deliveryLabel,
 );
 const quantity = ref(props.delivery.quantity ?? 0);
 const fuelTypeName = ref(
@@ -39,7 +39,7 @@ const rate = ref(
 function handleComplete() {
   // if (!deliveryIsValid.value && props.dialogType === `complete`) return;
   popPage();
-  props.delivery.completedClientLabel = clientNameLabel.value;
+  props.delivery.deliveryLabel = clientNameLabel.value;
   props.delivery.quantity = quantity.value;
   props.delivery.completedFuelTypeName = fuelTypeName.value;
   props.delivery.completedRate = rate.value;

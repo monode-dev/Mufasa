@@ -8,6 +8,7 @@ import {
   getClientLabel,
   Delivery,
   listUpcomingDeliveries,
+  isTankValid,
 } from "@/AppData";
 import { computed, ref, watchEffect } from "vue";
 import { exists, orderDocs } from "@/utils";
@@ -145,7 +146,7 @@ const gallonsToReachDesiredFill = computed(() =>
           }"
           :options="[
             //{ label: `None`, data: null },
-            ...listUpcomingDeliveries(appData.deliveries).map((x) => ({
+            ...listUpcomingDeliveries(appData.deliveries).filter((x) => exists(x.upcomingExistingTank) && isTankValid(x.upcomingExistingTank)).map((x) => ({
               label: `${getClientLabel((x as any)?.upcomingExistingClient)} - ${getTankLabel(
                 (x as any)?.upcomingExistingTank,
               )}`,
