@@ -21,7 +21,7 @@ const props = defineProps({
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
-  shortDepth: {
+  topDepth: {
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
@@ -33,7 +33,11 @@ const props = defineProps({
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
-  shortHeight: {
+  squareHeight: {
+    type: [Number, null, undefined] as PropType<number | null | undefined>,
+    required: true,
+  },
+  wideHeight: {
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
@@ -45,16 +49,21 @@ const props = defineProps({
     type: [Number, null, undefined] as PropType<number | null | undefined>,
     required: true,
   },
+  singleFile: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
   "update:shape",
   "update:length",
   "update:depth",
-  "update:shortDepth",
+  "update:topDepth",
   "update:fullDepth",
   "update:height",
-  "update:shortHeight",
+  "update:squareHeight",
+  "update:wideHeight",
   "update:fullHeight",
   "update:diameter",
 ]);
@@ -82,10 +91,11 @@ const dimensionHintText = `in.`;
     ]"
   />
   <!-- We need these to be one-per line for the tank dialog. -->
-  <Row
+  <Box
     v-if="exists(shape) && dimensions.length > 0"
     :sty="{
       width: `1f`,
+      axis: singleFile ? $Axis.column : $Axis.row,
       padBetween: 1,
     }"
   >
@@ -123,11 +133,12 @@ const dimensionHintText = `in.`;
       />
     </Label>
     <Box v-else :sty="{ width: `1f` }" />
-  </Row>
-  <Row
+  </Box>
+  <Box
     v-if="exists(shape) && dimensions.length > 2"
     :sty="{
       width: `1f`,
+      axis: singleFile ? $Axis.column : $Axis.row,
       padBetween: 1,
     }"
   >
@@ -163,11 +174,12 @@ const dimensionHintText = `in.`;
         }"
     /></Label>
     <Box v-else :sty="{ width: `1f` }" />
-  </Row>
-  <Row
+  </Box>
+  <Box
     v-if="exists(shape) && dimensions.length > 4"
     :sty="{
       width: `1f`,
+      axis: singleFile ? $Axis.column : $Axis.row,
       padBetween: 1,
     }"
   >
@@ -203,5 +215,5 @@ const dimensionHintText = `in.`;
         }"
     /></Label>
     <Box v-else :sty="{ width: `1f` }" />
-  </Row>
+  </Box>
 </template>

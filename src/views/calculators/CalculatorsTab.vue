@@ -3,20 +3,18 @@ import {
   getAppData,
   Client,
   Tank,
-  UpcomingExistingDelivery,
   getTankLabel,
   getClientLabel,
   Delivery,
   listUpcomingDeliveries,
   isTankValid,
 } from "@/AppData";
-import { computed, ref, watchEffect } from "vue";
-import { exists, orderDocs } from "@/utils";
+import { computed, ref } from "vue";
+import { exists } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import {
   calcGallonsToReachPercent,
   TankShapeId,
-  TANK_SHAPE_IDS,
   getTankShape,
 } from "@/views/tanks/ShapeUtils";
 
@@ -36,7 +34,7 @@ const toDimensionsTab = () => {
 };
 
 // Delivery
-const delivery = ref<UpcomingExistingDelivery | null>(null);
+const delivery = ref<Delivery | null>(null);
 
 // Tank
 const client = ref<Client | null>(null);
@@ -46,10 +44,11 @@ const tank = ref<Tank | null>(null);
 const dimTankShape = ref<TankShapeId | null>(null);
 const dimLength = ref<number | null>(null);
 const dimDepth = ref<number | null>(null);
-const dimShortDepth = ref<number | null>(null);
+const dimTopDepth = ref<number | null>(null);
 const dimFullDepth = ref<number | null>(null);
 const dimHeight = ref<number | null>(null);
-const dimShortHeight = ref<number | null>(null);
+const dimSquareHeight = ref<number | null>(null);
+const dimWideHeight = ref<number | null>(null);
 const dimFullHeight = ref<number | null>(null);
 const dimDiameter = ref<number | null>(null);
 
@@ -74,10 +73,11 @@ const pseudoTank = computed(() => {
         shape: dimTankShape.value,
         length: dimLength.value,
         depth: dimDepth.value,
-        shortDepth: dimShortDepth.value,
+        topDepth: dimTopDepth.value,
         fullDepth: dimFullDepth.value,
         height: dimHeight.value,
-        shortHeight: dimShortHeight.value,
+        squareHeight: dimSquareHeight.value,
+        wideHeight: dimWideHeight.value,
         fullHeight: dimFullHeight.value,
         diameter: dimDiameter.value,
       };
@@ -165,10 +165,11 @@ const gallonsToReachDesiredFill = computed(() =>
         v-model:shape="dimTankShape"
         v-model:length="dimLength"
         v-model:depth="dimDepth"
-        v-model:shortDepth="dimShortDepth"
+        v-model:topDepth="dimTopDepth"
         v-model:fullDepth="dimFullDepth"
         v-model:height="dimHeight"
-        v-model:shortHeight="dimShortHeight"
+        v-model:squareHeight="dimSquareHeight"
+        v-model:wideHeight="dimWideHeight"
         v-model:fullHeight="dimFullHeight"
         v-model:diameter="dimDiameter"
       />

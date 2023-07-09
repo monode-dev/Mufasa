@@ -20,10 +20,11 @@ const fuelType = ref<FuelType | null>(null);
 const shape = ref<TankShapeId | null>(null);
 const length = ref<number | null>(null);
 const depth = ref<number | null>(null);
-const shortDepth = ref<number | null>(null);
+const topDepth = ref<number | null>(null);
 const fullDepth = ref<number | null>(null);
 const height = ref<number | null>(null);
-const shortHeight = ref<number | null>(null);
+const squareHeight = ref<number | null>(null);
+const wideHeight = ref<number | null>(null);
 const fullHeight = ref<number | null>(null);
 const diameter = ref<number | null>(null);
 const optionalLabel = ref<string>(``);
@@ -32,10 +33,11 @@ const computedTank = computed(() => ({
   shape: shape.value,
   length: length.value,
   depth: depth.value,
-  shortDepth: shortDepth.value,
+  topDepth: topDepth.value,
   fullDepth: fullDepth.value,
   height: height.value,
-  shortHeight: shortHeight.value,
+  squareHeight: squareHeight.value,
+  wideHeight: wideHeight.value,
   fullHeight: fullHeight.value,
   diameter: diameter.value,
   optionalLabel: optionalLabel.value,
@@ -89,13 +91,15 @@ export default {
       <Text title>Create Tank</Text>
       <FuelTypeDropDown v-model:fuelType="fuelType" />
       <TankFields
+        singleFile
         v-model:shape="shape"
         v-model:length="length"
         v-model:depth="depth"
-        v-model:shortDepth="shortDepth"
+        v-model:topDepth="topDepth"
         v-model:fullDepth="fullDepth"
         v-model:height="height"
-        v-model:shortHeight="shortHeight"
+        v-model:squareHeight="squareHeight"
+        v-model:wideHeight="wideHeight"
         v-model:fullHeight="fullHeight"
         v-model:diameter="diameter"
       />
