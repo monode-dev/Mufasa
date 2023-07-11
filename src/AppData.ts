@@ -1,6 +1,6 @@
 import { Doc, List, defineAppDataStructure } from "./mufasa/Implement";
 import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
-import { exists, orderDocs } from "./utils";
+import { exists, roundToString, orderDocs, formatNumWithCommas } from "./utils";
 import { TankShapeId, getTankShape } from "@/views/tanks/ShapeUtils";
 import { computed, isRef, ref, watchEffect } from "vue";
 
@@ -71,7 +71,7 @@ export function getTankLabel(tank: Partial<Tank> | null | undefined): string {
   const fuelName = tank?.fuelType?.name;
   const volume = shapeUtils?.calcTotalVolume(tank);
   const shapeName = shapeUtils?.nameShort;
-  return `${fuelName} - ${Math.round(volume!)} Gal. - ${shapeName}${
+  return `${fuelName} - ${formatNumWithCommas(volume!)} Gal. - ${shapeName}${
     exists(tank?.optionalLabel) && tank?.optionalLabel?.trim() !== ``
       ? ` - ${tank?.optionalLabel}`
       : ``

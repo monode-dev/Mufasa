@@ -10,7 +10,7 @@ import {
   isTankValid,
 } from "@/AppData";
 import { computed, ref } from "vue";
-import { exists } from "@/utils";
+import { exists, formatNumWithCommas, roundToString } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import {
   calcGallonsToReachPercent,
@@ -189,7 +189,7 @@ const gallonsToReachDesiredFill = computed(() =>
         >
           {{
             exists(currentFillPercent) && !isNaN(currentFillPercent)
-              ? `${Math.round(100 * currentFillPercent)}%`
+              ? `${roundToString(100 * currentFillPercent)}%`
               : emptyText
           }}</Label
         >
@@ -199,7 +199,7 @@ const gallonsToReachDesiredFill = computed(() =>
         >
           {{
             exists(currentGallons) && !isNaN(currentGallons)
-              ? Math.round(currentGallons)
+              ? formatNumWithCommas(currentGallons)
               : emptyText
           }}</Label
         >
@@ -222,7 +222,7 @@ const gallonsToReachDesiredFill = computed(() =>
           label="Desired Fill"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
-          {{ Math.round(desiredFill * 100) }}%</Label
+          {{ roundToString(desiredFill * 100) }}%</Label
         >
         <Label
           label="Gallons to Add"
@@ -230,7 +230,7 @@ const gallonsToReachDesiredFill = computed(() =>
           >{{
             exists(gallonsToReachDesiredFill) &&
             !isNaN(gallonsToReachDesiredFill)
-              ? Math.round(gallonsToReachDesiredFill).toString()
+              ? formatNumWithCommas(gallonsToReachDesiredFill)
               : emptyText
           }}</Label
         >

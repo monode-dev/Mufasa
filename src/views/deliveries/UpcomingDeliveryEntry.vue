@@ -2,6 +2,7 @@
 import { getAppData, getClientLabel, getTankLabel, Delivery } from "@/AppData";
 import { pushPage } from "@/Nav";
 import { PropType, computed, watchEffect } from "vue";
+import { formatNumWithCommas } from "@/utils";
 import DeleteDialog from "../components/DeleteDialog.vue";
 import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
 import UpcomingDeliveryDialog from "./UpcomingDelivery.dialog.vue";
@@ -71,7 +72,11 @@ function handleDelete() {
     </Row>
     <Row :sty="{ width: `1f`, padBetween: 0.25 }">
       <Row :sty="{ width: isExistingDelivery ? `2f` : `1f`, padBetween: 0.25 }">
-        <Text :sty="{ width: `1f` }">{{ props.delivery.quantity }} Gallons</Text
+        <Text :sty="{ width: `1f` }"
+          >{{
+            formatNumWithCommas(delivery.quantity ?? 0, `min`)
+          }}
+          Gallons</Text
         >{{ isExistingDelivery ? `to` : `of` }}</Row
       >
       <Text

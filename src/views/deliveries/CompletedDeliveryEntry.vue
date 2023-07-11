@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Delivery } from "@/AppData";
 import { PropType } from "vue";
-import { exists } from "@/utils";
+import { exists, formatNumWithCommas } from "@/utils";
 import { pushPage } from "@/Nav";
 import CompleteDeliveryDialog from "./CompleteDelivery.dialog.vue";
 import DeleteDialogVue from "../components/DeleteDialog.vue";
@@ -126,7 +126,7 @@ function formatPosixTime(posixTime: number) {
     >
       <Label label="Gallons"
         ><Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }">{{
-          delivery.quantity
+          formatNumWithCommas(delivery.quantity ?? 0, `min`)
         }}</Text></Label
       >
       <Label label="Fuel"
@@ -149,11 +149,10 @@ function formatPosixTime(posixTime: number) {
       <Label label="Total"
         ><Text :sty="{ width: `1f`, align: $Align.centerLeft, height: 1 }"
           >${{
-            (
-              Math.round(
-                (delivery.quantity ?? 0) * (delivery.completedRate ?? 0) * 100,
-              ) / 100
-            ).toFixed(4)
+            formatNumWithCommas(
+              (delivery.quantity ?? 0) * (delivery.completedRate ?? 0),
+              4,
+            )
           }}</Text
         ></Label
       >

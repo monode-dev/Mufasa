@@ -22,10 +22,16 @@ export function sizeToCss(num: number | string) {
       getComputedStyle(document.documentElement).fontSize,
     );
     const pixelValue = remValue * fontSize;
-    return `${Math.round(pixelValue)}px`;
+    return `${roundToString(pixelValue)}px`;
   } else {
     return num;
   }
+}
+function roundToString(num: number, digits: number = 0): string {
+  // Sometimes there are rouding errors. adding a 0.000..01 on the end seems to reduce these.
+  const significantDecimals = num.toString().split(`.`)[1]?.length ?? 0;
+  const roundingOffset = Math.pow(10, -significantDecimals - 1);
+  return (num + roundingOffset).toFixed(digits);
 }
 
 export interface FlexSize {
