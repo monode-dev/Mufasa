@@ -15,6 +15,7 @@ import {
   doc,
   DocumentData,
   Firestore,
+  CollectionReference,
 } from "firebase/firestore";
 // import {
 //   getStorage,
@@ -57,6 +58,11 @@ let _watchEffect: (effect: () => void) => void;
 // Firebase
 let firestoreDb: Firestore;
 const MX_PARENT_KEY = `mx_parent`;
+let isProduction = false;
+function getCollectionRef(typeName: string): CollectionReference {
+  const collectionName = isProduction ? typeName : `Dev_${typeName}`;
+  return collection(firestoreDb, collectionName);
+}
 
 // async function getUuid() {
 //   return `${(await Device.getId()).uuid}-${Date.now()}`;
@@ -211,7 +217,7 @@ export function docProx<
         // Delete all sub docs
         for (const format of Object.values(objFormats[typeName])) {
           if (format.format === `many`) {
-            const collectionRef = collection(firestoreDb, format.typeName!);
+            const collectionRef = getCollectionRef(format.typeName!);
             const docs = await getDocs(
               query(collectionRef, where(MX_PARENT_KEY, "==", actualDocRef)),
             );
@@ -513,7 +519,7 @@ function listProx<
   propNameOnParent?: string,
 ) {
   // const chars = genRandomChars(10);
-  const collectionRef = collection(firestoreDb, typeName);
+  const collectionRef = getCollectionRef(typeName);
   // const collectionList = (() => {
   //   const collectionList = ref<T[]>([]);
   //   let lastSnapshot: QuerySnapshot | null = null;
@@ -779,7 +785,7 @@ function createCache(objFormats: ObjFormats) {
     }
   }
   for (const typeName in objFormats) {
-    const collectionRef = collection(firestoreDb, typeName);
+    const collectionRef = getCollectionRef(typeName);
     cache[typeName] = {
       docsChanged: _signal(0),
       docs: {},
@@ -945,6 +951,7 @@ export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
   _isSignal = reactivity.isSignal;
   _watchEffect = reactivity.watchEffect;
   // Setup Firebase
+  isProduction = options.isProduction;
   const firebasApp = initializeApp(firebaseOptions);
   firestoreDb = initializeFirestore(firebasApp, {
     cacheSizeBytes: CACHE_SIZE_UNLIMITED,
