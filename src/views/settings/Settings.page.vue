@@ -99,7 +99,7 @@ const appVersion = (() => {
 })();
 
 const productionText = computed(() => {
-  if (import.meta.env.NODE_ENV === "production") {
+  if (import.meta.env.PROD) {
     return "Production";
   } else {
     return "Development";
