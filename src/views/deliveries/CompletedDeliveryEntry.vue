@@ -151,7 +151,7 @@ function formatPosixTime(posixTime: number) {
           >${{
             formatNumWithCommas(
               (delivery.quantity ?? 0) * (delivery.completedRate ?? 0),
-              4,
+              2,
             )
           }}</Text
         ></Label
