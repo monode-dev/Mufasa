@@ -63,6 +63,7 @@ export default {
       <Column>
         <Box :sty="{ height: `1f` }" />
         <Column :sty="{ padBetween: 1 }">
+          <Text hint>Mode: {{ productionText }}</Text>
           <Text hint>Version: {{ appVersion }}</Text>
           <Text hint
             ><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text
@@ -78,7 +79,7 @@ export default {
 import { pageTransitions, pushPage } from "@/Nav";
 import { FuelType, getAppData, getClientLabel, listFuelTypes } from "@/AppData";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import CreateFuelTypeDialog from "./CreateFuelType.dialog.vue";
 
@@ -96,6 +97,14 @@ const appVersion = (() => {
   })();
   return appVersion;
 })();
+
+const productionText = computed(() => {
+  if (import.meta.env.NODE_ENV === "production") {
+    return "Production";
+  } else {
+    return "Development";
+  }
+});
 
 // function clearFirestore() {
 //   [...appData.deliveries].forEach((delivery) => {

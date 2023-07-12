@@ -1,5 +1,0 @@
-- #### Completed
-  - [x] Import data from spreadsheet. #feature
-  - [x] Make "Record Delivery" in Calculators tab work. #feature
-  - [x] The completed delivery total has rounding bugs. #bug
-  - [x] Add commas to big number. #polish

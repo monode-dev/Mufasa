@@ -1,6 +1,6 @@
 {
   "name": "ninety_percent",
-  "version": "1.28.76",
+  "version": "1.28.77",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "@capacitor/assets": "^2.0.4",
     "@rollup/pluginutils": "^5.0.2",
-    "@types/node": "^18.14.2",
+    "@types/node": "^18.16.19",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitejs/plugin-vue-jsx": "^3.0.0",
     "@vue/tsconfig": "^0.1.3",
