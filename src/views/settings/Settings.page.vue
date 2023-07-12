@@ -63,8 +63,11 @@ export default {
       <Column>
         <Box :sty="{ height: `1f` }" />
         <Column :sty="{ padBetween: 1 }">
-          <Text hint>Mode: {{ productionText }}</Text>
-          <Text hint>Version: {{ appVersion }}</Text>
+          <Text hint>{{
+            appVersion.length > 0
+              ? `Version: ${appVersion}`
+              : `Mode: ${modeText}`
+          }}</Text>
           <Text hint
             ><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text
           >
@@ -82,6 +85,7 @@ import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import { computed, ref } from "vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import CreateFuelTypeDialog from "./CreateFuelType.dialog.vue";
+import { exists } from "@/utils";
 
 function openTkeWebsite() {
   window.open(`https://www.tke.us`, `_blank`);
@@ -89,22 +93,15 @@ function openTkeWebsite() {
 
 const appData = getAppData();
 
+const modeText = import.meta.env.PROD ? `Production` : `Development`;
 const appVersion = (() => {
-  const appVersion = ref("-.-.-");
+  const appVersion = ref(``);
   (async () => {
     const currentVersionInfo = await CapacitorUpdater.current();
     appVersion.value = currentVersionInfo.bundle.version;
   })();
   return appVersion;
 })();
-
-const productionText = computed(() => {
-  if (import.meta.env.PROD) {
-    return "Production";
-  } else {
-    return "Development";
-  }
-});
 
 // function clearFirestore() {
 //   [...appData.deliveries].forEach((delivery) => {

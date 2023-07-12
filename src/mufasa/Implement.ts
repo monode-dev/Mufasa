@@ -934,6 +934,9 @@ export function defineAppDataStructure<T extends { [key: string]: DefMany }>(
     isSignal: typeof _isSignal;
     watchEffect: typeof _watchEffect;
   },
+  options: {
+    isProduction: boolean;
+  },
   modelDef: T,
 ) {
   // Setup Reactivity

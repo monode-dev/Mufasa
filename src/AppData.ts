@@ -206,6 +206,9 @@ export const { getAppData, mufasaTypes } = defineAppDataStructure(
     watchEffect: watchEffect,
   },
   {
+    isProduction: import.meta.env.PROD,
+  },
+  {
     clients: defMany(
       defObj({
         typeName: `Client`,
