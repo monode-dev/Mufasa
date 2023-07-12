@@ -2,12 +2,15 @@
 import { pageTransitions, popPage } from "@/Nav";
 import { Delivery, deliveryFormats, getClientLabel } from "@/AppData";
 import { PropType, VNodeRef, computed, ref } from "vue";
-import { canCompleteDelivery } from "@/AppData";
 
 const props = defineProps({
   delivery: {
     type: Object as PropType<Delivery>,
     required: true,
+  },
+  quantity: {
+    type: [Number, null, undefined] as PropType<number | null | undefined>,
+    default: undefined,
   },
 });
 
@@ -17,7 +20,7 @@ const deliveryLabel = ref(
     ? getClientLabel(props.delivery.upcomingExistingClient)
     : props.delivery.deliveryLabel,
 );
-const quantity = ref(props.delivery.quantity ?? 0);
+const quantity = ref(props.quantity ?? props.delivery.quantity ?? 0);
 const fuelType = ref(
   props.delivery.deliveryFormat === deliveryFormats.upcomingFromExisting
     ? props.delivery.upcomingExistingTank?.fuelType ?? null
@@ -83,19 +86,21 @@ export default {
     >
       <Text title>Complete Delivery</Text>
       <Label label="Client"
-        ><Field v-model:value="deliveryLabel" hint="--"
+        ><Field underlined v-model:value="deliveryLabel" hint="--"
       /></Label>
       <Label label="Fuel"
-        ><Field v-model:value="fuelTypeName" hint="--"
+        ><Field underlined v-model:value="fuelTypeName" hint="--"
       /></Label>
       <Label label="Gallons"
         ><NumField
+          underlined
           :negativesAreAllowed="false"
           v-model:value="quantity"
           hint="gal."
       /></Label>
       <Label label="Rate"
         ><NumField
+          underlined
           :negativesAreAllowed="false"
           v-model:value="rate"
           hint="$/gal."

@@ -9,7 +9,7 @@ import {
   listUpcomingDeliveries,
   isTankValid,
 } from "@/AppData";
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { exists, formatNumWithCommas, roundToString } from "@/utils";
 import { mdColors } from "@/miwi-md/Box/BoxDecoration";
 import {
@@ -17,6 +17,8 @@ import {
   TankShapeId,
   getTankShape,
 } from "@/views/tanks/ShapeUtils";
+import { pushPage } from "@/Nav";
+import CompleteDeliveryDialog from "../deliveries/CompleteDelivery.dialog.vue";
 
 const appData = getAppData();
 const tabIndex = ref(0);
@@ -34,7 +36,15 @@ const toDimensionsTab = () => {
 };
 
 // Delivery
-const delivery = ref<Delivery | null>(null);
+const delivery = ref<Delivery | null>();
+// Load the oldest uncompleted delivery by default
+watchEffect(() => {
+  // If the user has put something in delivery, let's not override it
+  if (exists(delivery.value) && delivery.value.isLoaded) return;
+  const upcomingDeliveries = listUpcomingDeliveries(appData.deliveries);
+  if (upcomingDeliveries.length <= 0) return;
+  delivery.value = upcomingDeliveries[0]; // Oldest uncompleted delivery
+});
 
 // Tank
 const client = ref<Client | null>(null);
@@ -106,6 +116,20 @@ const gallonsToReachDesiredFill = computed(() =>
     desiredFill.value,
   ),
 );
+
+function recordDelivery() {
+  pushPage(CompleteDeliveryDialog, {
+    delivery: delivery.value!,
+    quantity: parseFloat(roundToString(gallonsToReachDesiredFill.value!)),
+  });
+}
+const deliveryCanBeRecorded = computed(() => {
+  return (
+    exists(delivery.value) &&
+    exists(gallonsToReachDesiredFill.value) &&
+    gallonsToReachDesiredFill.value > 0
+  );
+});
 </script>
 
 <template>
@@ -240,7 +264,13 @@ const gallonsToReachDesiredFill = computed(() =>
     </Card>
     <Box />
     <Box />
-    <Button :sty="{ width: `1f`, background: $mdColors.grey }"
+    <Button
+      v-if="isDeliveryTab"
+      :sty="{
+        width: `1f`,
+        background: deliveryCanBeRecorded ? $mdColors.green : $mdColors.grey,
+      }"
+      :onClick="recordDelivery"
       >Record Delivery</Button
     >
   </Body>
