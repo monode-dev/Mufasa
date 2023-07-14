@@ -73,6 +73,11 @@ function openDropDown() {
     window.innerHeight * 0.6;
   dropDownIsOpen.value = true;
 }
+function closeDropDown() {
+  if (!dropDownIsOpen.value) return;
+  closeDropDown();
+  filterString.value = ``;
+}
 const selectedOption = computed(() => {
   const selectedKey = props.getKeyFromData(props.selected) ?? undefined;
   return allOptions.value.find(
@@ -105,15 +110,10 @@ function closeOnClickOutside(e: MouseEvent | TouchEvent) {
     !dropDownModalRef.value?.$el.contains(e.target) &&
     !openDropDownButtonRef.value?.$el.contains(e.target)
   ) {
-    dropDownIsOpen.value = false;
+    closeDropDown();
     //e.stopPropagation();
   }
 }
-watchEffect(() => {
-  if (!dropDownIsOpen.value) {
-    filterString.value = ``;
-  }
-});
 onMounted(() => {
   document.addEventListener("click", closeOnClickOutside);
   document.addEventListener("touchend", closeOnClickOutside);
@@ -125,7 +125,7 @@ onUnmounted(() => {
 
 function selectOption(option: Option) {
   emit(`update:selected`, option.data);
-  dropDownIsOpen.value = false;
+  closeDropDown();
 }
 </script>
 

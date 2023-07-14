@@ -218,7 +218,7 @@ const deliveryCanBeRecorded = computed(() => {
           }}</Label
         >
         <Label
-          label="Current Gallons"
+          label="Current Gal"
           :sty="{ align: $Align.centerLeft, width: `1f` }"
         >
           {{

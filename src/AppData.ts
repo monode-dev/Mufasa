@@ -213,7 +213,7 @@ export const { getAppData, types } = defineAppDataStructure(
     watchEffect: watchEffect,
   },
   {
-    isProduction: import.meta.env.PROD,
+    isProduction: true, //import.meta.env.PROD,
   },
   {
     clients: defMany(

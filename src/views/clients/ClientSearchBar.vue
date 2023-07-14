@@ -14,6 +14,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:filterString", "close"]);
+function close() {
+  emit("update:filterString", "");
+  emit("close");
+}
 </script>
 
 <template>
@@ -46,12 +50,7 @@ const emit = defineEmits(["update:filterString", "close"]);
       />
       <Box :sty="{ width: 0.25 }" />
     </Row>
-    <Icon
-      :onClick="() => emit(`close`)"
-      :scale="1.5"
-      icon="close"
-      :color="mdColors.white"
-    />
+    <Icon :onClick="close" :scale="1.5" icon="close" :color="mdColors.white" />
     <!-- <Icon
       :onClick="addPressed"
       :scale="1.5"
