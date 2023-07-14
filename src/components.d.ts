@@ -38,14 +38,14 @@ import CompleteDelivery from "./views/deliveries/CompleteDelivery.dialog.vue";
 import DeliveriesTab from "./views/deliveries/DeliveriesTab.vue";
 import UpcomingDelivery from "./views/deliveries/UpcomingDelivery.dialog.vue";
 import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue";
+import CreateTank from "./views/tanks/CreateTank.dialog.vue";
+import TankEntry from "./views/tanks/TankEntry.vue";
+import TankFields from "./views/tanks/TankFields.vue";
 import CreateFuelType from "./views/settings/CreateFuelType.dialog.vue";
 import FuelTypeDropDown from "./views/settings/FuelTypeDropDown.vue";
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
-import CreateTank from "./views/tanks/CreateTank.dialog.vue";
-import TankEntry from "./views/tanks/TankEntry.vue";
-import TankFields from "./views/tanks/TankFields.vue";
 
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
@@ -88,13 +88,13 @@ CompleteDelivery: typeof CompleteDelivery;
 DeliveriesTab: typeof DeliveriesTab;
 UpcomingDelivery: typeof UpcomingDelivery;
 UpcomingDeliveryEntry: typeof UpcomingDeliveryEntry;
+CreateTank: typeof CreateTank;
+TankEntry: typeof TankEntry;
+TankFields: typeof TankFields;
 CreateFuelType: typeof CreateFuelType;
 FuelTypeDropDown: typeof FuelTypeDropDown;
 FuelTypeEntry: typeof FuelTypeEntry;
 Settings: typeof Settings;
 SettingsButton: typeof SettingsButton;
-CreateTank: typeof CreateTank;
-TankEntry: typeof TankEntry;
-TankFields: typeof TankFields;
   }
 }
