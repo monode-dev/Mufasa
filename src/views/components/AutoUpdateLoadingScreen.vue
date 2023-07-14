@@ -6,6 +6,12 @@ import { pushPage } from "@/Nav";
 import { App } from "@capacitor/app";
 import HomePage from "@/views/Home.page.vue";
 import { exists } from "@/utils";
+import { getAppData } from "@/AppData";
+
+// We want to start loading the database immedietly
+getAppData();
+// Prevent tree shaking.
+// console.log(Object.keys(appData));
 
 const textSize = 1.25;
 let haveCheckedForUpdates = false;
