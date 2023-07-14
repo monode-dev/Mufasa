@@ -85,7 +85,8 @@ export const useNav = defineStore("navigator", () => {
        * so that we never accidentally see the loading splash screen. */
       if (openedPages.value.length === 1) {
         (async () => {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          // Wait for a bit for the data to load. This is a patch but it feels much better.
+          await new Promise((resolve) => setTimeout(resolve, 1.5 * 1000));
           SplashScreen.hide();
         })();
       }
