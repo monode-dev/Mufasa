@@ -1,5 +1,5 @@
 import { Tank } from "@/AppData";
-import { Doc } from "@/mufasa/Implement";
+import { Doc } from "@monode/orm";
 import { exists } from "@/utils";
 
 export const CUBIC_INCHES_PER_GALLON = 231;
@@ -13,7 +13,7 @@ export type TankShapeId =
   | `truckBedTank`;
 export type TankDimension = Exclude<
   keyof Tank,
-  `optionalLabel` | `fuelType` | `shape` | `creationTimePosix` | keyof Doc
+  `optionalLabel` | `fuelType` | `shape` | `creationTimePosix` | keyof Doc<{}>
 >;
 export type TankShapeDatails = {
   readonly nameLong: string;

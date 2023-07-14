@@ -1,10 +1,17 @@
-import { Doc, List, defineAppDataStructure } from "./mufasa/Implement";
-import { defObj, defMany, defOne, defPrim } from "./mufasa/Define";
+import {
+  defObj,
+  defMany,
+  defOne,
+  defPrim,
+  Doc,
+  List,
+  defineAppDataStructure,
+} from "@monode/orm";
 import { exists, roundToString, orderDocs, formatNumWithCommas } from "./utils";
 import { TankShapeId, getTankShape } from "@/views/tanks/ShapeUtils";
 import { computed, isRef, ref, watchEffect } from "vue";
 
-export type Client = (typeof mufasaTypes)["Client"];
+export type Client = (typeof types)["Client"];
 export function isClientValid(
   client: Partial<Client> | null | undefined,
 ): boolean {
@@ -54,7 +61,7 @@ export function listClients(
 
 // const a = {} as Client;
 // a.fuelType;
-export type Tank = (typeof mufasaTypes)["Tank"];
+export type Tank = (typeof types)["Tank"];
 export function isTankValid(tank: Partial<Tank> | null | undefined): boolean {
   const shapeUtils = getTankShape(tank?.shape);
   const volume = shapeUtils?.calcTotalVolume(tank);
@@ -91,7 +98,7 @@ export function listTanks(
 }
 
 // Fuel Type
-export type FuelType = (typeof mufasaTypes)["FuelType"];
+export type FuelType = (typeof types)["FuelType"];
 export function isFuelTypeValid(
   fuelType: Partial<FuelType> | null | undefined,
 ) {
@@ -115,7 +122,7 @@ export function listFuelTypes(
   return result;
 }
 
-export type Delivery = (typeof mufasaTypes)["Delivery"];
+export type Delivery = (typeof types)["Delivery"];
 export type DeliveryFormat = Delivery["deliveryFormat"];
 export const deliveryFormats = {
   upcomingFromExisting: `upcomingFromExisting`,
@@ -189,7 +196,7 @@ export function listCompletedDeliveries(
 }
 
 // App Data Structure
-export const { getAppData, mufasaTypes } = defineAppDataStructure(
+export const { getAppData, types } = defineAppDataStructure(
   `firestore`,
   {
     apiKey: "AIzaSyDt4S19UxISNKFacXXAQl0I2drGfStspD0",

@@ -3,11 +3,11 @@
 import { pageTransitions, popPage } from "@/Nav";
 import { Client } from "@/AppData";
 import { PropType, VNodeRef, ref } from "vue";
-import { Doc } from "@/mufasa/Implement";
+import { Doc } from "@monode/orm";
 
 const props = defineProps({
   obj: {
-    type: Object as PropType<Doc>,
+    type: Object as PropType<Doc<{}>>,
     required: true,
   },
   message: {
