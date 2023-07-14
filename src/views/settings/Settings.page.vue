@@ -111,7 +111,19 @@ const modeToSwapToName = computed(() =>
 
 function hideSplashScreen() {
   (async () => {
+    SplashScreen.hide();
+    SplashScreen.hide();
+    SplashScreen.hide();
+    SplashScreen.hide();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    SplashScreen.hide();
+    SplashScreen.hide();
+    SplashScreen.hide();
+    SplashScreen.hide();
     await new Promise((resolve) => setTimeout(resolve, 5000));
+    SplashScreen.hide();
+    SplashScreen.hide();
+    SplashScreen.hide();
     SplashScreen.hide();
   })();
 }
