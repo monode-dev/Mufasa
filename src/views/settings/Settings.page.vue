@@ -62,12 +62,7 @@ export default {
 
       <Box :sty="{ height: `1f` }" />
       <!-- Start Pin to Bottom -->
-      <Button
-        :onClick="
-          () => {
-            SplashScreen.hide();
-          }
-        "
+      <Button :onClick="hideSplashScreen"
         >Swap to {{ modeToSwapToName }} Mode</Button
       >
       <Text hint>{{
@@ -113,6 +108,13 @@ const appVersion = (() => {
 const modeToSwapToName = computed(() =>
   import.meta.env.PROD ? `Dev` : `Prod`,
 );
+
+function hideSplashScreen() {
+  (async () => {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    SplashScreen.hide();
+  })();
+}
 
 // function clearFirestore() {
 //   [...appData.deliveries].forEach((delivery) => {
