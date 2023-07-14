@@ -46,6 +46,7 @@ function close() {
       <Field
         hint="Search by Name or ID"
         :value="filterString"
+        :hasFocus="true"
         @update:value="emit(`update:filterString`, $event)"
       />
       <Box :sty="{ width: 0.25 }" />
