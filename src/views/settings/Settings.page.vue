@@ -59,21 +59,19 @@ export default {
           :fuelType="fuelType"
         />
       </Card>
-      <!-- Should be pinned to the bottom -->
-      <Column>
-        <Box :sty="{ height: `1f` }" />
-        <Column :sty="{ padBetween: 1 }">
-          <Text hint>{{
-            appVersion.length > 0
-              ? `Version: ${appVersion}`
-              : `Mode: ${modeText}`
-          }}</Text>
-          <Text hint
-            ><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text
-          >
-        </Column>
-        <Box :sty="{ height: 0.5 }" />
-      </Column>
+
+      <Box :sty="{ height: `1f` }" />
+      <!-- Start Pin to Bottom -->
+      <Button>Swap to {{ modeToSwapToName }} Mode</Button>
+      <Text hint>{{
+        appVersion.length > 0 ? `Version: ${appVersion}` : `Mode: ${modeText}`
+      }}</Text>
+      <Text hint
+        ><span>Made by <u @click="openTkeWebsite">tke.us</u></span></Text
+      >
+
+      <!-- This leaves space for the iOS handle. We might want a better global way to handle this. -->
+      <Box />
     </Body>
   </Page>
 </template>
@@ -102,6 +100,11 @@ const appVersion = (() => {
   })();
   return appVersion;
 })();
+
+// Swap Modes
+const modeToSwapToName = computed(() =>
+  import.meta.env.PROD ? `Dev` : `Prod`,
+);
 
 // function clearFirestore() {
 //   [...appData.deliveries].forEach((delivery) => {

@@ -25,15 +25,17 @@ let appStartRequested = false;
   }
 })();
 
-// For now let's just boot, and ask questions later.
-appStartRequested = true;
-
 // If have not checked for updates after a short bit, then apply the update after start
 setTimeout(() => {
   if (!haveCheckedForUpdates) {
     appStartRequested = true;
   }
-}, 6.5 * 1000);
+}, 2.5 * 1000);
+// setTimeout(() => {
+//   if (!haveCheckedForUpdates) {
+//     appStartRequested = true;
+//   }
+// }, 6.5 * 1000);
 setTimeout(() => {
   if (!haveDownloadedUpdate) {
     appStartRequested = true;
@@ -63,6 +65,7 @@ setTimeout(() => {
         // Apply the patch on close
         App.addListener("appStateChange", async ({ isActive }) => {
           if (!isActive) {
+            // I don't know whether or no we want to await this.
             await CapacitorUpdater.set({ id: patchData.id });
           }
         });
