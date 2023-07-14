@@ -62,7 +62,14 @@ export default {
 
       <Box :sty="{ height: `1f` }" />
       <!-- Start Pin to Bottom -->
-      <Button>Swap to {{ modeToSwapToName }} Mode</Button>
+      <Button
+        :onClick="
+          () => {
+            SplashScreen.hide();
+          }
+        "
+        >Swap to {{ modeToSwapToName }} Mode</Button
+      >
       <Text hint>{{
         appVersion.length > 0 ? `Version: ${appVersion}` : `Mode: ${modeText}`
       }}</Text>
@@ -84,6 +91,7 @@ import { computed, ref } from "vue";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import CreateFuelTypeDialog from "./CreateFuelType.dialog.vue";
 import { exists } from "@/utils";
+import { SplashScreen } from "@capacitor/splash-screen";
 
 function openTkeWebsite() {
   window.open(`https://www.tke.us`, `_blank`);
