@@ -9,9 +9,9 @@ import { exists } from "@/utils";
 import { getAppData } from "@/AppData";
 
 // We want to start loading the database immedietly
-(async () => {
-  getAppData();
-})();
+// (async () => {
+//   getAppData();
+// })();
 // getAppData();
 // Prevent tree shaking.
 // console.log(Object.keys(appData));
