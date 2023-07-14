@@ -84,7 +84,10 @@ export const useNav = defineStore("navigator", () => {
       /* We do this here instead of at the end of AutoUpdateLoadingScreen
        * so that we never accidentally see the loading splash screen. */
       if (openedPages.value.length === 1) {
-        SplashScreen.hide();
+        (async () => {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          SplashScreen.hide();
+        })();
       }
     },
     popPage,
