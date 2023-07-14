@@ -25,6 +25,9 @@ let appStartRequested = false;
   }
 })();
 
+// For now let's just boot, and ask questions later.
+appStartRequested = true;
+
 // If have not checked for updates after a short bit, then apply the update after start
 setTimeout(() => {
   if (!haveCheckedForUpdates) {
