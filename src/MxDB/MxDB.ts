@@ -24,6 +24,8 @@ export type ColSchema<T extends number | string | boolean | undefined = any> = {
 };
 /** Defines a column of the specified primitive type. */
 export function prim<T extends number | string | boolean>(
+  /** TODO: We might consider using Number, String, or Boolean as the first parameter
+   * instead. */
   defaultValue: T | null,
 ): ColSchema<T> {
   return {
@@ -67,9 +69,12 @@ type RowListTsType<T extends RowTsType> = {
 type _CreateParamsForRow<T extends RowTsType> = Partial<T> & {
   [Key in keyof _RowSpecificProps]: never;
 };
-type RowTsType<T extends TableSchema = {}, D extends TableSchemaDict = {}> = {
-  [K in keyof T]: T[K] | undefined;
-} & _RowSpecificProps;
+type RowTsType<
+  T extends TableSchema = {},
+  D extends TableSchemaDict = {},
+> = _RowSpecificProps & {
+  [K in keyof T]: T[K][`tableName`] extends null ? T[K][`explicitType`] : never;
+};
 /** These props show up on all rows and add utility functionality to them. */
 type _RowSpecificProps = {
   /** The unique id of this row. */
