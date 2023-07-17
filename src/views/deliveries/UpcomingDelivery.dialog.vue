@@ -47,7 +47,9 @@ const tank = ref<Tank | null>(
   deliveryToEdit.value?.upcomingExistingTank ?? null,
 );
 const deliveryLabel = ref(deliveryToEdit.value?.deliveryLabel ?? ``);
-const selectedFuelType = ref(tank.value?.fuelType ?? null);
+const selectedFuelType = ref(
+  deliveryToEdit?.value?.fuelType ?? tank.value?.fuelType ?? null,
+);
 const quantity = ref<number | null>(deliveryToEdit.value?.quantity ?? null);
 const computedFuelType = computed(() =>
   isExistingDelivery.value ? tank.value?.fuelType : selectedFuelType.value,

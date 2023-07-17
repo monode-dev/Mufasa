@@ -75,7 +75,7 @@ function openDropDown() {
 }
 function closeDropDown() {
   if (!dropDownIsOpen.value) return;
-  closeDropDown();
+  dropDownIsOpen.value = false;
   filterString.value = ``;
 }
 const selectedOption = computed(() => {
