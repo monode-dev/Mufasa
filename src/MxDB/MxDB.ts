@@ -59,11 +59,15 @@ export function listOf(table: string): ColSchema<undefined> {
 
 // SECTION: TS Types
 type RowListTsType<T extends RowTsType> = {
-  length: {
+  readonly length: {
     value: number;
   };
   add(params: _CreateParamsForRow<T>): Promise<T>;
-  /** TODO: Provide auto sorting via the timestamp & position method. We might have to put a
+  // TODO: Make this a read-only list.
+  // filter(filterFn: (doc: T) => boolean): RowListTsType<T>;
+  // TODO: Add a read-only list implementation to support map functions.
+  // map<R>(mapFn: (doc: T) => R): Array<R>;
+  /** TODO: Provide maunual sorting via the timestamp & position method. We might have to put a
    * `-` in front of position to track whether the movement was down or up. */
 };
 type _CreateParamsForRow<T extends RowTsType> = Partial<T> & {
@@ -73,7 +77,11 @@ type RowTsType<
   T extends TableSchema = {},
   D extends TableSchemaDict = {},
 > = _RowSpecificProps & {
-  [K in keyof T]: T[K][`tableName`] extends null ? T[K][`explicitType`] : never;
+  [K in keyof T]: T[K][`tableName`] extends null
+    ? T[K][`explicitType`]
+    : T[K][`isList`] extends true
+    ? RowListTsType<RowTsType<D[T[K][`tableName`] & string], D>>
+    : RowTsType<D[T[K][`tableName`] & string], D>;
 };
 /** These props show up on all rows and add utility functionality to them. */
 type _RowSpecificProps = {
@@ -89,28 +97,41 @@ type _RowSpecificProps = {
   deleteSelf(): Promise<void>;
 };
 
-// SECTION: createMxDB
+// SECTION: Reactivity
 export type CreateSignal = <T>(params: T) => {
   value: T;
 };
 export type SubscribeToCurrentScopeDispose = (fn: () => void) => void;
+
+// SECTION: Remote DB API
+export type RemoteDb = {
+  createRow(table: string, data: any): Promise<string>;
+  updateRow(table: string, id: string, data: any): Promise<void>;
+  deleteRow(table: string, id: string): Promise<void>;
+};
+
+// SECTION: createMxDB
 export function createMxDB<
   DbName extends string,
   RootSchema extends TableSchema,
   D extends TableSchemaDict,
 >(createParams: {
   name: DbName;
+  remoteDb: RemoteDb;
   // createSignal: CreateSignal;
   // subscribeToCurrentScopeDispose: SubscribeToCurrentScopeDispose;
   rootSchema: RootSchema; // Disallow anything other than defining lists of structs
   tableSchemas: D;
 }) {
-  // Load data from disk and store it in local db
+  // TODO: Load data from disk and store it in local db
 
-  // Start sync with remote db
+  // TODO: Start sync with remote db
 
   return {
+    // TODO: Implement proxies for local db
     getDB() {},
+
+    // TODO: Extract TS types from schema
     get types() {
       return {} as RowTsType<RootSchema, D>;
     },
