@@ -6,7 +6,7 @@ workflows:
       android_signing:
         - keystore_reference
       groups:
-        - google_play
+        - google_credentials
       vars:
         PACKAGE_NAME: "us.tke.ninetypercent"
         GOOGLE_PLAY_TRACK: internal
