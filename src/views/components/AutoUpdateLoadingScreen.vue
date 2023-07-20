@@ -35,7 +35,7 @@ let appStartRequested = false;
 })();
 
 // Ideally we want to start app data loading, but this seems to be freaking out right now.
-appStartRequested = true
+appStartRequested = true;
 
 // If have not checked for updates after a short bit, then apply the update after start
 setTimeout(() => {

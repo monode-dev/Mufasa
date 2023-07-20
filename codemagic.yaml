@@ -29,7 +29,7 @@ workflows:
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease \
-            -PversionCode=131  \
+            -PversionCode=132  \
             -PversionName=1.13
       - name: Print APK path
         script: |
@@ -102,7 +102,7 @@ workflows:
         script: |
           #!/bin/sh
           cd ios/App
-          agvtool new-version -all 1.28.97 
+          agvtool new-version -all 1.30.0 
         # LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
         # agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       # - name: Create Scheme

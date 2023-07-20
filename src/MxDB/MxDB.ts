@@ -9,13 +9,13 @@ export type TableSchema = {
  * suppot via the definition functions. I know this isn't the best approach since internally
  * it looks like we support cases we don't, but it's the easiest way I can think of to start
  * this project. */
-export type ColSchema<T extends number | string | boolean | undefined = any> = {
+export type ColSchema = {
   /** Use null to represent a primitive. */
-  tableName: string | null;
+  tableName: string | undefined;
+  explicitType: number | string | boolean | undefined;
   isList: boolean;
   isDefining: boolean;
-  default: string | number | boolean | null | [];
-  explicitType: T;
+  defaultValue: string | number | boolean | null | [];
   /** NOTE: We might consier adding an `isNullable` feature at some point, but right now
    * it is easier to just make everything nullabel. */
   /** NOTE: We at some point might consier adding a field like `addThisColumnToOlderVersion`
@@ -27,61 +27,67 @@ export function prim<T extends number | string | boolean>(
   /** TODO: We might consider using Number, String, or Boolean as the first parameter
    * instead. */
   defaultValue: T | null,
-): ColSchema<T> {
+) {
   return {
-    tableName: null,
+    tableName: undefined,
+    explicitType: {} as T,
     isList: false,
     isDefining: false,
-    default: defaultValue,
-    explicitType: {} as T,
-  };
+    defaultValue: defaultValue as T | null,
+  } satisfies ColSchema;
 }
 /** Defines a column that references a single row in a table. */
-export function refTo(table: string): ColSchema<undefined> {
+export function refTo<T extends string>(table: T) {
   return {
     tableName: table,
+    explicitType: undefined,
     isList: false,
     isDefining: false,
-    default: null,
-    explicitType: undefined,
-  };
+    defaultValue: null,
+  } satisfies ColSchema;
 }
 /** Defines a list of rows in a table that point back to this row. */
-export function listOf(table: string): ColSchema<undefined> {
+export function listOf<T extends string>(table: T) {
   return {
     tableName: table,
+    explicitType: undefined,
     isList: true,
     isDefining: true,
-    default: [],
-    explicitType: undefined,
-  };
+    defaultValue: [],
+  } satisfies ColSchema;
 }
 
 // SECTION: TS Types
-type RowListTsType<T extends RowTsType> = {
-  readonly length: {
-    value: number;
-  };
-  add(params: _CreateParamsForRow<T>): Promise<T>;
-  // TODO: Make this a read-only list.
-  // filter(filterFn: (doc: T) => boolean): RowListTsType<T>;
-  // TODO: Add a read-only list implementation to support map functions.
-  // map<R>(mapFn: (doc: T) => R): Array<R>;
+type RowListTsType<T extends RowTsType> = ImmutableList<T> & {
+  add(params: _CreateParamsForRow<T>): T;
   /** TODO: Provide maunual sorting via the timestamp & position method. We might have to put a
    * `-` in front of position to track whether the movement was down or up. */
+};
+type ImmutableList<T> = {
+  readonly length: {
+    get(): number;
+  };
+  [Symbol.iterator](): IterableIterator<T>;
+  // TODO: Figure out sort
+  // sort(filterFn: (element: T) => boolean): ImmutableList<T>;
+  filter(fn: (element: T) => boolean): ImmutableList<T>;
+  map<R>(fn: (element: T) => R): ImmutableList<R>;
 };
 type _CreateParamsForRow<T extends RowTsType> = Partial<T> & {
   [Key in keyof _RowSpecificProps]: never;
 };
 type RowTsType<
-  T extends TableSchema = {},
+  TypeName extends string = string,
   D extends TableSchemaDict = {},
 > = _RowSpecificProps & {
-  [K in keyof T]: T[K][`tableName`] extends null
-    ? T[K][`explicitType`]
-    : T[K][`isList`] extends true
-    ? RowListTsType<RowTsType<D[T[K][`tableName`] & string], D>>
-    : RowTsType<D[T[K][`tableName`] & string], D>;
+  [K in keyof D[TypeName]]: D[TypeName][K][`tableName`] extends string
+    ? D[TypeName][K][`isList`] extends true
+      ? RowListTsType<RowTsType<D[TypeName][K][`tableName`], D>>
+      : RowTsType<D[TypeName][K][`tableName`], D>
+    : {
+        get(): D[TypeName][K][`explicitType`] | null;
+        set(newValue: D[TypeName][K][`explicitType`]): void;
+      };
 };
 /** These props show up on all rows and add utility functionality to them. */
 type _RowSpecificProps = {
@@ -113,14 +119,14 @@ export type RemoteDb = {
 // SECTION: createMxDB
 export function createMxDB<
   DbName extends string,
-  RootSchema extends TableSchema,
+  // RootSchema extends TableSchema,
   D extends TableSchemaDict,
 >(createParams: {
   name: DbName;
-  remoteDb: RemoteDb;
+  // remoteDb: RemoteDb;
   // createSignal: CreateSignal;
   // subscribeToCurrentScopeDispose: SubscribeToCurrentScopeDispose;
-  rootSchema: RootSchema; // Disallow anything other than defining lists of structs
+  // rootSchema: RootSchema; // Disallow anything other than defining lists of structs
   tableSchemas: D;
 }) {
   // TODO: Load data from disk and store it in local db
@@ -129,11 +135,13 @@ export function createMxDB<
 
   return {
     // TODO: Implement proxies for local db
-    getDB() {},
+    getDB() {}, //: RowTsType<RootSchema, D>
 
     // TODO: Extract TS types from schema
     get types() {
-      return {} as RowTsType<RootSchema, D>;
+      return {} as {
+        [K in keyof D & string]: RowTsType<K, D>;
+      };
     },
   };
 }
