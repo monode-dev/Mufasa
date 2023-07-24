@@ -10,7 +10,7 @@ export type TableSchema = {
  * it looks like we support cases we don't, but it's the easiest way I can think of to start
  * this project. */
 export type ColSchema = {
-  /** Use null to represent a primitive. */
+  /** Use undefined to represent a primitive. */
   tableName: string | undefined;
   explicitType: number | string | boolean | undefined;
   isList: boolean;
