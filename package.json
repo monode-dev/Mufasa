@@ -9,7 +9,8 @@
     "icons": "npx @capacitor/assets generate --iconBackgroundColor \"#4caf50\" --splashBackgroundColor \"#4caf50\" --splashBackgroundColorDark \"#4caf50\" --logoSplashScale 0.4",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "orm:update": "npm i @monode/orm@latest"
   },
   "dependencies": {
     "@capacitor/android": "^4.7.0",
@@ -24,7 +25,7 @@
     "@capawesome/capacitor-screen-orientation": "^2.0.2",
     "@capgo/capacitor-updater": "^4.17.46",
     "@mdi/js": "^7.2.96",
-    "@monode/orm": "^0.0.6",
+    "@monode/orm": "^0.0.18",
     "firebase": "^9.0.0",
     "gsap": "^3.11.5",
     "mdi-vue": "^3.0.13",
