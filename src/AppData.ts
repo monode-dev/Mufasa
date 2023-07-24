@@ -1,8 +1,4 @@
 import {
-  defObj,
-  defMany,
-  defOne,
-  defPrim,
   Doc,
   List,
   defineAppDataStructure,
@@ -222,7 +218,7 @@ export const { getAppData, types } = defineAppDataStructure(
       fuelTypes: listOf(`FuelType`),
       deliveries: listOf(`Delivery`),
     },
-    docSchemas: {
+    typeSchemas: {
       Client: {
         name: prim<string>(``),
         clientId: prim<string>(``),
@@ -274,5 +270,4 @@ export const { getAppData, types } = defineAppDataStructure(
       },
     },
   },
-  {},
 );
