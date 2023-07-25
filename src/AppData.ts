@@ -9,6 +9,7 @@ import {
 import { exists, roundToString, orderDocs, formatNumWithCommas } from "./utils";
 import { TankShapeId, getTankShape } from "@/views/tanks/ShapeUtils";
 import { computed, isRef, ref, watchEffect } from "vue";
+import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
 
 export type Client = (typeof types)["Client"];
 export function isClientValid(
@@ -213,6 +214,27 @@ export const { getAppData, types } = defineAppDataStructure(
   },
   {
     isProduction: import.meta.env.PROD,
+    readFile: async (path: string) => {
+      // I don't know if the try-catch is necessary, but it's here just in case.
+      try {
+        const results = await Filesystem.readFile({
+          path: path,
+          directory: Directory.Data,
+          encoding: Encoding.UTF8,
+        });
+        return results.data;
+      } catch (e) {
+        return undefined;
+      }
+    },
+    writeFile: async (path: string, contents: string) => {
+      await Filesystem.writeFile({
+        path: path,
+        data: contents,
+        directory: Directory.Data,
+        encoding: Encoding.UTF8,
+      });
+    },
     rootSchema: {
       clients: listOf(`Client`),
       fuelTypes: listOf(`FuelType`),
