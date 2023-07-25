@@ -25,7 +25,7 @@
     "@capawesome/capacitor-screen-orientation": "^2.0.2",
     "@capgo/capacitor-updater": "^4.17.46",
     "@mdi/js": "^7.2.96",
-    "@monode/orm": "^0.0.20",
+    "@monode/orm": "^0.0.21",
     "firebase": "^9.0.0",
     "gsap": "^3.11.5",
     "mdi-vue": "^3.0.13",

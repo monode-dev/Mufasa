@@ -90,7 +90,7 @@ const pseudoTank = computed(() => {
         wideHeight: dimWideHeight.value,
         fullHeight: dimFullHeight.value,
         diameter: dimDiameter.value,
-      };
+      } satisfies Partial<Tank>;
 });
 const desiredFill = ref(0.9);
 const totalGallons = computed(() =>
@@ -166,7 +166,7 @@ const deliveryCanBeRecorded = computed(() => {
           label="Delivery"
           v-model:selected="delivery"
           :getKeyFromData="(data: Delivery | null) => {
-            return data?._firestoreRef?.path;
+            return data?._id ?? undefined;
           }"
           :options="[
             //{ label: `None`, data: null },

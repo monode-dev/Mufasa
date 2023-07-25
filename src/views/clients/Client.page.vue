@@ -87,7 +87,7 @@ export default {
       </Row>
       <TankEntry
         v-for="(tank, index) in listTanks(client.tanks)"
-        :key="tank._firestoreRef?.path ?? index"
+        :key="tank._id ?? index"
         :tank="tank"
       />
     </Body>
