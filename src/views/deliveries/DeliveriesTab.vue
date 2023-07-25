@@ -38,7 +38,7 @@ const completedDeliveries = computed(() => {
     >
     <UpcomingDeliveryEntry
       v-for="(delivery, index) in upcomingDeliveries"
-      :key="delivery._firestoreRef?.path ?? index"
+      :key="delivery._id ?? index"
       :delivery="delivery"
     />
 
@@ -50,7 +50,7 @@ const completedDeliveries = computed(() => {
     >
     <CompletedDeliveryEntry
       v-for="(delivery, index) in completedDeliveries"
-      :key="delivery._firestoreRef?.path ?? index"
+      :key="delivery._id ?? index"
       :delivery="delivery"
     />
   </Body>

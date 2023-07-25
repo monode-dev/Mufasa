@@ -30,8 +30,8 @@ const emit = defineEmits<{
 const appData = getAppData();
 
 watchEffect(() => {
-  const clientPath = props.client?._firestoreRef?.path;
-  const tankParentPath = props.tank?.mx_parent?._firestoreRef?.path;
+  const clientPath = props.client?._id;
+  const tankParentPath = props.tank?.mx_parent?._id;
   if (exists(tankParentPath) && tankParentPath !== clientPath) {
     emit("update:tank", null);
   }
@@ -44,7 +44,7 @@ watchEffect(() => {
       :selected="client"
       @update:selected="emit('update:client', $event)"
       :getKeyFromData="(data: Client | null) => {
-                return data?._firestoreRef?.path;
+                return data?._id ?? undefined;
             }"
       :options="
         listClients(appData.clients, true).map((x) => ({
@@ -70,7 +70,7 @@ watchEffect(() => {
       :selected="tank"
       @update:selected="emit('update:tank', $event)"
       :getKeyFromData="(data: Tank | null) => {
-                return data?._firestoreRef?.path;
+                return data?._id ?? undefined;
             }"
       :options="listTanks((client as Client | undefined)?.tanks, true).map(
                 (x, index) => ({ label: getTankLabel(x), data: x }),

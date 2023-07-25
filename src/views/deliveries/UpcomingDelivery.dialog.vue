@@ -71,12 +71,12 @@ const deliveryIsValid = computed(() =>
 // Related Deliveries
 const relatedDeliveries = computed(() => {
   const result = listCompletedDeliveries(appData.deliveries).filter((d) => {
-    const deliveryClientPath = d.upcomingExistingClient?._firestoreRef?.path;
-    const selectedClientPath = client.value?._firestoreRef?.path;
-    // const deliveryTankPath = d.upcomingExistingTank?._firestoreRef?.path;
-    // const selectedTankPath = tank.value?._firestoreRef?.path;
-    const deliveryFuelTypePath = d.fuelType?._firestoreRef?.path;
-    const selectedFuelTypePath = computedFuelType.value?._firestoreRef?.path;
+    const deliveryClientPath = d.upcomingExistingClient?._id;
+    const selectedClientPath = client.value?._id;
+    // const deliveryTankPath = d.upcomingExistingTank?._id;
+    // const selectedTankPath = tank.value?._id;
+    const deliveryFuelTypePath = d.fuelType?._id;
+    const selectedFuelTypePath = computedFuelType.value?._id;
     return (
       exists(deliveryClientPath) &&
       exists(selectedClientPath) &&
@@ -231,7 +231,7 @@ export default {
     <CompletedDeliveryEntry
       v-if="isExistingDelivery"
       v-for="delivery in relatedDeliveries"
-      :key="delivery._firestoreRef?.path"
+      :key="delivery._id ?? undefined"
       :delivery="delivery"
       hideOptions
       :sty="{ width: `85%` }"
