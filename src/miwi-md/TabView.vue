@@ -35,7 +35,7 @@ function selectTab(newTab: number) {
 const tabBodiesParent = ref<ComponentPublicInstance | null>(null);
 watchEffect(() => {
   const newTab = props.selectedTab;
-  const newTabPosition = newTab === 0 ? `100vw` : newTab === 1 ? 0 : `-100vw`;
+  const newTabPosition = newTab === 0 ? 0 : newTab === 1 ? `-100vw` : `-200vw`;
   if (tabBodiesParent.value?.$el) {
     gsap.to(tabBodiesParent.value.$el, {
       duration: 0.15,
