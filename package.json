@@ -3,7 +3,7 @@
   "version": "1.30.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build:patch": "vite build",
     "build:full": "vite build && npm run icons && npx cap sync",
     "icons": "npx @capacitor/assets generate --iconBackgroundColor \"#4caf50\" --splashBackgroundColor \"#4caf50\" --splashBackgroundColorDark \"#4caf50\" --logoSplashScale 0.4",

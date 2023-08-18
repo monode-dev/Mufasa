@@ -7,6 +7,7 @@ import {
   VNodeRef,
   watchEffect,
   onMounted,
+  watch,
 } from "vue";
 import { mdColors } from "./Box/BoxDecoration";
 import { sizeToCss } from "./Box/BoxSize";
@@ -73,8 +74,17 @@ const emit = defineEmits<{
 const inputRef = ref<VNodeRef | null>(null);
 
 // Input
+const tempValue = ref(props.value ?? ``);
+watch(
+  () => [props.value],
+  () => {
+    if (!props.hasFocus) {
+      tempValue.value = props.value ?? ``;
+    }
+  },
+);
 function handleInput(event: Event) {
-  emit("update:value", (event.target as any)?.value ?? "");
+  tempValue.value = (event.target as any)?.value ?? "";
 }
 function handleKeyPress(event: KeyboardEvent) {
   const nextInput = predictNextInput(event.key);
@@ -107,12 +117,22 @@ function predictNextInput(newText: string) {
 // Focus
 const inputElementHasFocus = ref(props.hasFocus);
 
+let valueOnFocus = props.value;
 const handleFocus = (e: FocusEvent) => {
+  valueOnFocus = props.value;
   inputElementHasFocus.value = true;
   emit("update:hasFocus", true);
 };
 
 const handleBlur = (e: FocusEvent) => {
+  const tempValueIsDifferentThanProp = tempValue.value !== props.value;
+  const haveTypedSomething = tempValue.value !== valueOnFocus;
+  if (haveTypedSomething && tempValueIsDifferentThanProp) {
+    emit("update:value", tempValue.value);
+  } else if (!haveTypedSomething && tempValueIsDifferentThanProp) {
+    // If someone else changed the value, and we didn't, then get the new value.
+    tempValue.value = props.value ?? ``;
+  }
   inputElementHasFocus.value = false;
   emit("update:hasFocus", false);
 };
