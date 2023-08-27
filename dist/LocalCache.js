@@ -30,9 +30,10 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         const collectionName = getCollectionName(params.typeName);
         // We use this to defer triggering listeners until after we have updated the cache
         const thingsToTrigger = [];
-        // If we are going to have to create a doc, record that so we can notify listeners later
-        if (!(0, utils_1.exists)(clientStorage.data?.types?.[collectionName]?.[params.docId])) {
-            // persistedData.types[params.typeName]![params.docId] = {};
+        // If this doc is being created or deleted, record that so we can notify listeners later
+        const isBeingCreated = !(0, utils_1.exists)(clientStorage.data?.types?.[collectionName]?.[params.docId]);
+        const isBeingDeleted = params.props[exports.DELETED_KEY] === true;
+        if (isBeingCreated || isBeingDeleted) {
             thingsToTrigger.push(() => {
                 docSignalTree[params.typeName].docsChanged.trigger();
             });

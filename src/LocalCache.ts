@@ -100,9 +100,12 @@ export function createCache({
     // We use this to defer triggering listeners until after we have updated the cache
     const thingsToTrigger: (() => void)[] = [];
 
-    // If we are going to have to create a doc, record that so we can notify listeners later
-    if (!exists(clientStorage.data?.types?.[collectionName]?.[params.docId])) {
-      // persistedData.types[params.typeName]![params.docId] = {};
+    // If this doc is being created or deleted, record that so we can notify listeners later
+    const isBeingCreated = !exists(
+      clientStorage.data?.types?.[collectionName]?.[params.docId],
+    );
+    const isBeingDeleted = params.props[DELETED_KEY] === true;
+    if (isBeingCreated || isBeingDeleted) {
       thingsToTrigger.push(() => {
         docSignalTree[params.typeName].docsChanged.trigger();
       });
