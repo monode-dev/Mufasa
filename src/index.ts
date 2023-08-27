@@ -6,12 +6,14 @@ import {
 } from "./Implement";
 import { PropSchema } from "./Parse";
 import { capacitorStorage as _capacitorStorage } from "./ClientStorage/Capacitor";
+import { globalStore as _globalStore } from "./utils";
 /** We should look into how drizzle orm handles definitions to get some inspiration for how to clean ours up. */
 // NOTE: It think this technically makes Mufasa an ORM, which means @miwi/orm might be a better spot for it.
 export type Doc<T extends {} = {}> = _Doc<T>;
 export type List<T extends _Doc<{}> = _Doc<{}>> = _List<T>;
 export const defineAppDataStructure = _defineAppDataStructure;
 export const capacitorStorage = _capacitorStorage;
+export const globalStore = _globalStore;
 
 /** Defines a prop of the specified primitive type. */
 export function prim<T extends number | string | boolean>(

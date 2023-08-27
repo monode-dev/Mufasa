@@ -1,10 +1,12 @@
 import { _Doc, _DocSpecificProps, _List, _defineAppDataStructure } from "./Implement";
 import { capacitorStorage as _capacitorStorage } from "./ClientStorage/Capacitor";
+import { globalStore as _globalStore } from "./utils";
 /** We should look into how drizzle orm handles definitions to get some inspiration for how to clean ours up. */
 export type Doc<T extends {} = {}> = _Doc<T>;
 export type List<T extends _Doc<{}> = _Doc<{}>> = _List<T>;
 export declare const defineAppDataStructure: typeof _defineAppDataStructure;
 export declare const capacitorStorage: typeof _capacitorStorage;
+export declare const globalStore: typeof _globalStore;
 /** Defines a prop of the specified primitive type. */
 export declare function prim<T extends number | string | boolean>(
 /** TODO: We might consider using Number, String, or Boolean as the first parameter

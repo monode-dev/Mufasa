@@ -1,11 +1,11 @@
 {
   "name": "mufasa",
-  "version": "0.0.98",
+  "version": "0.0.99",
   "main": "./dist/index.js",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/monode-dev/monode-orm.git"
+    "url": "https://github.com/monode-dev/Mufasa.git"
   },
   "scripts": {
     "build": "tsc",
