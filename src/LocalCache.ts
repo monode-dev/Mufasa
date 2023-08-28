@@ -163,6 +163,9 @@ export function createCache({
       docSignalTree[typeName].docsChanged.trigger();
       // TODO: Update parent lists.
     }
+    console.log(
+      `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
+    );
     for (const typeName in typeSchemas) {
       onSnapshot(
         query(
