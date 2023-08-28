@@ -175,8 +175,7 @@ export function createCache({
             ">",
             new Date(
               (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                0) -
-                30 * 1000,
+                0) - 30,
             ),
           ),
         ),

@@ -89,8 +89,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         console.log(`lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`);
         for (const typeName in typeSchemas) {
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                0) -
-                30 * 1000))), (snapshot) => {
+                0) - 30))), (snapshot) => {
                 let mostRecentChangeDate = clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0;
                 snapshot.docChanges().forEach((change) => {
                     if (change.type !== "removed") {
