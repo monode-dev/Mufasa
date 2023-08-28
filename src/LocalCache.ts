@@ -94,6 +94,7 @@ export function createCache({
     props: {
       [propName: string]: number | string | boolean | null | undefined;
     };
+    saveChanges?: boolean;
   }) {
     const clientStorage = await promisedClientStorage;
     const collectionName = getCollectionName(params.typeName);
@@ -167,6 +168,11 @@ export function createCache({
     }
     console.log(
       `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
+    );
+    console.log(
+      new Date(
+        (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0) - 30,
+      ),
     );
     for (const typeName in typeSchemas) {
       onSnapshot(

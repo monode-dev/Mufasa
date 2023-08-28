@@ -24,8 +24,8 @@ function capacitorStorage(fileSystem) {
         (async () => {
             while (true) {
                 if (lastSaveIndex !== saveIndex) {
-                    lastSaveIndex = saveIndex;
                     await fileSystem.writeFile(fileName, JSON.stringify(data));
+                    lastSaveIndex = saveIndex;
                 }
                 await new Promise((resolve) => setTimeout(resolve, 250));
             }

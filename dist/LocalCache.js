@@ -89,6 +89,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             // TODO: Update parent lists.
         }
         console.log(`lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`);
+        console.log(new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0) - 30));
         for (const typeName in typeSchemas) {
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
                 0) - 30))), (snapshot) => {
