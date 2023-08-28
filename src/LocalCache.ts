@@ -42,6 +42,7 @@ export function createCache({
   getClientStorage: GetClientStorage;
   isProduction: boolean;
 }) {
+  console.log(`About to Load client storage.`);
   const promisedClientStorage = getClientStorage<{
     lastChangeDate: {
       dev: number;
@@ -158,6 +159,7 @@ export function createCache({
   (async () => {
     const lastChangeDateProdKey = isProduction ? "prod" : "dev";
     const clientStorage = await promisedClientStorage;
+    console.log(`Finished Loading promisedClientStorage`);
     for (const typeName of Object.keys(typeSchemas)) {
       // Let the app know when the data is loaded.
       docSignalTree[typeName].docsChanged.trigger();

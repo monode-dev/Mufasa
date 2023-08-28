@@ -11,6 +11,7 @@ exports.CHANGE_DATE_KEY = `mx_changeDate`;
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
 function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, }) {
+    console.log(`About to Load client storage.`);
     const promisedClientStorage = getClientStorage(`mx_docs`, {
         lastChangeDate: {
             dev: 0,
@@ -81,6 +82,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
     (async () => {
         const lastChangeDateProdKey = isProduction ? "prod" : "dev";
         const clientStorage = await promisedClientStorage;
+        console.log(`Finished Loading promisedClientStorage`);
         for (const typeName of Object.keys(typeSchemas)) {
             // Let the app know when the data is loaded.
             docSignalTree[typeName].docsChanged.trigger();
