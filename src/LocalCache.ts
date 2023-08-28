@@ -166,7 +166,9 @@ export function createCache({
     );
     for (const typeName of Object.keys(typeSchemas)) {
       console.log(
-        `${typeName}: ${clientStorage.data.types?.[typeName]?.length}`,
+        `${typeName}: ${
+          Object.keys(clientStorage.data.types?.[typeName] ?? {}).length
+        }`,
       );
       // Let the app know when the data is loaded.
       docSignalTree[typeName].docsChanged.trigger();
