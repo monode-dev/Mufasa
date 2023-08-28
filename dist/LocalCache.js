@@ -83,7 +83,6 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         const lastChangeDateProdKey = isProduction ? "prod" : "dev";
         const clientStorage = await promisedClientStorage;
         console.log(`Finished Loading promisedClientStorage`);
-        console.log(`clientStorage.data: ${JSON.stringify(clientStorage.data, null, 2)}`);
         for (const typeName of Object.keys(typeSchemas)) {
             console.log(`${typeName}: ${Object.keys(clientStorage.data.types?.[typeName] ?? {}).length}`);
             // Let the app know when the data is loaded.
@@ -115,7 +114,8 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                         });
                     }
                 });
-                if (mostRecentChangeDate >=
+                console.log(`${typeName} docs changed: ${snapshot.docChanges().length}`);
+                if (mostRecentChangeDate >
                     (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)) {
                     clientStorage.updateData({
                         lastChangeDate: {

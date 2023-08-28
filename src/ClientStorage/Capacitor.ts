@@ -13,16 +13,8 @@ export function capacitorStorage(fileSystem: {
     let data: JsonObject = await (async () => {
       const savedData = await fileSystem.readFile(fileName);
       if (exists(savedData)) {
-        console.log(
-          `${fileName}'s savedData: ${JSON.stringify(
-            JSON.parse(savedData),
-            null,
-            2,
-          )}`,
-        );
         return JSON.parse(savedData);
       } else {
-        console.log(`${fileName}'s savedData: ${savedData}`);
         return init;
       }
     })();

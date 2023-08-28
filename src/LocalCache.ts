@@ -161,9 +161,6 @@ export function createCache({
     const lastChangeDateProdKey = isProduction ? "prod" : "dev";
     const clientStorage = await promisedClientStorage;
     console.log(`Finished Loading promisedClientStorage`);
-    console.log(
-      `clientStorage.data: ${JSON.stringify(clientStorage.data, null, 2)}`,
-    );
     for (const typeName of Object.keys(typeSchemas)) {
       console.log(
         `${typeName}: ${
@@ -218,8 +215,11 @@ export function createCache({
               });
             }
           });
+          console.log(
+            `${typeName} docs changed: ${snapshot.docChanges().length}`,
+          );
           if (
-            mostRecentChangeDate >=
+            mostRecentChangeDate >
             (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)
           ) {
             clientStorage.updateData({
