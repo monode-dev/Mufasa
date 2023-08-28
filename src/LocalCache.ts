@@ -158,7 +158,6 @@ export function createCache({
   }
 
   (async () => {
-    const lastChangeDateProdKey = isProduction ? "prod" : "dev";
     const clientStorage = await promisedClientStorage;
     console.log(`Finished Loading promisedClientStorage`);
     for (const typeName of Object.keys(typeSchemas)) {
@@ -180,6 +179,10 @@ export function createCache({
         }
       }
     }
+  })();
+  (async () => {
+    const clientStorage = await promisedClientStorage;
+    const lastChangeDateProdKey = isProduction ? "prod" : "dev";
     console.log(
       `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
     );

@@ -80,7 +80,6 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         thingsToTrigger.forEach((trigger) => trigger());
     }
     (async () => {
-        const lastChangeDateProdKey = isProduction ? "prod" : "dev";
         const clientStorage = await promisedClientStorage;
         console.log(`Finished Loading promisedClientStorage`);
         for (const typeName of Object.keys(typeSchemas)) {
@@ -96,6 +95,10 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                 }
             }
         }
+    })();
+    (async () => {
+        const clientStorage = await promisedClientStorage;
+        const lastChangeDateProdKey = isProduction ? "prod" : "dev";
         console.log(`lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`);
         for (const typeName in typeSchemas) {
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
