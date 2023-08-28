@@ -171,7 +171,9 @@ export function createCache({
     );
     console.log(
       new Date(
-        (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0) - 30,
+        (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0) *
+          1000 -
+          30,
       ),
     );
     for (const typeName in typeSchemas) {
@@ -183,7 +185,9 @@ export function createCache({
             ">",
             new Date(
               (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                0) - 30,
+                0) *
+                1000 -
+                30,
             ),
           ),
         ),
