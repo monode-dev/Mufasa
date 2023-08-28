@@ -113,9 +113,12 @@ function listProx(typeName, objFormats, localCache, isChild = false, mx_parent) 
         return vueRefToList(collectionList, mx_parent);
     }
     else {
-        const collectionList = _computed(() => localCache
-            .listAllObjectsOfType(typeName)
-            .map((docId) => docProx(docId, typeName, objFormats, localCache)));
+        const collectionList = _computed(() => {
+            console.log(`Getting collection list for ${typeName}`);
+            return localCache
+                .listAllObjectsOfType(typeName)
+                .map((docId) => docProx(docId, typeName, objFormats, localCache));
+        });
         return vueRefToList(collectionList, mx_parent);
     }
     function vueRefToList(collectionList, mx_parent) {

@@ -158,6 +158,7 @@ export function createCache({
   }
 
   (async () => {
+    const lastChangeDateProdKey = isProduction ? "prod" : "dev";
     const clientStorage = await promisedClientStorage;
     console.log(`Finished Loading promisedClientStorage`);
     for (const typeName of Object.keys(typeSchemas)) {
@@ -179,70 +180,66 @@ export function createCache({
         }
       }
     }
+    console.log(
+      `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
+    );
+    for (const typeName in typeSchemas) {
+      onSnapshot(
+        query(
+          collection(firestoreDb, getCollectionName(typeName)),
+          where(
+            CHANGE_DATE_KEY,
+            ">",
+            new Date(
+              (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
+                0) *
+                1000 -
+                30,
+            ),
+          ),
+        ),
+        (snapshot) => {
+          let mostRecentChangeDate =
+            clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0;
+          snapshot.docChanges().forEach((change) => {
+            if (change.type !== "removed") {
+              const docData = change.doc.data();
+              mostRecentChangeDate = Math.max(
+                mostRecentChangeDate,
+                docData[CHANGE_DATE_KEY].seconds,
+              );
+              updateSessionStorage({
+                typeName: typeName,
+                docId: change.doc.ref.path,
+                props: docData,
+              });
+            }
+          });
+          console.log(
+            `${typeName} docs changed: ${snapshot.docChanges().length}`,
+          );
+          if (
+            mostRecentChangeDate >
+            (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)
+          ) {
+            clientStorage.updateData({
+              lastChangeDate: {
+                [lastChangeDateProdKey]: mostRecentChangeDate,
+              } as any,
+            });
+            console.log(
+              new Date(
+                (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
+                  0) *
+                  1000 -
+                  30,
+              ),
+            );
+          }
+        },
+      );
+    }
   })();
-  // (async () => {
-  //   const clientStorage = await promisedClientStorage;
-  //   const lastChangeDateProdKey = isProduction ? "prod" : "dev";
-  //   console.log(
-  //     `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
-  //   );
-  //   for (const typeName in typeSchemas) {
-  //     onSnapshot(
-  //       query(
-  //         collection(firestoreDb, getCollectionName(typeName)),
-  //         where(
-  //           CHANGE_DATE_KEY,
-  //           ">",
-  //           new Date(
-  //             (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-  //               0) *
-  //               1000 -
-  //               30,
-  //           ),
-  //         ),
-  //       ),
-  //       (snapshot) => {
-  //         let mostRecentChangeDate =
-  //           clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0;
-  //         snapshot.docChanges().forEach((change) => {
-  //           if (change.type !== "removed") {
-  //             const docData = change.doc.data();
-  //             mostRecentChangeDate = Math.max(
-  //               mostRecentChangeDate,
-  //               docData[CHANGE_DATE_KEY].seconds,
-  //             );
-  //             updateSessionStorage({
-  //               typeName: typeName,
-  //               docId: change.doc.ref.path,
-  //               props: docData,
-  //             });
-  //           }
-  //         });
-  //         console.log(
-  //           `${typeName} docs changed: ${snapshot.docChanges().length}`,
-  //         );
-  //         if (
-  //           mostRecentChangeDate >
-  //           (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)
-  //         ) {
-  //           clientStorage.updateData({
-  //             lastChangeDate: {
-  //               [lastChangeDateProdKey]: mostRecentChangeDate,
-  //             } as any,
-  //           });
-  //           console.log(
-  //             new Date(
-  //               (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-  //                 0) *
-  //                 1000 -
-  //                 30,
-  //             ),
-  //           );
-  //         }
-  //       },
-  //     );
-  //   }
-  // })();
   const result = {
     listAllObjectsOfType(typeName: string) {
       docSignalTree[typeName].docsChanged.listen();
