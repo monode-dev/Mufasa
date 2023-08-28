@@ -94,7 +94,6 @@ export function createCache({
     props: {
       [propName: string]: number | string | boolean | null | undefined;
     };
-    saveChanges?: boolean;
   }) {
     const clientStorage = await promisedClientStorage;
     const collectionName = getCollectionName(params.typeName);
@@ -130,6 +129,7 @@ export function createCache({
         }
       }
     }
+
     // Download any new files.
     for (const propName of Object.keys(params.props)) {
       if (typeSchemas[params.typeName][propName]?.format === "file") {
@@ -164,7 +164,16 @@ export function createCache({
     for (const typeName of Object.keys(typeSchemas)) {
       // Let the app know when the data is loaded.
       docSignalTree[typeName].docsChanged.trigger();
-      // TODO: Update parent lists.
+      for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
+        docSignalTree[typeName].parents[parentId].trigger();
+      }
+      for (const docId of Object.keys(docSignalTree[typeName].docs)) {
+        for (const propName of Object.keys(
+          docSignalTree[typeName].docs[docId],
+        )) {
+          docSignalTree[typeName].docs[docId][propName].trigger();
+        }
+      }
     }
     console.log(
       `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,

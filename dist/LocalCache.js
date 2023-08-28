@@ -86,7 +86,14 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         for (const typeName of Object.keys(typeSchemas)) {
             // Let the app know when the data is loaded.
             docSignalTree[typeName].docsChanged.trigger();
-            // TODO: Update parent lists.
+            for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
+                docSignalTree[typeName].parents[parentId].trigger();
+            }
+            for (const docId of Object.keys(docSignalTree[typeName].docs)) {
+                for (const propName of Object.keys(docSignalTree[typeName].docs[docId])) {
+                    docSignalTree[typeName].docs[docId][propName].trigger();
+                }
+            }
         }
         console.log(`lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`);
         console.log(new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0) *
