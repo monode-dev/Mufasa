@@ -191,6 +191,7 @@ function listProx<TypeName extends string, F extends TypeSchemaDict>(
   if (isChild) {
     const collectionList = _computed(() => {
       if (exists(mx_parent)) {
+        console.log(`Getting child docs for ${typeName} ${mx_parent}`);
         return localCache
           .getChildDocs(typeName, mx_parent!)
           .map((docId) => docProx(docId, typeName, objFormats, localCache));
