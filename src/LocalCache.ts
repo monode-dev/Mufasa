@@ -181,13 +181,6 @@ export function createCache({
     console.log(
       `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
     );
-    console.log(
-      new Date(
-        (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0) *
-          1000 -
-          30,
-      ),
-    );
     for (const typeName in typeSchemas) {
       onSnapshot(
         query(
@@ -229,6 +222,14 @@ export function createCache({
                 [lastChangeDateProdKey]: mostRecentChangeDate,
               } as any,
             });
+            console.log(
+              new Date(
+                (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
+                  0) *
+                  1000 -
+                  30,
+              ),
+            );
           }
         },
       );
