@@ -48,6 +48,13 @@ export function createCache({
       dev: number;
       prod: number;
     };
+    childLists: {
+      [childType: string]: {
+        [parentId: string]: {
+          [childId: string]: true;
+        };
+      };
+    };
     types: {
       [typeName: string]: {
         [docId: string]: DocData;
@@ -58,6 +65,7 @@ export function createCache({
       dev: 0,
       prod: 0,
     },
+    childLists: {},
     types: {},
   });
   type PromiseType<T extends Promise<any>> = T extends Promise<infer U>
@@ -121,11 +129,40 @@ export function createCache({
           docSignalTree[params.typeName].docs[params.docId][propName].trigger();
         });
         if (propName === MX_PARENT_KEY) {
-          thingsToTrigger.push(() => {
-            docSignalTree[params.typeName].parents[
-              params.props[propName] as string
-            ].trigger();
-          });
+          // Notify Old Parent
+          if (exists(oldDoc?.[propName])) {
+            clientStorage.updateData({
+              childLists: {
+                [collectionName]: {
+                  [oldDoc?.[propName] as string]: {
+                    [params.docId]: undefined as any,
+                  },
+                },
+              },
+            });
+            thingsToTrigger.push(() => {
+              docSignalTree[params.typeName].parents[
+                oldDoc?.[propName] as string
+              ].trigger();
+            });
+          }
+          // Notify New Parent
+          if (exists(params.props[propName])) {
+            clientStorage.updateData({
+              childLists: {
+                [collectionName]: {
+                  [params.props[propName] as string]: {
+                    [params.docId]: true,
+                  },
+                },
+              },
+            });
+            thingsToTrigger.push(() => {
+              docSignalTree[params.typeName].parents[
+                params.props[propName] as string
+              ].trigger();
+            });
+          }
         }
       }
     }
@@ -263,16 +300,21 @@ export function createCache({
     },
     getChildDocs(childType: string, parentId: string) {
       docSignalTree[childType].parents[parentId].listen();
-      const children: string[] = [];
-      for (const [docId, thisDoc] of Object.entries(
-        clientStorage?.data.types?.[getCollectionName(childType)] ?? {},
-      )) {
-        if (exists(thisDoc[DELETED_KEY]) && thisDoc[DELETED_KEY]) continue;
-        if (thisDoc?.[MX_PARENT_KEY] === parentId) {
-          children.push(docId);
-        }
-      }
-      return children;
+      return Object.keys(
+        clientStorage?.data.childLists?.[getCollectionName(childType)]?.[
+          parentId
+        ] ?? {},
+      );
+      // const children: string[] = [];
+      // for (const [docId, thisDoc] of Object.entries(
+      //   clientStorage?.data.types?.[getCollectionName(childType)] ?? {},
+      // )) {
+      //   if (exists(thisDoc[DELETED_KEY]) && thisDoc[DELETED_KEY]) continue;
+      //   if (thisDoc?.[MX_PARENT_KEY] === parentId) {
+      //     children.push(docId);
+      //   }
+      // }
+      // return children;
     },
     getPropValue(typeName: string, docId: string, propName: string) {
       docSignalTree[typeName].docs[docId][propName].listen();

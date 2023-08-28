@@ -102,7 +102,7 @@ function listProx(typeName, objFormats, localCache, isChild = false, mx_parent) 
     if (isChild) {
         const collectionList = _computed(() => {
             if ((0, utils_1.exists)(mx_parent)) {
-                console.log(`Getting child docs for ${typeName} ${mx_parent}`);
+                // console.log(`Getting child docs for ${typeName} ${mx_parent}`);
                 return localCache
                     .getChildDocs(typeName, mx_parent)
                     .map((docId) => docProx(docId, typeName, objFormats, localCache));

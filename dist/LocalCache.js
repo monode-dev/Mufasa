@@ -17,6 +17,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             dev: 0,
             prod: 0,
         },
+        childLists: {},
         types: {},
     });
     let clientStorage = undefined;
@@ -48,9 +49,36 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                     docSignalTree[params.typeName].docs[params.docId][propName].trigger();
                 });
                 if (propName === exports.MX_PARENT_KEY) {
-                    thingsToTrigger.push(() => {
-                        docSignalTree[params.typeName].parents[params.props[propName]].trigger();
-                    });
+                    // Notify Old Parent
+                    if ((0, utils_1.exists)(oldDoc?.[propName])) {
+                        clientStorage.updateData({
+                            childLists: {
+                                [collectionName]: {
+                                    [oldDoc?.[propName]]: {
+                                        [params.docId]: undefined,
+                                    },
+                                },
+                            },
+                        });
+                        thingsToTrigger.push(() => {
+                            docSignalTree[params.typeName].parents[oldDoc?.[propName]].trigger();
+                        });
+                    }
+                    // Notify New Parent
+                    if ((0, utils_1.exists)(params.props[propName])) {
+                        clientStorage.updateData({
+                            childLists: {
+                                [collectionName]: {
+                                    [params.props[propName]]: {
+                                        [params.docId]: true,
+                                    },
+                                },
+                            },
+                        });
+                        thingsToTrigger.push(() => {
+                            docSignalTree[params.typeName].parents[params.props[propName]].trigger();
+                        });
+                    }
                 }
             }
         }
@@ -172,15 +200,17 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         },
         getChildDocs(childType, parentId) {
             docSignalTree[childType].parents[parentId].listen();
-            const children = [];
-            for (const [docId, thisDoc] of Object.entries(clientStorage?.data.types?.[getCollectionName(childType)] ?? {})) {
-                if ((0, utils_1.exists)(thisDoc[exports.DELETED_KEY]) && thisDoc[exports.DELETED_KEY])
-                    continue;
-                if (thisDoc?.[exports.MX_PARENT_KEY] === parentId) {
-                    children.push(docId);
-                }
-            }
-            return children;
+            return Object.keys(clientStorage?.data.childLists?.[getCollectionName(childType)]?.[parentId] ?? {});
+            // const children: string[] = [];
+            // for (const [docId, thisDoc] of Object.entries(
+            //   clientStorage?.data.types?.[getCollectionName(childType)] ?? {},
+            // )) {
+            //   if (exists(thisDoc[DELETED_KEY]) && thisDoc[DELETED_KEY]) continue;
+            //   if (thisDoc?.[MX_PARENT_KEY] === parentId) {
+            //     children.push(docId);
+            //   }
+            // }
+            // return children;
         },
         getPropValue(typeName, docId, propName) {
             docSignalTree[typeName].docs[docId][propName].listen();
