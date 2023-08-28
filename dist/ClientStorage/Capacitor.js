@@ -9,11 +9,11 @@ function capacitorStorage(fileSystem) {
         let data = await (async () => {
             const savedData = await fileSystem.readFile(fileName);
             if ((0, utils_1.exists)(savedData)) {
-                console.log(`savedData: ${JSON.stringify(JSON.parse(savedData), null, 2)}`);
+                console.log(`${fileName}'s savedData: ${JSON.stringify(JSON.parse(savedData), null, 2)}`);
                 return JSON.parse(savedData);
             }
             else {
-                console.log(`savedData: ${savedData}`);
+                console.log(`${fileName}'s savedData: ${savedData}`);
                 return init;
             }
         })();

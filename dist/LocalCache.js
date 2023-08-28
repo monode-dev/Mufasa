@@ -83,6 +83,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         const lastChangeDateProdKey = isProduction ? "prod" : "dev";
         const clientStorage = await promisedClientStorage;
         console.log(`Finished Loading promisedClientStorage`);
+        console.log(`clientStorage.data: ${JSON.stringify(clientStorage.data, null, 2)}`);
         for (const typeName of Object.keys(typeSchemas)) {
             console.log(`${typeName}: ${clientStorage.data.types?.[typeName]?.length}`);
             // Let the app know when the data is loaded.
