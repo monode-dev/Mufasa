@@ -11,7 +11,6 @@ exports.CHANGE_DATE_KEY = `mx_changeDate`;
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
 function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, }) {
-    console.log(`About to Load client storage.`);
     const promisedClientStorage = getClientStorage(`mx_docs`, {
         lastChangeDate: {
             dev: 0,
@@ -110,9 +109,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
     (async () => {
         const lastChangeDateProdKey = isProduction ? "prod" : "dev";
         const clientStorage = await promisedClientStorage;
-        console.log(`Finished Loading promisedClientStorage`);
         for (const typeName of Object.keys(typeSchemas)) {
-            console.log(`${typeName}: ${Object.keys(clientStorage.data.types?.[typeName] ?? {}).length}`);
             // Let the app know when the data is loaded.
             docSignalTree[typeName].docsChanged.trigger();
             for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
@@ -124,7 +121,6 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                 }
             }
         }
-        console.log(`lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`);
         for (const typeName in typeSchemas) {
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
                 0) *
@@ -150,10 +146,6 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                             [lastChangeDateProdKey]: mostRecentChangeDate,
                         },
                     });
-                    console.log(new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                        0) *
-                        1000 -
-                        30));
                 }
             });
         }

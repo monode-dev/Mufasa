@@ -42,7 +42,6 @@ export function createCache({
   getClientStorage: GetClientStorage;
   isProduction: boolean;
 }) {
-  console.log(`About to Load client storage.`);
   const promisedClientStorage = getClientStorage<{
     lastChangeDate: {
       dev: number;
@@ -197,13 +196,7 @@ export function createCache({
   (async () => {
     const lastChangeDateProdKey = isProduction ? "prod" : "dev";
     const clientStorage = await promisedClientStorage;
-    console.log(`Finished Loading promisedClientStorage`);
     for (const typeName of Object.keys(typeSchemas)) {
-      console.log(
-        `${typeName}: ${
-          Object.keys(clientStorage.data.types?.[typeName] ?? {}).length
-        }`,
-      );
       // Let the app know when the data is loaded.
       docSignalTree[typeName].docsChanged.trigger();
       for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
@@ -217,9 +210,6 @@ export function createCache({
         }
       }
     }
-    console.log(
-      `lastChangeDate: ${clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]}`,
-    );
     for (const typeName in typeSchemas) {
       onSnapshot(
         query(
@@ -264,14 +254,6 @@ export function createCache({
                 [lastChangeDateProdKey]: mostRecentChangeDate,
               } as any,
             });
-            console.log(
-              new Date(
-                (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                  0) *
-                  1000 -
-                  30,
-              ),
-            );
           }
         },
       );
