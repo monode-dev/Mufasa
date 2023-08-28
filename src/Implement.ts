@@ -200,12 +200,11 @@ function listProx<TypeName extends string, F extends TypeSchemaDict>(
     });
     return vueRefToList(collectionList, mx_parent);
   } else {
-    const collectionList = _computed(() => {
-      console.log(`Getting collection list for ${typeName}`);
-      return localCache
+    const collectionList = _computed(() =>
+      localCache
         .listAllObjectsOfType(typeName)
-        .map((docId) => docProx(docId, typeName, objFormats, localCache));
-    });
+        .map((docId) => docProx(docId, typeName, objFormats, localCache)),
+    );
     return vueRefToList(collectionList, mx_parent);
   }
   function vueRefToList<T extends _Doc<{}>>(
