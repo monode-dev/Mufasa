@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.117",
+  "version": "0.0.118",
   "main": "./dist/index.js",
   "license": "ISC",
   "repository": {
