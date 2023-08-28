@@ -84,6 +84,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         const clientStorage = await promisedClientStorage;
         console.log(`Finished Loading promisedClientStorage`);
         for (const typeName of Object.keys(typeSchemas)) {
+            console.log(`${typeName}: ${clientStorage.data.types?.[typeName]?.length}`);
             // Let the app know when the data is loaded.
             docSignalTree[typeName].docsChanged.trigger();
             for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
