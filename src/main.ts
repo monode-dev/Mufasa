@@ -51,14 +51,14 @@ import CompletedDeliveryEntry from "./views/deliveries/CompletedDeliveryEntry.vu
 import DeliveriesTab from "./views/deliveries/DeliveriesTab.vue";
 import UpcomingDelivery from "./views/deliveries/UpcomingDelivery.dialog.vue";
 import UpcomingDeliveryEntry from "./views/deliveries/UpcomingDeliveryEntry.vue";
-import CreateTank from "./views/tanks/CreateTank.dialog.vue";
-import TankEntry from "./views/tanks/TankEntry.vue";
-import TankFields from "./views/tanks/TankFields.vue";
 import CreateFuelType from "./views/settings/CreateFuelType.dialog.vue";
 import FuelTypeDropDown from "./views/settings/FuelTypeDropDown.vue";
 import FuelTypeEntry from "./views/settings/FuelTypeEntry.vue";
 import Settings from "./views/settings/Settings.page.vue";
 import SettingsButton from "./views/settings/SettingsButton.vue";
+import CreateTank from "./views/tanks/CreateTank.dialog.vue";
+import TankEntry from "./views/tanks/TankEntry.vue";
+import TankFields from "./views/tanks/TankFields.vue";
 // End Generated Imports
 CapacitorUpdater.notifyAppReady();
 
@@ -109,14 +109,14 @@ vueApp.component("CompletedDeliveryEntry", CompletedDeliveryEntry);
 vueApp.component("DeliveriesTab", DeliveriesTab);
 vueApp.component("UpcomingDelivery", UpcomingDelivery);
 vueApp.component("UpcomingDeliveryEntry", UpcomingDeliveryEntry);
-vueApp.component("CreateTank", CreateTank);
-vueApp.component("TankEntry", TankEntry);
-vueApp.component("TankFields", TankFields);
 vueApp.component("CreateFuelType", CreateFuelType);
 vueApp.component("FuelTypeDropDown", FuelTypeDropDown);
 vueApp.component("FuelTypeEntry", FuelTypeEntry);
 vueApp.component("Settings", Settings);
 vueApp.component("SettingsButton", SettingsButton);
+vueApp.component("CreateTank", CreateTank);
+vueApp.component("TankEntry", TankEntry);
+vueApp.component("TankFields", TankFields);
 // End Generated Components
 // vueApp.config.globalProperties.$align = Align;
 
