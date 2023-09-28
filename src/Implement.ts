@@ -50,6 +50,7 @@ export type _DocSpecificProps = {
   readonly isLoaded: boolean;
   readonly isDeleted: boolean;
   // readonly mx_parent: _Doc | null | undefined;
+  getPropFilePath(propName: string): string | null;
   deleteDoc(): Promise<void>;
 };
 export function docProx<
@@ -72,6 +73,10 @@ export function docProx<
     get isDeleted() {
       return (localCache.getPropValue(typeName, proxy._id ?? ``, DELETED_KEY) ??
         false) as boolean;
+    },
+    getPropFilePath(propName: string) {
+      if (!exists(proxy._id)) return null;
+      return localCache.getFilePath(typeName, proxy._id, propName);
     },
     async deleteDoc() {
       if (exists(docId)) {

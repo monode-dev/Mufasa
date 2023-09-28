@@ -19,6 +19,7 @@ export type _DocSpecificProps = {
     readonly _id: string | null | undefined;
     readonly isLoaded: boolean;
     readonly isDeleted: boolean;
+    getPropFilePath(propName: string): string | null;
     deleteDoc(): Promise<void>;
 };
 export declare function docProx<TypeName extends string, F extends TypeSchemaDict, T extends _Doc<{}> = SchemaToTsType<TypeName, F>>(docId: string | null | undefined, typeName: TypeName, objFormats: F, localCache: LocalCache): T;

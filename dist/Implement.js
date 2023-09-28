@@ -27,6 +27,11 @@ function docProx(docId, typeName, objFormats, localCache) {
             return (localCache.getPropValue(typeName, proxy._id ?? ``, LocalCache_1.DELETED_KEY) ??
                 false);
         },
+        getPropFilePath(propName) {
+            if (!(0, utils_1.exists)(proxy._id))
+                return null;
+            return localCache.getFilePath(typeName, proxy._id, propName);
+        },
         async deleteDoc() {
             if ((0, utils_1.exists)(docId)) {
                 // Delete all sub docs
