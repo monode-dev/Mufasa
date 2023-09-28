@@ -205,7 +205,6 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
             for (const key of Object.keys(options.rootSchema)) {
                 rootLists[key] = listProx(options.rootSchema[key].refTypeName, options.typeSchemas, localCache);
             }
-            rootLists[`getLocalFilePath`] = localCache.getFilePath;
             return rootLists;
         }),
         types: {},
