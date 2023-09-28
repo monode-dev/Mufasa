@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.119",
+  "version": "0.0.126",
   "main": "./dist/index.js",
   "license": "ISC",
   "repository": {
@@ -9,12 +9,14 @@
   },
   "scripts": {
     "build": "tsc",
-    "pub": "sucrase-node pub.ts"
+    "pub": "npx sucrase-node pub.ts"
   },
   "devDependencies": {
     "@types/node": "^20.4.2",
     "semver": "^7.5.4",
-    "sucrase": "^3.32.0"
+    "sucrase": "^3.32.0",
+    "tsc": "^2.0.4",
+    "typescript": "^5.2.2"
   },
   "exports": {
     ".": "./dist/index.js",

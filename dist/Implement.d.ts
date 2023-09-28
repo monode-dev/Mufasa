@@ -40,7 +40,9 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
     rootSchema: RS;
     typeSchemas: TSD;
 }): {
-    getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
+    getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; } & {
+        readonly getLocalFilePath: (path: string) => string;
+    };
     types: SchemaDictToTsType<TSD>;
 };
 export {};

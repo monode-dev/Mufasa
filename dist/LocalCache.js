@@ -211,6 +211,12 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             updateSessionStorage({ typeName, docId, props });
             return docId;
         },
+        getFilePath(typeName, docId, propName) {
+            const fileId = clientStorage?.data.types?.[getCollectionName(typeName)]?.[docId]?.[propName];
+            if (!(0, utils_1.exists)(fileId))
+                return null;
+            return clientStorage?.getFilePath(fileId) ?? null;
+        },
         async setPropValue(typeName, docId, propName, value) {
             if (typeSchemas[typeName]?.[propName]?.format === "file") {
                 const newFileId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_File`)).path;

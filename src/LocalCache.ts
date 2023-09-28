@@ -334,6 +334,13 @@ export function createCache({
 
       return docId;
     },
+    getFilePath(typeName: string, docId: string, propName: string) {
+      const fileId = clientStorage?.data.types?.[
+        getCollectionName(typeName)
+      ]?.[docId]?.[propName] as string | undefined | null;
+      if (!exists(fileId)) return null;
+      return clientStorage?.getFilePath(fileId) ?? null;
+    },
     async setPropValue(
       typeName: string,
       docId: string,

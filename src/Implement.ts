@@ -341,7 +341,10 @@ export function _defineAppDataStructure<
           localCache,
         );
       }
-      return rootLists;
+      (rootLists as any)[`getLocalFilePath`] = localCache.getFilePath;
+      return rootLists as typeof rootLists & {
+        readonly getLocalFilePath: (path: string) => string;
+      };
     }),
     types: {} as SchemaDictToTsType<typeof options.typeSchemas>,
   };

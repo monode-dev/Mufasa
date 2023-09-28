@@ -28,6 +28,7 @@ export declare function createCache({ typeSchemas, getCollectionName, firebaseAp
     addDoc(typeName: string, props: {
         [propName: string]: any;
     }): string;
+    getFilePath(typeName: string, docId: string, propName: string): string | null;
     setPropValue(typeName: string, docId: string, propName: string, value: any): Promise<void>;
     deleteDoc(typeName: string, docId: string): void;
 };

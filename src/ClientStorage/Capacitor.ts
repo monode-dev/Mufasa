@@ -5,6 +5,7 @@ export function capacitorStorage(fileSystem: {
   readFile: (path: string) => Promise<string | undefined>;
   writeFile: (path: string, data: string) => Promise<void>;
   deleteFile: (path: string) => Promise<void>;
+  getFilePath: (path: string) => string;
 }): GetClientStorage {
   return async function <T extends JsonObject>(fileName: string, init: T) {
     fileName = `${fileName}.json`;
@@ -77,6 +78,7 @@ export function capacitorStorage(fileSystem: {
       readFile: fileSystem.readFile,
       writeFile: fileSystem.writeFile,
       deleteFile: fileSystem.deleteFile,
+      getFilePath: fileSystem.getFilePath,
     };
   };
 }

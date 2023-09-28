@@ -68,6 +68,7 @@ function capacitorStorage(fileSystem) {
             readFile: fileSystem.readFile,
             writeFile: fileSystem.writeFile,
             deleteFile: fileSystem.deleteFile,
+            getFilePath: fileSystem.getFilePath,
         };
     };
 }

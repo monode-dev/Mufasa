@@ -15,5 +15,6 @@ export type ClientStorage<T extends JsonObject> = {
     readFile: (path: string) => Promise<string | undefined>;
     writeFile: (path: string, data: string) => Promise<void>;
     deleteFile: (path: string) => Promise<void>;
+    getFilePath: (path: string) => string;
 };
 export {};
