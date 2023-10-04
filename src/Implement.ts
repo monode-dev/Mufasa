@@ -1,10 +1,4 @@
-import { initializeApp, FirebaseOptions } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  Firestore,
-  CollectionReference,
-} from "firebase/firestore";
+import { FirebaseOptions } from "firebase/app";
 import { exists, globalStore } from "./utils";
 import {
   SchemaDictToTsType,
@@ -13,7 +7,7 @@ import {
   RootSchema,
 } from "./Parse";
 import { DELETED_KEY, LocalCache, createCache } from "./LocalCache";
-import { GetClientStorage } from "./ClientStorage/ClientStorage";
+import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
 
 //
 //
@@ -31,9 +25,10 @@ let _signal: <T>(initialValue: T) => Signal<T>;
 let _isSignal: (obj: any) => obj is Signal<any>;
 let _watchEffect: (effect: () => void) => void;
 // Firebase
-let firestoreDb: Firestore;
+// let firestoreDb: Firestore;
 let isProduction = false;
 function getCollectionName(typeName: string): string {
+  // return `${isProduction ? `Prod` : `Dev`}_${typeName}`;
   return isProduction ? typeName : `Dev_${typeName}`;
 }
 
@@ -290,6 +285,12 @@ function listProx<TypeName extends string, F extends TypeSchemaDict>(
 //
 //
 // SECTION: Define
+export type MfsFileSystem = {
+  readFile: (path: string) => Promise<string | undefined>;
+  writeFile: (path: string, data: string) => Promise<void>;
+  deleteFile: (path: string) => Promise<void>;
+  getFilePath: (path: string) => string;
+};
 export function _defineAppDataStructure<
   RS extends RootSchema,
   TSD extends TypeSchemaDict,
@@ -304,7 +305,7 @@ export function _defineAppDataStructure<
   },
   options: {
     isProduction: boolean;
-    getClientStorage: GetClientStorage;
+    fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
   },
@@ -316,18 +317,20 @@ export function _defineAppDataStructure<
   _watchEffect = reactivity.watchEffect;
   // Setup Firebase
   isProduction = options.isProduction;
-  const firebaseApp = initializeApp(firebaseOptions);
-  firestoreDb = getFirestore(firebaseApp);
 
   return {
     getAppData: globalStore(modelName, () => {
+      const persistedFunctionManager = initializePersistedFunctionManager(
+        `mfs_${modelName}_persistedFunctions`,
+        options.fileSystem,
+      );
       const localCache = createCache({
         typeSchemas: options.typeSchemas,
         getCollectionName,
-        firebaseApp,
-        firestoreDb,
+        firebaseOptions,
         _signal,
-        getClientStorage: options.getClientStorage,
+        persistedFunctionManager: persistedFunctionManager,
+        fileSystem: options.fileSystem,
         isProduction: options.isProduction,
       });
 

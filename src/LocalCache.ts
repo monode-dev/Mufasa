@@ -1,22 +1,12 @@
-import {
-  onSnapshot,
-  doc,
-  CollectionReference,
-  Firestore,
-  query,
-  where,
-  collection,
-} from "firebase/firestore";
 import { TypeSchemaDict, UPLOADING_FILE } from "./Parse";
-import { exists } from "./utils";
-import { Signal } from "./Implement";
-import { FirebaseApp } from "firebase/app";
-import { GetClientStorage } from "./ClientStorage/ClientStorage";
+import { JsonObject, exists, sleep } from "./utils";
+import { MfsFileSystem, Signal } from "./Implement";
+import { FirebaseOptions } from "firebase/app";
 import { newSignalTree, SignalEvent } from "./SignalTree";
-import { loadChangeUploader } from "./ServerStorage/ChangeUploader";
-import { getStorage, getBytes, ref as storageRef } from "firebase/storage";
+import { initializeFirestoreSync } from "./FirestoreSync";
+import { PersistedFunctionManager } from "./PersistedFunctionManager";
+import { uuid } from "uuidv4";
 
-export const CHANGE_DATE_KEY = `mx_changeDate`;
 export const DELETED_KEY = `mx_deleted`;
 export const MX_PARENT_KEY = `mx_parent`;
 
@@ -28,21 +18,22 @@ export type LocalCache = ReturnType<typeof createCache>;
 export function createCache({
   typeSchemas,
   getCollectionName,
-  firebaseApp,
-  firestoreDb,
+  firebaseOptions,
   _signal,
-  getClientStorage,
+  persistedFunctionManager,
+  fileSystem,
   isProduction,
 }: {
   typeSchemas: TypeSchemaDict;
   getCollectionName: (typeName: string) => string;
-  firebaseApp: FirebaseApp;
-  firestoreDb: Firestore;
+  firebaseOptions: FirebaseOptions;
   _signal: (initValue: any) => Signal<any>;
-  getClientStorage: GetClientStorage;
+  persistedFunctionManager: PersistedFunctionManager;
+  fileSystem: MfsFileSystem;
   isProduction: boolean;
 }) {
-  const promisedClientStorage = getClientStorage<{
+  // SECTION: Offline Cache
+  type OfflineCache = Partial<{
     lastChangeDate: {
       dev: number;
       prod: number;
@@ -59,22 +50,72 @@ export function createCache({
         [docId: string]: DocData;
       };
     };
-  }>(`mx_docs`, {
-    lastChangeDate: {
-      dev: 0,
-      prod: 0,
-    },
-    childLists: {},
-    types: {},
+  }>;
+  const offlineCacheFileName = `mfs_offlineCache`;
+  const _offlineCache = fileSystem
+    .readFile(offlineCacheFileName)
+    .then((saveFileString) => {
+      return (
+        exists(saveFileString) ? JSON.parse(saveFileString) : {}
+      ) as OfflineCache;
+    });
+  let unPromisedOfflineCache: Partial<OfflineCache> | undefined = undefined;
+  _offlineCache.then((cache) => {
+    unPromisedOfflineCache = cache;
   });
-  type PromiseType<T extends Promise<any>> = T extends Promise<infer U>
-    ? U
-    : never;
-  let clientStorage: PromiseType<typeof promisedClientStorage> | undefined =
-    undefined;
-  (async () => {
-    clientStorage = await promisedClientStorage;
-  })();
+  async function updateOfflineCache(updates: Partial<OfflineCache>) {
+    const offlineCache = await _offlineCache;
+    updateRec(offlineCache, updates);
+    requestSave();
+    function updateRec(original: any, updates: any) {
+      for (const propName in updates) {
+        const value = updates[propName];
+        if (value === undefined) {
+          // Undefined means delete
+          delete original[propName];
+        } else if (
+          typeof value === "object" &&
+          value !== null &&
+          !Array.isArray(value)
+        ) {
+          // Objects
+          if (
+            !exists(original[propName]) ||
+            typeof original[propName] !== "object" ||
+            Array.isArray(original[propName]) ||
+            original[propName] === null
+          ) {
+            original[propName] = {};
+          }
+          updateRec(original[propName] as JsonObject, value);
+        } else {
+          // Primitives
+          original[propName] = value;
+        }
+      }
+    }
+    requestSave();
+  }
+  // Start save Loop
+  let saveIndex = 0;
+  let lastSaveIndex = saveIndex;
+  function requestSave() {
+    saveIndex += 1;
+  }
+  _offlineCache.then(async (offlineCache) => {
+    while (true) {
+      if (lastSaveIndex !== saveIndex) {
+        await fileSystem.writeFile(
+          offlineCacheFileName,
+          JSON.stringify(offlineCache),
+        );
+        lastSaveIndex = saveIndex;
+      }
+      await sleep(250);
+    }
+  });
+
+  // Signal tree
   const docSignalTree = newSignalTree<{
     [typeName: string]: {
       docsChanged: SignalEvent;
@@ -88,12 +129,12 @@ export function createCache({
       };
     };
   }>(_signal);
-  const changeUploader = loadChangeUploader(
-    firestoreDb,
-    firebaseApp,
-    getClientStorage,
+  const firestoreSync = initializeFirestoreSync(
+    firebaseOptions,
+    isProduction,
+    persistedFunctionManager,
+    fileSystem,
   );
-  const serverFileStorage = getStorage(firebaseApp);
 
   async function updateSessionStorage(params: {
     typeName: string;
@@ -102,7 +143,7 @@ export function createCache({
       [propName: string]: number | string | boolean | null | undefined;
     };
   }) {
-    const clientStorage = await promisedClientStorage;
+    const offlineCache = await _offlineCache;
     const collectionName = getCollectionName(params.typeName);
 
     // We use this to defer triggering listeners until after we have updated the cache
@@ -110,7 +151,7 @@ export function createCache({
 
     // If this doc is being created or deleted, record that so we can notify listeners later
     const isBeingCreated = !exists(
-      clientStorage.data?.types?.[collectionName]?.[params.docId],
+      offlineCache.types?.[collectionName]?.[params.docId],
     );
     const isBeingDeleted = params.props[DELETED_KEY] === true;
     if (isBeingCreated || isBeingDeleted) {
@@ -120,7 +161,7 @@ export function createCache({
     }
 
     // Record all the props that changed so we can notify listeners later
-    const oldDoc = clientStorage.data?.types?.[collectionName]?.[params.docId];
+    const oldDoc = offlineCache.types?.[collectionName]?.[params.docId];
     // TODO: Run these notifications even if a previous version doesn't exists.
     for (const propName of Object.keys(params.props)) {
       if (!exists(oldDoc) || oldDoc[propName] !== params.props[propName]) {
@@ -130,7 +171,7 @@ export function createCache({
         if (propName === MX_PARENT_KEY) {
           // Notify Old Parent
           if (exists(oldDoc?.[propName])) {
-            clientStorage.updateData({
+            updateOfflineCache({
               childLists: {
                 [collectionName]: {
                   [oldDoc?.[propName] as string]: {
@@ -147,7 +188,7 @@ export function createCache({
           }
           // Notify New Parent
           if (exists(params.props[propName])) {
-            clientStorage.updateData({
+            updateOfflineCache({
               childLists: {
                 [collectionName]: {
                   [params.props[propName] as string]: {
@@ -172,16 +213,15 @@ export function createCache({
         const fileId = params.props[propName] as string | null | undefined;
         if (!exists(fileId)) continue;
         (async () => {
-          const bytes = await getBytes(storageRef(serverFileStorage, fileId));
-          const asString = new TextDecoder("utf-8").decode(bytes);
-          await clientStorage.writeFile(fileId, asString);
+          // TODO: Persist this file download in case it gets interrupted.
+          await firestoreSync.downloadFile(fileId);
           docSignalTree[params.typeName].docs[params.docId][propName].trigger();
         })();
       }
     }
 
     // Apply the updates locally
-    clientStorage.updateData({
+    updateOfflineCache({
       types: {
         [collectionName]: {
           [params.docId]: params.props,
@@ -193,11 +233,9 @@ export function createCache({
     thingsToTrigger.forEach((trigger) => trigger());
   }
 
-  (async () => {
-    const lastChangeDateProdKey = isProduction ? "prod" : "dev";
-    const clientStorage = await promisedClientStorage;
+  _offlineCache.then(() => {
+    // Let the app know when the data is loaded.
     for (const typeName of Object.keys(typeSchemas)) {
-      // Let the app know when the data is loaded.
       docSignalTree[typeName].docsChanged.trigger();
       for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
         docSignalTree[typeName].parents[parentId].trigger();
@@ -210,61 +248,24 @@ export function createCache({
         }
       }
     }
+
+    // Start syncing with the DB
     for (const typeName in typeSchemas) {
-      onSnapshot(
-        query(
-          collection(firestoreDb, getCollectionName(typeName)),
-          where(
-            CHANGE_DATE_KEY,
-            ">",
-            new Date(
-              (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                0) *
-                1000 -
-                30,
-            ),
-          ),
-        ),
-        (snapshot) => {
-          let mostRecentChangeDate =
-            clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0;
-          snapshot.docChanges().forEach((change) => {
-            if (change.type !== "removed") {
-              const docData = change.doc.data();
-              mostRecentChangeDate = Math.max(
-                mostRecentChangeDate,
-                docData[CHANGE_DATE_KEY].seconds,
-              );
-              updateSessionStorage({
-                typeName: typeName,
-                docId: change.doc.ref.path,
-                props: docData,
-              });
-            }
-          });
-          console.log(
-            `${typeName} docs changed: ${snapshot.docChanges().length}`,
-          );
-          if (
-            mostRecentChangeDate >
-            (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)
-          ) {
-            clientStorage.updateData({
-              lastChangeDate: {
-                [lastChangeDateProdKey]: mostRecentChangeDate,
-              } as any,
-            });
-          }
-        },
-      );
+      firestoreSync.watchCollection(typeName, (docId, docUpdates) => {
+        updateSessionStorage({
+          typeName: typeName,
+          docId: docId,
+          props: docUpdates as any,
+        });
+      });
     }
-  })();
-  const result = {
+  });
+  return {
     listAllObjectsOfType(typeName: string) {
       docSignalTree[typeName].docsChanged.listen();
       const objects: string[] = [];
       for (const [docId, thisDoc] of Object.entries(
-        clientStorage?.data.types?.[getCollectionName(typeName)] ?? {},
+        unPromisedOfflineCache?.types?.[getCollectionName(typeName)] ?? {},
       )) {
         if (exists(thisDoc[DELETED_KEY]) && thisDoc[DELETED_KEY]) continue;
         objects.push(docId);
@@ -276,14 +277,14 @@ export function createCache({
       return (
         exists(docId) &&
         exists(
-          clientStorage?.data.types?.[getCollectionName(typeName)]?.[docId],
+          unPromisedOfflineCache?.types?.[getCollectionName(typeName)]?.[docId],
         )
       );
     },
     getChildDocs(childType: string, parentId: string) {
       docSignalTree[childType].parents[parentId].listen();
       return Object.keys(
-        clientStorage?.data.childLists?.[getCollectionName(childType)]?.[
+        unPromisedOfflineCache?.childLists?.[getCollectionName(childType)]?.[
           parentId
         ] ?? {},
       );
@@ -301,14 +302,14 @@ export function createCache({
     getPropValue(typeName: string, docId: string, propName: string) {
       docSignalTree[typeName].docs[docId][propName].listen();
       const propValue =
-        clientStorage?.data.types?.[getCollectionName(typeName)]?.[docId]?.[
+        unPromisedOfflineCache?.types?.[getCollectionName(typeName)]?.[docId]?.[
           propName
         ];
       if (typeSchemas[typeName]?.[propName]?.format === "file") {
         if (!exists(propValue) || typeof propValue !== "string") return null;
 
         //  Check if a new file is being uploaded
-        const fileIsUploading = changeUploader.isFileUploading({
+        const fileIsUploading = firestoreSync.isFileUploading({
           docId,
           propName,
           fileId: propValue,
@@ -316,16 +317,21 @@ export function createCache({
         if (fileIsUploading) return UPLOADING_FILE;
 
         // Read the file from storage.
-        return clientStorage?.readFile(propValue) ?? null;
+        return fileSystem.readFile(propValue) ?? null;
       } else {
         return propValue;
       }
     },
+    getFilePath(typeName: string, docId: string, propName: string) {
+      const fileId = unPromisedOfflineCache?.types?.[
+        getCollectionName(typeName)
+      ]?.[docId]?.[propName] as string | undefined | null;
+      if (!exists(fileId)) return null;
+      return fileSystem.getFilePath(fileId) ?? null;
+    },
     addDoc(typeName: string, props: { [propName: string]: any }) {
-      const docId = doc(
-        collection(firestoreDb, getCollectionName(typeName)),
-      ).path;
-      changeUploader.uploadDocChange({
+      const docId = uuid();
+      firestoreSync.uploadDocChange({
         shouldOverwrite: true,
         docId,
         data: props,
@@ -334,13 +340,6 @@ export function createCache({
 
       return docId;
     },
-    getFilePath(typeName: string, docId: string, propName: string) {
-      const fileId = clientStorage?.data.types?.[
-        getCollectionName(typeName)
-      ]?.[docId]?.[propName] as string | undefined | null;
-      if (!exists(fileId)) return null;
-      return clientStorage?.getFilePath(fileId) ?? null;
-    },
     async setPropValue(
       typeName: string,
       docId: string,
@@ -348,17 +347,17 @@ export function createCache({
       value: any,
     ) {
       if (typeSchemas[typeName]?.[propName]?.format === "file") {
-        const newFileId = doc(collection(firestoreDb, `Mx_File`)).path;
+        const newFileId = uuid();
 
         // Write the file
-        clientStorage = await promisedClientStorage;
-        await clientStorage.writeFile(newFileId, value);
+        unPromisedOfflineCache = await _offlineCache;
+        await fileSystem.writeFile(newFileId, value);
 
         // Write to server
-        const oldFileId = clientStorage?.data.types?.[
+        const oldFileId = unPromisedOfflineCache.types?.[
           getCollectionName(typeName)
         ]?.[docId]?.[propName] as string | undefined | null;
-        changeUploader.uploadFileChange({
+        firestoreSync.uploadFileChange({
           docId,
           propName,
           newFileId,
@@ -371,7 +370,7 @@ export function createCache({
         const changes = {
           [propName]: value,
         };
-        changeUploader.uploadDocChange({
+        firestoreSync.uploadDocChange({
           shouldOverwrite: false,
           docId,
           data: changes,
@@ -382,7 +381,7 @@ export function createCache({
       }
     },
     deleteDoc(typeName: string, docId: string) {
-      changeUploader.uploadDocChange({
+      firestoreSync.uploadDocChange({
         shouldOverwrite: true,
         docId,
         data: {
@@ -393,11 +392,11 @@ export function createCache({
       // Delete any files
       for (const propName of Object.keys(typeSchemas[typeName])) {
         if (typeSchemas[typeName][propName]?.format === "file") {
-          const fileId = clientStorage?.data.types?.[
+          const fileId = unPromisedOfflineCache?.types?.[
             getCollectionName(typeName)
           ]?.[docId]?.[propName] as string | undefined | null;
           if (exists(fileId)) {
-            changeUploader.deleteFile({ fileId });
+            firestoreSync.deleteFile({ fileId });
           }
         }
       }
@@ -421,5 +420,4 @@ export function createCache({
       });
     },
   };
-  return result;
 }
