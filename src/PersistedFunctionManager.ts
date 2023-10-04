@@ -1,6 +1,6 @@
-import { uuid } from "uuidv4";
 import { DeepReadonly, Json, Unpromise, exists, sleep } from "./utils";
 import { MfsFileSystem } from "./Implement";
+import { v4 as uuidv4 } from "uuid";
 
 type _RunStage<P extends _StageProps, R extends _StageReturn> = (
   props: P,
@@ -150,7 +150,7 @@ export function initializePersistedFunctionManager(
         funcReturnType: {} as R,
         func: async (props: Exclude<P, string>) => {
           while (!exists(_persistedExecutions)) sleep(100);
-          const functionId = uuid();
+          const functionId = uuidv4();
           updatePersistedExecution(functionId, {
             functionTypeName,
             stageIndex: 0,

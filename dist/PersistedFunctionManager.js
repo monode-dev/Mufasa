@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initializePersistedFunctionManager = exports.QUIT_PERSISTED_FUNCTION = void 0;
-const uuidv4_1 = require("uuidv4");
 const utils_1 = require("./utils");
+const uuid_1 = require("uuid");
 exports.QUIT_PERSISTED_FUNCTION = "QUIT_PERSISTED_FUNCTION";
 function initializePersistedFunctionManager(managerId, fileSystem) {
     // Persisted Executions
@@ -98,7 +98,7 @@ function initializePersistedFunctionManager(managerId, fileSystem) {
                 func: async (props) => {
                     while (!(0, utils_1.exists)(_persistedExecutions))
                         (0, utils_1.sleep)(100);
-                    const functionId = (0, uuidv4_1.uuid)();
+                    const functionId = (0, uuid_1.v4)();
                     updatePersistedExecution(functionId, {
                         functionTypeName,
                         stageIndex: 0,

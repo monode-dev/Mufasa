@@ -5,7 +5,7 @@ import { FirebaseOptions } from "firebase/app";
 import { newSignalTree, SignalEvent } from "./SignalTree";
 import { initializeFirestoreSync } from "./FirestoreSync";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 
 export const DELETED_KEY = `mx_deleted`;
 export const MX_PARENT_KEY = `mx_parent`;
@@ -330,7 +330,7 @@ export function initializeCache({
       return fileSystem.getFilePath(fileId) ?? null;
     },
     addDoc(typeName: string, props: { [propName: string]: any }) {
-      const docId = uuid();
+      const docId = uuidv4();
       firestoreSync.uploadDocChange({
         shouldOverwrite: true,
         docId,
@@ -347,7 +347,7 @@ export function initializeCache({
       value: any,
     ) {
       if (typeSchemas[typeName]?.[propName]?.format === "file") {
-        const newFileId = uuid();
+        const newFileId = uuidv4();
 
         // Write the file
         unPromisedOfflineCache = await _offlineCache;

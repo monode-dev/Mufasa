@@ -5,7 +5,7 @@ const Parse_1 = require("./Parse");
 const utils_1 = require("./utils");
 const SignalTree_1 = require("./SignalTree");
 const FirestoreSync_1 = require("./FirestoreSync");
-const uuidv4_1 = require("uuidv4");
+const uuid_1 = require("uuid");
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
 function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _signal, persistedFunctionManager, fileSystem, isProduction, }) {
@@ -229,7 +229,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
             return fileSystem.getFilePath(fileId) ?? null;
         },
         addDoc(typeName, props) {
-            const docId = (0, uuidv4_1.uuid)();
+            const docId = (0, uuid_1.v4)();
             firestoreSync.uploadDocChange({
                 shouldOverwrite: true,
                 docId,
@@ -240,7 +240,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
         },
         async setPropValue(typeName, docId, propName, value) {
             if (typeSchemas[typeName]?.[propName]?.format === "file") {
-                const newFileId = (0, uuidv4_1.uuid)();
+                const newFileId = (0, uuid_1.v4)();
                 // Write the file
                 unPromisedOfflineCache = await _offlineCache;
                 await fileSystem.writeFile(newFileId, value);
