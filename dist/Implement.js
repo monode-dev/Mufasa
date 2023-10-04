@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._defineAppDataStructure = exports.docProx = void 0;
-const app_1 = require("firebase/app");
-const firestore_1 = require("firebase/firestore");
 const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
+const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
 let _computed;
 let _signal;
 let _isSignal;
 let _watchEffect;
 // Firebase
-let firestoreDb;
+// let firestoreDb: Firestore;
 let isProduction = false;
 function getCollectionName(typeName) {
+    // return `${isProduction ? `Prod` : `Dev`}_${typeName}`;
     return isProduction ? typeName : `Dev_${typeName}`;
 }
 function docProx(docId, typeName, objFormats, localCache) {
@@ -180,30 +180,24 @@ function listProx(typeName, objFormats, localCache, isChild = false, mx_parent) 
         };
     }
 }
-//
-//
-//
-//
-// SECTION: Define
-function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options) {
+function _defineAppDataStructure(modelName, options) {
     // Setup Reactivity
-    _computed = reactivity.computed;
-    _signal = reactivity.signal;
-    _isSignal = reactivity.isSignal;
-    _watchEffect = reactivity.watchEffect;
+    _computed = options.reactivity.computed;
+    _signal = options.reactivity.signal;
+    _isSignal = options.reactivity.isSignal;
+    _watchEffect = options.reactivity.watchEffect;
     // Setup Firebase
     isProduction = options.isProduction;
-    const firebaseApp = (0, app_1.initializeApp)(firebaseOptions);
-    firestoreDb = (0, firestore_1.getFirestore)(firebaseApp);
     return {
         getAppData: (0, utils_1.globalStore)(modelName, () => {
-            const localCache = (0, LocalCache_1.createCache)({
+            const persistedFunctionManager = (0, PersistedFunctionManager_1.initializePersistedFunctionManager)(`mfs_${modelName}_persistedFunctions`, options.fileSystem);
+            const localCache = (0, LocalCache_1.initializeCache)({
                 typeSchemas: options.typeSchemas,
                 getCollectionName,
-                firebaseApp,
-                firestoreDb,
+                firebaseOptions: options.firebaseOptions,
                 _signal,
-                getClientStorage: options.getClientStorage,
+                persistedFunctionManager: persistedFunctionManager,
+                fileSystem: options.fileSystem,
                 isProduction: options.isProduction,
             });
             const rootLists = {};

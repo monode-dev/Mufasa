@@ -1,11 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.file = exports.listOf = exports.refTo = exports.prim = exports.globalStore = exports.capacitorStorage = exports.defineAppDataStructure = void 0;
+exports.file = exports.listOf = exports.refTo = exports.prim = exports.globalStore = exports.defineAppDataStructure = void 0;
 const Implement_1 = require("./Implement");
-const Capacitor_1 = require("./ClientStorage/Capacitor");
 const utils_1 = require("./utils");
 exports.defineAppDataStructure = Implement_1._defineAppDataStructure;
-exports.capacitorStorage = Capacitor_1.capacitorStorage;
 exports.globalStore = utils_1.globalStore;
 /** Defines a prop of the specified primitive type. */
 function prim(

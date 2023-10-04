@@ -1,33 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.globalStore = exports.roundToString = exports.formatNumWithCommas = exports.orderDocs = exports.exists = void 0;
+exports.globalStore = exports.roundToString = exports.formatNumWithCommas = exports.sleep = exports.exists = void 0;
 function exists(x) {
     return x !== undefined && x !== null;
 }
 exports.exists = exists;
-function orderDocs(list, getKey, options) {
-    return [...list].sort((a, b) => {
-        const direction = options?.direction ?? `normal`;
-        const nullPosition = options?.nullPosition ?? `first`;
-        const keyA = getKey(direction === `normal` ? a : b);
-        const keyB = getKey(direction === `normal` ? b : a);
-        if (!exists(keyA)) {
-            return nullPosition === `first` ? -1 : 1;
-        }
-        else if (!exists(keyB)) {
-            return nullPosition === `first` ? 1 : -1;
-        }
-        else {
-            if (typeof keyA === `number` && typeof keyB === `number`) {
-                return keyA - keyB;
-            }
-            else {
-                return keyA.toString().localeCompare(keyB.toString());
-            }
-        }
-    });
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
-exports.orderDocs = orderDocs;
+exports.sleep = sleep;
 function formatNumWithCommas(num, digits = 0) {
     const rounded = roundToString(num, digits);
     const [whole, decimal] = rounded.split(`.`);

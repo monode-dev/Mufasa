@@ -1,7 +1,6 @@
 import { FirebaseOptions } from "firebase/app";
 import { SchemaDictToTsType, SchemaToTsType, TypeSchemaDict, RootSchema } from "./Parse";
 import { LocalCache } from "./LocalCache";
-import { GetClientStorage } from "./ClientStorage/ClientStorage";
 export type Computed<T> = {
     get value(): T;
 };
@@ -30,14 +29,22 @@ export type _List<T extends _Doc> = {
     map<R>(mapFn: (doc: T) => R): Array<R>;
     add(params: Partial<T>): T;
 };
-export declare function _defineAppDataStructure<RS extends RootSchema, TSD extends TypeSchemaDict>(modelName: string, firebaseOptions: FirebaseOptions, reactivity: {
-    computed: typeof _computed;
-    signal: typeof _signal;
-    isSignal: typeof _isSignal;
-    watchEffect: typeof _watchEffect;
-}, options: {
+export type MfsFileSystem = {
+    readFile: (path: string) => Promise<string | undefined>;
+    writeFile: (path: string, data: string) => Promise<void>;
+    deleteFile: (path: string) => Promise<void>;
+    getFilePath: (path: string) => string;
+};
+export declare function _defineAppDataStructure<RS extends RootSchema, TSD extends TypeSchemaDict>(modelName: string, options: {
     isProduction: boolean;
-    getClientStorage: GetClientStorage;
+    reactivity: {
+        computed: typeof _computed;
+        signal: typeof _signal;
+        isSignal: typeof _isSignal;
+        watchEffect: typeof _watchEffect;
+    };
+    firebaseOptions: FirebaseOptions;
+    fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
 }): {
