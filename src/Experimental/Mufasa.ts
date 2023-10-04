@@ -77,7 +77,7 @@
 // }
 
 // const firebase = initializeApp({
-//   apiKey: "AIzaSyC7IpnhoRTZWHPUvwI0zkEFDxKNJSlAe0k",
+//   apiKey: "",
 //   authDomain: "dataplate-08-19-2023.firebaseapp.com",
 //   projectId: "dataplate-08-19-2023",
 //   storageBucket: "dataplate-08-19-2023.appspot.com",
