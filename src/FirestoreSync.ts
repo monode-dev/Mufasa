@@ -36,6 +36,8 @@ export function initializeFirestoreSync(
   const firebaseApp = initializeApp(firebaseOptions);
   const firestore = getFirestore(firebaseApp);
   const firebaseStorage = getStorage(firebaseApp);
+  const getCollectionNameFromTypeName = (typeName: string) =>
+    `${isProduction ? `Prod` : `Dev`}_${typeName}`;
 
   const savedDataFileName = `mfs_firestoreSavedData`;
   const _savedData = fileSystem
@@ -77,12 +79,17 @@ export function initializeFirestoreSync(
   // Both file changes and doc changes require a doc change
   async function applyDocChange(change: {
     shouldOverwrite: boolean;
+    typeName: string;
     docId: string;
     data: {
       [key: string]: Json;
     };
   }) {
-    const docRef = doc(firestore, change.docId);
+    const docRef = doc(
+      firestore,
+      getCollectionNameFromTypeName(change.typeName),
+      change.docId,
+    );
     const props = {
       ...change.data,
       [CHANGE_DATE_KEY]: serverTimestamp(),
@@ -100,6 +107,7 @@ export function initializeFirestoreSync(
     .createPersistedFunction(
       uploadFileChangeTypeName,
       async (props: {
+        docTypeName: string;
         docId: string;
         propName: string;
         newFileId: string;
@@ -116,6 +124,7 @@ export function initializeFirestoreSync(
     .addStage(async (props) => {
       await applyDocChange({
         shouldOverwrite: false,
+        typeName: props.docTypeName,
         docId: props.docId,
         data: {
           [props.propName]: props.newFileId,
@@ -143,6 +152,7 @@ export function initializeFirestoreSync(
     ),
 
     uploadFileChange(props: {
+      docTypeName: string;
       docId: string;
       propName: string;
       newFileId: string;
@@ -150,6 +160,7 @@ export function initializeFirestoreSync(
       notifyUploadStarted: () => void;
     }) {
       uploadFileChange({
+        docTypeName: props.docTypeName,
         docId: props.docId,
         propName: props.propName,
         newFileId: props.newFileId,
@@ -202,10 +213,7 @@ export function initializeFirestoreSync(
       const mostRecentChangeDateOnStartup = savedData[collectionName] ?? 0;
       onSnapshot(
         query(
-          collection(
-            firestore,
-            `${isProduction ? `Prod` : `Dev`}_${collectionName}`,
-          ),
+          collection(firestore, getCollectionNameFromTypeName(collectionName)),
           where(
             CHANGE_DATE_KEY,
             ">",

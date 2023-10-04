@@ -333,6 +333,7 @@ export function initializeCache({
       const docId = uuidv4();
       firestoreSync.uploadDocChange({
         shouldOverwrite: true,
+        typeName,
         docId,
         data: props,
       });
@@ -358,6 +359,7 @@ export function initializeCache({
           getCollectionName(typeName)
         ]?.[docId]?.[propName] as string | undefined | null;
         firestoreSync.uploadFileChange({
+          docTypeName: typeName,
           docId,
           propName,
           newFileId,
@@ -372,6 +374,7 @@ export function initializeCache({
         };
         firestoreSync.uploadDocChange({
           shouldOverwrite: false,
+          typeName,
           docId,
           data: changes,
         });
@@ -383,6 +386,7 @@ export function initializeCache({
     deleteDoc(typeName: string, docId: string) {
       firestoreSync.uploadDocChange({
         shouldOverwrite: true,
+        typeName,
         docId,
         data: {
           [DELETED_KEY]: true,

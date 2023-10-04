@@ -232,6 +232,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
             const docId = (0, uuid_1.v4)();
             firestoreSync.uploadDocChange({
                 shouldOverwrite: true,
+                typeName,
                 docId,
                 data: props,
             });
@@ -247,6 +248,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
                 // Write to server
                 const oldFileId = unPromisedOfflineCache.types?.[getCollectionName(typeName)]?.[docId]?.[propName];
                 firestoreSync.uploadFileChange({
+                    docTypeName: typeName,
                     docId,
                     propName,
                     newFileId,
@@ -261,6 +263,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
                 };
                 firestoreSync.uploadDocChange({
                     shouldOverwrite: false,
+                    typeName,
                     docId,
                     data: changes,
                 });
@@ -271,6 +274,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
         deleteDoc(typeName, docId) {
             firestoreSync.uploadDocChange({
                 shouldOverwrite: true,
+                typeName,
                 docId,
                 data: {
                     [exports.DELETED_KEY]: true,

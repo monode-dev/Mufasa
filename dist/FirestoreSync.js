@@ -11,6 +11,7 @@ function initializeFirestoreSync(firebaseOptions, isProduction, persistedFunctio
     const firebaseApp = (0, app_1.initializeApp)(firebaseOptions);
     const firestore = (0, firestore_1.getFirestore)(firebaseApp);
     const firebaseStorage = (0, storage_1.getStorage)(firebaseApp);
+    const getCollectionNameFromTypeName = (typeName) => `${isProduction ? `Prod` : `Dev`}_${typeName}`;
     const savedDataFileName = `mfs_firestoreSavedData`;
     const _savedData = fileSystem
         .readFile(savedDataFileName)
@@ -41,7 +42,7 @@ function initializeFirestoreSync(firebaseOptions, isProduction, persistedFunctio
     });
     // Both file changes and doc changes require a doc change
     async function applyDocChange(change) {
-        const docRef = (0, firestore_1.doc)(firestore, change.docId);
+        const docRef = (0, firestore_1.doc)(firestore, getCollectionNameFromTypeName(change.typeName), change.docId);
         const props = {
             ...change.data,
             [exports.CHANGE_DATE_KEY]: (0, firestore_1.serverTimestamp)(),
@@ -68,6 +69,7 @@ function initializeFirestoreSync(firebaseOptions, isProduction, persistedFunctio
         .addStage(async (props) => {
         await applyDocChange({
             shouldOverwrite: false,
+            typeName: props.docTypeName,
             docId: props.docId,
             data: {
                 [props.propName]: props.newFileId,
@@ -93,6 +95,7 @@ function initializeFirestoreSync(firebaseOptions, isProduction, persistedFunctio
         uploadDocChange: persistedFunctionManager.createPersistedFunction(`uploadDocChangeToFirestore`, applyDocChange),
         uploadFileChange(props) {
             uploadFileChange({
+                docTypeName: props.docTypeName,
                 docId: props.docId,
                 propName: props.propName,
                 newFileId: props.newFileId,
@@ -126,7 +129,7 @@ function initializeFirestoreSync(firebaseOptions, isProduction, persistedFunctio
         async watchCollection(collectionName, handleUpdate) {
             const savedData = await _savedData;
             const mostRecentChangeDateOnStartup = savedData[collectionName] ?? 0;
-            (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestore, `${isProduction ? `Prod` : `Dev`}_${collectionName}`), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date(mostRecentChangeDateOnStartup * 1000 - 30))), (snapshot) => {
+            (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestore, getCollectionNameFromTypeName(collectionName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date(mostRecentChangeDateOnStartup * 1000 - 30))), (snapshot) => {
                 let mostRecentChangeDate = savedData[collectionName] ?? 0;
                 snapshot.docChanges().forEach((change) => {
                     if (change.type !== "removed") {
