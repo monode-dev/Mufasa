@@ -6,7 +6,7 @@ import {
   TypeSchemaDict,
   RootSchema,
 } from "./Parse";
-import { DELETED_KEY, LocalCache, createCache } from "./LocalCache";
+import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
 
 //
@@ -296,25 +296,25 @@ export function _defineAppDataStructure<
   TSD extends TypeSchemaDict,
 >(
   modelName: string,
-  firebaseOptions: FirebaseOptions,
-  reactivity: {
-    computed: typeof _computed;
-    signal: typeof _signal;
-    isSignal: typeof _isSignal;
-    watchEffect: typeof _watchEffect;
-  },
   options: {
     isProduction: boolean;
+    reactivity: {
+      computed: typeof _computed;
+      signal: typeof _signal;
+      isSignal: typeof _isSignal;
+      watchEffect: typeof _watchEffect;
+    };
+    firebaseOptions: FirebaseOptions;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
   },
 ) {
   // Setup Reactivity
-  _computed = reactivity.computed;
-  _signal = reactivity.signal;
-  _isSignal = reactivity.isSignal;
-  _watchEffect = reactivity.watchEffect;
+  _computed = options.reactivity.computed;
+  _signal = options.reactivity.signal;
+  _isSignal = options.reactivity.isSignal;
+  _watchEffect = options.reactivity.watchEffect;
   // Setup Firebase
   isProduction = options.isProduction;
 
@@ -324,10 +324,10 @@ export function _defineAppDataStructure<
         `mfs_${modelName}_persistedFunctions`,
         options.fileSystem,
       );
-      const localCache = createCache({
+      const localCache = initializeCache({
         typeSchemas: options.typeSchemas,
         getCollectionName,
-        firebaseOptions,
+        firebaseOptions: options.firebaseOptions,
         _signal,
         persistedFunctionManager: persistedFunctionManager,
         fileSystem: options.fileSystem,

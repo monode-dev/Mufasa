@@ -14,8 +14,8 @@ export type DocData = {
   [propName: string]: number | string | boolean | null | undefined;
 };
 
-export type LocalCache = ReturnType<typeof createCache>;
-export function createCache({
+export type LocalCache = ReturnType<typeof initializeCache>;
+export function initializeCache({
   typeSchemas,
   getCollectionName,
   firebaseOptions,
@@ -234,7 +234,7 @@ export function createCache({
   }
 
   _offlineCache.then(() => {
-    // Let the app know when the data is loaded.
+    // After we load data from the offline cache we should let the app know when the data is loaded.
     for (const typeName of Object.keys(typeSchemas)) {
       docSignalTree[typeName].docsChanged.trigger();
       for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
