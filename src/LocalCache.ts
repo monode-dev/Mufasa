@@ -173,7 +173,7 @@ export function initializeCache({
         if (propName === MX_PARENT_KEY) {
           // Notify Old Parent
           if (exists(oldDoc?.[propName])) {
-            updateOfflineCache({
+            await updateOfflineCache({
               childLists: {
                 [collectionName]: {
                   [oldDoc?.[propName] as string]: {
@@ -190,7 +190,7 @@ export function initializeCache({
           }
           // Notify New Parent
           if (exists(params.props[propName])) {
-            updateOfflineCache({
+            await updateOfflineCache({
               childLists: {
                 [collectionName]: {
                   [params.props[propName] as string]: {
@@ -223,7 +223,7 @@ export function initializeCache({
     }
 
     // Apply the updates locally
-    updateOfflineCache({
+    await updateOfflineCache({
       types: {
         [collectionName]: {
           [params.docId]: params.props,

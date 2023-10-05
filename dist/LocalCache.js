@@ -94,7 +94,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
                 if (propName === exports.MX_PARENT_KEY) {
                     // Notify Old Parent
                     if ((0, utils_1.exists)(oldDoc?.[propName])) {
-                        updateOfflineCache({
+                        await updateOfflineCache({
                             childLists: {
                                 [collectionName]: {
                                     [oldDoc?.[propName]]: {
@@ -109,7 +109,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
                     }
                     // Notify New Parent
                     if ((0, utils_1.exists)(params.props[propName])) {
-                        updateOfflineCache({
+                        await updateOfflineCache({
                             childLists: {
                                 [collectionName]: {
                                     [params.props[propName]]: {
@@ -139,7 +139,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
             }
         }
         // Apply the updates locally
-        updateOfflineCache({
+        await updateOfflineCache({
             types: {
                 [collectionName]: {
                     [params.docId]: params.props,
