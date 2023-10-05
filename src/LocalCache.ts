@@ -87,7 +87,7 @@ export function initializeCache({
           ) {
             original[propName] = {};
           }
-          updateRec(original[propName] as JsonObject, value);
+          updateRec(original[propName], value);
         } else {
           // Primitives
           original[propName] = value;
@@ -156,6 +156,7 @@ export function initializeCache({
     const isBeingDeleted = params.props[DELETED_KEY] === true;
     if (isBeingCreated || isBeingDeleted) {
       thingsToTrigger.push(() => {
+        console.log(`Triggering ${params.typeName}`);
         docSignalTree[params.typeName].docsChanged.trigger();
       });
     }
@@ -262,6 +263,7 @@ export function initializeCache({
   });
   return {
     listAllObjectsOfType(typeName: string) {
+      console.log(`Listening for ${typeName}`);
       docSignalTree[typeName].docsChanged.listen();
       const objects: string[] = [];
       for (const [docId, thisDoc] of Object.entries(

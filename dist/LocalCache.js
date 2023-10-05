@@ -78,6 +78,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
         const isBeingDeleted = params.props[exports.DELETED_KEY] === true;
         if (isBeingCreated || isBeingDeleted) {
             thingsToTrigger.push(() => {
+                console.log(`Triggering ${params.typeName}`);
                 docSignalTree[params.typeName].docsChanged.trigger();
             });
         }
@@ -173,6 +174,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
     });
     return {
         listAllObjectsOfType(typeName) {
+            console.log(`Listening for ${typeName}`);
             docSignalTree[typeName].docsChanged.listen();
             const objects = [];
             for (const [docId, thisDoc] of Object.entries(unPromisedOfflineCache?.types?.[getCollectionName(typeName)] ?? {})) {
