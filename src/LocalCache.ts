@@ -156,8 +156,13 @@ export function initializeCache({
     const isBeingDeleted = params.props[DELETED_KEY] === true;
     if (isBeingCreated || isBeingDeleted) {
       thingsToTrigger.push(() => {
-        console.log(`Triggering ${params.typeName}`);
-        console.log(JSON.stringify(offlineCache.types, null, 2));
+        console.log(
+          `Triggering ${params.typeName}: ${JSON.stringify(
+            offlineCache.types,
+            null,
+            2,
+          )}`,
+        );
         docSignalTree[params.typeName].docsChanged.trigger();
       });
     }
@@ -223,6 +228,13 @@ export function initializeCache({
     }
 
     // Apply the updates locally
+    console.log(
+      `Before update ${params.typeName}: ${JSON.stringify(
+        offlineCache.types,
+        null,
+        2,
+      )}`,
+    );
     await updateOfflineCache({
       types: {
         [collectionName]: {
@@ -230,6 +242,13 @@ export function initializeCache({
         },
       },
     });
+    console.log(
+      `After update ${params.typeName}: ${JSON.stringify(
+        offlineCache.types,
+        null,
+        2,
+      )}`,
+    );
 
     // Now that we've made the updates, then trigger the changes.
     thingsToTrigger.forEach((trigger) => trigger());
@@ -264,8 +283,13 @@ export function initializeCache({
   });
   return {
     listAllObjectsOfType(typeName: string) {
-      console.log(`Listening for ${typeName}`);
-      console.log(JSON.stringify(unPromisedOfflineCache?.types ?? {}, null, 2));
+      console.log(
+        `Listening for ${typeName}: ${JSON.stringify(
+          unPromisedOfflineCache?.types ?? {},
+          null,
+          2,
+        )}`,
+      );
       docSignalTree[typeName].docsChanged.listen();
       const objects: string[] = [];
       for (const [docId, thisDoc] of Object.entries(
