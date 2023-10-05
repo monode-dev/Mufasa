@@ -79,6 +79,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
         if (isBeingCreated || isBeingDeleted) {
             thingsToTrigger.push(() => {
                 console.log(`Triggering ${params.typeName}`);
+                console.log(JSON.stringify(offlineCache.types, null, 2));
                 docSignalTree[params.typeName].docsChanged.trigger();
             });
         }
@@ -175,6 +176,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
     return {
         listAllObjectsOfType(typeName) {
             console.log(`Listening for ${typeName}`);
+            console.log(JSON.stringify(unPromisedOfflineCache?.types ?? {}, null, 2));
             docSignalTree[typeName].docsChanged.listen();
             const objects = [];
             for (const [docId, thisDoc] of Object.entries(unPromisedOfflineCache?.types?.[getCollectionName(typeName)] ?? {})) {

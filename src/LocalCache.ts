@@ -157,6 +157,7 @@ export function initializeCache({
     if (isBeingCreated || isBeingDeleted) {
       thingsToTrigger.push(() => {
         console.log(`Triggering ${params.typeName}`);
+        console.log(JSON.stringify(offlineCache.types, null, 2));
         docSignalTree[params.typeName].docsChanged.trigger();
       });
     }
@@ -264,6 +265,7 @@ export function initializeCache({
   return {
     listAllObjectsOfType(typeName: string) {
       console.log(`Listening for ${typeName}`);
+      console.log(JSON.stringify(unPromisedOfflineCache?.types ?? {}, null, 2));
       docSignalTree[typeName].docsChanged.listen();
       const objects: string[] = [];
       for (const [docId, thisDoc] of Object.entries(
