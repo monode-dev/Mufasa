@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.148",
+  "version": "0.0.150",
   "main": "./dist/index.js",
   "license": "ISC",
   "repository": {
@@ -16,7 +16,6 @@
     "@types/uuid": "^9.0.4",
     "semver": "^7.5.4",
     "sucrase": "^3.32.0",
-    "tsc": "^2.0.4",
     "typescript": "^5.2.2"
   },
   "exports": {
@@ -24,7 +23,9 @@
     "./cap": "./dist/ClientStorage/Capacitor.js"
   },
   "dependencies": {
-    "firebase": "^10.4.0",
     "uuid": "^9.0.1"
+  },
+  "peerDependencies": {
+    "firebase": "^10.4.0"
   }
 }
