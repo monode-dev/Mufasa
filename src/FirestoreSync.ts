@@ -29,7 +29,7 @@ import {
   sleep,
 } from "./utils";
 import { FirebaseApp } from "firebase/app";
-import { User as FirebaseUser, getAuth } from "firebase/auth";
+import { Auth, User as FirebaseUser, getAuth } from "firebase/auth";
 import {
   PersistedFunctionManager,
   QUIT_PERSISTED_FUNCTION,
@@ -38,13 +38,21 @@ import { MfsFileSystem, Signal } from "./Implement";
 
 type CreateSignal = <T>(initValue: T) => Signal<T>;
 let _signal: CreateSignal | undefined = undefined;
-let _firebaseApp: FirebaseApp | undefined = undefined;
+let _auth: Auth | undefined = undefined;
+const auth = new Promise<Auth>(async (resolve) => {
+  while (!isValid(_auth)) {
+    await sleep(10);
+  }
+  resolve(_auth);
+});
 
 export type User = FirebaseUser | PENDING | NONEXISTENT;
 export function getUser() {
   const userSig = _signal!<User>(PENDING);
-  getAuth(_firebaseApp).onAuthStateChanged((user) => {
-    userSig.value = user ?? NONEXISTENT;
+  auth.then((auth) => {
+    auth.onAuthStateChanged((user) => {
+      userSig.value = user ?? NONEXISTENT;
+    });
   });
   return userSig;
 }
@@ -58,9 +66,9 @@ export function initializeFirestoreSync(
   signal: CreateSignal,
 ) {
   _signal = signal;
-  _firebaseApp = firebaseApp;
   const firestore = getFirestore(firebaseApp);
   const firebaseStorage = getStorage(firebaseApp);
+  _auth = getAuth(firebaseApp);
   const getCollectionNameFromTypeName = (typeName: string) =>
     `${isProduction ? `Prod` : `Dev`}_${typeName}`;
 

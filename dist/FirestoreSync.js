@@ -7,11 +7,19 @@ const utils_1 = require("./utils");
 const auth_1 = require("firebase/auth");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
 let _signal = undefined;
-let _firebaseApp = undefined;
+let _auth = undefined;
+const auth = new Promise(async (resolve) => {
+    while (!(0, utils_1.isValid)(_auth)) {
+        await (0, utils_1.sleep)(10);
+    }
+    resolve(_auth);
+});
 function getUser() {
     const userSig = _signal(utils_1.PENDING);
-    (0, auth_1.getAuth)(_firebaseApp).onAuthStateChanged((user) => {
-        userSig.value = user ?? utils_1.NONEXISTENT;
+    auth.then((auth) => {
+        auth.onAuthStateChanged((user) => {
+            userSig.value = user ?? utils_1.NONEXISTENT;
+        });
     });
     return userSig;
 }
@@ -19,9 +27,9 @@ exports.getUser = getUser;
 exports.CHANGE_DATE_KEY = `mfs_changeDate`;
 function initializeFirestoreSync(firebaseApp, isProduction, persistedFunctionManager, fileSystem, signal) {
     _signal = signal;
-    _firebaseApp = firebaseApp;
     const firestore = (0, firestore_1.getFirestore)(firebaseApp);
     const firebaseStorage = (0, storage_1.getStorage)(firebaseApp);
+    _auth = (0, auth_1.getAuth)(firebaseApp);
     const getCollectionNameFromTypeName = (typeName) => `${isProduction ? `Prod` : `Dev`}_${typeName}`;
     const savedDataFileName = `mfs_firestoreSavedData`;
     const _savedData = fileSystem
