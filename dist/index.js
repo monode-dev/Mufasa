@@ -1,12 +1,25 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.file = exports.listOf = exports.refTo = exports.prim = exports.getUser = exports.globalStore = exports.defineAppDataStructure = void 0;
+exports.file = exports.listOf = exports.refTo = exports.prim = exports.globalStore = exports.defineAppDataStructure = void 0;
 const Implement_1 = require("./Implement");
 const utils_1 = require("./utils");
-const FirestoreSync_1 = require("./FirestoreSync");
 exports.defineAppDataStructure = Implement_1._defineAppDataStructure;
 exports.globalStore = utils_1.globalStore;
-exports.getUser = FirestoreSync_1.getUser;
+__exportStar(require("./FirestoreSync"), exports);
 /** Defines a prop of the specified primitive type. */
 function prim(
 /** TODO: We might consider using Number, String, or Boolean as the first parameter
