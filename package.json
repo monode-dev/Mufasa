@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.144",
+  "version": "0.0.145",
   "main": "./dist/index.js",
   "license": "ISC",
   "repository": {
@@ -24,7 +24,7 @@
     "./cap": "./dist/ClientStorage/Capacitor.js"
   },
   "dependencies": {
-    "firebase": "^10.1.0",
+    "firebase": "^10.4.0",
     "uuid": "^9.0.1"
   }
 }
