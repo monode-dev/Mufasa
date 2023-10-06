@@ -14,12 +14,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.file = exports.listOf = exports.refTo = exports.prim = exports.globalStore = exports.defineAppDataStructure = void 0;
+exports.file = exports.listOf = exports.refTo = exports.prim = exports.defineAppDataStructure = void 0;
 const Implement_1 = require("./Implement");
-const utils_1 = require("./utils");
 exports.defineAppDataStructure = Implement_1._defineAppDataStructure;
-exports.globalStore = utils_1.globalStore;
 __exportStar(require("./FirestoreSync"), exports);
+__exportStar(require("./utils"), exports);
 /** Defines a prop of the specified primitive type. */
 function prim(
 /** TODO: We might consider using Number, String, or Boolean as the first parameter
