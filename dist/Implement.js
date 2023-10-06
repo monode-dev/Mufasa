@@ -4,6 +4,7 @@ exports._defineAppDataStructure = exports.docProx = void 0;
 const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
+const firestore_1 = require("firebase/firestore");
 let _computed;
 let _signal;
 let _isSignal;
@@ -188,6 +189,7 @@ function _defineAppDataStructure(modelName, options) {
     _watchEffect = options.reactivity.watchEffect;
     // Setup Firebase
     isProduction = options.isProduction;
+    console.log((0, firestore_1.collection)(options.firestore, `Dev_Client`));
     return {
         getAppData: (0, utils_1.globalStore)(modelName, () => {
             const persistedFunctionManager = (0, PersistedFunctionManager_1.initializePersistedFunctionManager)(`mfs_${modelName}_persistedFunctions`, options.fileSystem);

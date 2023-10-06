@@ -8,7 +8,7 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
-import { Firestore } from "firebase/firestore";
+import { Firestore, collection } from "firebase/firestore";
 import { FirebaseStorage } from "firebase/storage";
 import { Auth } from "firebase/auth";
 
@@ -323,6 +323,7 @@ export function _defineAppDataStructure<
   _watchEffect = options.reactivity.watchEffect;
   // Setup Firebase
   isProduction = options.isProduction;
+  console.log(collection(options.firestore, `Dev_Client`));
 
   return {
     getAppData: globalStore(modelName, () => {
