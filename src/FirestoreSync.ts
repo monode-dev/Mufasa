@@ -16,6 +16,7 @@ import {
   uploadString,
   deleteObject,
   getBytes,
+  FirebaseStorage,
 } from "firebase/storage";
 import {
   Json,
@@ -60,15 +61,16 @@ export function getUser() {
 export const CHANGE_DATE_KEY = `mfs_changeDate`;
 export function initializeFirestoreSync(
   firebaseApp: FirebaseApp,
+  firestore: Firestore,
+  firebaseStorage: FirebaseStorage,
+  auth: Auth,
   isProduction: boolean,
   persistedFunctionManager: PersistedFunctionManager,
   fileSystem: MfsFileSystem,
   signal: CreateSignal,
 ) {
   _signal = signal;
-  const firestore = getFirestore(firebaseApp);
-  const firebaseStorage = getStorage(firebaseApp);
-  _auth = getAuth(firebaseApp);
+  _auth = auth;
   const getCollectionNameFromTypeName = (typeName: string) =>
     `${isProduction ? `Prod` : `Dev`}_${typeName}`;
 

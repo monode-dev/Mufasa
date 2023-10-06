@@ -6,6 +6,9 @@ import { newSignalTree, SignalEvent } from "./SignalTree";
 import { initializeFirestoreSync } from "./FirestoreSync";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { v4 as uuidv4 } from "uuid";
+import { Firestore } from "firebase/firestore";
+import { FirebaseStorage } from "firebase/storage";
+import { Auth } from "firebase/auth";
 
 export const DELETED_KEY = `mx_deleted`;
 export const MX_PARENT_KEY = `mx_parent`;
@@ -19,6 +22,9 @@ export function initializeCache({
   typeSchemas,
   getCollectionName,
   firebaseApp,
+  firestore,
+  firebaseStorage,
+  auth,
   _signal,
   persistedFunctionManager,
   fileSystem,
@@ -27,6 +33,9 @@ export function initializeCache({
   typeSchemas: TypeSchemaDict;
   getCollectionName: (typeName: string) => string;
   firebaseApp: FirebaseApp;
+  firestore: Firestore;
+  firebaseStorage: FirebaseStorage;
+  auth: Auth;
   _signal: <T>(initValue: T) => Signal<T>;
   persistedFunctionManager: PersistedFunctionManager;
   fileSystem: MfsFileSystem;
@@ -131,6 +140,9 @@ export function initializeCache({
   }>(_signal);
   const firestoreSync = initializeFirestoreSync(
     firebaseApp,
+    firestore,
+    firebaseStorage,
+    auth,
     isProduction,
     persistedFunctionManager,
     fileSystem,

@@ -1,6 +1,9 @@
 import { FirebaseApp } from "firebase/app";
 import { SchemaDictToTsType, SchemaToTsType, TypeSchemaDict, RootSchema } from "./Parse";
 import { LocalCache } from "./LocalCache";
+import { Firestore } from "firebase/firestore";
+import { FirebaseStorage } from "firebase/storage";
+import { Auth } from "firebase/auth";
 export type Computed<T> = {
     get value(): T;
 };
@@ -44,6 +47,9 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
         watchEffect: typeof _watchEffect;
     };
     firebaseApp: FirebaseApp;
+    firestore: Firestore;
+    firebaseStorage: FirebaseStorage;
+    auth: Auth;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;

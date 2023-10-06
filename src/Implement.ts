@@ -8,6 +8,9 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
+import { Firestore } from "firebase/firestore";
+import { FirebaseStorage } from "firebase/storage";
+import { Auth } from "firebase/auth";
 
 //
 //
@@ -305,6 +308,9 @@ export function _defineAppDataStructure<
       watchEffect: typeof _watchEffect;
     };
     firebaseApp: FirebaseApp;
+    firestore: Firestore;
+    firebaseStorage: FirebaseStorage;
+    auth: Auth;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
@@ -328,6 +334,9 @@ export function _defineAppDataStructure<
         typeSchemas: options.typeSchemas,
         getCollectionName,
         firebaseApp: options.firebaseApp,
+        firestore: options.firestore,
+        firebaseStorage: options.firebaseStorage,
+        auth: options.auth,
         _signal,
         persistedFunctionManager: persistedFunctionManager,
         fileSystem: options.fileSystem,
