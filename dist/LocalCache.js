@@ -162,7 +162,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
         }
         // Start syncing with the DB
         for (const typeName in typeSchemas) {
-            firestoreSync.watchCollection(typeName, (docId, docUpdates) => {
+            firestoreSync.watchType(typeName, (docId, docUpdates) => {
                 updateSessionStorage({
                     typeName: typeName,
                     docId: docId,

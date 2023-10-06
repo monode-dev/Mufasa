@@ -178,6 +178,6 @@ export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, firest
         fileId: string;
     }): boolean;
     downloadFile(fileId: string): Promise<void>;
-    watchCollection(collectionName: string, handleUpdate: (id: string, data: JsonObject) => void): Promise<void>;
+    watchType(typeName: string, handleUpdate: (id: string, data: JsonObject) => void): Promise<void>;
 };
 export {};

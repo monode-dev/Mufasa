@@ -240,15 +240,16 @@ export function initializeFirestoreSync(
       await fileSystem.writeFile(fileId, asString);
     },
 
-    async watchCollection(
-      collectionName: string,
+    async watchType(
+      typeName: string,
       handleUpdate: (id: string, data: JsonObject) => void,
     ) {
       const savedData = await _savedData;
-      const mostRecentChangeDateOnStartup = savedData[collectionName] ?? 0;
+      const mostRecentChangeDateOnStartup = savedData[typeName] ?? 0;
+      console.log(`Querying ${getCollectionNameFromTypeName(typeName)}`);
       onSnapshot(
         query(
-          collection(firestore, getCollectionNameFromTypeName(collectionName)),
+          collection(firestore, getCollectionNameFromTypeName(typeName)),
           where(
             CHANGE_DATE_KEY,
             ">",
@@ -256,7 +257,7 @@ export function initializeFirestoreSync(
           ),
         ),
         (snapshot) => {
-          let mostRecentChangeDate = savedData[collectionName] ?? 0;
+          let mostRecentChangeDate = savedData[typeName] ?? 0;
           snapshot.docChanges().forEach((change) => {
             if (change.type !== "removed") {
               const docData = change.doc.data();
@@ -267,8 +268,8 @@ export function initializeFirestoreSync(
               handleUpdate(change.doc.ref.id, docData);
             }
           });
-          if (mostRecentChangeDate > savedData[collectionName] ?? 0) {
-            updateSavedData(collectionName, mostRecentChangeDate);
+          if (mostRecentChangeDate > savedData[typeName] ?? 0) {
+            updateSavedData(typeName, mostRecentChangeDate);
           }
         },
       );
