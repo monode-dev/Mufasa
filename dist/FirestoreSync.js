@@ -146,6 +146,7 @@ function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, 
             const savedData = await _savedData;
             const mostRecentChangeDateOnStartup = savedData[typeName] ?? 0;
             console.log(`Querying ${getCollectionNameFromTypeName(typeName)}`);
+            console.log(firestore);
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestore, getCollectionNameFromTypeName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date(mostRecentChangeDateOnStartup * 1000 - 30))), (snapshot) => {
                 let mostRecentChangeDate = savedData[typeName] ?? 0;
                 snapshot.docChanges().forEach((change) => {

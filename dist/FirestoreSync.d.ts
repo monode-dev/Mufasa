@@ -1,7 +1,7 @@
 import { Firestore } from "firebase/firestore";
 import { FirebaseStorage } from "firebase/storage";
-import { Json, JsonObject, NONEXISTENT, PENDING } from "./utils";
 import { FirebaseApp } from "firebase/app";
+import { Json, JsonObject, NONEXISTENT, PENDING } from "./utils";
 import { Auth, User as FirebaseUser } from "firebase/auth";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { MfsFileSystem, Signal } from "./Implement";

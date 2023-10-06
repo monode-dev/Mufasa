@@ -18,6 +18,7 @@ import {
   getBytes,
   FirebaseStorage,
 } from "firebase/storage";
+import { FirebaseApp } from "firebase/app";
 import {
   Json,
   JsonObject,
@@ -29,7 +30,6 @@ import {
   newSym,
   sleep,
 } from "./utils";
-import { FirebaseApp } from "firebase/app";
 import { Auth, User as FirebaseUser, getAuth } from "firebase/auth";
 import {
   PersistedFunctionManager,
@@ -247,6 +247,7 @@ export function initializeFirestoreSync(
       const savedData = await _savedData;
       const mostRecentChangeDateOnStartup = savedData[typeName] ?? 0;
       console.log(`Querying ${getCollectionNameFromTypeName(typeName)}`);
+      console.log(firestore);
       onSnapshot(
         query(
           collection(firestore, getCollectionNameFromTypeName(typeName)),
