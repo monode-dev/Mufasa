@@ -5,20 +5,38 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export class Unad {
-  get unadId() {
-    return (this.constructor as typeof Unad).name;
-  }
-  static create<T extends typeof Unad>(this: T): InstanceType<T> {
-    return new (this as any)();
-  }
+export const _symIdsKey = Symbol(`mfs_symIds`);
+export type Sym<T extends string> = {
+  [_symIdsKey]: { [Key in T]: true };
+};
+export function newSym<T extends string, U extends string = T>(
+  symId: T,
+  ...parents: Sym<U>[]
+) {
+  return {
+    [_symIdsKey]: {
+      [symId]: symId,
+      ...parents.reduce(
+        (acc, parent) => ({ ...acc, ...parent[_symIdsKey] }),
+        {} as { [Key in U]: true },
+      ),
+    },
+  } as Sym<T | U>;
 }
-export class Invalid extends Unad {}
-export class Pending extends Invalid {}
-export class Nonexistent extends Invalid {}
-export type Valid<T> = T extends null | undefined | Invalid ? never : T;
+export type INVALID = typeof INVALID;
+export const INVALID = newSym(`INVALID`);
+export type PENDING = typeof PENDING;
+export const PENDING = newSym(`PENDING`, INVALID);
+export type NONEXISTENT = typeof NONEXISTENT;
+export const NONEXISTENT = newSym(`NONEXISTENT`, INVALID);
+export function isSameSym<T extends string>(x: any, y: Sym<T>): x is Sym<T> {
+  if (x === undefined || x === null) return false;
+  if (x[_symIdsKey] === undefined) return false;
+  return Object.keys(y[_symIdsKey]).every((key) => x[_symIdsKey][key] === true);
+}
+export type Valid<T> = T extends null | undefined | INVALID ? never : T;
 export function isValid<T>(x: T): x is Valid<T> {
-  return x !== null && x !== undefined && !(x instanceof Invalid);
+  return x !== null && x !== undefined && !isSameSym(x, INVALID);
 }
 
 export type Json = JsonPrimitive | JsonArray | JsonObject;

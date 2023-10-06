@@ -9,9 +9,9 @@ const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
 let _signal = undefined;
 let _firebaseApp = undefined;
 function getUser() {
-    const userSig = _signal(utils_1.Pending.create());
+    const userSig = _signal(utils_1.PENDING);
     (0, auth_1.getAuth)(_firebaseApp).onAuthStateChanged((user) => {
-        userSig.value = user ?? utils_1.Nonexistent.create();
+        userSig.value = user ?? utils_1.NONEXISTENT;
     });
     return userSig;
 }

@@ -1,10 +1,10 @@
-import { Json, JsonObject, Nonexistent, Pending } from "./utils";
+import { Json, JsonObject, NONEXISTENT, PENDING } from "./utils";
 import { FirebaseApp } from "firebase/app";
 import { User as FirebaseUser } from "firebase/auth";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { MfsFileSystem, Signal } from "./Implement";
 type CreateSignal = <T>(initValue: T) => Signal<T>;
-export type User = FirebaseUser | Pending | Nonexistent;
+export type User = FirebaseUser | PENDING | NONEXISTENT;
 export declare function getUser(): Signal<User>;
 export declare const CHANGE_DATE_KEY = "mfs_changeDate";
 export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem, signal: CreateSignal): {

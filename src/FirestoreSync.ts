@@ -20,10 +20,12 @@ import {
 import {
   Json,
   JsonObject,
-  Nonexistent,
-  Pending,
+  NONEXISTENT,
+  PENDING,
+  Sym,
   exists,
   isValid,
+  newSym,
   sleep,
 } from "./utils";
 import { FirebaseApp } from "firebase/app";
@@ -38,11 +40,11 @@ type CreateSignal = <T>(initValue: T) => Signal<T>;
 let _signal: CreateSignal | undefined = undefined;
 let _firebaseApp: FirebaseApp | undefined = undefined;
 
-export type User = FirebaseUser | Pending | Nonexistent;
+export type User = FirebaseUser | PENDING | NONEXISTENT;
 export function getUser() {
-  const userSig = _signal!<User>(Pending.create());
+  const userSig = _signal!<User>(PENDING);
   getAuth(_firebaseApp).onAuthStateChanged((user) => {
-    userSig.value = user ?? Nonexistent.create();
+    userSig.value = user ?? NONEXISTENT;
   });
   return userSig;
 }

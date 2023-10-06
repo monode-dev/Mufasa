@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.globalStore = exports.roundToString = exports.formatNumWithCommas = exports.isValid = exports.Nonexistent = exports.Pending = exports.Invalid = exports.Unad = exports.sleep = exports.exists = void 0;
+exports.globalStore = exports.roundToString = exports.formatNumWithCommas = exports.isValid = exports.isSameSym = exports.NONEXISTENT = exports.PENDING = exports.INVALID = exports.newSym = exports._symIdsKey = exports.sleep = exports.exists = void 0;
 function exists(x) {
     return x !== undefined && x !== null;
 }
@@ -9,26 +9,29 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 exports.sleep = sleep;
-class Unad {
-    get unadId() {
-        return this.constructor.name;
-    }
-    static create() {
-        return new this();
-    }
+exports._symIdsKey = Symbol(`mfs_symIds`);
+function newSym(symId, ...parents) {
+    return {
+        [exports._symIdsKey]: {
+            [symId]: symId,
+            ...parents.reduce((acc, parent) => ({ ...acc, ...parent[exports._symIdsKey] }), {}),
+        },
+    };
 }
-exports.Unad = Unad;
-class Invalid extends Unad {
+exports.newSym = newSym;
+exports.INVALID = newSym(`INVALID`);
+exports.PENDING = newSym(`PENDING`, exports.INVALID);
+exports.NONEXISTENT = newSym(`NONEXISTENT`, exports.INVALID);
+function isSameSym(x, y) {
+    if (x === undefined || x === null)
+        return false;
+    if (x[exports._symIdsKey] === undefined)
+        return false;
+    return Object.keys(y[exports._symIdsKey]).every((key) => x[exports._symIdsKey][key] === true);
 }
-exports.Invalid = Invalid;
-class Pending extends Invalid {
-}
-exports.Pending = Pending;
-class Nonexistent extends Invalid {
-}
-exports.Nonexistent = Nonexistent;
+exports.isSameSym = isSameSym;
 function isValid(x) {
-    return x !== null && x !== undefined && !(x instanceof Invalid);
+    return x !== null && x !== undefined && !isSameSym(x, exports.INVALID);
 }
 exports.isValid = isValid;
 function formatNumWithCommas(num, digits = 0) {
