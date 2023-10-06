@@ -17,7 +17,15 @@ import {
   deleteObject,
   getBytes,
 } from "firebase/storage";
-import { Json, JsonObject, NONEXISTENT, PENDING, exists, sleep } from "./utils";
+import {
+  Json,
+  JsonObject,
+  Nonexistent,
+  Pending,
+  exists,
+  isValid,
+  sleep,
+} from "./utils";
 import { FirebaseApp } from "firebase/app";
 import { User as FirebaseUser, getAuth } from "firebase/auth";
 import {
@@ -30,11 +38,11 @@ type CreateSignal = <T>(initValue: T) => Signal<T>;
 let _signal: CreateSignal | undefined = undefined;
 let _firebaseApp: FirebaseApp | undefined = undefined;
 
-export type User = FirebaseUser | typeof PENDING | typeof NONEXISTENT;
+export type User = FirebaseUser | Pending | Nonexistent;
 export function getUser() {
-  const userSig = _signal!<User>(PENDING);
+  const userSig = _signal!<User>(Pending.create());
   getAuth(_firebaseApp).onAuthStateChanged((user) => {
-    userSig.value = user ?? NONEXISTENT;
+    userSig.value = user ?? Nonexistent.create();
   });
   return userSig;
 }
