@@ -194,7 +194,7 @@ function _defineAppDataStructure(modelName, options) {
             const localCache = (0, LocalCache_1.initializeCache)({
                 typeSchemas: options.typeSchemas,
                 getCollectionName,
-                firebaseOptions: options.firebaseOptions,
+                firebaseApp: options.firebaseApp,
                 _signal,
                 persistedFunctionManager: persistedFunctionManager,
                 fileSystem: options.fileSystem,

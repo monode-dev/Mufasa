@@ -8,7 +8,7 @@ const FirestoreSync_1 = require("./FirestoreSync");
 const uuid_1 = require("uuid");
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
-function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _signal, persistedFunctionManager, fileSystem, isProduction, }) {
+function initializeCache({ typeSchemas, getCollectionName, firebaseApp, _signal, persistedFunctionManager, fileSystem, isProduction, }) {
     const offlineCacheFileName = `mfs_offlineCache`;
     const _offlineCache = fileSystem
         .readFile(offlineCacheFileName)
@@ -67,7 +67,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _sig
     });
     // Signal tree
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
-    const firestoreSync = (0, FirestoreSync_1.initializeFirestoreSync)(firebaseOptions, isProduction, persistedFunctionManager, fileSystem);
+    const firestoreSync = (0, FirestoreSync_1.initializeFirestoreSync)(firebaseApp, isProduction, persistedFunctionManager, fileSystem, _signal);
     async function updateSessionStorage(params) {
         const offlineCache = await _offlineCache;
         const collectionName = getCollectionName(params.typeName);

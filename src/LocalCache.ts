@@ -1,7 +1,7 @@
 import { TypeSchemaDict, UPLOADING_FILE } from "./Parse";
 import { JsonObject, exists, sleep } from "./utils";
 import { MfsFileSystem, Signal } from "./Implement";
-import { FirebaseOptions } from "firebase/app";
+import { FirebaseApp, FirebaseOptions } from "firebase/app";
 import { newSignalTree, SignalEvent } from "./SignalTree";
 import { initializeFirestoreSync } from "./FirestoreSync";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
@@ -18,7 +18,7 @@ export type LocalCache = ReturnType<typeof initializeCache>;
 export function initializeCache({
   typeSchemas,
   getCollectionName,
-  firebaseOptions,
+  firebaseApp,
   _signal,
   persistedFunctionManager,
   fileSystem,
@@ -26,8 +26,8 @@ export function initializeCache({
 }: {
   typeSchemas: TypeSchemaDict;
   getCollectionName: (typeName: string) => string;
-  firebaseOptions: FirebaseOptions;
-  _signal: (initValue: any) => Signal<any>;
+  firebaseApp: FirebaseApp;
+  _signal: <T>(initValue: T) => Signal<T>;
   persistedFunctionManager: PersistedFunctionManager;
   fileSystem: MfsFileSystem;
   isProduction: boolean;
@@ -130,10 +130,11 @@ export function initializeCache({
     };
   }>(_signal);
   const firestoreSync = initializeFirestoreSync(
-    firebaseOptions,
+    firebaseApp,
     isProduction,
     persistedFunctionManager,
     fileSystem,
+    _signal,
   );
 
   async function updateSessionStorage(params: {

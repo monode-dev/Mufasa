@@ -5,6 +5,22 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export type Unad<T extends string> = {
+  mfs_unad: Set<T>;
+};
+export function unad<T extends string>(id: T) {
+  const _unad = <T extends string>(...ids: T[]) => ({
+    mfs_unad: new Set(ids),
+    subtypeOf: <U extends string>(...others: Unad<U>[]) =>
+      _unad<U | T>(...ids, ...others.flatMap((o) => [...o.mfs_unad])),
+  });
+  return _unad(id);
+}
+export const MFS = unad(`MFS`);
+export const INVALID = unad(`INVALID`).subtypeOf(MFS);
+export const PENDING = unad(`PENDING`).subtypeOf(INVALID);
+export const NONEXISTENT = unad(`NONEXISTENT`).subtypeOf(INVALID);
+
 export type Json = JsonPrimitive | JsonArray | JsonObject;
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = Json[];

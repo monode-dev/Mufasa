@@ -1,14 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeFirestoreSync = exports.CHANGE_DATE_KEY = void 0;
+exports.initializeFirestoreSync = exports.CHANGE_DATE_KEY = exports.getUser = void 0;
 const firestore_1 = require("firebase/firestore");
 const storage_1 = require("firebase/storage");
 const utils_1 = require("./utils");
-const app_1 = require("firebase/app");
+const auth_1 = require("firebase/auth");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
+let _signal = undefined;
+let _firebaseApp = undefined;
+function getUser() {
+    const userSig = _signal(utils_1.PENDING);
+    (0, auth_1.getAuth)(_firebaseApp).onAuthStateChanged((user) => {
+        userSig.value = user ?? utils_1.NONEXISTENT;
+    });
+    return userSig;
+}
+exports.getUser = getUser;
 exports.CHANGE_DATE_KEY = `mfs_changeDate`;
-function initializeFirestoreSync(firebaseOptions, isProduction, persistedFunctionManager, fileSystem) {
-    const firebaseApp = (0, app_1.initializeApp)(firebaseOptions);
+function initializeFirestoreSync(firebaseApp, isProduction, persistedFunctionManager, fileSystem, signal) {
+    _signal = signal;
+    _firebaseApp = firebaseApp;
     const firestore = (0, firestore_1.getFirestore)(firebaseApp);
     const firebaseStorage = (0, storage_1.getStorage)(firebaseApp);
     const getCollectionNameFromTypeName = (typeName) => `${isProduction ? `Prod` : `Dev`}_${typeName}`;

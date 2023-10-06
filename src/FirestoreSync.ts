@@ -17,23 +17,38 @@ import {
   deleteObject,
   getBytes,
 } from "firebase/storage";
-import { Json, JsonObject, exists, sleep } from "./utils";
-import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
+import { Json, JsonObject, NONEXISTENT, PENDING, exists, sleep } from "./utils";
+import { FirebaseApp } from "firebase/app";
+import { User as FirebaseUser, getAuth } from "firebase/auth";
 import {
   PersistedFunctionManager,
   QUIT_PERSISTED_FUNCTION,
 } from "./PersistedFunctionManager";
-import { MfsFileSystem } from "./Implement";
+import { MfsFileSystem, Signal } from "./Implement";
+
+type CreateSignal = <T>(initValue: T) => Signal<T>;
+let _signal: CreateSignal | undefined = undefined;
+let _firebaseApp: FirebaseApp | undefined = undefined;
+
+export type User = FirebaseUser | typeof PENDING | typeof NONEXISTENT;
+export function getUser() {
+  const userSig = _signal!<User>(PENDING);
+  getAuth(_firebaseApp).onAuthStateChanged((user) => {
+    userSig.value = user ?? NONEXISTENT;
+  });
+  return userSig;
+}
 
 export const CHANGE_DATE_KEY = `mfs_changeDate`;
-
 export function initializeFirestoreSync(
-  firebaseOptions: FirebaseOptions,
+  firebaseApp: FirebaseApp,
   isProduction: boolean,
   persistedFunctionManager: PersistedFunctionManager,
   fileSystem: MfsFileSystem,
+  signal: CreateSignal,
 ) {
-  const firebaseApp = initializeApp(firebaseOptions);
+  _signal = signal;
+  _firebaseApp = firebaseApp;
   const firestore = getFirestore(firebaseApp);
   const firebaseStorage = getStorage(firebaseApp);
   const getCollectionNameFromTypeName = (typeName: string) =>

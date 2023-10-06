@@ -1,4 +1,4 @@
-import { FirebaseOptions } from "firebase/app";
+import { FirebaseApp, FirebaseOptions } from "firebase/app";
 import { exists, globalStore } from "./utils";
 import {
   SchemaDictToTsType,
@@ -304,7 +304,7 @@ export function _defineAppDataStructure<
       isSignal: typeof _isSignal;
       watchEffect: typeof _watchEffect;
     };
-    firebaseOptions: FirebaseOptions;
+    firebaseApp: FirebaseApp;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
@@ -327,7 +327,7 @@ export function _defineAppDataStructure<
       const localCache = initializeCache({
         typeSchemas: options.typeSchemas,
         getCollectionName,
-        firebaseOptions: options.firebaseOptions,
+        firebaseApp: options.firebaseApp,
         _signal,
         persistedFunctionManager: persistedFunctionManager,
         fileSystem: options.fileSystem,

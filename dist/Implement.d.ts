@@ -1,4 +1,4 @@
-import { FirebaseOptions } from "firebase/app";
+import { FirebaseApp } from "firebase/app";
 import { SchemaDictToTsType, SchemaToTsType, TypeSchemaDict, RootSchema } from "./Parse";
 import { LocalCache } from "./LocalCache";
 export type Computed<T> = {
@@ -43,7 +43,7 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
         isSignal: typeof _isSignal;
         watchEffect: typeof _watchEffect;
     };
-    firebaseOptions: FirebaseOptions;
+    firebaseApp: FirebaseApp;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;

@@ -12,6 +12,7 @@ export type Doc<T extends {} = {}> = _Doc<T>;
 export type List<T extends _Doc<{}> = _Doc<{}>> = _List<T>;
 export const defineAppDataStructure = _defineAppDataStructure;
 export const globalStore = _globalStore;
+export * from "./FirestoreSync";
 
 /** Defines a prop of the specified primitive type. */
 export function prim<T extends number | string | boolean>(

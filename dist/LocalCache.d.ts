@@ -1,6 +1,6 @@
 import { TypeSchemaDict } from "./Parse";
 import { MfsFileSystem, Signal } from "./Implement";
-import { FirebaseOptions } from "firebase/app";
+import { FirebaseApp } from "firebase/app";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 export declare const DELETED_KEY = "mx_deleted";
 export declare const MX_PARENT_KEY = "mx_parent";
@@ -8,11 +8,11 @@ export type DocData = {
     [propName: string]: number | string | boolean | null | undefined;
 };
 export type LocalCache = ReturnType<typeof initializeCache>;
-export declare function initializeCache({ typeSchemas, getCollectionName, firebaseOptions, _signal, persistedFunctionManager, fileSystem, isProduction, }: {
+export declare function initializeCache({ typeSchemas, getCollectionName, firebaseApp, _signal, persistedFunctionManager, fileSystem, isProduction, }: {
     typeSchemas: TypeSchemaDict;
     getCollectionName: (typeName: string) => string;
-    firebaseOptions: FirebaseOptions;
-    _signal: (initValue: any) => Signal<any>;
+    firebaseApp: FirebaseApp;
+    _signal: <T>(initValue: T) => Signal<T>;
     persistedFunctionManager: PersistedFunctionManager;
     fileSystem: MfsFileSystem;
     isProduction: boolean;

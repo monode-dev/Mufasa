@@ -1,9 +1,13 @@
-import { Json, JsonObject } from "./utils";
-import { FirebaseOptions } from "firebase/app";
+import { Json, JsonObject, NONEXISTENT, PENDING } from "./utils";
+import { FirebaseApp } from "firebase/app";
+import { User as FirebaseUser } from "firebase/auth";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
-import { MfsFileSystem } from "./Implement";
+import { MfsFileSystem, Signal } from "./Implement";
+type CreateSignal = <T>(initValue: T) => Signal<T>;
+export type User = FirebaseUser | typeof PENDING | typeof NONEXISTENT;
+export declare function getUser(): Signal<User>;
 export declare const CHANGE_DATE_KEY = "mfs_changeDate";
-export declare function initializeFirestoreSync(firebaseOptions: FirebaseOptions, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem): {
+export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem, signal: CreateSignal): {
     uploadDocChange: ((props: {
         shouldOverwrite: boolean;
         typeName: string;
@@ -174,3 +178,4 @@ export declare function initializeFirestoreSync(firebaseOptions: FirebaseOptions
     downloadFile(fileId: string): Promise<void>;
     watchCollection(collectionName: string, handleUpdate: (id: string, data: JsonObject) => void): Promise<void>;
 };
+export {};
