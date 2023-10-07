@@ -1,10 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._defineAppDataStructure = exports.docProx = void 0;
+const app_1 = require("firebase/app");
 const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
 const firestore_1 = require("firebase/firestore");
+const storage_1 = require("firebase/storage");
+const auth_1 = require("firebase/auth");
 let _computed;
 let _signal;
 let _isSignal;
@@ -189,17 +192,21 @@ function _defineAppDataStructure(modelName, options) {
     _watchEffect = options.reactivity.watchEffect;
     // Setup Firebase
     isProduction = options.isProduction;
-    console.log((0, firestore_1.collection)(options.firestore, `Dev_Client`));
+    const firebaseApp = (0, app_1.initializeApp)(options.firebaseOptions);
+    const firestore = (0, firestore_1.getFirestore)(firebaseApp);
+    const firebaseStorage = (0, storage_1.getStorage)(firebaseApp);
+    const auth = (0, auth_1.getAuth)(firebaseApp);
+    console.log((0, firestore_1.collection)(firestore, `Dev_Client`));
     return {
         getAppData: (0, utils_1.globalStore)(modelName, () => {
             const persistedFunctionManager = (0, PersistedFunctionManager_1.initializePersistedFunctionManager)(`mfs_${modelName}_persistedFunctions`, options.fileSystem);
             const localCache = (0, LocalCache_1.initializeCache)({
                 typeSchemas: options.typeSchemas,
                 getCollectionName,
-                firebaseApp: options.firebaseApp,
-                firestore: options.firestore,
-                firebaseStorage: options.firebaseStorage,
-                auth: options.auth,
+                firebaseApp,
+                firestore,
+                firebaseStorage,
+                auth,
                 _signal,
                 persistedFunctionManager: persistedFunctionManager,
                 fileSystem: options.fileSystem,
@@ -212,6 +219,7 @@ function _defineAppDataStructure(modelName, options) {
             return rootLists;
         }),
         types: {},
+        firebaseAuth: auth,
     };
 }
 exports._defineAppDataStructure = _defineAppDataStructure;

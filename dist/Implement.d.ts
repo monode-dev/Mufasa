@@ -1,8 +1,6 @@
-import { FirebaseApp } from "firebase/app";
+import { FirebaseOptions } from "firebase/app";
 import { SchemaDictToTsType, SchemaToTsType, TypeSchemaDict, RootSchema } from "./Parse";
 import { LocalCache } from "./LocalCache";
-import { Firestore } from "firebase/firestore";
-import { FirebaseStorage } from "firebase/storage";
 import { Auth } from "firebase/auth";
 export type Computed<T> = {
     get value(): T;
@@ -46,15 +44,13 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
         isSignal: typeof _isSignal;
         watchEffect: typeof _watchEffect;
     };
-    firebaseApp: FirebaseApp;
-    firestore: Firestore;
-    firebaseStorage: FirebaseStorage;
-    auth: Auth;
+    firebaseOptions: FirebaseOptions;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
 }): {
     getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
     types: SchemaDictToTsType<TSD>;
+    firebaseAuth: Auth;
 };
 export {};

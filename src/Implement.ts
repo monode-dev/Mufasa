@@ -1,4 +1,4 @@
-import { FirebaseApp, FirebaseOptions } from "firebase/app";
+import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
 import { exists, globalStore } from "./utils";
 import {
   SchemaDictToTsType,
@@ -8,9 +8,9 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
-import { Firestore, collection } from "firebase/firestore";
-import { FirebaseStorage } from "firebase/storage";
-import { Auth } from "firebase/auth";
+import { Firestore, collection, getFirestore } from "firebase/firestore";
+import { FirebaseStorage, getStorage } from "firebase/storage";
+import { Auth, getAuth } from "firebase/auth";
 
 //
 //
@@ -307,10 +307,7 @@ export function _defineAppDataStructure<
       isSignal: typeof _isSignal;
       watchEffect: typeof _watchEffect;
     };
-    firebaseApp: FirebaseApp;
-    firestore: Firestore;
-    firebaseStorage: FirebaseStorage;
-    auth: Auth;
+    firebaseOptions: FirebaseOptions;
     fileSystem: MfsFileSystem;
     rootSchema: RS;
     typeSchemas: TSD;
@@ -323,7 +320,11 @@ export function _defineAppDataStructure<
   _watchEffect = options.reactivity.watchEffect;
   // Setup Firebase
   isProduction = options.isProduction;
-  console.log(collection(options.firestore, `Dev_Client`));
+  const firebaseApp = initializeApp(options.firebaseOptions);
+  const firestore = getFirestore(firebaseApp);
+  const firebaseStorage = getStorage(firebaseApp);
+  const auth = getAuth(firebaseApp);
+  console.log(collection(firestore, `Dev_Client`));
 
   return {
     getAppData: globalStore(modelName, () => {
@@ -334,10 +335,10 @@ export function _defineAppDataStructure<
       const localCache = initializeCache({
         typeSchemas: options.typeSchemas,
         getCollectionName,
-        firebaseApp: options.firebaseApp,
-        firestore: options.firestore,
-        firebaseStorage: options.firebaseStorage,
-        auth: options.auth,
+        firebaseApp,
+        firestore,
+        firebaseStorage,
+        auth,
         _signal,
         persistedFunctionManager: persistedFunctionManager,
         fileSystem: options.fileSystem,
@@ -362,5 +363,6 @@ export function _defineAppDataStructure<
       return rootLists;
     }),
     types: {} as SchemaDictToTsType<typeof options.typeSchemas>,
+    firebaseAuth: auth,
   };
 }
