@@ -1,5 +1,5 @@
-import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
-import { exists, globalStore } from "./utils";
+import {  FirebaseOptions, initializeApp } from "firebase/app";
+import { exists, globalStore, PENDING, NONEXISTENT } from "./utils";
 import {
   SchemaDictToTsType,
   SchemaToTsType,
@@ -8,9 +8,14 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
-import { Firestore, collection, getFirestore } from "firebase/firestore";
-import { FirebaseStorage, getStorage } from "firebase/storage";
-import { Auth, getAuth } from "firebase/auth";
+import {  collection, getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import {
+  GoogleAuthProvider,
+  getAuth,
+  signInWithPopup,
+  User as FirebaseUser
+} from "firebase/auth";
 
 //
 //
@@ -294,6 +299,7 @@ export type MfsFileSystem = {
   deleteFile: (path: string) => Promise<void>;
   getFilePath: (path: string) => string;
 };
+export type User = FirebaseUser | PENDING | NONEXISTENT;
 export function _defineAppDataStructure<
   RS extends RootSchema,
   TSD extends TypeSchemaDict,
@@ -363,6 +369,21 @@ export function _defineAppDataStructure<
       return rootLists;
     }),
     types: {} as SchemaDictToTsType<typeof options.typeSchemas>,
-    firebaseAuth: auth,
+    firebaseAuth: {
+      signOut() {
+        auth.signOut();
+      },
+      async signInWithGoogle() {
+        const googleAuth = new GoogleAuthProvider();
+        await signInWithPopup(auth, googleAuth);
+      },
+      getUser() {
+        const userSig = _signal!<User>(PENDING);
+        auth.onAuthStateChanged((user) => {
+          userSig.value = user ?? NONEXISTENT;
+        });
+        return userSig;
+      },
+    },
   };
 }

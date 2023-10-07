@@ -24,10 +24,8 @@ import {
   JsonObject,
   NONEXISTENT,
   PENDING,
-  Sym,
   exists,
   isValid,
-  newSym,
   sleep,
 } from "./utils";
 import { Auth, User as FirebaseUser, getAuth } from "firebase/auth";
@@ -40,23 +38,23 @@ import { MfsFileSystem, Signal } from "./Implement";
 type CreateSignal = <T>(initValue: T) => Signal<T>;
 let _signal: CreateSignal | undefined = undefined;
 let _auth: Auth | undefined = undefined;
-const auth = new Promise<Auth>(async (resolve) => {
-  while (!isValid(_auth)) {
-    await sleep(10);
-  }
-  resolve(_auth);
-});
+// const auth = new Promise<Auth>(async (resolve) => {
+//   while (!isValid(_auth)) {
+//     await sleep(10);
+//   }
+//   resolve(_auth);
+// });
 
-export type User = FirebaseUser | PENDING | NONEXISTENT;
-export function getUser() {
-  const userSig = _signal!<User>(PENDING);
-  auth.then((auth) => {
-    auth.onAuthStateChanged((user) => {
-      userSig.value = user ?? NONEXISTENT;
-    });
-  });
-  return userSig;
-}
+// export type User = FirebaseUser | PENDING | NONEXISTENT;
+// export function getUser() {
+//   const userSig = _signal!<User>(PENDING);
+//   auth.then((auth) => {
+//     auth.onAuthStateChanged((user) => {
+//       userSig.value = user ?? NONEXISTENT;
+//     });
+//   });
+//   return userSig;
+// }
 
 export const CHANGE_DATE_KEY = `mfs_changeDate`;
 export function initializeFirestoreSync(

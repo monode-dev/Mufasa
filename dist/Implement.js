@@ -219,7 +219,22 @@ function _defineAppDataStructure(modelName, options) {
             return rootLists;
         }),
         types: {},
-        firebaseAuth: auth,
+        firebaseAuth: {
+            signOut() {
+                auth.signOut();
+            },
+            async signInWithGoogle() {
+                const googleAuth = new auth_1.GoogleAuthProvider();
+                await (0, auth_1.signInWithPopup)(auth, googleAuth);
+            },
+            getUser() {
+                const userSig = _signal(utils_1.PENDING);
+                auth.onAuthStateChanged((user) => {
+                    userSig.value = user ?? utils_1.NONEXISTENT;
+                });
+                return userSig;
+            },
+        },
     };
 }
 exports._defineAppDataStructure = _defineAppDataStructure;

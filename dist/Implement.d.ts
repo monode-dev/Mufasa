@@ -1,7 +1,8 @@
 import { FirebaseOptions } from "firebase/app";
+import { PENDING, NONEXISTENT } from "./utils";
 import { SchemaDictToTsType, SchemaToTsType, TypeSchemaDict, RootSchema } from "./Parse";
 import { LocalCache } from "./LocalCache";
-import { Auth } from "firebase/auth";
+import { User as FirebaseUser } from "firebase/auth";
 export type Computed<T> = {
     get value(): T;
 };
@@ -36,6 +37,7 @@ export type MfsFileSystem = {
     deleteFile: (path: string) => Promise<void>;
     getFilePath: (path: string) => string;
 };
+export type User = FirebaseUser | PENDING | NONEXISTENT;
 export declare function _defineAppDataStructure<RS extends RootSchema, TSD extends TypeSchemaDict>(modelName: string, options: {
     isProduction: boolean;
     reactivity: {
@@ -51,6 +53,10 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
 }): {
     getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
     types: SchemaDictToTsType<TSD>;
-    firebaseAuth: Auth;
+    firebaseAuth: {
+        signOut(): void;
+        signInWithGoogle(): Promise<void>;
+        getUser(): Signal<User>;
+    };
 };
 export {};

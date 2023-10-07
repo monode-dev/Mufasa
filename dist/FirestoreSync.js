@@ -1,28 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeFirestoreSync = exports.CHANGE_DATE_KEY = exports.getUser = void 0;
+exports.initializeFirestoreSync = exports.CHANGE_DATE_KEY = void 0;
 const firestore_1 = require("firebase/firestore");
 const storage_1 = require("firebase/storage");
 const utils_1 = require("./utils");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
 let _signal = undefined;
 let _auth = undefined;
-const auth = new Promise(async (resolve) => {
-    while (!(0, utils_1.isValid)(_auth)) {
-        await (0, utils_1.sleep)(10);
-    }
-    resolve(_auth);
-});
-function getUser() {
-    const userSig = _signal(utils_1.PENDING);
-    auth.then((auth) => {
-        auth.onAuthStateChanged((user) => {
-            userSig.value = user ?? utils_1.NONEXISTENT;
-        });
-    });
-    return userSig;
-}
-exports.getUser = getUser;
+// const auth = new Promise<Auth>(async (resolve) => {
+//   while (!isValid(_auth)) {
+//     await sleep(10);
+//   }
+//   resolve(_auth);
+// });
+// export type User = FirebaseUser | PENDING | NONEXISTENT;
+// export function getUser() {
+//   const userSig = _signal!<User>(PENDING);
+//   auth.then((auth) => {
+//     auth.onAuthStateChanged((user) => {
+//       userSig.value = user ?? NONEXISTENT;
+//     });
+//   });
+//   return userSig;
+// }
 exports.CHANGE_DATE_KEY = `mfs_changeDate`;
 function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem, signal) {
     _signal = signal;
