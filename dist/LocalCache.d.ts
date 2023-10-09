@@ -1,4 +1,3 @@
-import { TypeSchemaDict } from "./Parse";
 import { MfsFileSystem, Signal } from "./Implement";
 import { FirebaseApp } from "firebase/app";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
@@ -8,11 +7,14 @@ import { Auth } from "firebase/auth";
 export declare const DELETED_KEY = "mx_deleted";
 export declare const MX_PARENT_KEY = "mx_parent";
 export type DocData = {
-    [propName: string]: number | string | boolean | null | undefined;
+    [propName: string]: PropValue;
+};
+export type PropValue = string | number | boolean | null | undefined | {
+    value: string | number | boolean | null | undefined;
+    typeName: string;
 };
 export type LocalCache = ReturnType<typeof initializeCache>;
-export declare function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestore, firebaseStorage, auth, _signal, persistedFunctionManager, fileSystem, isProduction, }: {
-    typeSchemas: TypeSchemaDict;
+export declare function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseStorage, auth, _signal, persistedFunctionManager, fileSystem, isProduction, }: {
     getCollectionName: (typeName: string) => string;
     firebaseApp: FirebaseApp;
     firestore: Firestore;
@@ -23,16 +25,20 @@ export declare function initializeCache({ typeSchemas, getCollectionName, fireba
     fileSystem: MfsFileSystem;
     isProduction: boolean;
 }): {
+    syncType(typeName: string): Promise<void>;
     listAllObjectsOfType(typeName: string): string[];
     checkExists(typeName: string, docId: string | null | undefined): boolean;
     getChildDocs(childType: string, parentId: string): string[];
-    getPropValue(typeName: string, docId: string, propName: string): string | number | boolean | Promise<string | undefined> | {
+    getPropValue(typeName: string, docId: string, propName: string): Promise<string | undefined> | {
         readonly mx_unad: "UploadingFile";
-    } | null | undefined;
+    } | PropValue;
     getFilePath(typeName: string, docId: string, propName: string): string | null;
     addDoc(typeName: string, props: {
         [propName: string]: any;
     }): string;
-    setPropValue(typeName: string, docId: string, propName: string, value: any): Promise<void>;
+    setPropValue(typeName: string, docId: string, propName: string, value: string | number | boolean | {
+        value: string | number | boolean | null | undefined;
+        typeName: string;
+    } | null | undefined): Promise<void>;
     deleteDoc(typeName: string, docId: string): void;
 };

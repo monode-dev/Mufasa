@@ -8,7 +8,7 @@ const FirestoreSync_1 = require("./FirestoreSync");
 const uuid_1 = require("uuid");
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
-function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestore, firebaseStorage, auth, _signal, persistedFunctionManager, fileSystem, isProduction, }) {
+function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseStorage, auth, _signal, persistedFunctionManager, fileSystem, isProduction, }) {
     const offlineCacheFileName = `mfs_offlineCache`;
     const _offlineCache = fileSystem
         .readFile(offlineCacheFileName)
@@ -67,7 +67,7 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
     });
     // Signal tree
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
-    const firestoreSync = (0, FirestoreSync_1.initializeFirestoreSync)(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem, _signal);
+    const firestoreSync = (0, FirestoreSync_1.initializeFirestoreSync)(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem);
     async function updateSessionStorage(params) {
         const offlineCache = await _offlineCache;
         const collectionName = getCollectionName(params.typeName);
@@ -125,8 +125,9 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
         }
         // Download any new files.
         for (const propName of Object.keys(params.props)) {
-            if (typeSchemas[params.typeName][propName]?.format === "file") {
-                const fileId = params.props[propName];
+            const propValue = params.props[propName];
+            if (typeof propValue === "object" && propValue?.typeName === `file`) {
+                const fileId = propValue.value;
                 if (!(0, utils_1.exists)(fileId))
                     continue;
                 (async () => {
@@ -147,9 +148,25 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
         // Now that we've made the updates, then trigger the changes.
         thingsToTrigger.forEach((trigger) => trigger());
     }
-    _offlineCache.then(() => {
+    const syncedTypes = new Set();
+    async function syncType(typeName) {
+        await _offlineCache;
+        if (syncedTypes.has(typeName))
+            return;
+        syncedTypes.add(typeName);
+        // Start syncing with the DB
+        firestoreSync.watchType(typeName, (docId, docUpdates) => {
+            updateSessionStorage({
+                typeName: typeName,
+                docId: docId,
+                props: docUpdates,
+            });
+        });
+    }
+    _offlineCache.then((offlineCache) => {
+        const typeNames = Object.keys(offlineCache.types ?? {});
         // After we load data from the offline cache we should let the app know when the data is loaded.
-        for (const typeName of Object.keys(typeSchemas)) {
+        for (const typeName of typeNames) {
             docSignalTree[typeName].docsChanged.trigger();
             for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
                 docSignalTree[typeName].parents[parentId].trigger();
@@ -161,17 +178,14 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
             }
         }
         // Start syncing with the DB
-        for (const typeName in typeSchemas) {
-            firestoreSync.watchType(typeName, (docId, docUpdates) => {
-                updateSessionStorage({
-                    typeName: typeName,
-                    docId: docId,
-                    props: docUpdates,
-                });
-            });
+        for (const typeName in typeNames) {
+            syncType(typeName);
         }
     });
     return {
+        async syncType(typeName) {
+            await syncType(typeName);
+        },
         listAllObjectsOfType(typeName) {
             docSignalTree[typeName].docsChanged.listen();
             const objects = [];
@@ -204,19 +218,18 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
         getPropValue(typeName, docId, propName) {
             docSignalTree[typeName].docs[docId][propName].listen();
             const propValue = unPromisedOfflineCache?.types?.[getCollectionName(typeName)]?.[docId]?.[propName];
-            if (typeSchemas[typeName]?.[propName]?.format === "file") {
-                if (!(0, utils_1.exists)(propValue) || typeof propValue !== "string")
-                    return null;
+            if (typeof propValue === "object" && propValue?.typeName === `file`) {
+                const fileId = propValue.value;
                 //  Check if a new file is being uploaded
                 const fileIsUploading = firestoreSync.isFileUploading({
                     docId,
                     propName,
-                    fileId: propValue,
+                    fileId: fileId,
                 });
                 if (fileIsUploading)
                     return Parse_1.UPLOADING_FILE;
                 // Read the file from storage.
-                return fileSystem.readFile(propValue) ?? null;
+                return fileSystem.readFile(fileId) ?? null;
             }
             else {
                 return propValue;
@@ -240,11 +253,11 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
             return docId;
         },
         async setPropValue(typeName, docId, propName, value) {
-            if (typeSchemas[typeName]?.[propName]?.format === "file") {
+            if (typeof value === "object" && value?.typeName === `file`) {
                 const newFileId = (0, uuid_1.v4)();
                 // Write the file
                 unPromisedOfflineCache = await _offlineCache;
-                await fileSystem.writeFile(newFileId, value);
+                await fileSystem.writeFile(newFileId, value.value);
                 // Write to server
                 const oldFileId = unPromisedOfflineCache.types?.[getCollectionName(typeName)]?.[docId]?.[propName];
                 firestoreSync.uploadFileChange({
@@ -280,29 +293,33 @@ function initializeCache({ typeSchemas, getCollectionName, firebaseApp, firestor
                     [exports.DELETED_KEY]: true,
                 },
             });
-            // Delete any files
-            for (const propName of Object.keys(typeSchemas[typeName])) {
-                if (typeSchemas[typeName][propName]?.format === "file") {
-                    const fileId = unPromisedOfflineCache?.types?.[getCollectionName(typeName)]?.[docId]?.[propName];
-                    if ((0, utils_1.exists)(fileId)) {
-                        firestoreSync.deleteFile({ fileId });
+            const docData = unPromisedOfflineCache?.types?.[getCollectionName(typeName)]?.[docId];
+            if ((0, utils_1.exists)(docData)) {
+                const propKeys = Object.keys(docData);
+                // Delete any files
+                for (const propName of Object.keys(docData)) {
+                    const propValue = docData[propName];
+                    if (typeof propValue === "object" && propValue?.typeName === `file`) {
+                        const fileId = propValue.value;
+                        if ((0, utils_1.exists)(fileId)) {
+                            firestoreSync.deleteFile({ fileId });
+                        }
                     }
                 }
+                // Write locally
+                updateSessionStorage({
+                    typeName,
+                    docId,
+                    props: {
+                        [exports.DELETED_KEY]: true,
+                        [exports.MX_PARENT_KEY]: undefined,
+                        ...propKeys.reduce((total, curr) => ({
+                            ...total,
+                            [curr]: undefined,
+                        }), {}),
+                    },
+                });
             }
-            // Write locally
-            const propKeys = Object.keys(typeSchemas[typeName]);
-            updateSessionStorage({
-                typeName,
-                docId,
-                props: {
-                    [exports.DELETED_KEY]: true,
-                    [exports.MX_PARENT_KEY]: undefined,
-                    ...propKeys.reduce((total, curr) => ({
-                        ...total,
-                        [curr]: undefined,
-                    }), {}),
-                },
-            });
         },
     };
 }

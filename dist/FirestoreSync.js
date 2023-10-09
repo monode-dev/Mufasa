@@ -5,29 +5,14 @@ const firestore_1 = require("firebase/firestore");
 const storage_1 = require("firebase/storage");
 const utils_1 = require("./utils");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
-let _signal = undefined;
-let _auth = undefined;
-// const auth = new Promise<Auth>(async (resolve) => {
-//   while (!isValid(_auth)) {
-//     await sleep(10);
-//   }
-//   resolve(_auth);
-// });
-// export type User = FirebaseUser | PENDING | NONEXISTENT;
-// export function getUser() {
-//   const userSig = _signal!<User>(PENDING);
-//   auth.then((auth) => {
-//     auth.onAuthStateChanged((user) => {
-//       userSig.value = user ?? NONEXISTENT;
-//     });
-//   });
-//   return userSig;
-// }
 exports.CHANGE_DATE_KEY = `mfs_changeDate`;
-function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem, signal) {
-    _signal = signal;
-    _auth = auth;
-    const getCollectionNameFromTypeName = (typeName) => `${isProduction ? `Prod` : `Dev`}_${typeName}`;
+function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem) {
+    const getFirestorePathToTypeCollection = (typeName) => {
+        const collectionName = `${isProduction ? `Prod` : `Dev`}_${typeName}`;
+        const userId = auth.currentUser?.uid;
+        const path = `userData/${auth.currentUser?.uid}/${collectionName}`;
+        return collectionName;
+    };
     const savedDataFileName = `mfs_firestoreSavedData`;
     const _savedData = fileSystem
         .readFile(savedDataFileName)
@@ -58,7 +43,7 @@ function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, 
     });
     // Both file changes and doc changes require a doc change
     async function applyDocChange(change) {
-        const docRef = (0, firestore_1.doc)(firestore, getCollectionNameFromTypeName(change.typeName), change.docId);
+        const docRef = (0, firestore_1.doc)(firestore, getFirestorePathToTypeCollection(change.typeName), change.docId);
         const props = {
             ...change.data,
             [exports.CHANGE_DATE_KEY]: (0, firestore_1.serverTimestamp)(),
@@ -145,9 +130,7 @@ function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, 
         async watchType(typeName, handleUpdate) {
             const savedData = await _savedData;
             const mostRecentChangeDateOnStartup = savedData[typeName] ?? 0;
-            console.log(`Querying ${getCollectionNameFromTypeName(typeName)}`);
-            console.log(firestore);
-            (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestore, getCollectionNameFromTypeName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date(mostRecentChangeDateOnStartup * 1000 - 30))), (snapshot) => {
+            (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestore, getFirestorePathToTypeCollection(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date(mostRecentChangeDateOnStartup * 1000 - 30))), (snapshot) => {
                 let mostRecentChangeDate = savedData[typeName] ?? 0;
                 snapshot.docChanges().forEach((change) => {
                     if (change.type !== "removed") {

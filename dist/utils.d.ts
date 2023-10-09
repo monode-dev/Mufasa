@@ -17,7 +17,7 @@ export declare function isSameSym<T extends string>(x: any, y: Sym<T>): x is Sym
 export type Valid<T> = T extends null | undefined | INVALID ? never : T;
 export declare function isValid<T>(x: T): x is Valid<T>;
 export type Json = JsonPrimitive | JsonArray | JsonObject;
-export type JsonPrimitive = string | number | boolean | null;
+export type JsonPrimitive = string | number | boolean | null | undefined;
 export type JsonArray = Json[];
 export type JsonObject = {
     [key: string]: Json;

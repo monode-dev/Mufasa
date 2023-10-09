@@ -4,105 +4,81 @@ import { FirebaseApp } from "firebase/app";
 import { Json, JsonObject } from "./utils";
 import { Auth } from "firebase/auth";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
-import { MfsFileSystem, Signal } from "./Implement";
-type CreateSignal = <T>(initValue: T) => Signal<T>;
+import { MfsFileSystem } from "./Implement";
+import { DocData } from "./LocalCache";
 export declare const CHANGE_DATE_KEY = "mfs_changeDate";
-export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, firestore: Firestore, firebaseStorage: FirebaseStorage, auth: Auth, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem, signal: CreateSignal): {
+export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, firestore: Firestore, firebaseStorage: FirebaseStorage, auth: Auth, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem): {
     uploadDocChange: ((props: {
         shouldOverwrite: boolean;
         typeName: string;
         docId: string;
-        data: {
-            [key: string]: Json;
-        };
+        data: DocData;
     }) => void) & {
         addStage: <T extends void | Json>(runStage: (props: never) => Promise<T>) => ((props: {
             shouldOverwrite: boolean;
             typeName: string;
             docId: string;
-            data: {
-                [key: string]: Json;
-            };
+            data: DocData;
         }) => void) & {
             addStage: <T_1 extends void | Json>(runStage: (props: Exclude<T, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_1>) => ((props: {
                 shouldOverwrite: boolean;
                 typeName: string;
                 docId: string;
-                data: {
-                    [key: string]: Json;
-                };
+                data: DocData;
             }) => void) & {
                 addStage: <T_2 extends void | Json>(runStage: (props: Exclude<T_1, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_2>) => ((props: {
                     shouldOverwrite: boolean;
                     typeName: string;
                     docId: string;
-                    data: {
-                        [key: string]: Json;
-                    };
+                    data: DocData;
                 }) => void) & {
                     addStage: <T_3 extends void | Json>(runStage: (props: Exclude<T_2, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_3>) => ((props: {
                         shouldOverwrite: boolean;
                         typeName: string;
                         docId: string;
-                        data: {
-                            [key: string]: Json;
-                        };
+                        data: DocData;
                     }) => void) & {
                         addStage: <T_4 extends void | Json>(runStage: (props: Exclude<T_3, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_4>) => ((props: {
                             shouldOverwrite: boolean;
                             typeName: string;
                             docId: string;
-                            data: {
-                                [key: string]: Json;
-                            };
+                            data: DocData;
                         }) => void) & {
                             addStage: <T_5 extends void | Json>(runStage: (props: Exclude<T_4, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_5>) => ((props: {
                                 shouldOverwrite: boolean;
                                 typeName: string;
                                 docId: string;
-                                data: {
-                                    [key: string]: Json;
-                                };
+                                data: DocData;
                             }) => void) & {
                                 addStage: <T_6 extends void | Json>(runStage: (props: Exclude<T_5, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_6>) => ((props: {
                                     shouldOverwrite: boolean;
                                     typeName: string;
                                     docId: string;
-                                    data: {
-                                        [key: string]: Json;
-                                    };
+                                    data: DocData;
                                 }) => void) & {
                                     addStage: <T_7 extends void | Json>(runStage: (props: Exclude<T_6, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_7>) => ((props: {
                                         shouldOverwrite: boolean;
                                         typeName: string;
                                         docId: string;
-                                        data: {
-                                            [key: string]: Json;
-                                        };
+                                        data: DocData;
                                     }) => void) & {
                                         addStage: <T_8 extends void | Json>(runStage: (props: Exclude<T_7, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_8>) => ((props: {
                                             shouldOverwrite: boolean;
                                             typeName: string;
                                             docId: string;
-                                            data: {
-                                                [key: string]: Json;
-                                            };
+                                            data: DocData;
                                         }) => void) & {
                                             addStage: <T_9 extends void | Json>(runStage: (props: Exclude<T_8, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_9>) => ((props: {
                                                 shouldOverwrite: boolean;
                                                 typeName: string;
                                                 docId: string;
-                                                data: {
-                                                    [key: string]: Json;
-                                                };
+                                                data: DocData;
                                             }) => void) & {
                                                 addStage: <T_10 extends void | Json>(runStage: (props: Exclude<T_9, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_10>) => ((props: {
                                                     shouldOverwrite: boolean;
                                                     typeName: string;
                                                     docId: string;
-                                                    data: {
-                                                        [key: string]: Json;
-                                                    };
+                                                    data: DocData;
                                                 }) => void) & any;
                                             };
                                         };
@@ -178,4 +154,3 @@ export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, firest
     downloadFile(fileId: string): Promise<void>;
     watchType(typeName: string, handleUpdate: (id: string, data: JsonObject) => void): Promise<void>;
 };
-export {};

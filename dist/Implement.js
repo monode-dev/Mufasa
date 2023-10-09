@@ -201,7 +201,6 @@ function _defineAppDataStructure(modelName, options) {
         getAppData: (0, utils_1.globalStore)(modelName, () => {
             const persistedFunctionManager = (0, PersistedFunctionManager_1.initializePersistedFunctionManager)(`mfs_${modelName}_persistedFunctions`, options.fileSystem);
             const localCache = (0, LocalCache_1.initializeCache)({
-                typeSchemas: options.typeSchemas,
                 getCollectionName,
                 firebaseApp,
                 firestore,
@@ -212,6 +211,7 @@ function _defineAppDataStructure(modelName, options) {
                 fileSystem: options.fileSystem,
                 isProduction: options.isProduction,
             });
+            Object.keys(options.typeSchemas).forEach(localCache.syncType);
             const rootLists = {};
             for (const key of Object.keys(options.rootSchema)) {
                 rootLists[key] = listProx(options.rootSchema[key].refTypeName, options.typeSchemas, localCache);

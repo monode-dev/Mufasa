@@ -34,27 +34,7 @@ import {
   QUIT_PERSISTED_FUNCTION,
 } from "./PersistedFunctionManager";
 import { MfsFileSystem, Signal } from "./Implement";
-
-type CreateSignal = <T>(initValue: T) => Signal<T>;
-let _signal: CreateSignal | undefined = undefined;
-let _auth: Auth | undefined = undefined;
-// const auth = new Promise<Auth>(async (resolve) => {
-//   while (!isValid(_auth)) {
-//     await sleep(10);
-//   }
-//   resolve(_auth);
-// });
-
-// export type User = FirebaseUser | PENDING | NONEXISTENT;
-// export function getUser() {
-//   const userSig = _signal!<User>(PENDING);
-//   auth.then((auth) => {
-//     auth.onAuthStateChanged((user) => {
-//       userSig.value = user ?? NONEXISTENT;
-//     });
-//   });
-//   return userSig;
-// }
+import { DocData } from "./LocalCache";
 
 export const CHANGE_DATE_KEY = `mfs_changeDate`;
 export function initializeFirestoreSync(
@@ -65,12 +45,13 @@ export function initializeFirestoreSync(
   isProduction: boolean,
   persistedFunctionManager: PersistedFunctionManager,
   fileSystem: MfsFileSystem,
-  signal: CreateSignal,
 ) {
-  _signal = signal;
-  _auth = auth;
-  const getCollectionNameFromTypeName = (typeName: string) =>
-    `${isProduction ? `Prod` : `Dev`}_${typeName}`;
+  const getFirestorePathToTypeCollection = (typeName: string) => {
+    const collectionName = `${isProduction ? `Prod` : `Dev`}_${typeName}`;
+    const userId = auth.currentUser?.uid;
+    const path = `userData/${auth.currentUser?.uid}/${collectionName}`;
+    return collectionName;
+  };
 
   const savedDataFileName = `mfs_firestoreSavedData`;
   const _savedData = fileSystem
@@ -114,13 +95,11 @@ export function initializeFirestoreSync(
     shouldOverwrite: boolean;
     typeName: string;
     docId: string;
-    data: {
-      [key: string]: Json;
-    };
+    data: DocData;
   }) {
     const docRef = doc(
       firestore,
-      getCollectionNameFromTypeName(change.typeName),
+      getFirestorePathToTypeCollection(change.typeName),
       change.docId,
     );
     const props = {
@@ -244,11 +223,9 @@ export function initializeFirestoreSync(
     ) {
       const savedData = await _savedData;
       const mostRecentChangeDateOnStartup = savedData[typeName] ?? 0;
-      console.log(`Querying ${getCollectionNameFromTypeName(typeName)}`);
-      console.log(firestore);
       onSnapshot(
         query(
-          collection(firestore, getCollectionNameFromTypeName(typeName)),
+          collection(firestore, getFirestorePathToTypeCollection(typeName)),
           where(
             CHANGE_DATE_KEY,
             ">",

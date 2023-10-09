@@ -1,4 +1,4 @@
-import {  FirebaseOptions, initializeApp } from "firebase/app";
+import { FirebaseOptions, initializeApp } from "firebase/app";
 import { exists, globalStore, PENDING, NONEXISTENT } from "./utils";
 import {
   SchemaDictToTsType,
@@ -8,13 +8,13 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
-import {  collection, getFirestore } from "firebase/firestore";
+import { collection, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import {
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
-  User as FirebaseUser
+  User as FirebaseUser,
 } from "firebase/auth";
 
 //
@@ -339,7 +339,6 @@ export function _defineAppDataStructure<
         options.fileSystem,
       );
       const localCache = initializeCache({
-        typeSchemas: options.typeSchemas,
         getCollectionName,
         firebaseApp,
         firestore,
@@ -350,6 +349,7 @@ export function _defineAppDataStructure<
         fileSystem: options.fileSystem,
         isProduction: options.isProduction,
       });
+      Object.keys(options.typeSchemas).forEach(localCache.syncType);
 
       const rootLists: {
         [K in keyof RS]: ReturnType<

@@ -40,7 +40,7 @@ export function isValid<T>(x: T): x is Valid<T> {
 }
 
 export type Json = JsonPrimitive | JsonArray | JsonObject;
-export type JsonPrimitive = string | number | boolean | null;
+export type JsonPrimitive = string | number | boolean | null | undefined;
 export type JsonArray = Json[];
 export type JsonObject = {
   [key: string]: Json;
