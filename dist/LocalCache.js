@@ -6,9 +6,10 @@ const utils_1 = require("./utils");
 const SignalTree_1 = require("./SignalTree");
 const FirestoreSync_1 = require("./FirestoreSync");
 const uuid_1 = require("uuid");
+const Reactivity_1 = require("./Reactivity");
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
-function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseStorage, auth, _signal, persistedFunctionManager, fileSystem, isProduction, }) {
+function initializeCache({ getCollectionName, firebaseApp, _signal, formula, persistedFunctionManager, fileSystem, isProduction, }) {
     const offlineCacheFileName = `mfs_offlineCache`;
     const _offlineCache = fileSystem
         .readFile(offlineCacheFileName)
@@ -67,7 +68,7 @@ function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseSt
     });
     // Signal tree
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
-    const firestoreSync = (0, FirestoreSync_1.initializeFirestoreSync)(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem);
+    const firestoreSync = (0, FirestoreSync_1.initializeFirestoreSync)(firebaseApp, isProduction, persistedFunctionManager, fileSystem);
     async function updateSessionStorage(params) {
         const offlineCache = await _offlineCache;
         const collectionName = getCollectionName(params.typeName);
@@ -148,6 +149,7 @@ function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseSt
         // Now that we've made the updates, then trigger the changes.
         thingsToTrigger.forEach((trigger) => trigger());
     }
+    // We need to tell the DB what types to watch for.
     const syncedTypes = new Set();
     async function syncType(typeName) {
         await _offlineCache;
@@ -178,14 +180,10 @@ function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseSt
             }
         }
         // Start syncing with the DB
-        for (const typeName in typeNames) {
-            syncType(typeName);
-        }
+        typeNames.forEach(syncType);
     });
     return {
-        async syncType(typeName) {
-            await syncType(typeName);
-        },
+        syncType: syncType,
         listAllObjectsOfType(typeName) {
             docSignalTree[typeName].docsChanged.listen();
             const objects = [];
@@ -229,10 +227,10 @@ function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseSt
                 if (fileIsUploading)
                     return Parse_1.UPLOADING_FILE;
                 // Read the file from storage.
-                return fileSystem.readFile(fileId) ?? null;
+                return fileSystem.readFile(fileId) ?? utils_1.NONEXISTENT;
             }
             else {
-                return propValue;
+                return propValue ?? utils_1.NONEXISTENT;
             }
         },
         getFilePath(typeName, docId, propName) {
@@ -284,6 +282,19 @@ function initializeCache({ getCollectionName, firebaseApp, firestore, firebaseSt
                 updateSessionStorage({ typeName, docId, props: changes });
             }
         },
+        createProp(initValue) {
+            const signal = _signal(initValue);
+            return {
+                [Reactivity_1.MFS_IS_PROP]: true,
+                get() {
+                    return signal.value;
+                },
+                set(newValue) {
+                    signal.value = newValue;
+                },
+            };
+        },
+        createFormula: formula,
         deleteDoc(typeName, docId) {
             firestoreSync.uploadDocChange({
                 shouldOverwrite: true,

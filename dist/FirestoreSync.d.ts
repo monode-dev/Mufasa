@@ -1,80 +1,77 @@
-import { Firestore } from "firebase/firestore";
-import { FirebaseStorage } from "firebase/storage";
 import { FirebaseApp } from "firebase/app";
-import { Json, JsonObject } from "./utils";
-import { Auth } from "firebase/auth";
+import { JsonObject } from "./utils";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { MfsFileSystem } from "./Implement";
 import { DocData } from "./LocalCache";
 export declare const CHANGE_DATE_KEY = "mfs_changeDate";
-export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, firestore: Firestore, firebaseStorage: FirebaseStorage, auth: Auth, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem): {
+export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, isProduction: boolean, persistedFunctionManager: PersistedFunctionManager, fileSystem: MfsFileSystem): {
     uploadDocChange: ((props: {
         shouldOverwrite: boolean;
         typeName: string;
         docId: string;
         data: DocData;
     }) => void) & {
-        addStage: <T extends void | Json>(runStage: (props: never) => Promise<T>) => ((props: {
+        addStage: <T extends void | import("./utils").Json>(runStage: (props: never) => Promise<T>) => ((props: {
             shouldOverwrite: boolean;
             typeName: string;
             docId: string;
             data: DocData;
         }) => void) & {
-            addStage: <T_1 extends void | Json>(runStage: (props: Exclude<T, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_1>) => ((props: {
+            addStage: <T_1 extends void | import("./utils").Json>(runStage: (props: Exclude<T, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_1>) => ((props: {
                 shouldOverwrite: boolean;
                 typeName: string;
                 docId: string;
                 data: DocData;
             }) => void) & {
-                addStage: <T_2 extends void | Json>(runStage: (props: Exclude<T_1, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_2>) => ((props: {
+                addStage: <T_2 extends void | import("./utils").Json>(runStage: (props: Exclude<T_1, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_2>) => ((props: {
                     shouldOverwrite: boolean;
                     typeName: string;
                     docId: string;
                     data: DocData;
                 }) => void) & {
-                    addStage: <T_3 extends void | Json>(runStage: (props: Exclude<T_2, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_3>) => ((props: {
+                    addStage: <T_3 extends void | import("./utils").Json>(runStage: (props: Exclude<T_2, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_3>) => ((props: {
                         shouldOverwrite: boolean;
                         typeName: string;
                         docId: string;
                         data: DocData;
                     }) => void) & {
-                        addStage: <T_4 extends void | Json>(runStage: (props: Exclude<T_3, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_4>) => ((props: {
+                        addStage: <T_4 extends void | import("./utils").Json>(runStage: (props: Exclude<T_3, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_4>) => ((props: {
                             shouldOverwrite: boolean;
                             typeName: string;
                             docId: string;
                             data: DocData;
                         }) => void) & {
-                            addStage: <T_5 extends void | Json>(runStage: (props: Exclude<T_4, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_5>) => ((props: {
+                            addStage: <T_5 extends void | import("./utils").Json>(runStage: (props: Exclude<T_4, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_5>) => ((props: {
                                 shouldOverwrite: boolean;
                                 typeName: string;
                                 docId: string;
                                 data: DocData;
                             }) => void) & {
-                                addStage: <T_6 extends void | Json>(runStage: (props: Exclude<T_5, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_6>) => ((props: {
+                                addStage: <T_6 extends void | import("./utils").Json>(runStage: (props: Exclude<T_5, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_6>) => ((props: {
                                     shouldOverwrite: boolean;
                                     typeName: string;
                                     docId: string;
                                     data: DocData;
                                 }) => void) & {
-                                    addStage: <T_7 extends void | Json>(runStage: (props: Exclude<T_6, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_7>) => ((props: {
+                                    addStage: <T_7 extends void | import("./utils").Json>(runStage: (props: Exclude<T_6, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_7>) => ((props: {
                                         shouldOverwrite: boolean;
                                         typeName: string;
                                         docId: string;
                                         data: DocData;
                                     }) => void) & {
-                                        addStage: <T_8 extends void | Json>(runStage: (props: Exclude<T_7, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_8>) => ((props: {
+                                        addStage: <T_8 extends void | import("./utils").Json>(runStage: (props: Exclude<T_7, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_8>) => ((props: {
                                             shouldOverwrite: boolean;
                                             typeName: string;
                                             docId: string;
                                             data: DocData;
                                         }) => void) & {
-                                            addStage: <T_9 extends void | Json>(runStage: (props: Exclude<T_8, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_9>) => ((props: {
+                                            addStage: <T_9 extends void | import("./utils").Json>(runStage: (props: Exclude<T_8, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_9>) => ((props: {
                                                 shouldOverwrite: boolean;
                                                 typeName: string;
                                                 docId: string;
                                                 data: DocData;
                                             }) => void) & {
-                                                addStage: <T_10 extends void | Json>(runStage: (props: Exclude<T_9, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_10>) => ((props: {
+                                                addStage: <T_10 extends void | import("./utils").Json>(runStage: (props: Exclude<T_9, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_10>) => ((props: {
                                                     shouldOverwrite: boolean;
                                                     typeName: string;
                                                     docId: string;
@@ -102,37 +99,37 @@ export declare function initializeFirestoreSync(firebaseApp: FirebaseApp, firest
     deleteFile: ((props: {
         fileId: string;
     }) => void) & {
-        addStage: <T_11 extends void | Json>(runStage: (props: never) => Promise<T_11>) => ((props: {
+        addStage: <T_11 extends void | import("./utils").Json>(runStage: (props: never) => Promise<T_11>) => ((props: {
             fileId: string;
         }) => void) & {
-            addStage: <T_12 extends void | Json>(runStage: (props: Exclude<T_11, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_12>) => ((props: {
+            addStage: <T_12 extends void | import("./utils").Json>(runStage: (props: Exclude<T_11, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_12>) => ((props: {
                 fileId: string;
             }) => void) & {
-                addStage: <T_13 extends void | Json>(runStage: (props: Exclude<T_12, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_13>) => ((props: {
+                addStage: <T_13 extends void | import("./utils").Json>(runStage: (props: Exclude<T_12, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_13>) => ((props: {
                     fileId: string;
                 }) => void) & {
-                    addStage: <T_14 extends void | Json>(runStage: (props: Exclude<T_13, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_14>) => ((props: {
+                    addStage: <T_14 extends void | import("./utils").Json>(runStage: (props: Exclude<T_13, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_14>) => ((props: {
                         fileId: string;
                     }) => void) & {
-                        addStage: <T_15 extends void | Json>(runStage: (props: Exclude<T_14, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_15>) => ((props: {
+                        addStage: <T_15 extends void | import("./utils").Json>(runStage: (props: Exclude<T_14, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_15>) => ((props: {
                             fileId: string;
                         }) => void) & {
-                            addStage: <T_16 extends void | Json>(runStage: (props: Exclude<T_15, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_16>) => ((props: {
+                            addStage: <T_16 extends void | import("./utils").Json>(runStage: (props: Exclude<T_15, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_16>) => ((props: {
                                 fileId: string;
                             }) => void) & {
-                                addStage: <T_17 extends void | Json>(runStage: (props: Exclude<T_16, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_17>) => ((props: {
+                                addStage: <T_17 extends void | import("./utils").Json>(runStage: (props: Exclude<T_16, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_17>) => ((props: {
                                     fileId: string;
                                 }) => void) & {
-                                    addStage: <T_18 extends void | Json>(runStage: (props: Exclude<T_17, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_18>) => ((props: {
+                                    addStage: <T_18 extends void | import("./utils").Json>(runStage: (props: Exclude<T_17, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_18>) => ((props: {
                                         fileId: string;
                                     }) => void) & {
-                                        addStage: <T_19 extends void | Json>(runStage: (props: Exclude<T_18, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_19>) => ((props: {
+                                        addStage: <T_19 extends void | import("./utils").Json>(runStage: (props: Exclude<T_18, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_19>) => ((props: {
                                             fileId: string;
                                         }) => void) & {
-                                            addStage: <T_20 extends void | Json>(runStage: (props: Exclude<T_19, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_20>) => ((props: {
+                                            addStage: <T_20 extends void | import("./utils").Json>(runStage: (props: Exclude<T_19, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_20>) => ((props: {
                                                 fileId: string;
                                             }) => void) & {
-                                                addStage: <T_21 extends void | Json>(runStage: (props: Exclude<T_20, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_21>) => ((props: {
+                                                addStage: <T_21 extends void | import("./utils").Json>(runStage: (props: Exclude<T_20, void | "QUIT_PERSISTED_FUNCTION">) => Promise<T_21>) => ((props: {
                                                     fileId: string;
                                                 }) => void) & any;
                                             };

@@ -1,8 +1,7 @@
-import { _Doc, _DocSpecificProps, _List, _defineAppDataStructure } from "./Implement";
-/** We should look into how drizzle orm handles definitions to get some inspiration for how to clean ours up. */
+import { _Doc, _DocSpecificProps, _List } from "./Implement";
 export type Doc<T extends {} = {}> = _Doc<T>;
 export type List<T extends _Doc<{}> = _Doc<{}>> = _List<T>;
-export declare const defineAppDataStructure: typeof _defineAppDataStructure;
+export * from "./Implement";
 export * from "./FirestoreSync";
 export * from "./utils";
 /** Defines a prop of the specified primitive type. */

@@ -1,14 +1,12 @@
 import { TypeSchemaDict, UPLOADING_FILE } from "./Parse";
-import { JsonObject, exists, sleep } from "./utils";
+import { JsonObject, NONEXISTENT, exists, sleep } from "./utils";
 import { MfsFileSystem, Signal } from "./Implement";
-import { FirebaseApp, FirebaseOptions } from "firebase/app";
+import { FirebaseApp } from "firebase/app";
 import { newSignalTree, SignalEvent } from "./SignalTree";
 import { initializeFirestoreSync } from "./FirestoreSync";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { v4 as uuidv4 } from "uuid";
-import { Firestore } from "firebase/firestore";
-import { FirebaseStorage } from "firebase/storage";
-import { Auth } from "firebase/auth";
+import { MFS_IS_PROP, Prop, PropReader } from "./Reactivity";
 
 export const DELETED_KEY = `mx_deleted`;
 export const MX_PARENT_KEY = `mx_parent`;
@@ -31,20 +29,16 @@ export type LocalCache = ReturnType<typeof initializeCache>;
 export function initializeCache({
   getCollectionName,
   firebaseApp,
-  firestore,
-  firebaseStorage,
-  auth,
   _signal,
+  formula,
   persistedFunctionManager,
   fileSystem,
   isProduction,
 }: {
   getCollectionName: (typeName: string) => string;
   firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  firebaseStorage: FirebaseStorage;
-  auth: Auth;
   _signal: <T>(initValue: T) => Signal<T>;
+  formula: <T>(evaluate: () => T) => PropReader<T>;
   persistedFunctionManager: PersistedFunctionManager;
   fileSystem: MfsFileSystem;
   isProduction: boolean;
@@ -148,9 +142,6 @@ export function initializeCache({
   }>(_signal);
   const firestoreSync = initializeFirestoreSync(
     firebaseApp,
-    firestore,
-    firebaseStorage,
-    auth,
     isProduction,
     persistedFunctionManager,
     fileSystem,
@@ -252,6 +243,7 @@ export function initializeCache({
     thingsToTrigger.forEach((trigger) => trigger());
   }
 
+  // We need to tell the DB what types to watch for.
   const syncedTypes = new Set<string>();
   async function syncType(typeName: string) {
     await _offlineCache;
@@ -285,15 +277,11 @@ export function initializeCache({
     }
 
     // Start syncing with the DB
-    for (const typeName in typeNames) {
-      syncType(typeName);
-    }
+    typeNames.forEach(syncType);
   });
 
   return {
-    async syncType(typeName: string) {
-      await syncType(typeName);
-    },
+    syncType: syncType,
 
     listAllObjectsOfType(typeName: string) {
       docSignalTree[typeName].docsChanged.listen();
@@ -351,9 +339,9 @@ export function initializeCache({
         if (fileIsUploading) return UPLOADING_FILE;
 
         // Read the file from storage.
-        return fileSystem.readFile(fileId) ?? null;
+        return fileSystem.readFile(fileId) ?? NONEXISTENT;
       } else {
-        return propValue;
+        return propValue ?? NONEXISTENT;
       }
     },
     getFilePath(typeName: string, docId: string, propName: string) {
@@ -426,6 +414,22 @@ export function initializeCache({
         updateSessionStorage({ typeName, docId, props: changes });
       }
     },
+
+    createProp<T>(initValue: T): Prop<T> {
+      const signal = _signal(initValue);
+      return {
+        [MFS_IS_PROP]: true,
+        get() {
+          return signal.value;
+        },
+        set(newValue: T) {
+          signal.value = newValue;
+        },
+      };
+    },
+
+    createFormula: formula,
+
     deleteDoc(typeName: string, docId: string) {
       firestoreSync.uploadDocChange({
         shouldOverwrite: true,

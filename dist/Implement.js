@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._defineAppDataStructure = exports.docProx = void 0;
+exports.initializeMufasa = exports.getLocalCache = exports.MFS_LOCAL_CACHE = exports.docProx = void 0;
 const app_1 = require("firebase/app");
 const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
-const firestore_1 = require("firebase/firestore");
-const storage_1 = require("firebase/storage");
 const auth_1 = require("firebase/auth");
+const Reactivity_1 = require("./Reactivity");
 let _computed;
 let _signal;
 let _isSignal;
@@ -184,7 +183,17 @@ function listProx(typeName, objFormats, localCache, isChild = false, mx_parent) 
         };
     }
 }
-function _defineAppDataStructure(modelName, options) {
+//
+//
+//
+//
+// SECTION: Define
+exports.MFS_LOCAL_CACHE = Symbol(`MFS_LOCAL_CACHE`);
+function getLocalCache() {
+    return window[exports.MFS_LOCAL_CACHE];
+}
+exports.getLocalCache = getLocalCache;
+function initializeMufasa(options) {
     // Setup Reactivity
     _computed = options.reactivity.computed;
     _signal = options.reactivity.signal;
@@ -193,24 +202,28 @@ function _defineAppDataStructure(modelName, options) {
     // Setup Firebase
     isProduction = options.isProduction;
     const firebaseApp = (0, app_1.initializeApp)(options.firebaseOptions);
-    const firestore = (0, firestore_1.getFirestore)(firebaseApp);
-    const firebaseStorage = (0, storage_1.getStorage)(firebaseApp);
     const auth = (0, auth_1.getAuth)(firebaseApp);
-    console.log((0, firestore_1.collection)(firestore, `Dev_Client`));
+    const persistedFunctionManager = (0, PersistedFunctionManager_1.initializePersistedFunctionManager)(`mfs_persistedFunctions`, options.fileSystem);
+    window[exports.MFS_LOCAL_CACHE] = (0, LocalCache_1.initializeCache)({
+        getCollectionName,
+        firebaseApp,
+        _signal,
+        formula: (evaluate) => {
+            const computed = _computed(evaluate);
+            return {
+                [Reactivity_1.MFS_IS_PROP]: true,
+                get() {
+                    return computed.value;
+                },
+            };
+        },
+        persistedFunctionManager: persistedFunctionManager,
+        fileSystem: options.fileSystem,
+        isProduction: options.isProduction,
+    });
     return {
-        getAppData: (0, utils_1.globalStore)(modelName, () => {
-            const persistedFunctionManager = (0, PersistedFunctionManager_1.initializePersistedFunctionManager)(`mfs_${modelName}_persistedFunctions`, options.fileSystem);
-            const localCache = (0, LocalCache_1.initializeCache)({
-                getCollectionName,
-                firebaseApp,
-                firestore,
-                firebaseStorage,
-                auth,
-                _signal,
-                persistedFunctionManager: persistedFunctionManager,
-                fileSystem: options.fileSystem,
-                isProduction: options.isProduction,
-            });
+        getAppData: (0, utils_1.globalStore)(`mufasa`, () => {
+            const localCache = getLocalCache();
             Object.keys(options.typeSchemas).forEach(localCache.syncType);
             const rootLists = {};
             for (const key of Object.keys(options.rootSchema)) {
@@ -219,7 +232,7 @@ function _defineAppDataStructure(modelName, options) {
             return rootLists;
         }),
         types: {},
-        firebaseAuth: {
+        firebaseUtils: {
             signOut() {
                 auth.signOut();
             },
@@ -234,7 +247,13 @@ function _defineAppDataStructure(modelName, options) {
                 });
                 return userSig;
             },
+            async syncType(typeName) {
+                getLocalCache().syncType(typeName);
+            },
+            get localCache() {
+                return getLocalCache();
+            },
         },
     };
 }
-exports._defineAppDataStructure = _defineAppDataStructure;
+exports.initializeMufasa = initializeMufasa;

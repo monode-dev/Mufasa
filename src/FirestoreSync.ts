@@ -1,5 +1,4 @@
 import {
-  Firestore,
   collection,
   doc,
   getFirestore,
@@ -16,36 +15,27 @@ import {
   uploadString,
   deleteObject,
   getBytes,
-  FirebaseStorage,
 } from "firebase/storage";
 import { FirebaseApp } from "firebase/app";
-import {
-  Json,
-  JsonObject,
-  NONEXISTENT,
-  PENDING,
-  exists,
-  isValid,
-  sleep,
-} from "./utils";
-import { Auth, User as FirebaseUser, getAuth } from "firebase/auth";
+import { JsonObject, exists, sleep } from "./utils";
+import { getAuth } from "firebase/auth";
 import {
   PersistedFunctionManager,
   QUIT_PERSISTED_FUNCTION,
 } from "./PersistedFunctionManager";
-import { MfsFileSystem, Signal } from "./Implement";
+import { MfsFileSystem } from "./Implement";
 import { DocData } from "./LocalCache";
 
 export const CHANGE_DATE_KEY = `mfs_changeDate`;
 export function initializeFirestoreSync(
   firebaseApp: FirebaseApp,
-  firestore: Firestore,
-  firebaseStorage: FirebaseStorage,
-  auth: Auth,
   isProduction: boolean,
   persistedFunctionManager: PersistedFunctionManager,
   fileSystem: MfsFileSystem,
 ) {
+  const auth = getAuth(firebaseApp);
+  const firestore = getFirestore(firebaseApp);
+  const firebaseStorage = getStorage(firebaseApp);
   const getFirestorePathToTypeCollection = (typeName: string) => {
     const collectionName = `${isProduction ? `Prod` : `Dev`}_${typeName}`;
     const userId = auth.currentUser?.uid;

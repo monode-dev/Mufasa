@@ -4,9 +4,13 @@ exports.initializeFirestoreSync = exports.CHANGE_DATE_KEY = void 0;
 const firestore_1 = require("firebase/firestore");
 const storage_1 = require("firebase/storage");
 const utils_1 = require("./utils");
+const auth_1 = require("firebase/auth");
 const PersistedFunctionManager_1 = require("./PersistedFunctionManager");
 exports.CHANGE_DATE_KEY = `mfs_changeDate`;
-function initializeFirestoreSync(firebaseApp, firestore, firebaseStorage, auth, isProduction, persistedFunctionManager, fileSystem) {
+function initializeFirestoreSync(firebaseApp, isProduction, persistedFunctionManager, fileSystem) {
+    const auth = (0, auth_1.getAuth)(firebaseApp);
+    const firestore = (0, firestore_1.getFirestore)(firebaseApp);
+    const firebaseStorage = (0, storage_1.getStorage)(firebaseApp);
     const getFirestorePathToTypeCollection = (typeName) => {
         const collectionName = `${isProduction ? `Prod` : `Dev`}_${typeName}`;
         const userId = auth.currentUser?.uid;

@@ -1,5 +1,5 @@
 import { FirebaseOptions, initializeApp } from "firebase/app";
-import { exists, globalStore, PENDING, NONEXISTENT } from "./utils";
+import { exists, globalStore, PENDING, NONEXISTENT, sleep } from "./utils";
 import {
   SchemaDictToTsType,
   SchemaToTsType,
@@ -8,14 +8,13 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, initializeCache } from "./LocalCache";
 import { initializePersistedFunctionManager } from "./PersistedFunctionManager";
-import { collection, getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
 import {
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
   User as FirebaseUser,
 } from "firebase/auth";
+import { MFS_IS_PROP } from "./Reactivity";
 
 //
 //
@@ -293,6 +292,10 @@ function listProx<TypeName extends string, F extends TypeSchemaDict>(
 //
 //
 // SECTION: Define
+export const MFS_LOCAL_CACHE = Symbol(`MFS_LOCAL_CACHE`);
+export function getLocalCache() {
+  return (window as any)[MFS_LOCAL_CACHE] as LocalCache;
+}
 export type MfsFileSystem = {
   readFile: (path: string) => Promise<string | undefined>;
   writeFile: (path: string, data: string) => Promise<void>;
@@ -300,25 +303,22 @@ export type MfsFileSystem = {
   getFilePath: (path: string) => string;
 };
 export type User = FirebaseUser | PENDING | NONEXISTENT;
-export function _defineAppDataStructure<
+export function initializeMufasa<
   RS extends RootSchema,
   TSD extends TypeSchemaDict,
->(
-  modelName: string,
-  options: {
-    isProduction: boolean;
-    reactivity: {
-      computed: typeof _computed;
-      signal: typeof _signal;
-      isSignal: typeof _isSignal;
-      watchEffect: typeof _watchEffect;
-    };
-    firebaseOptions: FirebaseOptions;
-    fileSystem: MfsFileSystem;
-    rootSchema: RS;
-    typeSchemas: TSD;
-  },
-) {
+>(options: {
+  isProduction: boolean;
+  reactivity: {
+    computed: typeof _computed;
+    signal: typeof _signal;
+    isSignal: typeof _isSignal;
+    watchEffect: typeof _watchEffect;
+  };
+  firebaseOptions: FirebaseOptions;
+  fileSystem: MfsFileSystem;
+  rootSchema: RS;
+  typeSchemas: TSD;
+}) {
   // Setup Reactivity
   _computed = options.reactivity.computed;
   _signal = options.reactivity.signal;
@@ -327,30 +327,33 @@ export function _defineAppDataStructure<
   // Setup Firebase
   isProduction = options.isProduction;
   const firebaseApp = initializeApp(options.firebaseOptions);
-  const firestore = getFirestore(firebaseApp);
-  const firebaseStorage = getStorage(firebaseApp);
   const auth = getAuth(firebaseApp);
-  console.log(collection(firestore, `Dev_Client`));
+  const persistedFunctionManager = initializePersistedFunctionManager(
+    `mfs_persistedFunctions`,
+    options.fileSystem,
+  );
+  (window as any)[MFS_LOCAL_CACHE] = initializeCache({
+    getCollectionName,
+    firebaseApp,
+    _signal,
+    formula: <T>(evaluate: () => T) => {
+      const computed = _computed(evaluate);
+      return {
+        [MFS_IS_PROP]: true,
+        get() {
+          return computed.value;
+        },
+      };
+    },
+    persistedFunctionManager: persistedFunctionManager,
+    fileSystem: options.fileSystem,
+    isProduction: options.isProduction,
+  });
 
   return {
-    getAppData: globalStore(modelName, () => {
-      const persistedFunctionManager = initializePersistedFunctionManager(
-        `mfs_${modelName}_persistedFunctions`,
-        options.fileSystem,
-      );
-      const localCache = initializeCache({
-        getCollectionName,
-        firebaseApp,
-        firestore,
-        firebaseStorage,
-        auth,
-        _signal,
-        persistedFunctionManager: persistedFunctionManager,
-        fileSystem: options.fileSystem,
-        isProduction: options.isProduction,
-      });
+    getAppData: globalStore(`mufasa`, () => {
+      const localCache = getLocalCache();
       Object.keys(options.typeSchemas).forEach(localCache.syncType);
-
       const rootLists: {
         [K in keyof RS]: ReturnType<
           typeof listProx<
@@ -369,7 +372,7 @@ export function _defineAppDataStructure<
       return rootLists;
     }),
     types: {} as SchemaDictToTsType<typeof options.typeSchemas>,
-    firebaseAuth: {
+    firebaseUtils: {
       signOut() {
         auth.signOut();
       },
@@ -383,6 +386,12 @@ export function _defineAppDataStructure<
           userSig.value = user ?? NONEXISTENT;
         });
         return userSig;
+      },
+      async syncType(typeName: string) {
+        getLocalCache().syncType(typeName);
+      },
+      get localCache() {
+        return getLocalCache();
       },
     },
   };

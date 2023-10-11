@@ -31,6 +31,30 @@ export type _List<T extends _Doc> = {
     map<R>(mapFn: (doc: T) => R): Array<R>;
     add(params: Partial<T>): T;
 };
+export declare const MFS_LOCAL_CACHE: unique symbol;
+export declare function getLocalCache(): {
+    syncType: (typeName: string) => Promise<void>;
+    listAllObjectsOfType(typeName: string): string[];
+    checkExists(typeName: string, docId: string | null | undefined): boolean;
+    getChildDocs(childType: string, parentId: string): string[];
+    getPropValue(typeName: string, docId: string, propName: string): string | number | boolean | Promise<string | undefined> | import("./utils").Sym<"INVALID" | "NONEXISTENT"> | {
+        readonly mx_unad: "UploadingFile";
+    } | {
+        value: string | number | boolean | null | undefined;
+        typeName: string;
+    };
+    getFilePath(typeName: string, docId: string, propName: string): string | null;
+    addDoc(typeName: string, props: {
+        [propName: string]: any;
+    }): string;
+    setPropValue(typeName: string, docId: string, propName: string, value: string | number | boolean | {
+        value: string | number | boolean | null | undefined;
+        typeName: string;
+    } | null | undefined): Promise<void>;
+    createProp<T>(initValue: T): import("./Reactivity").Prop<T>;
+    createFormula: <T_1>(evaluate: () => T_1) => import("./Reactivity").PropReader<T_1>;
+    deleteDoc(typeName: string, docId: string): void;
+};
 export type MfsFileSystem = {
     readFile: (path: string) => Promise<string | undefined>;
     writeFile: (path: string, data: string) => Promise<void>;
@@ -38,7 +62,7 @@ export type MfsFileSystem = {
     getFilePath: (path: string) => string;
 };
 export type User = FirebaseUser | PENDING | NONEXISTENT;
-export declare function _defineAppDataStructure<RS extends RootSchema, TSD extends TypeSchemaDict>(modelName: string, options: {
+export declare function initializeMufasa<RS extends RootSchema, TSD extends TypeSchemaDict>(options: {
     isProduction: boolean;
     reactivity: {
         computed: typeof _computed;
@@ -53,10 +77,34 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
 }): {
     getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
     types: SchemaDictToTsType<TSD>;
-    firebaseAuth: {
+    firebaseUtils: {
         signOut(): void;
         signInWithGoogle(): Promise<void>;
         getUser(): Signal<User>;
+        syncType(typeName: string): Promise<void>;
+        readonly localCache: {
+            syncType: (typeName: string) => Promise<void>;
+            listAllObjectsOfType(typeName: string): string[];
+            checkExists(typeName: string, docId: string | null | undefined): boolean;
+            getChildDocs(childType: string, parentId: string): string[];
+            getPropValue(typeName: string, docId: string, propName: string): string | number | boolean | Promise<string | undefined> | import("./utils").Sym<"INVALID" | "NONEXISTENT"> | {
+                readonly mx_unad: "UploadingFile";
+            } | {
+                value: string | number | boolean | null | undefined;
+                typeName: string;
+            };
+            getFilePath(typeName: string, docId: string, propName: string): string | null;
+            addDoc(typeName: string, props: {
+                [propName: string]: any;
+            }): string;
+            setPropValue(typeName: string, docId: string, propName: string, value: string | number | boolean | {
+                value: string | number | boolean | null | undefined;
+                typeName: string;
+            } | null | undefined): Promise<void>;
+            createProp<T>(initValue: T): import("./Reactivity").Prop<T>;
+            createFormula: <T_1>(evaluate: () => T_1) => import("./Reactivity").PropReader<T_1>;
+            deleteDoc(typeName: string, docId: string): void;
+        };
     };
 };
 export {};

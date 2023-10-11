@@ -14,9 +14,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.file = exports.listOf = exports.refTo = exports.prim = exports.defineAppDataStructure = void 0;
-const Implement_1 = require("./Implement");
-exports.defineAppDataStructure = Implement_1._defineAppDataStructure;
+exports.file = exports.listOf = exports.refTo = exports.prim = void 0;
+__exportStar(require("./Implement"), exports);
 __exportStar(require("./FirestoreSync"), exports);
 __exportStar(require("./utils"), exports);
 /** Defines a prop of the specified primitive type. */

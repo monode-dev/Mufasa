@@ -1,15 +1,8 @@
-import {
-  _Doc,
-  _DocSpecificProps,
-  _List,
-  _defineAppDataStructure,
-} from "./Implement";
+import { _Doc, _DocSpecificProps, _List } from "./Implement";
 import { PropSchema } from "./Parse";
-/** We should look into how drizzle orm handles definitions to get some inspiration for how to clean ours up. */
-// NOTE: It think this technically makes Mufasa an ORM, which means @miwi/orm might be a better spot for it.
 export type Doc<T extends {} = {}> = _Doc<T>;
 export type List<T extends _Doc<{}> = _Doc<{}>> = _List<T>;
-export const defineAppDataStructure = _defineAppDataStructure;
+export * from "./Implement";
 export * from "./FirestoreSync";
 export * from "./utils";
 
