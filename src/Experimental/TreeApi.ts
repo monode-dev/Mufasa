@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { getLocalCache } from "..";
-import { PropReader, formula, MFS_IS_PROP, prop } from "../Reactivity";
+import { PropReader, formula, MFS_IS_PROP, prop, Prop } from "../Reactivity";
 
 // function list<T extends abstract new (...args: any) => any>(
 //   typeClass: T,
@@ -15,7 +15,15 @@ import { PropReader, formula, MFS_IS_PROP, prop } from "../Reactivity";
 //   });
 // }
 
-export const MFS_ID = Symbol(`MFS_ID`);
+export type MfsPropsForCreate<T extends typeof MfsObj> = Partial<{
+  [propName in keyof InstanceType<T>]: InstanceType<T>[propName] extends Prop<
+    infer T
+  >
+    ? T
+    : never;
+}>;
+
+// export const MFS_ID = Symbol(`MFS_ID`);
 /** TypeName will be inferred from class name. Override YourType.typeName to manually specify a type name. */
 export abstract class MfsObj {
   /*** This can be overridden to manually specify a type name. */
@@ -25,50 +33,7 @@ export abstract class MfsObj {
   get typeName() {
     return (this.constructor as typeof MfsObj).typeName;
   }
-  readonly [MFS_ID]: PropReader<string>;
-  constructor(id: PropReader<string>) {
-    this[MFS_ID] = id;
-  }
-  private static _spawnInst<T extends typeof MfsObj>(
-    this: T,
-    instId: PropReader<string>,
-  ): InstanceType<T> {
-    const localCache = getLocalCache();
-    const typeName = this.typeName;
-    localCache.syncType(typeName);
-    const childInstance = new (this as any)(instId);
-
-    // Substitute props.
-    for (const propKey of Object.keys(childInstance)) {
-      if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
-      childInstance[propKey] = {
-        [MFS_IS_PROP]: true,
-        get() {
-          return localCache.getPropValue(
-            typeName,
-            childInstance[MFS_ID].get(),
-            propKey,
-          );
-        },
-        set(newValue: any) {
-          localCache.setPropValue(
-            typeName,
-            childInstance[MFS_ID].get(),
-            propKey,
-            newValue,
-          );
-        },
-      };
-    }
-    return childInstance;
-  }
-  static create<T extends typeof MfsObj>(
-    this: T,
-    createProps?: Partial<InstanceType<T>>,
-  ): InstanceType<T> {
-    const newId = uuidv4();
-    return this._spawnInst(prop(newId));
-  }
+  readonly mfsId: PropReader<string> = prop(``);
 
   static getAllDocs<T extends typeof MfsObj>(this: T): InstanceType<T>[] {
     const localCache = getLocalCache();
@@ -77,14 +42,73 @@ export abstract class MfsObj {
     // TODO: Get all docs from local cache.
     return localCache
       .listAllObjectsOfType(typeName)
-      .map((docId) => this._spawnInst(prop(docId)));
+      .map((mfsId) => this._create({ mfsId: prop(mfsId) }));
   }
 
-  static docCollections: {
-    [collectionName: string]: {
-      [docId: string]: MfsObj;
-    };
-  } = {};
+  static create<T extends typeof MfsObj>(
+    this: T,
+    createProps?: MfsPropsForCreate<T>,
+  ): InstanceType<T> {
+    return this._create({
+      initProps: createProps ?? {},
+    });
+  }
+
+  private static _create<T extends typeof MfsObj>(
+    this: T,
+    options:
+      | {
+          mfsId: PropReader<string>;
+          initProps?: never;
+        }
+      | {
+          mfsId?: never;
+          initProps: MfsPropsForCreate<T>;
+        },
+  ): InstanceType<T> {
+    // Ensure this type is syncing with the DB.
+    const localCache = getLocalCache();
+    const typeName = this.typeName;
+    localCache.syncType(typeName);
+
+    // Create a new instance.
+    const childInstance = new (this as any)();
+
+    // Substitute props.
+    const defaultProps: { [propName: string]: any } = {};
+    for (const propKey of Object.keys(childInstance)) {
+      if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
+      if (!(childInstance[propKey]?.get instanceof Function)) continue;
+      if (!(childInstance[propKey]?.set instanceof Function)) continue;
+      defaultProps[propKey] = childInstance[propKey].get();
+      childInstance[propKey] = {
+        [MFS_IS_PROP]: true,
+        get() {
+          return localCache.getPropValue(
+            typeName,
+            childInstance.mfsId.get(),
+            propKey,
+          );
+        },
+        set(newValue: any) {
+          localCache.setPropValue(
+            typeName,
+            childInstance.mfsId.get(),
+            propKey,
+            newValue,
+          );
+        },
+      };
+    }
+
+    // Set up the inst id
+    childInstance.mfsId =
+      options.mfsId !== undefined
+        ? options.mfsId
+        : prop(localCache.addDoc(typeName, defaultProps));
+
+    return childInstance;
+  }
 }
 
 // abstract class MfsSession extends MfsObj {}
