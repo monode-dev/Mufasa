@@ -7,11 +7,12 @@ export declare abstract class MfsObj {
     get typeName(): string;
     readonly [MFS_ID]: PropReader<string>;
     constructor(id: PropReader<string>);
+    private static _spawnInst;
+    static create<T extends typeof MfsObj>(this: T, createProps?: Partial<InstanceType<T>>): InstanceType<T>;
     static getAllDocs<T extends typeof MfsObj>(this: T): InstanceType<T>[];
     static docCollections: {
         [collectionName: string]: {
             [docId: string]: MfsObj;
         };
     };
-    static create<T extends typeof MfsObj>(this: T, createProps?: Partial<InstanceType<T>>): InstanceType<T>;
 }

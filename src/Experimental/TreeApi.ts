@@ -28,26 +28,45 @@ export abstract class MfsObj {
   readonly [MFS_ID]: PropReader<string>;
   constructor(id: PropReader<string>) {
     this[MFS_ID] = id;
+  }
+  private static _spawnInst<T extends typeof MfsObj>(
+    this: T,
+    instId: PropReader<string>,
+  ): InstanceType<T> {
+    const localCache = getLocalCache();
+    localCache.syncType(this.typeName);
+    const childInstance = new (this as any)(instId);
 
     // Substitute props.
-    const localCache = getLocalCache();
-    for (const propKey of Object.keys(this)) {
-      if (!((this as any)[propKey]?.[MFS_IS_PROP] ?? false)) continue;
-      (this as any)[propKey] = {
+    for (const propKey of Object.keys(childInstance)) {
+      if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
+      childInstance[propKey] = {
         [MFS_IS_PROP]: true,
         get() {
-          return localCache.getPropValue(this.typeName, this[MFS_ID], propKey);
+          return localCache.getPropValue(
+            this.typeName,
+            childInstance[MFS_ID],
+            propKey,
+          );
         },
         set(newValue: any) {
           localCache.setPropValue(
             this.typeName,
-            this[MFS_ID],
+            childInstance[MFS_ID],
             propKey,
             newValue,
           );
         },
       };
     }
+    return childInstance;
+  }
+  static create<T extends typeof MfsObj>(
+    this: T,
+    createProps?: Partial<InstanceType<T>>,
+  ): InstanceType<T> {
+    const newId = uuidv4();
+    return this._spawnInst(prop(newId));
   }
 
   static getAllDocs<T extends typeof MfsObj>(this: T): InstanceType<T>[] {
@@ -57,7 +76,7 @@ export abstract class MfsObj {
     // TODO: Get all docs from local cache.
     return localCache
       .listAllObjectsOfType(typeName)
-      .map((docId) => new (this as any)(prop(docId)));
+      .map((docId) => this._spawnInst(prop(docId)));
   }
 
   static docCollections: {
@@ -65,15 +84,6 @@ export abstract class MfsObj {
       [docId: string]: MfsObj;
     };
   } = {};
-  static create<T extends typeof MfsObj>(
-    this: T,
-    createProps?: Partial<InstanceType<T>>,
-  ): InstanceType<T> {
-    const newId = uuidv4();
-    const childInstance = new (this as any)(prop(newId));
-
-    return childInstance;
-  }
 }
 
 // abstract class MfsSession extends MfsObj {}
