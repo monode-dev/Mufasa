@@ -47,7 +47,8 @@ class MfsObj {
             if (!(childInstance[propKey]?.set instanceof Function))
                 continue;
             defaultProps[propKey] =
-                options.initProps[propKey] ?? childInstance[propKey].get();
+                (options.initProps ?? {})[propKey] ??
+                    childInstance[propKey].get();
             childInstance[propKey] = {
                 [Reactivity_1.MFS_IS_PROP]: true,
                 get() {

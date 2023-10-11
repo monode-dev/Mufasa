@@ -82,7 +82,8 @@ export abstract class MfsObj {
       if (!(childInstance[propKey]?.get instanceof Function)) continue;
       if (!(childInstance[propKey]?.set instanceof Function)) continue;
       defaultProps[propKey] =
-        (options.initProps as any)[propKey] ?? childInstance[propKey].get();
+        ((options.initProps ?? {}) as any)[propKey] ??
+        childInstance[propKey].get();
       childInstance[propKey] = {
         [MFS_IS_PROP]: true,
         get() {
