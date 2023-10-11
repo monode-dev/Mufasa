@@ -40,6 +40,7 @@ export abstract class MfsObj {
     // Substitute props.
     for (const propKey of Object.keys(childInstance)) {
       if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
+      console.log(propKey);
       childInstance[propKey] = {
         [MFS_IS_PROP]: true,
         get() {

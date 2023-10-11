@@ -38,6 +38,7 @@ class MfsObj {
         for (const propKey of Object.keys(childInstance)) {
             if (!(childInstance[propKey]?.[Reactivity_1.MFS_IS_PROP] ?? false))
                 continue;
+            console.log(propKey);
             childInstance[propKey] = {
                 [Reactivity_1.MFS_IS_PROP]: true,
                 get() {
