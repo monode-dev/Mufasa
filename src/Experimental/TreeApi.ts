@@ -28,6 +28,26 @@ export abstract class MfsObj {
   readonly [MFS_ID]: PropReader<string>;
   constructor(id: PropReader<string>) {
     this[MFS_ID] = id;
+
+    // Substitute props.
+    const localCache = getLocalCache();
+    for (const propKey of Object.keys(this)) {
+      if (!((this as any)[propKey]?.[MFS_IS_PROP] ?? false)) continue;
+      (this as any)[propKey] = {
+        [MFS_IS_PROP]: true,
+        get() {
+          return localCache.getPropValue(this.typeName, this[MFS_ID], propKey);
+        },
+        set(newValue: any) {
+          localCache.setPropValue(
+            this.typeName,
+            this[MFS_ID],
+            propKey,
+            newValue,
+          );
+        },
+      };
+    }
   }
 
   static getAllDocs<T extends typeof MfsObj>(this: T): InstanceType<T>[] {
@@ -51,21 +71,6 @@ export abstract class MfsObj {
   ): InstanceType<T> {
     const newId = uuidv4();
     const childInstance = new (this as any)(prop(newId));
-
-    // Substitute props.
-    const localCache = getLocalCache();
-    for (const propKey of Object.keys(childInstance)) {
-      if (!(childInstance?.[propKey]?.[MFS_IS_PROP] ?? false)) continue;
-      childInstance[propKey] = {
-        [MFS_IS_PROP]: true,
-        get() {
-          return localCache.getPropValue(this.typeName, newId, propKey);
-        },
-        set(newValue: any) {
-          localCache.setPropValue(this.typeName, newId, propKey, newValue);
-        },
-      };
-    }
 
     return childInstance;
   }
