@@ -32,7 +32,8 @@ class MfsObj {
     }
     static _spawnInst(instId) {
         const localCache = (0, __1.getLocalCache)();
-        localCache.syncType(this.typeName);
+        const typeName = this.typeName;
+        localCache.syncType(typeName);
         const childInstance = new this(instId);
         // Substitute props.
         for (const propKey of Object.keys(childInstance)) {
@@ -42,12 +43,12 @@ class MfsObj {
             childInstance[propKey] = {
                 [Reactivity_1.MFS_IS_PROP]: true,
                 get() {
-                    const value = localCache.getPropValue(this.typeName, childInstance[exports.MFS_ID], propKey);
-                    console.log(`get ${this.typeName}: ${childInstance[exports.MFS_ID]}.${propKey} = ${value}`);
+                    const value = localCache.getPropValue(typeName, childInstance[exports.MFS_ID].get(), propKey);
+                    console.log(`get ${typeName}: ${childInstance[exports.MFS_ID].get()}.${propKey} = ${value}`);
                     return value;
                 },
                 set(newValue) {
-                    localCache.setPropValue(this.typeName, childInstance[exports.MFS_ID], propKey, newValue);
+                    localCache.setPropValue(typeName, childInstance[exports.MFS_ID].get(), propKey, newValue);
                 },
             };
         }

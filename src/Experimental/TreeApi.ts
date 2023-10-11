@@ -34,7 +34,8 @@ export abstract class MfsObj {
     instId: PropReader<string>,
   ): InstanceType<T> {
     const localCache = getLocalCache();
-    localCache.syncType(this.typeName);
+    const typeName = this.typeName;
+    localCache.syncType(typeName);
     const childInstance = new (this as any)(instId);
 
     // Substitute props.
@@ -45,19 +46,21 @@ export abstract class MfsObj {
         [MFS_IS_PROP]: true,
         get() {
           const value = localCache.getPropValue(
-            this.typeName,
-            childInstance[MFS_ID],
+            typeName,
+            childInstance[MFS_ID].get(),
             propKey,
           );
           console.log(
-            `get ${this.typeName}: ${childInstance[MFS_ID]}.${propKey} = ${value}`,
+            `get ${typeName}: ${childInstance[
+              MFS_ID
+            ].get()}.${propKey} = ${value}`,
           );
           return value;
         },
         set(newValue: any) {
           localCache.setPropValue(
-            this.typeName,
-            childInstance[MFS_ID],
+            typeName,
+            childInstance[MFS_ID].get(),
             propKey,
             newValue,
           );
