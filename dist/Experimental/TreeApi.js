@@ -38,13 +38,16 @@ class MfsObj {
         // Substitute props.
         const defaultProps = {};
         for (const propKey of Object.keys(childInstance)) {
+            if (propKey === `mfsId`)
+                continue;
             if (!(childInstance[propKey]?.[Reactivity_1.MFS_IS_PROP] ?? false))
                 continue;
             if (!(childInstance[propKey]?.get instanceof Function))
                 continue;
             if (!(childInstance[propKey]?.set instanceof Function))
                 continue;
-            defaultProps[propKey] = childInstance[propKey].get();
+            defaultProps[propKey] =
+                options.initProps[propKey] ?? childInstance[propKey].get();
             childInstance[propKey] = {
                 [Reactivity_1.MFS_IS_PROP]: true,
                 get() {

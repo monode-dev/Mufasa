@@ -240,15 +240,15 @@ function initializeCache({ getCollectionName, firebaseApp, _signal, formula, per
             return fileSystem.getFilePath(fileId) ?? null;
         },
         addDoc(typeName, props) {
-            const docId = (0, uuid_1.v4)();
+            const mfsId = (0, uuid_1.v4)();
             firestoreSync.uploadDocChange({
                 shouldOverwrite: true,
                 typeName,
-                docId,
+                docId: mfsId,
                 data: props,
             });
-            updateSessionStorage({ typeName, docId, props });
-            return docId;
+            updateSessionStorage({ typeName, docId: mfsId, props });
+            return mfsId;
         },
         async setPropValue(typeName, docId, propName, value) {
             if (typeof value === "object" && value?.typeName === `file`) {

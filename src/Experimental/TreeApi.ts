@@ -77,10 +77,12 @@ export abstract class MfsObj {
     // Substitute props.
     const defaultProps: { [propName: string]: any } = {};
     for (const propKey of Object.keys(childInstance)) {
+      if (propKey === `mfsId`) continue;
       if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
       if (!(childInstance[propKey]?.get instanceof Function)) continue;
       if (!(childInstance[propKey]?.set instanceof Function)) continue;
-      defaultProps[propKey] = childInstance[propKey].get();
+      defaultProps[propKey] =
+        (options.initProps as any)[propKey] ?? childInstance[propKey].get();
       childInstance[propKey] = {
         [MFS_IS_PROP]: true,
         get() {

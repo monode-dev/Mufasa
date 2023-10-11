@@ -352,16 +352,16 @@ export function initializeCache({
       return fileSystem.getFilePath(fileId) ?? null;
     },
     addDoc(typeName: string, props: { [propName: string]: any }) {
-      const docId = uuidv4();
+      const mfsId = uuidv4();
       firestoreSync.uploadDocChange({
         shouldOverwrite: true,
         typeName,
-        docId,
+        docId: mfsId,
         data: props,
       });
-      updateSessionStorage({ typeName, docId, props });
+      updateSessionStorage({ typeName, docId: mfsId, props });
 
-      return docId;
+      return mfsId;
     },
     async setPropValue(
       typeName: string,
