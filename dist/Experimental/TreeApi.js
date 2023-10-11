@@ -42,7 +42,9 @@ class MfsObj {
             childInstance[propKey] = {
                 [Reactivity_1.MFS_IS_PROP]: true,
                 get() {
-                    return localCache.getPropValue(this.typeName, childInstance[exports.MFS_ID], propKey);
+                    const value = localCache.getPropValue(this.typeName, childInstance[exports.MFS_ID], propKey);
+                    console.log(`get ${this.typeName}: ${childInstance[exports.MFS_ID]}.${propKey} = ${value}`);
+                    return value;
                 },
                 set(newValue) {
                     localCache.setPropValue(this.typeName, childInstance[exports.MFS_ID], propKey, newValue);

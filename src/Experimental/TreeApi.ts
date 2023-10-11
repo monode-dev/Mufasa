@@ -44,11 +44,15 @@ export abstract class MfsObj {
       childInstance[propKey] = {
         [MFS_IS_PROP]: true,
         get() {
-          return localCache.getPropValue(
+          const value = localCache.getPropValue(
             this.typeName,
             childInstance[MFS_ID],
             propKey,
           );
+          console.log(
+            `get ${this.typeName}: ${childInstance[MFS_ID]}.${propKey} = ${value}`,
+          );
+          return value;
         },
         set(newValue: any) {
           localCache.setPropValue(
