@@ -66,6 +66,10 @@ class MfsObj {
                 : (0, Reactivity_1.prop)(localCache.addDoc(typeName, defaultProps));
         return childInstance;
     }
+    /** Permanently deletes this object. */
+    delete() {
+        (0, __1.getLocalCache)().deleteDoc(this.typeName, this.mfsId.get());
+    }
 }
 exports.MfsObj = MfsObj;
 // abstract class MfsSession extends MfsObj {}

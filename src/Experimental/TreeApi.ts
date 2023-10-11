@@ -112,6 +112,11 @@ export abstract class MfsObj {
 
     return childInstance;
   }
+
+  /** Permanently deletes this object. */
+  delete() {
+    getLocalCache().deleteDoc(this.typeName, this.mfsId.get());
+  }
 }
 
 // abstract class MfsSession extends MfsObj {}

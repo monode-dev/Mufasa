@@ -11,4 +11,6 @@ export declare abstract class MfsObj {
     static getAllDocs<T extends typeof MfsObj>(this: T): InstanceType<T>[];
     static create<T extends typeof MfsObj>(this: T, createProps?: MfsPropsForCreate<T>): InstanceType<T>;
     private static _create;
+    /** Permanently deletes this object. */
+    delete(): void;
 }
