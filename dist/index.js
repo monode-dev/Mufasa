@@ -19,6 +19,7 @@ __exportStar(require("./Implement"), exports);
 __exportStar(require("./FirestoreSync"), exports);
 __exportStar(require("./utils"), exports);
 __exportStar(require("./Experimental/TreeApi"), exports);
+__exportStar(require("./Reactivity"), exports);
 /** Defines a prop of the specified primitive type. */
 function prim(
 /** TODO: We might consider using Number, String, or Boolean as the first parameter

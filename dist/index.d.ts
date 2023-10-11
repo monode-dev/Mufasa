@@ -5,6 +5,7 @@ export * from "./Implement";
 export * from "./FirestoreSync";
 export * from "./utils";
 export * from "./Experimental/TreeApi";
+export * from "./Reactivity";
 /** Defines a prop of the specified primitive type. */
 export declare function prim<T extends number | string | boolean>(
 /** TODO: We might consider using Number, String, or Boolean as the first parameter
