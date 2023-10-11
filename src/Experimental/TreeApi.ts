@@ -37,7 +37,7 @@ abstract class MfsObj {
     // TODO: Get all docs from local cache.
     return localCache
       .listAllObjectsOfType(typeName)
-      .map((docId) => new (this as any)(docId));
+      .map((docId) => new (this as any)(prop(docId)));
   }
 
   static docCollections: {

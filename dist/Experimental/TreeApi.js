@@ -36,7 +36,7 @@ class MfsObj {
         // TODO: Get all docs from local cache.
         return localCache
             .listAllObjectsOfType(typeName)
-            .map((docId) => new this(docId));
+            .map((docId) => new this((0, Reactivity_1.prop)(docId)));
     }
     static docCollections = {};
     static create(createProps) {
