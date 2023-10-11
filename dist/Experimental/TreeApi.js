@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MfsObj = exports.MFS_ID = void 0;
 const uuid_1 = require("uuid");
 const __1 = require("..");
 const Reactivity_1 = require("../Reactivity");
@@ -15,7 +16,7 @@ const Reactivity_1 = require("../Reactivity");
 //     // TODO: Read from local cache.
 //   });
 // }
-const MFS_ID = Symbol(`MFS_ID`);
+exports.MFS_ID = Symbol(`MFS_ID`);
 /** TypeName will be inferred from class name. Override YourType.typeName to manually specify a type name. */
 class MfsObj {
     /*** This can be overridden to manually specify a type name. */
@@ -25,9 +26,9 @@ class MfsObj {
     get typeName() {
         return this.constructor.typeName;
     }
-    [MFS_ID];
+    [exports.MFS_ID];
     constructor(id) {
-        this[MFS_ID] = id;
+        this[exports.MFS_ID] = id;
     }
     static getAllDocs() {
         const localCache = (0, __1.getLocalCache)();
@@ -60,6 +61,7 @@ class MfsObj {
         return childInstance;
     }
 }
+exports.MfsObj = MfsObj;
 // abstract class MfsSession extends MfsObj {}
 // abstract class MfsLocal extends MfsObj {}
 // abstract class MfsGlobal extends MfsObj {}

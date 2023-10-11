@@ -5,6 +5,7 @@ export type List<T extends _Doc<{}> = _Doc<{}>> = _List<T>;
 export * from "./Implement";
 export * from "./FirestoreSync";
 export * from "./utils";
+export * from "./Experimental/TreeApi";
 
 /** Defines a prop of the specified primitive type. */
 export function prim<T extends number | string | boolean>(

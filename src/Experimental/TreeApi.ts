@@ -15,9 +15,9 @@ import { PropReader, formula, MFS_IS_PROP, prop } from "../Reactivity";
 //   });
 // }
 
-const MFS_ID = Symbol(`MFS_ID`);
+export const MFS_ID = Symbol(`MFS_ID`);
 /** TypeName will be inferred from class name. Override YourType.typeName to manually specify a type name. */
-abstract class MfsObj {
+export abstract class MfsObj {
   /*** This can be overridden to manually specify a type name. */
   static get typeName() {
     return this.name;
