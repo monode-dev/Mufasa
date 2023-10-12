@@ -4,7 +4,7 @@ export declare function list<T extends typeof MfsObj>(entryClass: T, propName: k
     [MFS_IS_LIST]: boolean;
     entryClass: T;
     otherPropName: keyof InstanceType<T>;
-    get(): never[];
+    get(): InstanceType<T>[];
 };
 export type MfsPropsForCreate<T extends typeof MfsObj> = Partial<{
     [propName in keyof InstanceType<T>]: InstanceType<T>[propName] extends Prop<infer T> ? T : never;

@@ -19,7 +19,7 @@ export function list<T extends typeof MfsObj>(
     entryClass,
     otherPropName: propName,
     get() {
-      return [];
+      return [] as InstanceType<T>[];
     },
   };
 }
