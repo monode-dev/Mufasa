@@ -353,7 +353,10 @@ export function initializeMufasa<
   return {
     getAppData: globalStore(`mufasa`, () => {
       const localCache = getLocalCache();
-      Object.keys(options.typeSchemas).forEach(localCache.syncType);
+      Object.keys(options.typeSchemas).forEach((typeName) => {
+        localCache.syncType(typeName);
+        localCache.indexOnProp(typeName, `mx_parent`);
+      });
       const rootLists: {
         [K in keyof RS]: ReturnType<
           typeof listProx<

@@ -1,6 +1,7 @@
 import { getLocalCache } from "./Implement";
 
 export const MFS_IS_PROP = Symbol(`MFS_IS_PROP`);
+export const MFS_IS_LIST = Symbol(`MFS_IS_LIST`);
 
 // TODO: Implement an optional type.
 export type PropReader<T> = {

@@ -224,7 +224,10 @@ function initializeMufasa(options) {
     return {
         getAppData: (0, utils_1.globalStore)(`mufasa`, () => {
             const localCache = getLocalCache();
-            Object.keys(options.typeSchemas).forEach(localCache.syncType);
+            Object.keys(options.typeSchemas).forEach((typeName) => {
+                localCache.syncType(typeName);
+                localCache.indexOnProp(typeName, `mx_parent`);
+            });
             const rootLists = {};
             for (const key of Object.keys(options.rootSchema)) {
                 rootLists[key] = listProx(options.rootSchema[key].refTypeName, options.typeSchemas, localCache);

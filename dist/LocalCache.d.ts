@@ -25,6 +25,7 @@ export declare function initializeCache({ getCollectionName, firebaseApp, _signa
     listAllObjectsOfType(typeName: string): string[];
     checkExists(typeName: string, docId: string | null | undefined): boolean;
     getChildDocs(childType: string, parentId: string): string[];
+    getIndexedDocs(typeName: string, propName: string, propValue: string): string[];
     getPropValue(typeName: string, docId: string, propName: string): string | number | boolean | Promise<string | undefined> | import("./utils").Sym<"INVALID" | "NONEXISTENT"> | {
         readonly mx_unad: "UploadingFile";
     } | {
@@ -39,6 +40,7 @@ export declare function initializeCache({ getCollectionName, firebaseApp, _signa
         value: string | number | boolean | null | undefined;
         typeName: string;
     } | null | undefined): Promise<void>;
+    indexOnProp(typeName: string, propName: string): Promise<void>;
     createProp<T>(initValue: T): Prop<T>;
     createFormula: <T_1>(evaluate: () => T_1) => PropReader<T_1>;
     deleteDoc(typeName: string, docId: string): void;

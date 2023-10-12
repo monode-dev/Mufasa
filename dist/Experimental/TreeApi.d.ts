@@ -1,4 +1,11 @@
-import { PropReader, Prop } from "../Reactivity";
+import { PropReader, MFS_IS_PROP, Prop, MFS_IS_LIST } from "../Reactivity";
+export declare function list<T extends typeof MfsObj>(entryClass: T, propName: keyof InstanceType<T>): {
+    [MFS_IS_PROP]: boolean;
+    [MFS_IS_LIST]: boolean;
+    entryClass: T;
+    otherPropName: keyof InstanceType<T>;
+    get(): never[];
+};
 export type MfsPropsForCreate<T extends typeof MfsObj> = Partial<{
     [propName in keyof InstanceType<T>]: InstanceType<T>[propName] extends Prop<infer T> ? T : never;
 }>;

@@ -1,8 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MfsObj = void 0;
+exports.MfsObj = exports.list = void 0;
 const __1 = require("..");
 const Reactivity_1 = require("../Reactivity");
+function list(entryClass, propName) {
+    return {
+        [Reactivity_1.MFS_IS_PROP]: true,
+        [Reactivity_1.MFS_IS_LIST]: true,
+        entryClass,
+        otherPropName: propName,
+        get() {
+            return [];
+        },
+    };
+}
+exports.list = list;
 // export const MFS_ID = Symbol(`MFS_ID`);
 /** TypeName will be inferred from class name. Override YourType.typeName to manually specify a type name. */
 class MfsObj {
@@ -44,20 +56,41 @@ class MfsObj {
                 continue;
             if (!(childInstance[propKey]?.get instanceof Function))
                 continue;
-            if (!(childInstance[propKey]?.set instanceof Function))
+            const isList = childInstance[propKey]?.[Reactivity_1.MFS_IS_LIST] ?? false;
+            // Lists are don't have to have a set function
+            if (!isList && !(childInstance[propKey]?.set instanceof Function)) {
                 continue;
-            defaultProps[propKey] =
-                (options.initProps ?? {})[propKey] ??
-                    childInstance[propKey].get();
-            childInstance[propKey] = {
-                [Reactivity_1.MFS_IS_PROP]: true,
-                get() {
-                    return localCache.getPropValue(typeName, childInstance.mfsId.get(), propKey);
-                },
-                set(newValue) {
-                    localCache.setPropValue(typeName, childInstance.mfsId.get(), propKey, newValue);
-                },
-            };
+            }
+            if (isList) {
+                const entryClass = childInstance[propKey].entryClass;
+                const otherPropName = childInstance[propKey].otherPropName;
+                if (typeof otherPropName !== `string`) {
+                    throw new Error(`Invalid prop name "${otherPropName.toString()}".`);
+                }
+                localCache.syncType(entryClass.typeName);
+                localCache.indexOnProp(entryClass.typeName, otherPropName);
+                childInstance[propKey] = {
+                    [Reactivity_1.MFS_IS_PROP]: true,
+                    [Reactivity_1.MFS_IS_LIST]: true,
+                    get() {
+                        return localCache.getIndexedDocs(entryClass.typeName, otherPropName, childInstance.mfsId.get());
+                    },
+                };
+            }
+            else {
+                defaultProps[propKey] =
+                    (options.initProps ?? {})[propKey] ??
+                        childInstance[propKey].get();
+                childInstance[propKey] = {
+                    [Reactivity_1.MFS_IS_PROP]: true,
+                    get() {
+                        return localCache.getPropValue(typeName, childInstance.mfsId.get(), propKey);
+                    },
+                    set(newValue) {
+                        localCache.setPropValue(typeName, childInstance.mfsId.get(), propKey, newValue);
+                    },
+                };
+            }
         }
         // Set up the inst id
         childInstance.mfsId =

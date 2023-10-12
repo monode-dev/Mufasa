@@ -1,4 +1,5 @@
 export declare const MFS_IS_PROP: unique symbol;
+export declare const MFS_IS_LIST: unique symbol;
 export type PropReader<T> = {
     readonly [MFS_IS_PROP]: true;
     get(): T;

@@ -6,7 +6,7 @@ import { newSignalTree, SignalEvent } from "./SignalTree";
 import { initializeFirestoreSync } from "./FirestoreSync";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { v4 as uuidv4 } from "uuid";
-import { MFS_IS_PROP, Prop, PropReader } from "./Reactivity";
+import { MFS_IS_PROP, Prop, PropReader, prop } from "./Reactivity";
 
 export const DELETED_KEY = `mx_deleted`;
 export const MX_PARENT_KEY = `mx_parent`;
@@ -49,10 +49,19 @@ export function initializeCache({
       dev: number;
       prod: number;
     };
-    childLists: {
-      [childType: string]: {
-        [parentId: string]: {
-          [childId: string]: true;
+    // childLists: {
+    //   [childType: string]: {
+    //     [parentId: string]: {
+    //       [childId: string]: true;
+    //     };
+    //   };
+    // };
+    indexes: {
+      [typeName: string]: {
+        [propName: string]: {
+          [propValue: string]: {
+            [docId: string]: true;
+          };
         };
       };
     };
@@ -130,8 +139,10 @@ export function initializeCache({
   const docSignalTree = newSignalTree<{
     [typeName: string]: {
       docsChanged: SignalEvent;
-      parents: {
-        [parentId: string]: SignalEvent;
+      indexes: {
+        [propName: string]: {
+          [propValue: string]: SignalEvent;
+        };
       };
       docs: {
         [docId: string]: {
@@ -181,16 +192,18 @@ export function initializeCache({
           // Notify Old Parent
           if (exists(oldDoc?.[propName])) {
             await updateOfflineCache({
-              childLists: {
-                [collectionName]: {
-                  [oldDoc?.[propName] as string]: {
-                    [params.docId]: undefined as any,
+              indexes: {
+                [params.typeName]: {
+                  [propName]: {
+                    [oldDoc?.[propName] as string]: {
+                      [params.docId]: undefined as any,
+                    },
                   },
                 },
               },
             });
             thingsToTrigger.push(() => {
-              docSignalTree[params.typeName].parents[
+              docSignalTree[params.typeName].indexes[propName][
                 oldDoc?.[propName] as string
               ].trigger();
             });
@@ -198,16 +211,18 @@ export function initializeCache({
           // Notify New Parent
           if (exists(params.props[propName])) {
             await updateOfflineCache({
-              childLists: {
-                [collectionName]: {
-                  [params.props[propName] as string]: {
-                    [params.docId]: true,
+              indexes: {
+                [params.typeName]: {
+                  [propName]: {
+                    [params.props[propName] as string]: {
+                      [params.docId]: true,
+                    },
                   },
                 },
               },
             });
             thingsToTrigger.push(() => {
-              docSignalTree[params.typeName].parents[
+              docSignalTree[params.typeName].indexes[propName][
                 params.props[propName] as string
               ].trigger();
             });
@@ -264,8 +279,12 @@ export function initializeCache({
     // After we load data from the offline cache we should let the app know when the data is loaded.
     for (const typeName of typeNames) {
       docSignalTree[typeName].docsChanged.trigger();
-      for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
-        docSignalTree[typeName].parents[parentId].trigger();
+      for (const propName of Object.keys(docSignalTree[typeName].indexes)) {
+        for (const propValue of Object.keys(
+          docSignalTree[typeName].indexes[propName],
+        )) {
+          docSignalTree[typeName].indexes[propName][propValue].trigger();
+        }
       }
       for (const docId of Object.keys(docSignalTree[typeName].docs)) {
         for (const propName of Object.keys(
@@ -304,22 +323,14 @@ export function initializeCache({
       );
     },
     getChildDocs(childType: string, parentId: string) {
-      docSignalTree[childType].parents[parentId].listen();
+      return this.getIndexedDocs(childType, MX_PARENT_KEY, parentId);
+    },
+    getIndexedDocs(typeName: string, propName: string, propValue: string) {
+      docSignalTree[typeName].indexes[propName][propValue].listen();
       return Object.keys(
-        unPromisedOfflineCache?.childLists?.[getCollectionName(childType)]?.[
-          parentId
-        ] ?? {},
+        unPromisedOfflineCache?.indexes?.[typeName]?.[propName]?.[propValue] ??
+          {},
       );
-      // const children: string[] = [];
-      // for (const [docId, thisDoc] of Object.entries(
-      //   clientStorage?.data.types?.[getCollectionName(childType)] ?? {},
-      // )) {
-      //   if (exists(thisDoc[DELETED_KEY]) && thisDoc[DELETED_KEY]) continue;
-      //   if (thisDoc?.[MX_PARENT_KEY] === parentId) {
-      //     children.push(docId);
-      //   }
-      // }
-      // return children;
     },
     getPropValue(typeName: string, docId: string, propName: string) {
       docSignalTree[typeName].docs[docId][propName].listen();
@@ -413,6 +424,39 @@ export function initializeCache({
         // Write locally
         updateSessionStorage({ typeName, docId, props: changes });
       }
+    },
+
+    // TODO: Insert a addIndex function here.
+    async indexOnProp(typeName: string, propName: string) {
+      const offlineCache = await _offlineCache;
+      const collectionName = getCollectionName(typeName);
+
+      // Index all existing docs
+      const indexedData: {
+        [propValue: string]: {
+          [docId: string]: true;
+        };
+      } = {};
+      for (const [docId, docData] of Object.entries(
+        offlineCache.types?.[collectionName] ?? {},
+      )) {
+        const propValue = docData[propName];
+        if (exists(propValue)) {
+          indexedData[propValue as string] = {
+            ...(indexedData[propValue as string] ?? {}),
+            [docId]: true,
+          };
+        }
+      }
+
+      // Add the index
+      updateOfflineCache({
+        indexes: {
+          [typeName]: {
+            [propName]: indexedData,
+          },
+        },
+      });
     },
 
     createProp<T>(initValue: T): Prop<T> {

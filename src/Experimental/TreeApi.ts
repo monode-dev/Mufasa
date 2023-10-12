@@ -1,19 +1,28 @@
 import { v4 as uuidv4 } from "uuid";
 import { getLocalCache } from "..";
-import { PropReader, formula, MFS_IS_PROP, prop, Prop } from "../Reactivity";
+import {
+  PropReader,
+  formula,
+  MFS_IS_PROP,
+  prop,
+  Prop,
+  MFS_IS_LIST,
+} from "../Reactivity";
 
-// function list<T extends abstract new (...args: any) => any>(
-//   typeClass: T,
-//   propName: keyof InstanceType<T>,
-// ) {
-//   const localCache = getLocalCache();
-//   const entryTypeName: string = (typeClass as any).typeName;
-//   localCache.syncType(entryTypeName);
-//   // TODO: request an index on the given property.
-//   return formula(() => {
-//     // TODO: Read from local cache.
-//   });
-// }
+export function list<T extends typeof MfsObj>(
+  entryClass: T,
+  propName: keyof InstanceType<T>,
+) {
+  return {
+    [MFS_IS_PROP]: true,
+    [MFS_IS_LIST]: true,
+    entryClass,
+    otherPropName: propName,
+    get() {
+      return [];
+    },
+  };
+}
 
 export type MfsPropsForCreate<T extends typeof MfsObj> = Partial<{
   [propName in keyof InstanceType<T>]: InstanceType<T>[propName] extends Prop<
@@ -80,28 +89,53 @@ export abstract class MfsObj {
       if (propKey === `mfsId`) continue;
       if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
       if (!(childInstance[propKey]?.get instanceof Function)) continue;
-      if (!(childInstance[propKey]?.set instanceof Function)) continue;
-      defaultProps[propKey] =
-        ((options.initProps ?? {}) as any)[propKey] ??
-        childInstance[propKey].get();
-      childInstance[propKey] = {
-        [MFS_IS_PROP]: true,
-        get() {
-          return localCache.getPropValue(
-            typeName,
-            childInstance.mfsId.get(),
-            propKey,
-          );
-        },
-        set(newValue: any) {
-          localCache.setPropValue(
-            typeName,
-            childInstance.mfsId.get(),
-            propKey,
-            newValue,
-          );
-        },
-      };
+      const isList = childInstance[propKey]?.[MFS_IS_LIST] ?? false;
+      // Lists are don't have to have a set function
+      if (!isList && !(childInstance[propKey]?.set instanceof Function)) {
+        continue;
+      }
+      if (isList) {
+        const entryClass = childInstance[propKey].entryClass;
+        const otherPropName = childInstance[propKey].otherPropName;
+        if (typeof otherPropName !== `string`) {
+          throw new Error(`Invalid prop name "${otherPropName.toString()}".`);
+        }
+        localCache.syncType(entryClass.typeName);
+        localCache.indexOnProp(entryClass.typeName, otherPropName);
+        childInstance[propKey] = {
+          [MFS_IS_PROP]: true,
+          [MFS_IS_LIST]: true,
+          get() {
+            return localCache.getIndexedDocs(
+              entryClass.typeName,
+              otherPropName,
+              childInstance.mfsId.get(),
+            );
+          },
+        };
+      } else {
+        defaultProps[propKey] =
+          ((options.initProps ?? {}) as any)[propKey] ??
+          childInstance[propKey].get();
+        childInstance[propKey] = {
+          [MFS_IS_PROP]: true,
+          get() {
+            return localCache.getPropValue(
+              typeName,
+              childInstance.mfsId.get(),
+              propKey,
+            );
+          },
+          set(newValue: any) {
+            localCache.setPropValue(
+              typeName,
+              childInstance.mfsId.get(),
+              propKey,
+              newValue,
+            );
+          },
+        };
+      }
     }
 
     // Set up the inst id

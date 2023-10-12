@@ -94,31 +94,35 @@ function initializeCache({ getCollectionName, firebaseApp, _signal, formula, per
                     // Notify Old Parent
                     if ((0, utils_1.exists)(oldDoc?.[propName])) {
                         await updateOfflineCache({
-                            childLists: {
-                                [collectionName]: {
-                                    [oldDoc?.[propName]]: {
-                                        [params.docId]: undefined,
+                            indexes: {
+                                [params.typeName]: {
+                                    [propName]: {
+                                        [oldDoc?.[propName]]: {
+                                            [params.docId]: undefined,
+                                        },
                                     },
                                 },
                             },
                         });
                         thingsToTrigger.push(() => {
-                            docSignalTree[params.typeName].parents[oldDoc?.[propName]].trigger();
+                            docSignalTree[params.typeName].indexes[propName][oldDoc?.[propName]].trigger();
                         });
                     }
                     // Notify New Parent
                     if ((0, utils_1.exists)(params.props[propName])) {
                         await updateOfflineCache({
-                            childLists: {
-                                [collectionName]: {
-                                    [params.props[propName]]: {
-                                        [params.docId]: true,
+                            indexes: {
+                                [params.typeName]: {
+                                    [propName]: {
+                                        [params.props[propName]]: {
+                                            [params.docId]: true,
+                                        },
                                     },
                                 },
                             },
                         });
                         thingsToTrigger.push(() => {
-                            docSignalTree[params.typeName].parents[params.props[propName]].trigger();
+                            docSignalTree[params.typeName].indexes[propName][params.props[propName]].trigger();
                         });
                     }
                 }
@@ -170,8 +174,10 @@ function initializeCache({ getCollectionName, firebaseApp, _signal, formula, per
         // After we load data from the offline cache we should let the app know when the data is loaded.
         for (const typeName of typeNames) {
             docSignalTree[typeName].docsChanged.trigger();
-            for (const parentId of Object.keys(docSignalTree[typeName].parents)) {
-                docSignalTree[typeName].parents[parentId].trigger();
+            for (const propName of Object.keys(docSignalTree[typeName].indexes)) {
+                for (const propValue of Object.keys(docSignalTree[typeName].indexes[propName])) {
+                    docSignalTree[typeName].indexes[propName][propValue].trigger();
+                }
             }
             for (const docId of Object.keys(docSignalTree[typeName].docs)) {
                 for (const propName of Object.keys(docSignalTree[typeName].docs[docId])) {
@@ -200,18 +206,12 @@ function initializeCache({ getCollectionName, firebaseApp, _signal, formula, per
                 (0, utils_1.exists)(unPromisedOfflineCache?.types?.[getCollectionName(typeName)]?.[docId]));
         },
         getChildDocs(childType, parentId) {
-            docSignalTree[childType].parents[parentId].listen();
-            return Object.keys(unPromisedOfflineCache?.childLists?.[getCollectionName(childType)]?.[parentId] ?? {});
-            // const children: string[] = [];
-            // for (const [docId, thisDoc] of Object.entries(
-            //   clientStorage?.data.types?.[getCollectionName(childType)] ?? {},
-            // )) {
-            //   if (exists(thisDoc[DELETED_KEY]) && thisDoc[DELETED_KEY]) continue;
-            //   if (thisDoc?.[MX_PARENT_KEY] === parentId) {
-            //     children.push(docId);
-            //   }
-            // }
-            // return children;
+            return this.getIndexedDocs(childType, exports.MX_PARENT_KEY, parentId);
+        },
+        getIndexedDocs(typeName, propName, propValue) {
+            docSignalTree[typeName].indexes[propName][propValue].listen();
+            return Object.keys(unPromisedOfflineCache?.indexes?.[typeName]?.[propName]?.[propValue] ??
+                {});
         },
         getPropValue(typeName, docId, propName) {
             docSignalTree[typeName].docs[docId][propName].listen();
@@ -281,6 +281,30 @@ function initializeCache({ getCollectionName, firebaseApp, _signal, formula, per
                 // Write locally
                 updateSessionStorage({ typeName, docId, props: changes });
             }
+        },
+        // TODO: Insert a addIndex function here.
+        async indexOnProp(typeName, propName) {
+            const offlineCache = await _offlineCache;
+            const collectionName = getCollectionName(typeName);
+            // Index all existing docs
+            const indexedData = {};
+            for (const [docId, docData] of Object.entries(offlineCache.types?.[collectionName] ?? {})) {
+                const propValue = docData[propName];
+                if ((0, utils_1.exists)(propValue)) {
+                    indexedData[propValue] = {
+                        ...(indexedData[propValue] ?? {}),
+                        [docId]: true,
+                    };
+                }
+            }
+            // Add the index
+            updateOfflineCache({
+                indexes: {
+                    [typeName]: {
+                        [propName]: indexedData,
+                    },
+                },
+            });
         },
         createProp(initValue) {
             const signal = _signal(initValue);
