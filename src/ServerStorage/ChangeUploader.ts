@@ -115,9 +115,9 @@ export function loadChangeUploader(
 
       // Delete old file
       if (exists(change.oldFileId)) {
-        console.log(
-          `change.oldFileId: ${JSON.stringify(change.oldFileId, null, 2)}`,
-        );
+        // console.log(
+        //   `change.oldFileId: ${JSON.stringify(change.oldFileId, null, 2)}`,
+        // );
         const oldFileRef = storageRef(serverFileStorage, change.oldFileId);
         // NOTE: I don't think we have to wait for these.
         clientStorage.deleteFile(change.oldFileId);

@@ -240,9 +240,9 @@ export function createCache({
               });
             }
           });
-          console.log(
-            `${typeName} docs changed: ${snapshot.docChanges().length}`,
-          );
+          // console.log(
+          //   `${typeName} docs changed: ${snapshot.docChanges().length}`,
+          // );
           if (
             mostRecentChangeDate >
             (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)
@@ -280,7 +280,7 @@ export function createCache({
     },
     getChildDocs(childType: string, parentId: string) {
       docSignalTree[childType].parents[parentId].listen();
-      console.log(`getChildDocs`, childType, parentId);
+      // console.log(`getChildDocs`, childType, parentId);
       return Object.keys(
         clientStorage?.data.childLists?.[getCollectionName(childType)]?.[
           parentId

@@ -138,7 +138,9 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                         });
                     }
                 });
-                console.log(`${typeName} docs changed: ${snapshot.docChanges().length}`);
+                // console.log(
+                //   `${typeName} docs changed: ${snapshot.docChanges().length}`,
+                // );
                 if (mostRecentChangeDate >
                     (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0)) {
                     clientStorage.updateData({
@@ -168,7 +170,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         },
         getChildDocs(childType, parentId) {
             docSignalTree[childType].parents[parentId].listen();
-            console.log(`getChildDocs`, childType, parentId);
+            // console.log(`getChildDocs`, childType, parentId);
             return Object.keys(clientStorage?.data.childLists?.[getCollectionName(childType)]?.[parentId] ?? {});
             // const children: string[] = [];
             // for (const [docId, thisDoc] of Object.entries(
