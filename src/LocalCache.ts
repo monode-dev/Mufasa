@@ -109,9 +109,8 @@ export function createCache({
     const thingsToTrigger: (() => void)[] = [];
 
     // If this doc is being created or deleted, record that so we can notify listeners later
-    const isBeingCreated = !exists(
-      clientStorage.data?.types?.[collectionName]?.[params.docId],
-    );
+    const oldDoc = clientStorage.data?.types?.[collectionName]?.[params.docId];
+    const isBeingCreated = !exists(oldDoc);
     const isBeingDeleted = params.props[DELETED_KEY] === true;
     if (isBeingCreated || isBeingDeleted) {
       thingsToTrigger.push(() => {
@@ -120,20 +119,19 @@ export function createCache({
     }
 
     // Record all the props that changed so we can notify listeners later
-    const oldDoc = clientStorage.data?.types?.[collectionName]?.[params.docId];
-    // TODO: Run these notifications even if a previous version doesn't exists.
-    for (const propName of Object.keys(params.props)) {
-      if (!exists(oldDoc) || oldDoc[propName] !== params.props[propName]) {
+    for (const [propName, newValue] of Object.entries(params.props)) {
+      const oldValue = oldDoc?.[propName];
+      if (isBeingCreated || oldValue !== newValue) {
         thingsToTrigger.push(() => {
           docSignalTree[params.typeName].docs[params.docId][propName].trigger();
         });
         if (propName === MX_PARENT_KEY) {
           // Notify Old Parent
-          if (exists(oldDoc?.[propName])) {
+          if (exists(oldValue)) {
             clientStorage.updateData({
               childLists: {
                 [collectionName]: {
-                  [oldDoc?.[propName] as string]: {
+                  [oldValue as string]: {
                     [params.docId]: undefined as any,
                   },
                 },
@@ -141,16 +139,16 @@ export function createCache({
             });
             thingsToTrigger.push(() => {
               docSignalTree[params.typeName].parents[
-                oldDoc?.[propName] as string
+                oldValue as string
               ].trigger();
             });
           }
           // Notify New Parent
-          if (exists(params.props[propName])) {
+          if (exists(newValue)) {
             clientStorage.updateData({
               childLists: {
                 [collectionName]: {
-                  [params.props[propName] as string]: {
+                  [newValue as string]: {
                     [params.docId]: true,
                   },
                 },
@@ -158,7 +156,7 @@ export function createCache({
             });
             thingsToTrigger.push(() => {
               docSignalTree[params.typeName].parents[
-                params.props[propName] as string
+                newValue as string
               ].trigger();
             });
           }
@@ -282,6 +280,7 @@ export function createCache({
     },
     getChildDocs(childType: string, parentId: string) {
       docSignalTree[childType].parents[parentId].listen();
+      console.log(`getChildDocs`, childType, parentId);
       return Object.keys(
         clientStorage?.data.childLists?.[getCollectionName(childType)]?.[
           parentId

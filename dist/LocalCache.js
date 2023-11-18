@@ -32,7 +32,8 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         // We use this to defer triggering listeners until after we have updated the cache
         const thingsToTrigger = [];
         // If this doc is being created or deleted, record that so we can notify listeners later
-        const isBeingCreated = !(0, utils_1.exists)(clientStorage.data?.types?.[collectionName]?.[params.docId]);
+        const oldDoc = clientStorage.data?.types?.[collectionName]?.[params.docId];
+        const isBeingCreated = !(0, utils_1.exists)(oldDoc);
         const isBeingDeleted = params.props[exports.DELETED_KEY] === true;
         if (isBeingCreated || isBeingDeleted) {
             thingsToTrigger.push(() => {
@@ -40,42 +41,41 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             });
         }
         // Record all the props that changed so we can notify listeners later
-        const oldDoc = clientStorage.data?.types?.[collectionName]?.[params.docId];
-        // TODO: Run these notifications even if a previous version doesn't exists.
-        for (const propName of Object.keys(params.props)) {
-            if (!(0, utils_1.exists)(oldDoc) || oldDoc[propName] !== params.props[propName]) {
+        for (const [propName, newValue] of Object.entries(params.props)) {
+            const oldValue = oldDoc?.[propName];
+            if (isBeingCreated || oldValue !== newValue) {
                 thingsToTrigger.push(() => {
                     docSignalTree[params.typeName].docs[params.docId][propName].trigger();
                 });
                 if (propName === exports.MX_PARENT_KEY) {
                     // Notify Old Parent
-                    if ((0, utils_1.exists)(oldDoc?.[propName])) {
+                    if ((0, utils_1.exists)(oldValue)) {
                         clientStorage.updateData({
                             childLists: {
                                 [collectionName]: {
-                                    [oldDoc?.[propName]]: {
+                                    [oldValue]: {
                                         [params.docId]: undefined,
                                     },
                                 },
                             },
                         });
                         thingsToTrigger.push(() => {
-                            docSignalTree[params.typeName].parents[oldDoc?.[propName]].trigger();
+                            docSignalTree[params.typeName].parents[oldValue].trigger();
                         });
                     }
                     // Notify New Parent
-                    if ((0, utils_1.exists)(params.props[propName])) {
+                    if ((0, utils_1.exists)(newValue)) {
                         clientStorage.updateData({
                             childLists: {
                                 [collectionName]: {
-                                    [params.props[propName]]: {
+                                    [newValue]: {
                                         [params.docId]: true,
                                     },
                                 },
                             },
                         });
                         thingsToTrigger.push(() => {
-                            docSignalTree[params.typeName].parents[params.props[propName]].trigger();
+                            docSignalTree[params.typeName].parents[newValue].trigger();
                         });
                     }
                 }
@@ -168,6 +168,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         },
         getChildDocs(childType, parentId) {
             docSignalTree[childType].parents[parentId].listen();
+            console.log(`getChildDocs`, childType, parentId);
             return Object.keys(clientStorage?.data.childLists?.[getCollectionName(childType)]?.[parentId] ?? {});
             // const children: string[] = [];
             // for (const [docId, thisDoc] of Object.entries(
