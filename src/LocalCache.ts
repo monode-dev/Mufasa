@@ -6,7 +6,7 @@ import { newSignalTree, SignalEvent } from "./SignalTree";
 import { initializeFirestoreSync } from "./FirestoreSync";
 import { PersistedFunctionManager } from "./PersistedFunctionManager";
 import { v4 as uuidv4 } from "uuid";
-import { MFS_IS_PROP, Prop, PropReader, prop } from "./Reactivity";
+import { PropGetter, PropSetter, prop } from "./Reactivity";
 
 export const DELETED_KEY = `mx_deleted`;
 export const MX_PARENT_KEY = `mx_parent`;
@@ -30,7 +30,8 @@ export function initializeCache({
   getCollectionName,
   firebaseApp,
   _signal,
-  formula,
+  createSignal,
+  createComputed,
   persistedFunctionManager,
   fileSystem,
   isProduction,
@@ -38,7 +39,8 @@ export function initializeCache({
   getCollectionName: (typeName: string) => string;
   firebaseApp: FirebaseApp;
   _signal: <T>(initValue: T) => Signal<T>;
-  formula: <T>(evaluate: () => T) => PropReader<T>;
+  createSignal: <T>(initValue: T) => PropGetter<T> & PropSetter<T>;
+  createComputed: <T>(evaluate: () => T) => PropGetter<T>;
   persistedFunctionManager: PersistedFunctionManager;
   fileSystem: MfsFileSystem;
   isProduction: boolean;
@@ -362,8 +364,12 @@ export function initializeCache({
       if (!exists(fileId)) return null;
       return fileSystem.getFilePath(fileId) ?? null;
     },
-    addDoc(typeName: string, props: { [propName: string]: any }) {
-      const mfsId = uuidv4();
+    addDoc(
+      typeName: string,
+      props: { [propName: string]: any },
+      mfsId?: string,
+    ) {
+      mfsId = mfsId ?? uuidv4();
       firestoreSync.uploadDocChange({
         shouldOverwrite: true,
         typeName,
@@ -459,20 +465,9 @@ export function initializeCache({
       });
     },
 
-    createProp<T>(initValue: T): Prop<T> {
-      const signal = _signal(initValue);
-      return {
-        [MFS_IS_PROP]: true,
-        get() {
-          return signal.value;
-        },
-        set(newValue: T) {
-          signal.value = newValue;
-        },
-      };
-    },
+    createSignal: createSignal,
 
-    createFormula: formula,
+    createComputed: createComputed,
 
     deleteDoc(typeName: string, docId: string) {
       firestoreSync.uploadDocChange({

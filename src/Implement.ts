@@ -14,7 +14,6 @@ import {
   signInWithPopup,
   User as FirebaseUser,
 } from "firebase/auth";
-import { MFS_IS_PROP } from "./Reactivity";
 
 //
 //
@@ -336,10 +335,20 @@ export function initializeMufasa<
     getCollectionName,
     firebaseApp,
     _signal,
-    formula: <T>(evaluate: () => T) => {
+    createSignal: <T>(initialValue: T) => {
+      const signal = _signal(initialValue);
+      return {
+        get() {
+          return signal.value;
+        },
+        set(newValue: T) {
+          signal.value = newValue;
+        },
+      };
+    },
+    createComputed: <T>(evaluate: () => T) => {
       const computed = _computed(evaluate);
       return {
-        [MFS_IS_PROP]: true,
         get() {
           return computed.value;
         },

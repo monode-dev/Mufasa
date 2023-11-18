@@ -1,27 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
-import { getLocalCache } from "..";
-import {
-  PropReader,
-  formula,
-  MFS_IS_PROP,
-  prop,
-  Prop,
-  MFS_IS_LIST,
-} from "../Reactivity";
+import { MFS_PROP_CONFIG, exists, getLocalCache, isValid } from "..";
+import { PropGetter, formula, prop, Prop } from "../Reactivity";
 
-export function list<T extends typeof MfsObj>(
-  entryClass: T,
-  propName: keyof InstanceType<T>,
-) {
-  return {
-    [MFS_IS_PROP]: true,
-    [MFS_IS_LIST]: true,
-    entryClass,
-    otherPropName: propName,
-    get() {
-      return [] as InstanceType<T>[];
-    },
-  };
+export function extendsMfsObj<T>(
+  ChildClass: T,
+): ChildClass is T & typeof MfsObj {
+  let prototype = Object.getPrototypeOf(ChildClass);
+  while (prototype !== null) {
+    if (prototype === MfsObj) {
+      return true;
+    }
+    prototype = Object.getPrototypeOf(prototype);
+  }
+  return false;
 }
 
 export type MfsPropsForCreate<T extends typeof MfsObj> = Partial<{
@@ -42,7 +33,7 @@ export abstract class MfsObj {
   get typeName() {
     return (this.constructor as typeof MfsObj).typeName;
   }
-  readonly mfsId: PropReader<string> = prop(``);
+  readonly mfsId: PropGetter<string> = prop(``);
 
   static getAllDocs<T extends typeof MfsObj>(this: T): InstanceType<T>[] {
     const localCache = getLocalCache();
@@ -51,7 +42,7 @@ export abstract class MfsObj {
     // TODO: Get all docs from local cache.
     return localCache
       .listAllObjectsOfType(typeName)
-      .map((mfsId) => this._create({ mfsId: prop(mfsId) }));
+      .map((mfsId) => this._create({ instMfsId: prop(mfsId) }));
   }
 
   static create<T extends typeof MfsObj>(
@@ -63,15 +54,15 @@ export abstract class MfsObj {
     });
   }
 
-  private static _create<T extends typeof MfsObj>(
+  static _create<T extends typeof MfsObj>(
     this: T,
     options:
       | {
-          mfsId: PropReader<string>;
+          instMfsId: PropGetter<string>;
           initProps?: never;
         }
       | {
-          mfsId?: never;
+          instMfsId?: never;
           initProps: MfsPropsForCreate<T>;
         },
   ): InstanceType<T> {
@@ -81,55 +72,80 @@ export abstract class MfsObj {
     localCache.syncType(typeName);
 
     // Create a new instance.
-    const childInstance = new (this as any)();
+    // TODO: There is probably a neat way to type this. Like Writable<Partial<MfsObj>> or something.
+    const newInstance = new (this as any)();
+    newInstance.mfsId = options.instMfsId ?? prop(uuidv4());
 
     // Substitute props.
-    const defaultProps: { [propName: string]: any } = {};
-    for (const propKey of Object.keys(childInstance)) {
+    const createDocProps: { [propName: string]: any } = {};
+    for (const propKey of Object.keys(newInstance)) {
       if (propKey === `mfsId`) continue;
-      if (!(childInstance[propKey]?.[MFS_IS_PROP] ?? false)) continue;
-      if (!(childInstance[propKey]?.get instanceof Function)) continue;
-      const isList = childInstance[propKey]?.[MFS_IS_LIST] ?? false;
-      // Lists are don't have to have a set function
-      if (!isList && !(childInstance[propKey]?.set instanceof Function)) {
-        continue;
-      }
-      if (isList) {
-        const entryClass = childInstance[propKey].entryClass;
-        const otherPropName = childInstance[propKey].otherPropName;
+      const propConfig = newInstance[propKey]?.[MFS_PROP_CONFIG];
+      if (!isValid(propConfig)) continue;
+
+      if (propConfig.format === `objRef`) {
+        const PropClass = newInstance[propKey].typeClass;
+        const propValueInst = PropClass._create({
+          mfsId: formula(() => {
+            const propValue = localCache.getPropValue(
+              typeName,
+              newInstance.mfsId.get(),
+              propKey,
+            ) as any;
+            return propValue?.value ?? ``;
+          }),
+        });
+        propValueInst.set = (newValue: InstanceType<typeof PropClass>) => {
+          localCache.setPropValue(
+            typeName,
+            newInstance.mfsId.get(),
+            propKey,
+            newValue.mfsId.get(),
+          );
+        };
+        // Update createDocProps when applicable.
+        if (isValid(options.initProps)) {
+          const initId = (
+            (options.initProps as any)[propKey] as MfsObj | undefined
+          )?.mfsId.get();
+          if (isValid(initId)) {
+            createDocProps[propKey] = initId;
+          }
+        }
+        newInstance[propKey] = propValueInst;
+      } else if (propConfig.format === `list`) {
+        const entryClass = newInstance[propKey].entryClass;
+        const otherPropName = newInstance[propKey].otherPropName;
         if (typeof otherPropName !== `string`) {
           throw new Error(`Invalid prop name "${otherPropName.toString()}".`);
         }
         localCache.syncType(entryClass.typeName);
         localCache.indexOnProp(entryClass.typeName, otherPropName);
-        childInstance[propKey] = {
-          [MFS_IS_PROP]: true,
-          [MFS_IS_LIST]: true,
+        newInstance[propKey] = {
           get() {
             return localCache.getIndexedDocs(
               entryClass.typeName,
               otherPropName,
-              childInstance.mfsId.get(),
+              newInstance.mfsId.get(),
             );
           },
         };
       } else {
-        defaultProps[propKey] =
+        createDocProps[propKey] =
           ((options.initProps ?? {}) as any)[propKey] ??
-          childInstance[propKey].get();
-        childInstance[propKey] = {
-          [MFS_IS_PROP]: true,
+          newInstance[propKey].get();
+        newInstance[propKey] = {
           get() {
             return localCache.getPropValue(
               typeName,
-              childInstance.mfsId.get(),
+              newInstance.mfsId.get(),
               propKey,
             );
           },
           set(newValue: any) {
             localCache.setPropValue(
               typeName,
-              childInstance.mfsId.get(),
+              newInstance.mfsId.get(),
               propKey,
               newValue,
             );
@@ -139,12 +155,11 @@ export abstract class MfsObj {
     }
 
     // Set up the inst id
-    childInstance.mfsId =
-      options.mfsId !== undefined
-        ? options.mfsId
-        : prop(localCache.addDoc(typeName, defaultProps));
+    if (isValid(options.initProps)) {
+      localCache.addDoc(typeName, createDocProps, newInstance.mfsId.get());
+    }
 
-    return childInstance;
+    return newInstance;
   }
 
   /** Permanently deletes this object. */
@@ -156,15 +171,18 @@ export abstract class MfsObj {
 // abstract class MfsSession extends MfsObj {}
 // abstract class MfsLocal extends MfsObj {}
 // abstract class MfsGlobal extends MfsObj {}
+// function list(...args: any) {}
 
 // class Client extends MfsObj {
 //   name = prop(``);
+//   specialName = formula(() => `Special ${this.name.get()}`);
 //   assets = list(Asset, `client`);
 // }
 
 // const clients = Client.getAllDocs();
 // const client = Client.create();
 // client.name.set(`Bob`);
+// client.specialName.get();
 
 // class Asset extends MfsGlobal {
 //   name = prop(``);
