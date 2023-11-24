@@ -33,6 +33,7 @@ export function createCache({
   _signal,
   getClientStorage,
   isProduction,
+  noCloudFiles,
 }: {
   typeSchemas: TypeSchemaDict;
   getCollectionName: (typeName: string) => string;
@@ -41,6 +42,7 @@ export function createCache({
   _signal: (initValue: any) => Signal<any>;
   getClientStorage: GetClientStorage;
   isProduction: boolean;
+  noCloudFiles: boolean;
 }) {
   const promisedClientStorage = getClientStorage<{
     lastChangeDate: {
@@ -92,6 +94,7 @@ export function createCache({
     firestoreDb,
     firebaseApp,
     getClientStorage,
+    noCloudFiles,
   );
   const serverFileStorage = getStorage(firebaseApp);
 

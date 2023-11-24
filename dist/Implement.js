@@ -208,6 +208,7 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
                 _signal,
                 getClientStorage: options.getClientStorage,
                 isProduction: options.isProduction,
+                noCloudFiles: options.noCloudFiles ?? false,
             });
             const rootLists = {};
             for (const key of Object.keys(options.rootSchema)) {

@@ -36,6 +36,7 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
     watchEffect: typeof _watchEffect;
 }, options: {
     isProduction: boolean;
+    noCloudFiles?: boolean;
     getClientStorage: GetClientStorage;
     rootSchema: RS;
     typeSchemas: TSD;

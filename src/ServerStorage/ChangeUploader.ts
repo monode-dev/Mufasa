@@ -11,6 +11,7 @@ import {
   ref as storageRef,
   uploadString,
   deleteObject,
+  FirebaseStorage,
 } from "firebase/storage";
 import {
   ClientStorage,
@@ -24,6 +25,7 @@ export function loadChangeUploader(
   firestoreDb: Firestore,
   firebaseApp: FirebaseApp,
   getClientStorage: GetClientStorage,
+  noCloudFiles: boolean,
 ) {
   // Types
   type DocChange = {
@@ -67,7 +69,9 @@ export function loadChangeUploader(
       uploadStashedChange(changeId);
     }
   })();
-  const serverFileStorage = getStorage(firebaseApp);
+  const serverFileStorage: FirebaseStorage = noCloudFiles
+    ? ({} as any)
+    : getStorage(firebaseApp);
 
   // Upload a change to the server
   async function uploadStashedChange(changeId: string) {

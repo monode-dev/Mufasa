@@ -10,7 +10,7 @@ const storage_1 = require("firebase/storage");
 exports.CHANGE_DATE_KEY = `mx_changeDate`;
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
-function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, }) {
+function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, noCloudFiles, }) {
     const promisedClientStorage = getClientStorage(`mx_docs`, {
         lastChangeDate: {
             dev: 0,
@@ -24,7 +24,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         clientStorage = await promisedClientStorage;
     })();
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
-    const changeUploader = (0, ChangeUploader_1.loadChangeUploader)(firestoreDb, firebaseApp, getClientStorage);
+    const changeUploader = (0, ChangeUploader_1.loadChangeUploader)(firestoreDb, firebaseApp, getClientStorage, noCloudFiles);
     const serverFileStorage = (0, storage_1.getStorage)(firebaseApp);
     async function updateSessionStorage(params) {
         const clientStorage = await promisedClientStorage;

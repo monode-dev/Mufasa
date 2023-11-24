@@ -300,6 +300,7 @@ export function _defineAppDataStructure<
   },
   options: {
     isProduction: boolean;
+    noCloudFiles?: boolean;
     getClientStorage: GetClientStorage;
     rootSchema: RS;
     typeSchemas: TSD;
@@ -335,6 +336,7 @@ export function _defineAppDataStructure<
         _signal,
         getClientStorage: options.getClientStorage,
         isProduction: options.isProduction,
+        noCloudFiles: options.noCloudFiles ?? false,
       });
 
       const rootLists: {

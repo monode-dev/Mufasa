@@ -10,7 +10,7 @@ export type DocData = {
     [propName: string]: number | string | boolean | null | undefined;
 };
 export type LocalCache = ReturnType<typeof createCache>;
-export declare function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, }: {
+export declare function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, noCloudFiles, }: {
     typeSchemas: TypeSchemaDict;
     getCollectionName: (typeName: string) => string;
     firebaseApp: FirebaseApp;
@@ -18,6 +18,7 @@ export declare function createCache({ typeSchemas, getCollectionName, firebaseAp
     _signal: (initValue: any) => Signal<any>;
     getClientStorage: GetClientStorage;
     isProduction: boolean;
+    noCloudFiles: boolean;
 }): {
     listAllObjectsOfType(typeName: string): string[];
     checkExists(typeName: string, docId: string | null | undefined): boolean;
