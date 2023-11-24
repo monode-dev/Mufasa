@@ -206,7 +206,7 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
                 getCollectionName,
                 firebaseApp,
                 firestoreDb,
-                serverFileStorage: options.noCloudStorage
+                serverFileStorage: options.noCloudFiles
                     ? {}
                     : (0, storage_1.getStorage)(firebaseApp),
                 _signal,
