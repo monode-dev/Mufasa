@@ -14,7 +14,7 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, createCache } from "./LocalCache";
 import { GetClientStorage } from "./ClientStorage/ClientStorage";
-import { getAuth } from "firebase/auth";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 
 //
 //
@@ -315,8 +315,16 @@ export function _defineAppDataStructure<
   const firebaseApp = initializeApp(firebaseOptions);
   firestoreDb = getFirestore(firebaseApp);
 
+  const auth = getAuth(firebaseApp);
+
   return {
-    auth: getAuth(firebaseApp),
+    auth: auth,
+
+    signInWithGoogle: async function signInWithGoogle() {
+      console.log("Signing into Google...");
+      const googleAuth = new GoogleAuthProvider();
+      await signInWithPopup(auth, googleAuth);
+    },
 
     getAppData: globalStore(modelName, () => {
       const localCache = createCache({
