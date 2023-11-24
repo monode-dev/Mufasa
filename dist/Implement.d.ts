@@ -40,6 +40,7 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
     rootSchema: RS;
     typeSchemas: TSD;
 }): {
+    auth: import("@firebase/auth").Auth;
     getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
     types: SchemaDictToTsType<TSD>;
 };

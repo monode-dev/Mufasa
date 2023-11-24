@@ -5,6 +5,7 @@ const app_1 = require("firebase/app");
 const firestore_1 = require("firebase/firestore");
 const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
+const auth_1 = require("firebase/auth");
 let _computed;
 let _signal;
 let _isSignal;
@@ -191,6 +192,7 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
     const firebaseApp = (0, app_1.initializeApp)(firebaseOptions);
     firestoreDb = (0, firestore_1.getFirestore)(firebaseApp);
     return {
+        auth: (0, auth_1.getAuth)(firebaseApp),
         getAppData: (0, utils_1.globalStore)(modelName, () => {
             const localCache = (0, LocalCache_1.createCache)({
                 typeSchemas: options.typeSchemas,

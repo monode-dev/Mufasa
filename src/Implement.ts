@@ -14,6 +14,7 @@ import {
 } from "./Parse";
 import { DELETED_KEY, LocalCache, createCache } from "./LocalCache";
 import { GetClientStorage } from "./ClientStorage/ClientStorage";
+import { getAuth } from "firebase/auth";
 
 //
 //
@@ -315,6 +316,8 @@ export function _defineAppDataStructure<
   firestoreDb = getFirestore(firebaseApp);
 
   return {
+    auth: getAuth(firebaseApp),
+
     getAppData: globalStore(modelName, () => {
       const localCache = createCache({
         typeSchemas: options.typeSchemas,
