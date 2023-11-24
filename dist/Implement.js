@@ -6,6 +6,7 @@ const firestore_1 = require("firebase/firestore");
 const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
 const auth_1 = require("firebase/auth");
+const storage_1 = require("firebase/storage");
 let _computed;
 let _signal;
 let _isSignal;
@@ -205,10 +206,10 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
                 getCollectionName,
                 firebaseApp,
                 firestoreDb,
+                serverFileStorage: (0, storage_1.getStorage)(firebaseApp),
                 _signal,
                 getClientStorage: options.getClientStorage,
                 isProduction: options.isProduction,
-                noCloudFiles: options.noCloudFiles ?? false,
             });
             const rootLists = {};
             for (const key of Object.keys(options.rootSchema)) {

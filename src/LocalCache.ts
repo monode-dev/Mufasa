@@ -15,10 +15,10 @@ import { GetClientStorage } from "./ClientStorage/ClientStorage";
 import { newSignalTree, SignalEvent } from "./SignalTree";
 import { loadChangeUploader } from "./ServerStorage/ChangeUploader";
 import {
-  getStorage,
-  getBytes,
-  ref as storageRef,
   FirebaseStorage,
+  getBytes,
+  getStorage,
+  ref as storageRef,
 } from "firebase/storage";
 
 export const CHANGE_DATE_KEY = `mx_changeDate`;
@@ -35,19 +35,19 @@ export function createCache({
   getCollectionName,
   firebaseApp,
   firestoreDb,
+  serverFileStorage,
   _signal,
   getClientStorage,
   isProduction,
-  noCloudFiles,
 }: {
   typeSchemas: TypeSchemaDict;
   getCollectionName: (typeName: string) => string;
   firebaseApp: FirebaseApp;
   firestoreDb: Firestore;
+  serverFileStorage: FirebaseStorage;
   _signal: (initValue: any) => Signal<any>;
   getClientStorage: GetClientStorage;
   isProduction: boolean;
-  noCloudFiles: boolean;
 }) {
   const promisedClientStorage = getClientStorage<{
     lastChangeDate: {
@@ -99,11 +99,8 @@ export function createCache({
     firestoreDb,
     firebaseApp,
     getClientStorage,
-    noCloudFiles,
+    serverFileStorage,
   );
-  const serverFileStorage: FirebaseStorage = noCloudFiles
-    ? ({} as any)
-    : getStorage(firebaseApp);
 
   async function updateSessionStorage(params: {
     typeName: string;

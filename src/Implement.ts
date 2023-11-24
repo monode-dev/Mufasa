@@ -15,6 +15,7 @@ import {
 import { DELETED_KEY, LocalCache, createCache } from "./LocalCache";
 import { GetClientStorage } from "./ClientStorage/ClientStorage";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 //
 //
@@ -300,7 +301,6 @@ export function _defineAppDataStructure<
   },
   options: {
     isProduction: boolean;
-    noCloudFiles?: boolean;
     getClientStorage: GetClientStorage;
     rootSchema: RS;
     typeSchemas: TSD;
@@ -333,10 +333,10 @@ export function _defineAppDataStructure<
         getCollectionName,
         firebaseApp,
         firestoreDb,
+        serverFileStorage: getStorage(firebaseApp),
         _signal,
         getClientStorage: options.getClientStorage,
         isProduction: options.isProduction,
-        noCloudFiles: options.noCloudFiles ?? false,
       });
 
       const rootLists: {

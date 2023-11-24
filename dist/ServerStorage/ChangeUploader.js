@@ -5,7 +5,7 @@ const firestore_1 = require("firebase/firestore");
 const storage_1 = require("firebase/storage");
 const LocalCache_1 = require("../LocalCache");
 const utils_1 = require("../utils");
-function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, noCloudFiles) {
+function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFileStorage) {
     function isFileChange(change) {
         return (0, utils_1.exists)(change?.newFileId);
     }
@@ -21,9 +21,6 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, noCloudF
             uploadStashedChange(changeId);
         }
     })();
-    const serverFileStorage = noCloudFiles
-        ? {}
-        : (0, storage_1.getStorage)(firebaseApp);
     // Upload a change to the server
     async function uploadStashedChange(changeId) {
         const clientStorage = await promisedClientStorage;

@@ -25,7 +25,7 @@ export function loadChangeUploader(
   firestoreDb: Firestore,
   firebaseApp: FirebaseApp,
   getClientStorage: GetClientStorage,
-  noCloudFiles: boolean,
+  serverFileStorage: FirebaseStorage,
 ) {
   // Types
   type DocChange = {
@@ -69,9 +69,6 @@ export function loadChangeUploader(
       uploadStashedChange(changeId);
     }
   })();
-  const serverFileStorage: FirebaseStorage = noCloudFiles
-    ? ({} as any)
-    : getStorage(firebaseApp);
 
   // Upload a change to the server
   async function uploadStashedChange(changeId: string) {

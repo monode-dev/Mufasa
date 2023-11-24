@@ -3,6 +3,7 @@ import { TypeSchemaDict } from "./Parse";
 import { Signal } from "./Implement";
 import { FirebaseApp } from "firebase/app";
 import { GetClientStorage } from "./ClientStorage/ClientStorage";
+import { FirebaseStorage } from "firebase/storage";
 export declare const CHANGE_DATE_KEY = "mx_changeDate";
 export declare const DELETED_KEY = "mx_deleted";
 export declare const MX_PARENT_KEY = "mx_parent";
@@ -10,15 +11,15 @@ export type DocData = {
     [propName: string]: number | string | boolean | null | undefined;
 };
 export type LocalCache = ReturnType<typeof createCache>;
-export declare function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, _signal, getClientStorage, isProduction, noCloudFiles, }: {
+export declare function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, serverFileStorage, _signal, getClientStorage, isProduction, }: {
     typeSchemas: TypeSchemaDict;
     getCollectionName: (typeName: string) => string;
     firebaseApp: FirebaseApp;
     firestoreDb: Firestore;
+    serverFileStorage: FirebaseStorage;
     _signal: (initValue: any) => Signal<any>;
     getClientStorage: GetClientStorage;
     isProduction: boolean;
-    noCloudFiles: boolean;
 }): {
     listAllObjectsOfType(typeName: string): string[];
     checkExists(typeName: string, docId: string | null | undefined): boolean;
