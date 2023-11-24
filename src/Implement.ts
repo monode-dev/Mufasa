@@ -301,6 +301,7 @@ export function _defineAppDataStructure<
   },
   options: {
     isProduction: boolean;
+    noCloudStorage?: boolean;
     getClientStorage: GetClientStorage;
     rootSchema: RS;
     typeSchemas: TSD;
@@ -333,7 +334,9 @@ export function _defineAppDataStructure<
         getCollectionName,
         firebaseApp,
         firestoreDb,
-        serverFileStorage: getStorage(firebaseApp),
+        serverFileStorage: options.noCloudStorage
+          ? ({} as any)
+          : getStorage(firebaseApp),
         _signal,
         getClientStorage: options.getClientStorage,
         isProduction: options.isProduction,
