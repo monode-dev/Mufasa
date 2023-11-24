@@ -14,7 +14,12 @@ import { FirebaseApp } from "firebase/app";
 import { GetClientStorage } from "./ClientStorage/ClientStorage";
 import { newSignalTree, SignalEvent } from "./SignalTree";
 import { loadChangeUploader } from "./ServerStorage/ChangeUploader";
-import { getStorage, getBytes, ref as storageRef } from "firebase/storage";
+import {
+  getStorage,
+  getBytes,
+  ref as storageRef,
+  FirebaseStorage,
+} from "firebase/storage";
 
 export const CHANGE_DATE_KEY = `mx_changeDate`;
 export const DELETED_KEY = `mx_deleted`;
@@ -96,7 +101,9 @@ export function createCache({
     getClientStorage,
     noCloudFiles,
   );
-  const serverFileStorage = getStorage(firebaseApp);
+  const serverFileStorage: FirebaseStorage = noCloudFiles
+    ? ({} as any)
+    : getStorage(firebaseApp);
 
   async function updateSessionStorage(params: {
     typeName: string;

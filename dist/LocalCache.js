@@ -25,7 +25,9 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
     })();
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
     const changeUploader = (0, ChangeUploader_1.loadChangeUploader)(firestoreDb, firebaseApp, getClientStorage, noCloudFiles);
-    const serverFileStorage = (0, storage_1.getStorage)(firebaseApp);
+    const serverFileStorage = noCloudFiles
+        ? {}
+        : (0, storage_1.getStorage)(firebaseApp);
     async function updateSessionStorage(params) {
         const clientStorage = await promisedClientStorage;
         const collectionName = getCollectionName(params.typeName);
