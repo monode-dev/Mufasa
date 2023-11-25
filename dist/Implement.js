@@ -195,10 +195,9 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
     const auth = (0, auth_1.getAuth)(firebaseApp);
     return {
         auth: auth,
-        signInWithGoogle: async function signInWithGoogle() {
-            console.log("Signing into Google...");
-            const googleAuth = new auth_1.GoogleAuthProvider();
-            await (0, auth_1.signInWithPopup)(auth, googleAuth);
+        signInWithGoogleToken: async function signInWithGoogleToken(idToken) {
+            const googleAuth = auth_1.GoogleAuthProvider.credential(idToken);
+            await (0, auth_1.signInWithCredential)(auth, googleAuth);
         },
         getAppData: (0, utils_1.globalStore)(modelName, () => {
             const localCache = (0, LocalCache_1.createCache)({
