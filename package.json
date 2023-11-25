@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.185",
+  "version": "0.0.186",
   "main": "./dist/index.js",
   "license": "ISC",
   "repository": {
@@ -21,7 +21,6 @@
     "./cap": "./dist/ClientStorage/Capacitor.js"
   },
   "dependencies": {
-    "@capacitor-firebase/authentication": "^1.4.0",
     "firebase": "^9.23.0",
     "i": "^0.3.7",
     "npm": "^10.2.4"
