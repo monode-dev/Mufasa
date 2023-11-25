@@ -21,6 +21,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 
 //
 //
@@ -327,9 +328,10 @@ export function _defineAppDataStructure<
   return {
     auth: auth,
 
-    signInWithGoogleToken: async function signInWithGoogleToken(
-      idToken: string,
-    ) {
+    signInWithGoogle: async function signInWithGoogle() {
+      const result = await FirebaseAuthentication.signInWithGoogle();
+      const idToken = result.credential?.idToken;
+      if (!exists(idToken)) return;
       const googleAuth = GoogleAuthProvider.credential(idToken);
       await signInWithCredential(auth, googleAuth);
     },

@@ -42,7 +42,7 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
     typeSchemas: TSD;
 }): {
     auth: import("@firebase/auth").Auth;
-    signInWithGoogleToken: (idToken: string) => Promise<void>;
+    signInWithGoogle: () => Promise<void>;
     getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
     types: SchemaDictToTsType<TSD>;
 };

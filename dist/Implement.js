@@ -7,6 +7,7 @@ const utils_1 = require("./utils");
 const LocalCache_1 = require("./LocalCache");
 const auth_1 = require("firebase/auth");
 const storage_1 = require("firebase/storage");
+const authentication_1 = require("@capacitor-firebase/authentication");
 let _computed;
 let _signal;
 let _isSignal;
@@ -195,7 +196,11 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
     const auth = (0, auth_1.getAuth)(firebaseApp);
     return {
         auth: auth,
-        signInWithGoogleToken: async function signInWithGoogleToken(idToken) {
+        signInWithGoogle: async function signInWithGoogle() {
+            const result = await authentication_1.FirebaseAuthentication.signInWithGoogle();
+            const idToken = result.credential?.idToken;
+            if (!(0, utils_1.exists)(idToken))
+                return;
             const googleAuth = auth_1.GoogleAuthProvider.credential(idToken);
             await (0, auth_1.signInWithCredential)(auth, googleAuth);
         },
