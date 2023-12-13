@@ -22,7 +22,7 @@ import {
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 // import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
-    // "@capacitor-firebase/authentication": "^1.4.0",
+// "@capacitor-firebase/authentication": "^1.4.0",
 
 //
 //
@@ -186,8 +186,6 @@ export function docProx<
 export type _List<T extends _Doc> = {
   [Symbol.iterator]: () => IterableIterator<T>;
   readonly length: number;
-  filter(filterFn: (doc: T) => boolean): _List<T>;
-  map<R>(mapFn: (doc: T) => R): Array<R>;
   add(params: Partial<T>): T;
 };
 function listProx<TypeName extends string, F extends TypeSchemaDict>(
@@ -197,8 +195,8 @@ function listProx<TypeName extends string, F extends TypeSchemaDict>(
   isChild: boolean = false,
   mx_parent?: string | null | undefined,
 ) {
-  if (isChild) {
-    const collectionList = _computed(() => {
+  const collectionList = _computed(() => {
+    if (isChild) {
       if (exists(mx_parent)) {
         return localCache
           .getChildDocs(typeName, mx_parent!)
@@ -206,87 +204,152 @@ function listProx<TypeName extends string, F extends TypeSchemaDict>(
       } else {
         return [];
       }
-    });
-    return vueRefToList(collectionList, mx_parent);
-  } else {
-    const collectionList = _computed(() =>
-      localCache
+    } else {
+      return localCache
         .listAllObjectsOfType(typeName)
-        .map((docId) => docProx(docId, typeName, objFormats, localCache)),
-    );
-    return vueRefToList(collectionList, mx_parent);
-  }
-  function vueRefToList<T extends _Doc<{}>>(
-    collectionList: Computed<T[]> | Signal<T[]>,
-    mx_parent?: string | null | undefined,
-  ): _List<T> {
-    return {
-      [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
-      get length() {
-        return collectionList.value.length;
-      },
-      filter(filterFn) {
-        return vueRefToList(
-          _computed(() => collectionList.value.filter(filterFn)),
-        );
-      },
-      map(mapFn) {
-        return collectionList.value.map(mapFn);
-      },
-      add(createParams) {
-        return docProx<TypeName, F>(
-          (() => {
-            const parent = mx_parent;
+        .map((docId) => docProx(docId, typeName, objFormats, localCache));
+    }
+  });
+  return {
+    [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
+    get length() {
+      return collectionList.value.length;
+    },
+    add(createParams) {
+      return docProx<TypeName, F>(
+        (() => {
+          const parent = mx_parent;
 
-            const defaultProps: { [key: string]: any } = getDefaultProps();
-            for (const [key, prop] of Object.entries(objFormats[typeName])) {
-              if (
-                prop.format === `prim` &&
-                exists(createParams[key as keyof typeof createParams])
-              ) {
-                defaultProps[key] =
-                  createParams[key as keyof typeof createParams];
-              } else if (
-                prop.format === `one` &&
-                exists(createParams[key as keyof typeof createParams])
-              ) {
-                defaultProps[key] = (
-                  createParams[key as keyof typeof createParams] as _Doc
-                )?._id;
-              }
-            }
-            const newDocId = localCache.addDoc(typeName, {
-              ...defaultProps,
-              ...(exists(parent) ? { mx_parent: parent } : {}),
-            });
-
-            return newDocId;
-          })(),
-          typeName,
-          objFormats,
-          localCache,
-        ) as T;
-        function getDefaultProps() {
-          const defaultProps: { [key: string]: any } = {};
-          const defProps = objFormats[typeName];
-          for (const key of Object.keys(defProps)) {
-            const prop = defProps[key];
-            if (prop.format === `prim`) {
-              const defaultValue = prop.defaultValue;
-              if (typeof defaultValue === `function`) {
-                defaultProps[key] = defaultValue();
-              } else {
-                defaultProps[key] = defaultValue;
-              }
-            } else if (prop.format === `file`) {
-              defaultProps[key] = null;
+          const defaultProps: { [key: string]: any } = getDefaultProps();
+          for (const [key, prop] of Object.entries(objFormats[typeName])) {
+            if (
+              prop.format === `prim` &&
+              exists(createParams[key as keyof typeof createParams])
+            ) {
+              defaultProps[key] =
+                createParams[key as keyof typeof createParams];
+            } else if (
+              prop.format === `one` &&
+              exists(createParams[key as keyof typeof createParams])
+            ) {
+              defaultProps[key] = (
+                createParams[key as keyof typeof createParams] as _Doc
+              )?._id;
             }
           }
-          return defaultProps;
+          const newDocId = localCache.addDoc(typeName, {
+            ...defaultProps,
+            ...(exists(parent) ? { mx_parent: parent } : {}),
+          });
+
+          return newDocId;
+        })(),
+        typeName,
+        objFormats,
+        localCache,
+      );
+      function getDefaultProps() {
+        const defaultProps: { [key: string]: any } = {};
+        const defProps = objFormats[typeName];
+        for (const key of Object.keys(defProps)) {
+          const prop = defProps[key];
+          if (prop.format === `prim`) {
+            const defaultValue = prop.defaultValue;
+            if (typeof defaultValue === `function`) {
+              defaultProps[key] = defaultValue();
+            } else {
+              defaultProps[key] = defaultValue;
+            }
+          } else if (prop.format === `file`) {
+            defaultProps[key] = null;
+          }
         }
-      },
-    };
-  }
+        return defaultProps;
+      }
+    },
+  } satisfies _List<SchemaToTsType<TypeName, F>>;
+  // if (isChild) {
+  //   const collectionList = _computed(() => {
+  //     if (exists(mx_parent)) {
+  //       return localCache
+  //         .getChildDocs(typeName, mx_parent!)
+  //         .map((docId) => docProx(docId, typeName, objFormats, localCache));
+  //     } else {
+  //       return [];
+  //     }
+  //   });
+  //   return vueRefToList(collectionList, mx_parent);
+  // } else {
+  //   const collectionList = _computed(() =>
+  //     localCache
+  //       .listAllObjectsOfType(typeName)
+  //       .map((docId) => docProx(docId, typeName, objFormats, localCache)),
+  //   );
+  //   return vueRefToList(collectionList, mx_parent);
+  // }
+  // function vueRefToList<T extends _Doc<{}>>(
+  //   collectionList: Computed<T[]> | Signal<T[]>,
+  //   mx_parent?: string | null | undefined,
+  // ): _List<T> {
+  //   return {
+  //     [Symbol.iterator]: () => collectionList.value[Symbol.iterator](),
+  //     get length() {
+  //       return collectionList.value.length;
+  //     },
+  //     add(createParams) {
+  //       return docProx<TypeName, F>(
+  //         (() => {
+  //           const parent = mx_parent;
+
+  //           const defaultProps: { [key: string]: any } = getDefaultProps();
+  //           for (const [key, prop] of Object.entries(objFormats[typeName])) {
+  //             if (
+  //               prop.format === `prim` &&
+  //               exists(createParams[key as keyof typeof createParams])
+  //             ) {
+  //               defaultProps[key] =
+  //                 createParams[key as keyof typeof createParams];
+  //             } else if (
+  //               prop.format === `one` &&
+  //               exists(createParams[key as keyof typeof createParams])
+  //             ) {
+  //               defaultProps[key] = (
+  //                 createParams[key as keyof typeof createParams] as _Doc
+  //               )?._id;
+  //             }
+  //           }
+  //           const newDocId = localCache.addDoc(typeName, {
+  //             ...defaultProps,
+  //             ...(exists(parent) ? { mx_parent: parent } : {}),
+  //           });
+
+  //           return newDocId;
+  //         })(),
+  //         typeName,
+  //         objFormats,
+  //         localCache,
+  //       ) as T;
+  //       function getDefaultProps() {
+  //         const defaultProps: { [key: string]: any } = {};
+  //         const defProps = objFormats[typeName];
+  //         for (const key of Object.keys(defProps)) {
+  //           const prop = defProps[key];
+  //           if (prop.format === `prim`) {
+  //             const defaultValue = prop.defaultValue;
+  //             if (typeof defaultValue === `function`) {
+  //               defaultProps[key] = defaultValue();
+  //             } else {
+  //               defaultProps[key] = defaultValue;
+  //             }
+  //           } else if (prop.format === `file`) {
+  //             defaultProps[key] = null;
+  //           }
+  //         }
+  //         return defaultProps;
+  //       }
+  //     },
+  //   };
+  // }
 }
 
 //

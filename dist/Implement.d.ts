@@ -25,8 +25,6 @@ export declare function docProx<TypeName extends string, F extends TypeSchemaDic
 export type _List<T extends _Doc> = {
     [Symbol.iterator]: () => IterableIterator<T>;
     readonly length: number;
-    filter(filterFn: (doc: T) => boolean): _List<T>;
-    map<R>(mapFn: (doc: T) => R): Array<R>;
     add(params: Partial<T>): T;
 };
 export declare function _defineAppDataStructure<RS extends RootSchema, TSD extends TypeSchemaDict>(modelName: string, firebaseOptions: FirebaseOptions, reactivity: {
@@ -42,7 +40,11 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
     typeSchemas: TSD;
 }): {
     auth: import("@firebase/auth").Auth;
-    getAppData: () => { [K in keyof RS]: _List<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>; };
+    getAppData: () => { [K in keyof RS]: {
+        [Symbol.iterator]: () => IterableIterator<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>;
+        readonly length: number;
+        add(createParams: Partial<SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>>): SchemaToTsType<NonNullable<RS[K]["refTypeName"]>, TSD>;
+    }; };
     types: SchemaDictToTsType<TSD>;
 };
 export {};
