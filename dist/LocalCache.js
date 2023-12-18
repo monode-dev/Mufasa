@@ -10,7 +10,9 @@ const storage_1 = require("firebase/storage");
 exports.CHANGE_DATE_KEY = `mx_changeDate`;
 exports.DELETED_KEY = `mx_deleted`;
 exports.MX_PARENT_KEY = `mx_parent`;
-function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb, serverFileStorage, _signal, getClientStorage, isProduction, }) {
+function createCache({ typeSchemas, getCollectionName, 
+// firebaseApp,
+firestoreDb, serverFileStorage, _signal, getClientStorage, isProduction, newDocPath, }) {
     const promisedClientStorage = getClientStorage(`mx_docs`, {
         lastChangeDate: {
             dev: 0,
@@ -24,7 +26,9 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         clientStorage = await promisedClientStorage;
     })();
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
-    const changeUploader = (0, ChangeUploader_1.loadChangeUploader)(firestoreDb, firebaseApp, getClientStorage, serverFileStorage);
+    const changeUploader = (0, ChangeUploader_1.loadChangeUploader)(firestoreDb, 
+    // firebaseApp,
+    getClientStorage, serverFileStorage);
     async function updateSessionStorage(params) {
         const clientStorage = await promisedClientStorage;
         const collectionName = getCollectionName(params.typeName);
@@ -121,6 +125,8 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             }
         }
         for (const typeName in typeSchemas) {
+            if (!(0, utils_1.exists)(firestoreDb))
+                continue;
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
                 0) *
                 1000 -
@@ -204,7 +210,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             }
         },
         addDoc(typeName, props) {
-            const docId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName))).path;
+            const docId = newDocPath(getCollectionName(typeName));
             changeUploader.uploadDocChange({
                 shouldOverwrite: true,
                 docId,
@@ -215,7 +221,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
         },
         async setPropValue(typeName, docId, propName, value) {
             if (typeSchemas[typeName]?.[propName]?.format === "file") {
-                const newFileId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_File`)).path;
+                const newFileId = newDocPath(`Mx_File`);
                 // Write the file
                 clientStorage = await promisedClientStorage;
                 await clientStorage.writeFile(newFileId, value);

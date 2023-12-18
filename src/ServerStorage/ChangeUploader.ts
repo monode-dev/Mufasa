@@ -22,10 +22,10 @@ import { DeepReadonly, exists } from "../utils";
 import { FirebaseApp } from "firebase/app";
 
 export function loadChangeUploader(
-  firestoreDb: Firestore,
-  firebaseApp: FirebaseApp,
+  firestoreDb: Firestore | null,
+  // firebaseApp: FirebaseApp,
   getClientStorage: GetClientStorage,
-  serverFileStorage: FirebaseStorage,
+  serverFileStorage: FirebaseStorage | null,
 ) {
   // Types
   type DocChange = {
@@ -53,6 +53,8 @@ export function loadChangeUploader(
   }
 
   // Init
+  const cloudEnabled = exists(firestoreDb);
+  const storageEnabled = exists(serverFileStorage) && cloudEnabled;
   type ChangeStorage = {
     [changeId: string]: DocChange | FileChange | FileDelete;
   };
@@ -80,6 +82,7 @@ export function loadChangeUploader(
     if (isFileChange(change)) {
       // Upload file
       if (!change.haveUploadedFile) {
+        if (!storageEnabled) return;
         const data = await clientStorage.readFile(change.newFileId);
         if (!exists(data)) {
           clientStorage.updateData({
@@ -119,6 +122,7 @@ export function loadChangeUploader(
         // console.log(
         //   `change.oldFileId: ${JSON.stringify(change.oldFileId, null, 2)}`,
         // );
+        if (!storageEnabled) return;
         const oldFileRef = storageRef(serverFileStorage, change.oldFileId);
         // NOTE: I don't think we have to wait for these.
         clientStorage.deleteFile(change.oldFileId);
@@ -130,6 +134,7 @@ export function loadChangeUploader(
       }
     } else if (isFileDelete(change)) {
       try {
+        if (!storageEnabled) return;
         await deleteObject(
           storageRef(serverFileStorage, change.idOfFileToDelete),
         );
@@ -148,6 +153,7 @@ export function loadChangeUploader(
 
     // Both file changes and doc changes require a doc change
     async function applyDocChange(change: DocChange) {
+      if (!cloudEnabled) return;
       const docRef = doc(firestoreDb, change.docId);
       const props = {
         ...change.data,
@@ -163,6 +169,7 @@ export function loadChangeUploader(
 
   return {
     async uploadDocChange(change: DocChange) {
+      if (!cloudEnabled) return;
       // Save in case app is closed
       const clientStorage = await promisedClientStorage;
       const changeId = doc(collection(firestoreDb, `Mx_Change`)).path;
@@ -181,6 +188,7 @@ export function loadChangeUploader(
       oldFileId?: string;
       notifyUploadStarted: () => void;
     }) {
+      if (!storageEnabled) return;
       const clientStorage = await promisedClientStorage;
 
       // Save in case app is closed
@@ -205,6 +213,7 @@ export function loadChangeUploader(
     },
 
     async deleteFile(params: { fileId: string }) {
+      if (!exists(firestoreDb)) return;
       const clientStorage = await promisedClientStorage;
       // Save in case app is closed
       const changeId = doc(collection(firestoreDb, `Mx_Change`)).path;
@@ -223,6 +232,7 @@ export function loadChangeUploader(
       propName: string;
       fileId: string;
     }): boolean {
+      if (!storageEnabled) return false;
       if (!exists(unpromisedClientStorage)) return false;
       for (const change of Object.values(unpromisedClientStorage.data)) {
         if (!isFileChange(change)) continue;

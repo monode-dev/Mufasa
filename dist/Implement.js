@@ -261,10 +261,7 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
     // Setup Firebase
     isProduction = options.isProduction;
     const firebaseApp = (0, app_1.initializeApp)(firebaseOptions);
-    firestoreDb = (0, firestore_1.getFirestore)(firebaseApp);
-    if (!options.enableCloud) {
-        (0, firestore_1.disableNetwork)(firestoreDb);
-    }
+    const firestoreDb = (0, firestore_1.getFirestore)(firebaseApp);
     const auth = (0, auth_1.getAuth)(firebaseApp);
     return {
         auth: auth,
@@ -279,14 +276,17 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
             const localCache = (0, LocalCache_1.createCache)({
                 typeSchemas: options.typeSchemas,
                 getCollectionName,
-                firebaseApp,
-                firestoreDb,
-                serverFileStorage: options.noCloudFiles
+                // firebaseApp,
+                firestoreDb: options.enableCloud ? firestoreDb : null,
+                serverFileStorage: options.noCloudFiles || !options.enableCloud
                     ? {}
                     : (0, storage_1.getStorage)(firebaseApp),
                 _signal,
                 getClientStorage: options.getClientStorage,
                 isProduction: options.isProduction,
+                newDocPath(collectionName) {
+                    return (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, collectionName)).path;
+                },
             });
             const rootLists = {};
             for (const key of Object.keys(options.rootSchema)) {

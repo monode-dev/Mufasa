@@ -5,13 +5,18 @@ const firestore_1 = require("firebase/firestore");
 const storage_1 = require("firebase/storage");
 const LocalCache_1 = require("../LocalCache");
 const utils_1 = require("../utils");
-function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFileStorage) {
+function loadChangeUploader(firestoreDb, 
+// firebaseApp: FirebaseApp,
+getClientStorage, serverFileStorage) {
     function isFileChange(change) {
         return (0, utils_1.exists)(change?.newFileId);
     }
     function isFileDelete(change) {
         return (0, utils_1.exists)(change?.idOfFileToDelete);
     }
+    // Init
+    const cloudEnabled = (0, utils_1.exists)(firestoreDb);
+    const storageEnabled = (0, utils_1.exists)(serverFileStorage) && cloudEnabled;
     const promisedClientStorage = getClientStorage(`mx_unPushedChanges`, {});
     let unpromisedClientStorage = undefined;
     (async () => {
@@ -31,6 +36,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
         if (isFileChange(change)) {
             // Upload file
             if (!change.haveUploadedFile) {
+                if (!storageEnabled)
+                    return;
                 const data = await clientStorage.readFile(change.newFileId);
                 if (!(0, utils_1.exists)(data)) {
                     clientStorage.updateData({
@@ -68,6 +75,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
                 // console.log(
                 //   `change.oldFileId: ${JSON.stringify(change.oldFileId, null, 2)}`,
                 // );
+                if (!storageEnabled)
+                    return;
                 const oldFileRef = (0, storage_1.ref)(serverFileStorage, change.oldFileId);
                 // NOTE: I don't think we have to wait for these.
                 clientStorage.deleteFile(change.oldFileId);
@@ -81,6 +90,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
         }
         else if (isFileDelete(change)) {
             try {
+                if (!storageEnabled)
+                    return;
                 await (0, storage_1.deleteObject)((0, storage_1.ref)(serverFileStorage, change.idOfFileToDelete));
             }
             catch (e) {
@@ -97,6 +108,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
         });
         // Both file changes and doc changes require a doc change
         async function applyDocChange(change) {
+            if (!cloudEnabled)
+                return;
             const docRef = (0, firestore_1.doc)(firestoreDb, change.docId);
             const props = {
                 ...change.data,
@@ -112,6 +125,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
     }
     return {
         async uploadDocChange(change) {
+            if (!cloudEnabled)
+                return;
             // Save in case app is closed
             const clientStorage = await promisedClientStorage;
             const changeId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_Change`)).path;
@@ -122,6 +137,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
             await uploadStashedChange(changeId);
         },
         async uploadFileChange(params) {
+            if (!storageEnabled)
+                return;
             const clientStorage = await promisedClientStorage;
             // Save in case app is closed
             const changeId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_Change`)).path;
@@ -142,6 +159,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
             await uploadStashedChange(changeId);
         },
         async deleteFile(params) {
+            if (!(0, utils_1.exists)(firestoreDb))
+                return;
             const clientStorage = await promisedClientStorage;
             // Save in case app is closed
             const changeId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_Change`)).path;
@@ -154,6 +173,8 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
             await uploadStashedChange(changeId);
         },
         isFileUploading(params) {
+            if (!storageEnabled)
+                return false;
             if (!(0, utils_1.exists)(unpromisedClientStorage))
                 return false;
             for (const change of Object.values(unpromisedClientStorage.data)) {

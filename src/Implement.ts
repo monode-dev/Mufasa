@@ -1,11 +1,5 @@
 import { initializeApp, FirebaseOptions } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  Firestore,
-  CollectionReference,
-  disableNetwork,
-} from "firebase/firestore";
+import { getFirestore, Firestore, collection, doc } from "firebase/firestore";
 import { exists, globalStore } from "./utils";
 import {
   SchemaDictToTsType,
@@ -387,10 +381,7 @@ export function _defineAppDataStructure<
   // Setup Firebase
   isProduction = options.isProduction;
   const firebaseApp = initializeApp(firebaseOptions);
-  firestoreDb = getFirestore(firebaseApp);
-  if (!options.enableCloud) {
-    disableNetwork(firestoreDb);
-  }
+  const firestoreDb = getFirestore(firebaseApp);
 
   const auth = getAuth(firebaseApp);
 
@@ -409,14 +400,18 @@ export function _defineAppDataStructure<
       const localCache = createCache({
         typeSchemas: options.typeSchemas,
         getCollectionName,
-        firebaseApp,
-        firestoreDb,
-        serverFileStorage: options.noCloudFiles
-          ? ({} as any)
-          : getStorage(firebaseApp),
+        // firebaseApp,
+        firestoreDb: options.enableCloud ? firestoreDb : null,
+        serverFileStorage:
+          options.noCloudFiles || !options.enableCloud
+            ? ({} as any)
+            : getStorage(firebaseApp),
         _signal,
         getClientStorage: options.getClientStorage,
         isProduction: options.isProduction,
+        newDocPath(collectionName: string): string {
+          return doc(collection(firestoreDb, collectionName)).path;
+        },
       });
 
       const rootLists: {

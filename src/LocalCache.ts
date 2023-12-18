@@ -1,7 +1,5 @@
 import {
   onSnapshot,
-  doc,
-  CollectionReference,
   Firestore,
   query,
   where,
@@ -33,21 +31,23 @@ export type LocalCache = ReturnType<typeof createCache>;
 export function createCache({
   typeSchemas,
   getCollectionName,
-  firebaseApp,
+  // firebaseApp,
   firestoreDb,
   serverFileStorage,
   _signal,
   getClientStorage,
   isProduction,
+  newDocPath,
 }: {
   typeSchemas: TypeSchemaDict;
   getCollectionName: (typeName: string) => string;
-  firebaseApp: FirebaseApp;
-  firestoreDb: Firestore;
+  // firebaseApp: FirebaseApp;
+  firestoreDb: Firestore | null;
   serverFileStorage: FirebaseStorage;
   _signal: (initValue: any) => Signal<any>;
   getClientStorage: GetClientStorage;
   isProduction: boolean;
+  newDocPath: (collectionName: string) => string;
 }) {
   const promisedClientStorage = getClientStorage<{
     lastChangeDate: {
@@ -97,7 +97,7 @@ export function createCache({
   }>(_signal);
   const changeUploader = loadChangeUploader(
     firestoreDb,
-    firebaseApp,
+    // firebaseApp,
     getClientStorage,
     serverFileStorage,
   );
@@ -216,6 +216,7 @@ export function createCache({
       }
     }
     for (const typeName in typeSchemas) {
+      if (!exists(firestoreDb)) continue;
       onSnapshot(
         query(
           collection(firestoreDb, getCollectionName(typeName)),
@@ -328,9 +329,7 @@ export function createCache({
       }
     },
     addDoc(typeName: string, props: { [propName: string]: any }) {
-      const docId = doc(
-        collection(firestoreDb, getCollectionName(typeName)),
-      ).path;
+      const docId = newDocPath(getCollectionName(typeName));
       changeUploader.uploadDocChange({
         shouldOverwrite: true,
         docId,
@@ -347,7 +346,7 @@ export function createCache({
       value: any,
     ) {
       if (typeSchemas[typeName]?.[propName]?.format === "file") {
-        const newFileId = doc(collection(firestoreDb, `Mx_File`)).path;
+        const newFileId = newDocPath(`Mx_File`);
 
         // Write the file
         clientStorage = await promisedClientStorage;

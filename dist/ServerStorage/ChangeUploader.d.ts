@@ -2,8 +2,7 @@ import { Firestore } from "firebase/firestore";
 import { FirebaseStorage } from "firebase/storage";
 import { GetClientStorage } from "../ClientStorage/ClientStorage";
 import { DocData } from "../LocalCache";
-import { FirebaseApp } from "firebase/app";
-export declare function loadChangeUploader(firestoreDb: Firestore, firebaseApp: FirebaseApp, getClientStorage: GetClientStorage, serverFileStorage: FirebaseStorage): {
+export declare function loadChangeUploader(firestoreDb: Firestore | null, getClientStorage: GetClientStorage, serverFileStorage: FirebaseStorage | null): {
     uploadDocChange(change: {
         shouldOverwrite: boolean;
         docId: string;
