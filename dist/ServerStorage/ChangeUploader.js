@@ -34,26 +34,6 @@ getClientStorage, serverFileStorage) {
             return;
         // Apply to server
         if (isFileChange(change)) {
-            // Upload file
-            if (!change.haveUploadedFile) {
-                if (!storageEnabled)
-                    return;
-                const data = await clientStorage.readFile(change.newFileId);
-                if (!(0, utils_1.exists)(data)) {
-                    clientStorage.updateData({
-                        [changeId]: undefined,
-                    });
-                    return;
-                }
-                const fileRef = (0, storage_1.ref)(serverFileStorage, change.newFileId);
-                await (0, storage_1.uploadString)(fileRef, data);
-                // TODO: Figure out why typing isn't working and we have to do `as any`.
-                clientStorage.updateData({
-                    [changeId]: {
-                        haveUploadedFile: true,
-                    },
-                });
-            }
             // Apply doc change
             if ((0, utils_1.exists)(change.propPath)) {
                 await applyDocChange({
@@ -67,6 +47,26 @@ getClientStorage, serverFileStorage) {
                 clientStorage.updateData({
                     [changeId]: {
                         propPath: undefined,
+                    },
+                });
+            }
+            if (!storageEnabled)
+                return;
+            // Upload file
+            if (!change.haveUploadedFile) {
+                const data = await clientStorage.readFile(change.newFileId);
+                if (!(0, utils_1.exists)(data)) {
+                    clientStorage.updateData({
+                        [changeId]: undefined,
+                    });
+                    return;
+                }
+                const fileRef = (0, storage_1.ref)(serverFileStorage, change.newFileId);
+                await (0, storage_1.uploadString)(fileRef, data);
+                // TODO: Figure out why typing isn't working and we have to do `as any`.
+                clientStorage.updateData({
+                    [changeId]: {
+                        haveUploadedFile: true,
                     },
                 });
             }

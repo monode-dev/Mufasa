@@ -80,26 +80,6 @@ export function loadChangeUploader(
 
     // Apply to server
     if (isFileChange(change)) {
-      // Upload file
-      if (!change.haveUploadedFile) {
-        if (!storageEnabled) return;
-        const data = await clientStorage.readFile(change.newFileId);
-        if (!exists(data)) {
-          clientStorage.updateData({
-            [changeId]: undefined,
-          });
-          return;
-        }
-        const fileRef = storageRef(serverFileStorage, change.newFileId);
-        await uploadString(fileRef, data);
-        // TODO: Figure out why typing isn't working and we have to do `as any`.
-        clientStorage.updateData({
-          [changeId]: {
-            haveUploadedFile: true,
-          } as any,
-        });
-      }
-
       // Apply doc change
       if (exists(change.propPath)) {
         await applyDocChange({
@@ -113,6 +93,26 @@ export function loadChangeUploader(
         clientStorage.updateData({
           [changeId]: {
             propPath: undefined,
+          } as any,
+        });
+      }
+
+      if (!storageEnabled) return;
+      // Upload file
+      if (!change.haveUploadedFile) {
+        const data = await clientStorage.readFile(change.newFileId);
+        if (!exists(data)) {
+          clientStorage.updateData({
+            [changeId]: undefined,
+          });
+          return;
+        }
+        const fileRef = storageRef(serverFileStorage, change.newFileId);
+        await uploadString(fileRef, data);
+        // TODO: Figure out why typing isn't working and we have to do `as any`.
+        clientStorage.updateData({
+          [changeId]: {
+            haveUploadedFile: true,
           } as any,
         });
       }
