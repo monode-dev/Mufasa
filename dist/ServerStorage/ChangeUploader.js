@@ -7,7 +7,7 @@ const LocalCache_1 = require("../LocalCache");
 const utils_1 = require("../utils");
 function loadChangeUploader(firestoreDb, 
 // firebaseApp: FirebaseApp,
-getClientStorage, serverFileStorage) {
+getClientStorage, serverFileStorage, newDocPath) {
     function isFileChange(change) {
         return (0, utils_1.exists)(change?.newFileId);
     }
@@ -137,11 +137,9 @@ getClientStorage, serverFileStorage) {
             await uploadStashedChange(changeId);
         },
         async uploadFileChange(params) {
-            if (!storageEnabled)
-                return;
             const clientStorage = await promisedClientStorage;
             // Save in case app is closed
-            const changeId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_Change`)).path;
+            const changeId = newDocPath(`Mx_Change`);
             clientStorage.updateData({
                 [changeId]: {
                     newFileId: params.newFileId,

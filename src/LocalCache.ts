@@ -100,6 +100,7 @@ export function createCache({
     // firebaseApp,
     getClientStorage,
     serverFileStorage,
+    newDocPath,
   );
 
   async function updateSessionStorage(params: {

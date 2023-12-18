@@ -26,6 +26,7 @@ export function loadChangeUploader(
   // firebaseApp: FirebaseApp,
   getClientStorage: GetClientStorage,
   serverFileStorage: FirebaseStorage | null,
+  newDocPath: (collectionName: string) => string,
 ) {
   // Types
   type DocChange = {
@@ -188,11 +189,10 @@ export function loadChangeUploader(
       oldFileId?: string;
       notifyUploadStarted: () => void;
     }) {
-      if (!storageEnabled) return;
       const clientStorage = await promisedClientStorage;
 
       // Save in case app is closed
-      const changeId = doc(collection(firestoreDb, `Mx_Change`)).path;
+      const changeId = newDocPath(`Mx_Change`);
       clientStorage.updateData({
         [changeId]: {
           newFileId: params.newFileId,
