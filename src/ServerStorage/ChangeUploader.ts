@@ -27,6 +27,13 @@ export function loadChangeUploader(
   getClientStorage: GetClientStorage,
   serverFileStorage: FirebaseStorage | null,
   newDocPath: (collectionName: string) => string,
+  updateSessionStorage: (params: {
+    typeName: string;
+    docId: string;
+    props: {
+      [propName: string]: number | string | boolean | null | undefined;
+    };
+  }) => Promise<void>,
 ) {
   // Types
   type DocChange = {
@@ -38,6 +45,7 @@ export function loadChangeUploader(
     newFileId: string;
     haveUploadedFile: boolean;
     propPath?: {
+      typeName: string;
       docId: string;
       propName: string;
     };
@@ -83,13 +91,24 @@ export function loadChangeUploader(
     if (isFileChange(change)) {
       // Apply doc change
       if (exists(change.propPath)) {
-        await applyDocChange({
-          shouldOverwrite: false,
+        updateSessionStorage({
+          typeName: change.propPath.typeName,
           docId: change.propPath.docId,
-          data: {
+          props: {
             [change.propPath.propName]: change.newFileId,
           },
         });
+        if (!cloudEnabled) return;
+        await applyDocChange(
+          {
+            shouldOverwrite: false,
+            docId: change.propPath.docId,
+            data: {
+              [change.propPath.propName]: change.newFileId,
+            },
+          },
+          firestoreDb,
+        );
         // TODO: Figure out why typing isn't working and we have to do `as any`.
         clientStorage.updateData({
           [changeId]: {
@@ -144,7 +163,8 @@ export function loadChangeUploader(
       }
     } else {
       // Doc Change
-      await applyDocChange(change);
+      if (!cloudEnabled) return;
+      await applyDocChange(change, firestoreDb);
     }
 
     // Mark complete
@@ -153,8 +173,7 @@ export function loadChangeUploader(
     });
 
     // Both file changes and doc changes require a doc change
-    async function applyDocChange(change: DocChange) {
-      if (!cloudEnabled) return;
+    async function applyDocChange(change: DocChange, firestoreDb: Firestore) {
       const docRef = doc(firestoreDb, change.docId);
       const props = {
         ...change.data,
@@ -170,10 +189,9 @@ export function loadChangeUploader(
 
   return {
     async uploadDocChange(change: DocChange) {
-      if (!cloudEnabled) return;
       // Save in case app is closed
       const clientStorage = await promisedClientStorage;
-      const changeId = doc(collection(firestoreDb, `Mx_Change`)).path;
+      const changeId = newDocPath(`Mx_Change`);
       clientStorage.updateData({
         [changeId]: change,
       });
@@ -183,6 +201,7 @@ export function loadChangeUploader(
     },
 
     async uploadFileChange(params: {
+      typeName: string;
       docId: string;
       propName: string;
       newFileId: string;
@@ -198,6 +217,7 @@ export function loadChangeUploader(
           newFileId: params.newFileId,
           haveUploadedFile: false,
           propPath: {
+            typeName: params.typeName,
             docId: params.docId,
             propName: params.propName,
           },

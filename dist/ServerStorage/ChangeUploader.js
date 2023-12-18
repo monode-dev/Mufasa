@@ -7,7 +7,7 @@ const LocalCache_1 = require("../LocalCache");
 const utils_1 = require("../utils");
 function loadChangeUploader(firestoreDb, 
 // firebaseApp: FirebaseApp,
-getClientStorage, serverFileStorage, newDocPath) {
+getClientStorage, serverFileStorage, newDocPath, updateSessionStorage) {
     function isFileChange(change) {
         return (0, utils_1.exists)(change?.newFileId);
     }
@@ -36,13 +36,22 @@ getClientStorage, serverFileStorage, newDocPath) {
         if (isFileChange(change)) {
             // Apply doc change
             if ((0, utils_1.exists)(change.propPath)) {
+                updateSessionStorage({
+                    typeName: change.propPath.typeName,
+                    docId: change.propPath.docId,
+                    props: {
+                        [change.propPath.propName]: change.newFileId,
+                    },
+                });
+                if (!cloudEnabled)
+                    return;
                 await applyDocChange({
                     shouldOverwrite: false,
                     docId: change.propPath.docId,
                     data: {
                         [change.propPath.propName]: change.newFileId,
                     },
-                });
+                }, firestoreDb);
                 // TODO: Figure out why typing isn't working and we have to do `as any`.
                 clientStorage.updateData({
                     [changeId]: {
@@ -100,16 +109,16 @@ getClientStorage, serverFileStorage, newDocPath) {
         }
         else {
             // Doc Change
-            await applyDocChange(change);
+            if (!cloudEnabled)
+                return;
+            await applyDocChange(change, firestoreDb);
         }
         // Mark complete
         clientStorage.updateData({
             [changeId]: undefined,
         });
         // Both file changes and doc changes require a doc change
-        async function applyDocChange(change) {
-            if (!cloudEnabled)
-                return;
+        async function applyDocChange(change, firestoreDb) {
             const docRef = (0, firestore_1.doc)(firestoreDb, change.docId);
             const props = {
                 ...change.data,
@@ -125,11 +134,9 @@ getClientStorage, serverFileStorage, newDocPath) {
     }
     return {
         async uploadDocChange(change) {
-            if (!cloudEnabled)
-                return;
             // Save in case app is closed
             const clientStorage = await promisedClientStorage;
-            const changeId = (0, firestore_1.doc)((0, firestore_1.collection)(firestoreDb, `Mx_Change`)).path;
+            const changeId = newDocPath(`Mx_Change`);
             clientStorage.updateData({
                 [changeId]: change,
             });
@@ -145,6 +152,7 @@ getClientStorage, serverFileStorage, newDocPath) {
                     newFileId: params.newFileId,
                     haveUploadedFile: false,
                     propPath: {
+                        typeName: params.typeName,
                         docId: params.docId,
                         propName: params.propName,
                     },

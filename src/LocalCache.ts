@@ -101,6 +101,7 @@ export function createCache({
     getClientStorage,
     serverFileStorage,
     newDocPath,
+    updateSessionStorage,
   );
 
   async function updateSessionStorage(params: {
@@ -358,6 +359,7 @@ export function createCache({
           getCollectionName(typeName)
         ]?.[docId]?.[propName] as string | undefined | null;
         changeUploader.uploadFileChange({
+          typeName,
           docId,
           propName,
           newFileId,

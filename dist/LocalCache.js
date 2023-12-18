@@ -28,7 +28,7 @@ firestoreDb, serverFileStorage, _signal, getClientStorage, isProduction, newDocP
     const docSignalTree = (0, SignalTree_1.newSignalTree)(_signal);
     const changeUploader = (0, ChangeUploader_1.loadChangeUploader)(firestoreDb, 
     // firebaseApp,
-    getClientStorage, serverFileStorage, newDocPath);
+    getClientStorage, serverFileStorage, newDocPath, updateSessionStorage);
     async function updateSessionStorage(params) {
         const clientStorage = await promisedClientStorage;
         const collectionName = getCollectionName(params.typeName);
@@ -228,6 +228,7 @@ firestoreDb, serverFileStorage, _signal, getClientStorage, isProduction, newDocP
                 // Write to server
                 const oldFileId = clientStorage?.data.types?.[getCollectionName(typeName)]?.[docId]?.[propName];
                 changeUploader.uploadFileChange({
+                    typeName,
                     docId,
                     propName,
                     newFileId,
