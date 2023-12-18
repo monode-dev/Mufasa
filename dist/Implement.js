@@ -262,6 +262,9 @@ function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options
     isProduction = options.isProduction;
     const firebaseApp = (0, app_1.initializeApp)(firebaseOptions);
     firestoreDb = (0, firestore_1.getFirestore)(firebaseApp);
+    if (!options.enableCloud) {
+        (0, firestore_1.disableNetwork)(firestoreDb);
+    }
     const auth = (0, auth_1.getAuth)(firebaseApp);
     return {
         auth: auth,

@@ -38,6 +38,7 @@ export declare function _defineAppDataStructure<RS extends RootSchema, TSD exten
     getClientStorage: GetClientStorage;
     rootSchema: RS;
     typeSchemas: TSD;
+    enableCloud: boolean;
 }): {
     auth: import("@firebase/auth").Auth;
     getAppData: () => { [K in keyof RS]: {

@@ -4,6 +4,7 @@ import {
   collection,
   Firestore,
   CollectionReference,
+  disableNetwork,
 } from "firebase/firestore";
 import { exists, globalStore } from "./utils";
 import {
@@ -375,6 +376,7 @@ export function _defineAppDataStructure<
     getClientStorage: GetClientStorage;
     rootSchema: RS;
     typeSchemas: TSD;
+    enableCloud: boolean;
   },
 ) {
   // Setup Reactivity
@@ -386,6 +388,9 @@ export function _defineAppDataStructure<
   isProduction = options.isProduction;
   const firebaseApp = initializeApp(firebaseOptions);
   firestoreDb = getFirestore(firebaseApp);
+  if (!options.enableCloud) {
+    disableNetwork(firestoreDb);
+  }
 
   const auth = getAuth(firebaseApp);
 
