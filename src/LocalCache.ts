@@ -178,12 +178,19 @@ export function createCache({
       if (typeSchemas[params.typeName][propName]?.format === "file") {
         const fileId = params.props[propName] as string | null | undefined;
         if (!exists(fileId)) continue;
-        (async () => {
-          const bytes = await getBytes(storageRef(serverFileStorage, fileId));
-          const asString = new TextDecoder("utf-8").decode(bytes);
-          await clientStorage.writeFile(fileId, asString);
-          docSignalTree[params.typeName].docs[params.docId][propName].trigger();
-        })();
+        try {
+          const storRef = storageRef(serverFileStorage, fileId);
+          (async () => {
+            const bytes = await getBytes(storRef);
+            const asString = new TextDecoder("utf-8").decode(bytes);
+            await clientStorage.writeFile(fileId, asString);
+            docSignalTree[params.typeName].docs[params.docId][
+              propName
+            ].trigger();
+          })();
+        } catch (err) {
+          console.log(`Error downloading file ${fileId}`, err);
+        }
       }
     }
 

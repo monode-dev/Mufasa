@@ -90,12 +90,18 @@ firestoreDb, serverFileStorage, _signal, getClientStorage, isProduction, newDocP
                 const fileId = params.props[propName];
                 if (!(0, utils_1.exists)(fileId))
                     continue;
-                (async () => {
-                    const bytes = await (0, storage_1.getBytes)((0, storage_1.ref)(serverFileStorage, fileId));
-                    const asString = new TextDecoder("utf-8").decode(bytes);
-                    await clientStorage.writeFile(fileId, asString);
-                    docSignalTree[params.typeName].docs[params.docId][propName].trigger();
-                })();
+                try {
+                    const storRef = (0, storage_1.ref)(serverFileStorage, fileId);
+                    (async () => {
+                        const bytes = await (0, storage_1.getBytes)(storRef);
+                        const asString = new TextDecoder("utf-8").decode(bytes);
+                        await clientStorage.writeFile(fileId, asString);
+                        docSignalTree[params.typeName].docs[params.docId][propName].trigger();
+                    })();
+                }
+                catch (err) {
+                    console.log(`Error downloading file ${fileId}`, err);
+                }
             }
         }
         // Apply the updates locally
