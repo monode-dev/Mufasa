@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.203",
+  "version": "0.0.204",
   "main": "./dist/mufasa.js",
   "license": "MIT",
   "type": "module",
@@ -19,6 +19,22 @@
     "./firebase": "./dist/Plugins/Firebase.js",
     "./compress-image": "./dist/Plugins/CompressImage.js"
   },
+  "typesVersions": {
+    "*": {
+      "solid": [
+        "dist/Plugins/Solid.js"
+      ],
+      "capacitor": [
+        "dist/Plugins/Capacitor.js"
+      ],
+      "firebase": [
+        "dist/Plugins/Firebase.js"
+      ],
+      "compress-image": [
+        "dist/Plugins/CompressImage.js"
+      ]
+    }
+  },
   "dependencies": {
     "uuid": "^9.0.1"
   },
@@ -31,6 +47,7 @@
     "@types/node": "^20.4.2",
     "@types/uuid": "^9.0.8",
     "semver": "^7.5.4",
-    "sucrase": "^3.32.0"
+    "sucrase": "^3.32.0",
+    "typescript": "^5.3.3"
   }
 }
