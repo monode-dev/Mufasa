@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.209",
+  "version": "0.0.211",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -11,33 +11,32 @@
     "pub": "sucrase-node pub.js"
   },
   "files": [
-    "dist/*"
+    "/dist"
   ],
+  "type": "module",
+  "main": "./dist/Mufasa.js",
+  "types": "./dist/Mufasa.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/Mufasa.d.ts",
-      "import": "./dist/Mufasa.js",
-      "default": "./dist/Mufasa.js"
-    },
-    "./solid": {
-      "types": "./dist/Plugins/Solid.d.ts",
-      "import": "./dist/Plugins/Solid.js",
-      "default": "./dist/Plugins/Solid.js"
-    },
-    "./capacitor": {
-      "types": "./dist/Plugins/Capacitor.d.ts",
-      "import": "./dist/Plugins/Capacitor.js",
-      "default": "./dist/Plugins/Capacitor.js"
-    },
-    "./firebase": {
-      "types": "./dist/Plugins/Firebase.d.ts",
-      "import": "./dist/Plugins/Firebase.js",
-      "default": "./dist/Plugins/Firebase.js"
-    },
-    "./compress-image": {
-      "types": "./dist/Plugins/CompressImage.d.ts",
-      "import": "./dist/Plugins/CompressImage.js",
-      "default": "./dist/Plugins/CompressImage.js"
+    ".": "./dist/Mufasa.js",
+    "./solid": "./dist/Plugins/Solid.js",
+    "./capacitor": "./dist/Plugins/Capacitor.js",
+    "./firebase": "./dist/Plugins/Firebase.js",
+    "./compress-image": "./dist/Plugins/CompressImage.js"
+  },
+  "typesVersions": {
+    "*": {
+      "solid": [
+        "./dist/Plugins/Solid.d.ts"
+      ],
+      "capacitor": [
+        "./dist/Plugins/Capacitor.d.ts"
+      ],
+      "firebase": [
+        "./dist/Plugins/Firebase.d.ts"
+      ],
+      "compress-image": [
+        "./dist/Plugins/CompressImage.d.ts"
+      ]
     }
   },
   "dependencies": {

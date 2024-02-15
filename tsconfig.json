@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": ["ESNext", "DOM"],
     "declaration": true,
     "outDir": "./dist",
