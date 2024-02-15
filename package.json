@@ -1,8 +1,7 @@
 {
   "name": "mufasa",
-  "version": "0.0.208",
+  "version": "0.0.209",
   "license": "MIT",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/monode-dev/Mufasa.git"
