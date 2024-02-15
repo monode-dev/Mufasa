@@ -1,7 +1,7 @@
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import { Json, LocalJsonPersister, ToReadonlyJson } from "../DocStore";
-import { doNow } from "../Utils";
-import { LocalFilePersister } from "../FileStore";
+import { Json, LocalJsonPersister, ToReadonlyJson } from "../DocStore.js";
+import { doNow } from "../Utils.js";
+import { LocalFilePersister } from "../FileStore.js";
 
 // SECTION: Doc Persister
 export function capacitorJsonPersister(

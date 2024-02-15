@@ -1,4 +1,4 @@
-import { Doc, GetDefaultPersistersFromDocType } from "./Doc";
+import { Doc, GetDefaultPersistersFromDocType } from "./Doc.js";
 type GetListFromTableConfig<OtherInst extends Doc, TableConfig> = undefined extends TableConfig ? List<OtherInst> : TableConfig extends GetDefaultPersistersFromDocType ? List<OtherInst> : TableConfig extends keyof OtherInst ? OtherInst[TableConfig] extends Doc ? ReadonlyList<OtherInst> : List<OtherInst> : List<OtherInst>;
 export declare function list<OtherClass extends typeof Doc, TableConfig extends undefined | GetDefaultPersistersFromDocType | keyof InstanceType<OtherClass>>(OtherClass: OtherClass, tableConfig?: TableConfig): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig>;
 export declare class List<T extends Doc> {

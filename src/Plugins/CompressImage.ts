@@ -1,4 +1,4 @@
-import { doNow } from "../Utils";
+import { doNow } from "../Utils.js";
 
 export async function compressImage(config: {
   webPath: string;

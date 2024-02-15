@@ -1,8 +1,8 @@
-import { prop } from "./Doc";
-import { Persistance, } from "./DocStore";
+import { prop } from "./Doc.js";
+import { Persistance, } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils";
-import { createPersistedFunction } from "./PersistedFunction";
+import { isValid } from "./Utils.js";
+import { createPersistedFunction } from "./PersistedFunction.js";
 export function initializeFileStoreFactory(factoryConfig) {
     function fileStore(config) {
         const pushCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pushCreate`), async (fileId) => {

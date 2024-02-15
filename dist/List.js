@@ -1,5 +1,5 @@
-import { Doc, IsCustomProp, prop, } from "./Doc";
-import { isValid } from "./Utils";
+import { Doc, IsCustomProp, prop, } from "./Doc.js";
+import { isValid } from "./Utils.js";
 const relTables = new Map();
 export function list(OtherClass, tableConfig) {
     const otherProp = typeof tableConfig === `string` ? tableConfig : null;

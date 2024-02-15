@@ -1,5 +1,5 @@
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import { doNow } from "../Utils";
+import { doNow } from "../Utils.js";
 // SECTION: Doc Persister
 export function capacitorJsonPersister(directoryName) {
     return {

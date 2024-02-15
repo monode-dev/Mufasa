@@ -6,7 +6,7 @@ import {
   PrimVal,
   WritablePersistanceTaggedUpdateBatch,
   createDocStore,
-} from "./DocStore";
+} from "./DocStore.js";
 import {
   Flagged,
   PickFlagged,
@@ -14,7 +14,7 @@ import {
   StripFlag,
   doNow,
   isValid,
-} from "./Utils";
+} from "./Utils.js";
 
 export type GetDefaultPersistersFromDocType = (
   docType: string,

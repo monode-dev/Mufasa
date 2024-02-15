@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils";
-import { createPersistedFunction } from "./PersistedFunction";
+import { isValid } from "./Utils.js";
+import { createPersistedFunction } from "./PersistedFunction.js";
 
 export const DELETED_KEY = `mx_deleted`;
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];

@@ -1,13 +1,13 @@
-import { DocExports, prop } from "./Doc";
+import { DocExports, prop } from "./Doc.js";
 import {
   GlobalDocPersister,
   LocalJsonPersister,
   Persistance,
   SessionDocPersister,
-} from "./DocStore";
+} from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils";
-import { createPersistedFunction } from "./PersistedFunction";
+import { isValid } from "./Utils.js";
+import { createPersistedFunction } from "./PersistedFunction.js";
 
 export type GlobalFilePersister = {
   uploadFile: (fileId: string, data: string) => Promise<void>;

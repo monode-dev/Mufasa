@@ -1,4 +1,4 @@
-import { Json, LocalJsonFilePersister } from "./DocStore";
+import { Json, LocalJsonFilePersister } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 
 type AddStep<PrevIn extends Json[], PrevOut> = {

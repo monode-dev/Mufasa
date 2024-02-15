@@ -10,15 +10,15 @@ import {
   and,
   QueryFilterConstraint,
 } from "firebase/firestore";
-import { DocJson, GlobalDocChange, GlobalDocPersister } from "../DocStore";
+import { DocJson, GlobalDocChange, GlobalDocPersister } from "../DocStore.js";
 import {
   uploadString,
   deleteObject,
   getBytes,
   StorageReference,
 } from "firebase/storage";
-import { isValid } from "../Utils";
-import { GlobalFilePersister } from "../FileStore";
+import { isValid } from "../Utils.js";
+import { GlobalFilePersister } from "../FileStore.js";
 
 export function firestoreDocPersister(
   collectionRef: CollectionReference,

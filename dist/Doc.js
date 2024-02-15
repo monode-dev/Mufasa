@@ -1,5 +1,5 @@
-import { Persistance, createDocStore, } from "./DocStore";
-import { listObjEntries, doNow, isValid, } from "./Utils";
+import { Persistance, createDocStore, } from "./DocStore.js";
+import { listObjEntries, doNow, isValid, } from "./Utils.js";
 let getDefaultPersistersFromDocType;
 export function initializeDocClass(getDocClassOptions) {
     getDefaultPersistersFromDocType =

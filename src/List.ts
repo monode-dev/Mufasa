@@ -4,8 +4,8 @@ import {
   GetDefaultPersistersFromDocType,
   IsCustomProp,
   prop,
-} from "./Doc";
-import { isValid } from "./Utils";
+} from "./Doc.js";
+import { isValid } from "./Utils.js";
 
 const relTables = new Map<typeof Doc, Map<string, typeof Doc>>();
 
@@ -15,12 +15,12 @@ type GetListFromTableConfig<
 > = undefined extends TableConfig
   ? List<OtherInst>
   : TableConfig extends GetDefaultPersistersFromDocType
-    ? List<OtherInst>
-    : TableConfig extends keyof OtherInst
-      ? OtherInst[TableConfig] extends Doc
-        ? ReadonlyList<OtherInst>
-        : List<OtherInst>
-      : List<OtherInst>;
+  ? List<OtherInst>
+  : TableConfig extends keyof OtherInst
+  ? OtherInst[TableConfig] extends Doc
+    ? ReadonlyList<OtherInst>
+    : List<OtherInst>
+  : List<OtherInst>;
 export function list<
   OtherClass extends typeof Doc,
   TableConfig extends

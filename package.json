@@ -1,6 +1,7 @@
 {
   "name": "mufasa",
-  "version": "0.0.197",
+  "version": "0.0.198",
+  "main": "./dist/mufasa.js",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -10,12 +11,6 @@
   "scripts": {
     "build": "tsc",
     "pub": "sucrase-node pub.js"
-  },
-  "devDependencies": {
-    "@types/node": "^20.4.2",
-    "@types/uuid": "^9.0.8",
-    "semver": "^7.5.4",
-    "sucrase": "^3.32.0"
   },
   "exports": {
     ".": "./dist/Mufasa.js",
@@ -31,5 +26,11 @@
     "@capacitor/filesystem": "^5.0.0",
     "firebase": "^10.0.0",
     "solid-js": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "@types/uuid": "^9.0.8",
+    "semver": "^7.5.4",
+    "sucrase": "^3.32.0"
   }
 }

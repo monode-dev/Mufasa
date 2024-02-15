@@ -1,6 +1,6 @@
 import { Signal, batch, createMemo, createSignal, untrack } from "solid-js";
-import { DELETED_KEY, PrimVal, SessionDocPersister } from "../DocStore";
-import { isValid } from "../Utils";
+import { DELETED_KEY, PrimVal, SessionDocPersister } from "../DocStore.js";
+import { isValid } from "../Utils.js";
 
 const GET_FUNC = 0;
 const SET_FUNC = 1;

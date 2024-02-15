@@ -1,6 +1,6 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, } from "firebase/storage";
-import { isValid } from "../Utils";
+import { isValid } from "../Utils.js";
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     return {
