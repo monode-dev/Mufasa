@@ -48,7 +48,9 @@ try {
   console.log("Successfully published the package");
 
   // Commit the version change
-  execSync(`miwi sync "Publishing ${newVersion}"`);
+  execSync(`git add .`);
+  execSync(`git commit -m "Publishing ${newVersion}"`);
+  execSync(`git push`);
 } catch (err) {
   console.error("Error reading, updating, or publishing the package.", err);
   process.exit(1);
