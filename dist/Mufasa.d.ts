@@ -1,7 +1,7 @@
 import { GetDefaultPersistersFromDocType } from "./Doc";
 export { prop, formula } from "./Doc";
 export { list } from "./List";
-export { compressImage } from "./Plugins/CompressImage";
+export { isValid } from "./Utils";
 export declare function initializeMufasa(mfsConfig: {
     getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
 }): {
