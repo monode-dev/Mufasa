@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.199",
+  "version": "0.0.200",
   "main": "./dist/mufasa.js",
   "license": "MIT",
   "type": "module",
@@ -12,6 +12,10 @@
     "build": "tsc",
     "pub": "sucrase-node pub.js"
   },
+  "files": [
+    "dist/",
+    "dist/Plugins/"
+  ],
   "exports": {
     ".": {
       "types": "./dist/Mufasa.d.ts",
