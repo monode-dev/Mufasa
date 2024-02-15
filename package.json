@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.194",
+  "version": "0.0.195",
   "main": "./dist/mufasa.js",
   "license": "MIT",
   "type": "module",
@@ -29,8 +29,8 @@
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
-    "@capacitor/filesystem": "^5.2.1",
-    "firebase": "^10.8.0",
-    "solid-js": "^1.8.15"
+    "@capacitor/filesystem": "^5.0.0",
+    "firebase": "^10.0.0",
+    "solid-js": "^1.5.0"
   }
 }
