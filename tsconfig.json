@@ -9,5 +9,6 @@
     "strict": true,
     "esModuleInterop": true
   },
-  "src": ["src"]
+  "include": ["*/**/*.ts"],
+  "exclude": ["node_modules", "*/**/*.d.ts"]
 }
