@@ -1,18 +1,32 @@
-export declare function exists<T>(x: T): x is NonNullable<T>;
-export declare function orderDocs<T, K extends string | number | null | undefined>(list: Iterable<T>, getKey: (obj: T) => K, options?: {
-    nullPosition?: `first` | `last`;
-    direction?: `normal` | `reverse`;
-}): T[];
-export declare function formatNumWithCommas(num: number, digits?: number | `min`): string;
-export declare function roundToString(num: number, digits?: number | `min`): string;
-export type Unpromise<T> = T extends Promise<infer R> ? R : T;
-export type DeepReadonly<T> = T extends Function ? T : T extends (infer R)[] ? ReadonlyArray<DeepReadonly<R>> : T extends object ? {
-    readonly [K in keyof T]: DeepReadonly<T[K]>;
-} : T;
+export declare function doNow<T>(func: () => T): T;
 export type DeepPartial<T> = T extends object ? {
     [K in keyof T]?: DeepPartial<T[K]>;
 } : T;
-export type Json = number | boolean | string | null | {
-    [k: string]: Json;
-} | Array<Json>;
-export declare function globalStore<T>(storeName: string, defineStore: () => T): () => T;
+export declare const _symIdsKey: unique symbol;
+export type Sym<T extends string> = {
+    [_symIdsKey]: {
+        [Key in T]: true;
+    };
+};
+export declare function newSym<T extends string, U extends string = T>(symId: T, ...parents: Sym<U>[]): Sym<T | U>;
+export type INVALID = typeof INVALID;
+export declare const INVALID: Sym<"INVALID">;
+export type PENDING = typeof PENDING;
+export declare const PENDING: Sym<"INVALID" | "PENDING">;
+export type NONEXISTENT = typeof NONEXISTENT;
+export declare const NONEXISTENT: Sym<"INVALID" | "NONEXISTENT">;
+export declare function isSameSym<T extends string>(x: any, y: Sym<T>): x is Sym<T>;
+export type Valid<T> = T extends null | undefined | INVALID ? never : T;
+export declare function isValid<T>(x: T): x is Valid<T>;
+export declare function listObjKeys<T extends {}>(obj: T): (keyof T)[];
+export declare function listObjValues<T extends {}>(obj: T): T[keyof T][];
+export declare function listObjEntries<T extends {}>(obj: T): [keyof T, T[keyof T]][];
+export type PickFlagged<T, FlagSym extends symbol> = {
+    [K in keyof T]: IsFlagged<T[K], FlagSym> extends true ? K : never;
+}[keyof T];
+export type IsFlagged<T, FlagSym extends symbol> = true extends (T extends Flagged<infer U, FlagSym> ? (U extends T ? false : true) : false) ? true : false;
+export type Flagged<T, FlagSym extends symbol> = T | (T & Flag<FlagSym>);
+export type StripFlag<T, FlagSym extends symbol> = T extends Flagged<infer U, FlagSym> ? U : T;
+export type Flag<FlagSym extends symbol> = {
+    [K in FlagSym]: FlagSym;
+};

@@ -1,28 +1,36 @@
 {
   "name": "mufasa",
-  "version": "0.0.193",
-  "main": "./dist/index.js",
-  "license": "ISC",
+  "version": "0.0.194",
+  "main": "./dist/mufasa.js",
+  "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/monode-dev/Mufasa.git"
   },
   "scripts": {
     "build": "tsc",
-    "pub": "sucrase-node pub.ts"
+    "pub": "sucrase-node pub.js"
   },
   "devDependencies": {
     "@types/node": "^20.4.2",
+    "@types/uuid": "^9.0.8",
     "semver": "^7.5.4",
     "sucrase": "^3.32.0"
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./cap": "./dist/ClientStorage/Capacitor.js"
+    ".": "./dist/Mufasa.js",
+    "./solid": "./dist/Plugins/Solid.js",
+    "./capacitor": "./dist/Plugins/Capacitor.js",
+    "./firebase": "./dist/Plugins/Firebase.js",
+    "./compress-image": "./dist/Plugins/CompressImage.js"
   },
   "dependencies": {
-    "firebase": "^9.23.0",
-    "i": "^0.3.7",
-    "npm": "^10.2.4"
+    "uuid": "^9.0.1"
+  },
+  "peerDependencies": {
+    "@capacitor/filesystem": "^5.2.1",
+    "firebase": "^10.8.0",
+    "solid-js": "^1.8.15"
   }
 }
