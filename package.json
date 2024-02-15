@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.0.202",
+  "version": "0.0.203",
   "main": "./dist/mufasa.js",
   "license": "MIT",
   "type": "module",
