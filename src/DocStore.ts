@@ -192,6 +192,7 @@ export function createDocStore(config: DocPersisters) {
           docMaxPersistance,
           propMaxPersistance,
         );
+        console.log(`key: ${key}, value: ${value}`);
         console.log(
           `docMaxPersistance: ${docMaxPersistance}, propMaxPersistance: ${propMaxPersistance}, actualMaxPersistance: ${actualMaxPersistance}`,
         );
