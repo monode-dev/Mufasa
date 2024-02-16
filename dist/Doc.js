@@ -56,6 +56,7 @@ getDocId) {
                 ...(isValid(propConfig.toPrim)
                     ? {
                         set: function (value) {
+                            console.log(`Doc.set ${key}: ${value}`);
                             this._docStore.batchUpdate({
                                 [docId]: { [key]: propConfig.toPrim(value) },
                             });
