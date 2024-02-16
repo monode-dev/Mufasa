@@ -155,6 +155,7 @@ export function createDocStore(config: DocPersisters) {
   }) {
     // TODO: Handle "maxPersistance".
     await localDocs.loadedFromLocalStorage;
+    console.log(`batchUpdate`, params);
     const sessionUpdates: WritableUpdateBatch = {};
     const localUpdates: WritableUpdateBatch = {};
     const globalUpdates: WritableUpdateBatch = {};

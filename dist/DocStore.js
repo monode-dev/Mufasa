@@ -44,6 +44,7 @@ export function createDocStore(config) {
     async function batchUpdate(params) {
         // TODO: Handle "maxPersistance".
         await localDocs.loadedFromLocalStorage;
+        console.log(`batchUpdate`, params);
         const sessionUpdates = {};
         const localUpdates = {};
         const globalUpdates = {};
