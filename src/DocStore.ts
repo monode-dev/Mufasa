@@ -181,29 +181,30 @@ export function createDocStore(config: DocPersisters) {
           globalCreates.add(docId);
         }
       }
-      Object.entries(props).forEach(
-        ([key, { value, maxPersistance: propMaxPersistance }]) => {
-          const actualMaxPersistance = Math.min(
-            docMaxPersistance,
-            propMaxPersistance,
-          );
-          if (actualMaxPersistance >= Persistance.session) {
-            if (!isValid(sessionUpdates[docId])) sessionUpdates[docId] = {};
-            sessionUpdates[docId][key] = value;
-          }
-          if (actualMaxPersistance >= Persistance.local) {
-            if (!isValid(localUpdates[docId])) localUpdates[docId] = {};
-            localUpdates[docId][key] = value;
-          }
-          if (actualMaxPersistance === Persistance.global) {
-            if (!isValid(globalUpdates[docId])) globalUpdates[docId] = {};
-            globalUpdates[docId][key] = value;
-          }
+      Object.entries({
+        ...props,
+        [MAX_PERSISTANCE_KEY]: {
+          value: docMaxPersistance,
+          maxPersistance: docMaxPersistance,
         },
-      );
-      sessionUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
-      localUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
-      globalUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
+      }).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
+        const actualMaxPersistance = Math.min(
+          docMaxPersistance,
+          propMaxPersistance,
+        );
+        if (actualMaxPersistance >= Persistance.session) {
+          if (!isValid(sessionUpdates[docId])) sessionUpdates[docId] = {};
+          sessionUpdates[docId][key] = value;
+        }
+        if (actualMaxPersistance >= Persistance.local) {
+          if (!isValid(localUpdates[docId])) localUpdates[docId] = {};
+          localUpdates[docId][key] = value;
+        }
+        if (actualMaxPersistance === Persistance.global) {
+          if (!isValid(globalUpdates[docId])) globalUpdates[docId] = {};
+          globalUpdates[docId][key] = value;
+        }
+      });
     });
 
     // Changes are pushed to session store, but never come from there.

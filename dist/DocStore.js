@@ -67,7 +67,13 @@ export function createDocStore(config) {
                     globalCreates.add(docId);
                 }
             }
-            Object.entries(props).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
+            Object.entries({
+                ...props,
+                [MAX_PERSISTANCE_KEY]: {
+                    value: docMaxPersistance,
+                    maxPersistance: docMaxPersistance,
+                },
+            }).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
                 const actualMaxPersistance = Math.min(docMaxPersistance, propMaxPersistance);
                 if (actualMaxPersistance >= Persistance.session) {
                     if (!isValid(sessionUpdates[docId]))
@@ -85,9 +91,6 @@ export function createDocStore(config) {
                     globalUpdates[docId][key] = value;
                 }
             });
-            sessionUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
-            localUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
-            globalUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
         });
         // Changes are pushed to session store, but never come from there.
         config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
