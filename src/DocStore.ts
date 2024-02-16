@@ -3,6 +3,7 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
 export const DELETED_KEY = `mx_deleted`;
+export const MAX_PERSISTANCE_KEY = `maxPersistance`;
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
 export const Persistance = {
   session: `session`,
@@ -36,7 +37,6 @@ export type SessionDocPersister = {
     key: string,
     initValue: PrimVal | (() => PrimVal),
   ): PrimVal;
-  // getDocPersistance(docId: string): Persistance | null;
   getAllDocs(): string[];
 };
 
@@ -144,6 +144,7 @@ export function createDocStore(config: DocPersisters) {
     newDocsAreOnlyVirtual: boolean;
     updates: PersistanceTaggedUpdateBatch;
   }) {
+    // TODO: Handle "maxPersistance".
     await localDocs.loadedFromLocalStorage;
     const sessionUpdates: WritableUpdateBatch = {};
     const localUpdates: WritableUpdateBatch = {};
@@ -172,7 +173,7 @@ export function createDocStore(config: DocPersisters) {
       });
     });
 
-    // TODO: Base these off of config.sessionDocPersister.getDocPersistance()
+    // TODO: Base these off of config.sessionDocPersister.getMaxPersistance()
     const docsBeingAddedToSession = new Set<string>();
     const docsBeingRemovedFromSession = new Set<string>();
     const docsBeingAddedToLocal = new Set<string>();
@@ -258,7 +259,7 @@ export function createDocStore(config: DocPersisters) {
 
     createDoc(
       props: PersistanceTaggedUpdateBatch[string],
-      // maxPersistance?: Persistance,
+      maxPersistance?: Persistance,
       manualDocId?: string,
     ) {
       const docId = manualDocId ?? uuidv4();
@@ -266,7 +267,13 @@ export function createDocStore(config: DocPersisters) {
         sourceStoreType: Persistance.session,
         newDocsAreOnlyVirtual: false,
         updates: {
-          [docId]: props,
+          [docId]: {
+            ...props,
+            [MAX_PERSISTANCE_KEY]: {
+              value: maxPersistance ?? Persistance.global,
+              maxPersistance: maxPersistance ?? Persistance.global,
+            },
+          },
         },
       });
       return docId;
@@ -294,5 +301,28 @@ export function createDocStore(config: DocPersisters) {
     getProp: config.sessionDocPersister.getProp,
 
     getAllDocs: config.sessionDocPersister.getAllDocs,
+
+    getMaxPersistance(docId: string) {
+      return this.getProp(
+        docId,
+        MAX_PERSISTANCE_KEY,
+        null,
+      ) as Persistance | null;
+    },
+
+    promoteDocPersistance(docId: string, newPersistance: Persistance) {
+      batchUpdate({
+        sourceStoreType: Persistance.session,
+        newDocsAreOnlyVirtual: false,
+        updates: {
+          [docId]: {
+            [MAX_PERSISTANCE_KEY]: {
+              value: newPersistance,
+              maxPersistance: newPersistance,
+            },
+          },
+        },
+      });
+    },
   } as const;
 }

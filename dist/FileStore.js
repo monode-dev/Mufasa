@@ -10,7 +10,6 @@ export function initializeFileStoreFactory(factoryConfig) {
             const webPath = await config.localFilePersister.getWebPath(fileId);
             if (!isValid(webPath))
                 return null;
-            // TODO: Not being persisted because the document doesn't exist yet.
             SyncedFile._fromId(fileId).webPath = webPath;
             return fileId;
         }).addStep(async (fileId) => {
@@ -22,7 +21,7 @@ export function initializeFileStoreFactory(factoryConfig) {
                 return;
             config.globalFilePersister?.uploadFile(fileId, fileData);
             // We wait to actually create the doc until the file is uploaded so that others can know when the file is available.
-            SyncedFile._docStore.createDoc({}, fileId);
+            SyncedFile._docStore.promoteDocPersistance(fileId, Persistance.global);
         });
         const pullCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pullCreate`), async (fileId) => {
             const fileData = await config.globalFilePersister?.downloadFile(fileId);
@@ -66,6 +65,7 @@ export function initializeFileStoreFactory(factoryConfig) {
                 await config.localFilePersister.writeFile(docId, byteString);
                 console.log(`Wrote file.`);
                 pushCreate(docId);
+                SyncedFile._docStore.createDoc({}, Persistance.local, docId);
                 return SyncedFile._fromId(docId);
             }
             onDelete() {

@@ -143,6 +143,10 @@ export class Doc {
     return this._docStore.getAllDocs().map(this._fromId.bind(this) as any);
   }
 
+  get maxPersistance(): Persistance | null {
+    return this._docStore.getMaxPersistance(this.docId);
+  }
+
   static _fromId<T extends typeof Doc>(
     this: T,
     docId: string,

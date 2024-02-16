@@ -19,9 +19,10 @@ Install Mufasa via `npm i mufasa`. To update to the latest version run `npm i mu
 Import and initialize Mufasa anywhere in your app.
 
 ```ts
-import { Teacher } from "./Teacher";
-import { Course } from "./Course";
 import { initializeMufasa } from "mufasa";
+import { solidPersister } from "mufasa/solid";
+import { capacitorJsonPersister } from "mufasa/capacitor";
+import { firestoreDocPersister } from "mufasa/firebase";
 
 // Export "Doc" so it can be used in other files too.
 export const { Doc } = initializeMufasa({
@@ -88,6 +89,8 @@ export class Student extends Doc {
 #### Use Documents in your UI
 
 ```tsx
+import { Teacher } from "./Teacher";
+import { Course } from "./Course";
 import { For } from "solid-js";
 
 function TeacherUI(teacher: Teacher) {

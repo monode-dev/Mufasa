@@ -1,4 +1,5 @@
 export declare const DELETED_KEY = "mx_deleted";
+export declare const MAX_PERSISTANCE_KEY = "maxPersistance";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
 export declare const Persistance: {
     readonly session: "session";
@@ -69,9 +70,11 @@ export type DocPersisters = {
 export declare function createDocStore(config: DocPersisters): {
     readonly loadedFromLocalStorage: Promise<void>;
     readonly batchUpdate: (updates: PersistanceTaggedUpdateBatch) => void;
-    readonly createDoc: (props: PersistanceTaggedUpdateBatch[string], manualDocId?: string) => string;
+    readonly createDoc: (props: PersistanceTaggedUpdateBatch[string], maxPersistance?: Persistance, manualDocId?: string) => string;
     readonly deleteDoc: (docId: string) => void;
     readonly isDocDeleted: (docId: string) => boolean;
     readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
     readonly getAllDocs: () => string[];
+    readonly getMaxPersistance: (docId: string) => Persistance | null;
+    readonly promoteDocPersistance: (docId: string, newPersistance: Persistance) => void;
 };

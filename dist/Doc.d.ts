@@ -28,11 +28,13 @@ export declare class Doc {
                 readonly value: PrimVal;
                 readonly maxPersistance: Persistance;
             };
-        }, manualDocId?: string | undefined) => string;
+        }, maxPersistance?: Persistance | undefined, manualDocId?: string | undefined) => string;
         readonly deleteDoc: (docId: string) => void;
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
+        readonly getMaxPersistance: (docId: string) => Persistance | null;
+        readonly promoteDocPersistance: (docId: string, newPersistance: Persistance) => void;
     };
     get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
@@ -49,11 +51,13 @@ export declare class Doc {
                 readonly value: PrimVal;
                 readonly maxPersistance: Persistance;
             };
-        }, manualDocId?: string | undefined) => string;
+        }, maxPersistance?: Persistance | undefined, manualDocId?: string | undefined) => string;
         readonly deleteDoc: (docId: string) => void;
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
+        readonly getMaxPersistance: (docId: string) => Persistance | null;
+        readonly promoteDocPersistance: (docId: string, newPersistance: Persistance) => void;
     };
     static newTypeFromPersisters(persisters: DocPersisters): {
         new (): {
@@ -73,14 +77,17 @@ export declare class Doc {
                         readonly value: PrimVal;
                         readonly maxPersistance: Persistance;
                     };
-                }, manualDocId?: string | undefined) => string;
+                }, maxPersistance?: Persistance | undefined, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
                 readonly getAllDocs: () => string[];
+                readonly getMaxPersistance: (docId: string) => Persistance | null;
+                readonly promoteDocPersistance: (docId: string, newPersistance: Persistance) => void;
             };
             readonly docId: string;
             readonly isDeleted: boolean;
+            readonly maxPersistance: Persistance | null;
             /** Override to run code just before an object is deleted. */
             onDelete(): void;
             /** Permanently deletes this object. */
@@ -104,11 +111,13 @@ export declare class Doc {
                     readonly value: PrimVal;
                     readonly maxPersistance: Persistance;
                 };
-            }, manualDocId?: string | undefined) => string;
+            }, maxPersistance?: Persistance | undefined, manualDocId?: string | undefined) => string;
             readonly deleteDoc: (docId: string) => void;
             readonly isDocDeleted: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
+            readonly getMaxPersistance: (docId: string) => Persistance | null;
+            readonly promoteDocPersistance: (docId: string, newPersistance: Persistance) => void;
         };
         newTypeFromPersisters(persisters: DocPersisters): any;
         getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[];
@@ -118,6 +127,7 @@ export declare class Doc {
     get docId(): string;
     get isDeleted(): boolean;
     static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[];
+    get maxPersistance(): Persistance | null;
     static _fromId<T extends typeof Doc>(this: T, docId: string): InstanceType<T>;
     static create<T extends typeof Doc>(this: T, ...overrideProps: CreateParams<T>): InstanceType<T>;
     /** Override to run code just before an object is deleted. */
