@@ -59,6 +59,7 @@ export function createDocStore(config) {
                 const isBeingDeleted = props[DELETED_KEY]?.value === true;
                 const docIsBeingPromotedToGlobal = prevMaxPersistance !== Persistance.global &&
                     newMaxPersistance === Persistance.global;
+                console.log(`docId: ${docId}, docExistsInSession: ${docExistsInSession}, isBeingDeleted: ${isBeingDeleted}, docIsBeingPromotedToGlobal: ${docIsBeingPromotedToGlobal}`);
                 if (isBeingDeleted) {
                     globalDeletes.add(docId);
                 }

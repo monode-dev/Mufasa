@@ -56,6 +56,7 @@ getDocId) {
                 ...(isValid(propConfig.toPrim)
                     ? {
                         set: function (value) {
+                            // TODO: Only do update if value is different.
                             this._docStore.batchUpdate({
                                 [docId]: {
                                     [key]: {

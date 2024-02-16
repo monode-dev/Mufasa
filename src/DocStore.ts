@@ -174,6 +174,9 @@ export function createDocStore(config: DocPersisters) {
         const docIsBeingPromotedToGlobal =
           prevMaxPersistance !== Persistance.global &&
           newMaxPersistance === Persistance.global;
+        console.log(
+          `docId: ${docId}, docExistsInSession: ${docExistsInSession}, isBeingDeleted: ${isBeingDeleted}, docIsBeingPromotedToGlobal: ${docIsBeingPromotedToGlobal}`,
+        );
         if (isBeingDeleted) {
           globalDeletes.add(docId);
         } else if (!docExistsInSession || docIsBeingPromotedToGlobal) {
