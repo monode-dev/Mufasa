@@ -56,7 +56,7 @@ export function createDocStore(config) {
             const docMaxPersistance = Math.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance);
             if (docMaxPersistance === Persistance.global) {
                 const docExistsInSession = config.sessionDocPersister.docExists(docId);
-                const isBeingDeleted = props[DELETED_KEY].value === true;
+                const isBeingDeleted = props[DELETED_KEY]?.value === true;
                 const docIsBeingPromotedToGlobal = prevMaxPersistance !== Persistance.global &&
                     newMaxPersistance === Persistance.global;
                 if (isBeingDeleted) {
