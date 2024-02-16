@@ -18,7 +18,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                         // Skip removed documents. Documents should never be deleted only flagged.
                         if (change.type === "removed") {
                             console.error(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
-                is not currently configured to handle documents being deleted.`, change.doc.data());
+                is not currently configured to handle documents being removed.`, change.doc.data());
                             console.log(`latestChangeDate`, latestChangeDate, testDate);
                             return;
                         }
@@ -31,6 +31,8 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                     if (latestChangeDate > metaData.data.lastChangeDatePosix) {
                         metaData.batchUpdate((data) => (data.lastChangeDatePosix = latestChangeDate));
                     }
+                }, (error) => {
+                    console.log(`Encountered error: ${error}`);
                 });
             });
         },

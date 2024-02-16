@@ -55,7 +55,7 @@ export function firestoreDocPersister(
               if (change.type === "removed") {
                 console.error(
                   `The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
-                is not currently configured to handle documents being deleted.`,
+                is not currently configured to handle documents being removed.`,
                   change.doc.data(),
                 );
                 console.log(`latestChangeDate`, latestChangeDate, testDate);
@@ -76,6 +76,9 @@ export function firestoreDocPersister(
                 (data) => (data.lastChangeDatePosix = latestChangeDate),
               );
             }
+          },
+          (error) => {
+            console.log(`Encountered error: ${error}`);
           },
         );
       });
