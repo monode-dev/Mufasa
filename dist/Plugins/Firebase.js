@@ -9,7 +9,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 lastChangeDatePosix: 0,
             });
             metaData.loadedFromLocalStorage.then(() => {
-                const changeDateAtStart = new Date(metaData.data.lastChangeDatePosix);
+                const changeDateAtStart = new Date(metaData.data.lastChangeDatePosix - 30);
                 console.log(`Change date at start: ${changeDateAtStart}`);
                 onSnapshot(query(collectionRef, and(where(CHANGE_DATE_KEY, ">=", changeDateAtStart), ...queryConstraints)), (snapshot) => {
                     const updates = {};
@@ -24,7 +24,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                         }
                         // Update doc store.
                         updates[change.doc.id] = change.doc.data();
-                        latestChangeDate = Math.max(latestChangeDate, change.doc.data()[CHANGE_DATE_KEY]);
+                        latestChangeDate = Math.max(latestChangeDate, change.doc.data()[CHANGE_DATE_KEY].seconds * 1000);
                     });
                     batchUpdate(updates);
                     if (latestChangeDate > metaData.data.lastChangeDatePosix) {

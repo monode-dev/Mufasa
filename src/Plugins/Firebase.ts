@@ -31,7 +31,9 @@ export function firestoreDocPersister(
         lastChangeDatePosix: 0,
       });
       metaData.loadedFromLocalStorage.then(() => {
-        const changeDateAtStart = new Date(metaData.data.lastChangeDatePosix);
+        const changeDateAtStart = new Date(
+          metaData.data.lastChangeDatePosix - 30,
+        );
         console.log(`Change date at start: ${changeDateAtStart}`);
         onSnapshot(
           query(
@@ -67,7 +69,7 @@ export function firestoreDocPersister(
               updates[change.doc.id] = change.doc.data() as DocJson;
               latestChangeDate = Math.max(
                 latestChangeDate,
-                change.doc.data()[CHANGE_DATE_KEY],
+                change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
               );
             });
             batchUpdate(updates);
