@@ -49,7 +49,12 @@ export function firestoreDocPersister(
             } = {};
             let latestChangeDate = metaData.data.lastChangeDatePosix;
             snapshot.docChanges().forEach((change) => {
-              console.log("Firebase.firestoreDocPersister", change);
+              console.log(
+                "Firebase.firestoreDocPersister",
+                change.type,
+                change.doc.id,
+                change.doc.data(),
+              );
               // Skip removed documents. Documents should never be deleted only flagged.
               if (change.type === "removed") {
                 console.error(
