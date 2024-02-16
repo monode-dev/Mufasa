@@ -66,8 +66,8 @@ export function createDocStore(config) {
         Object.entries(params.updates).forEach(([docId, props]) => {
             const prevMaxPersistance = getMaxPersistance(docId);
             const newMaxPersistance = (props[MAX_PERSISTANCE_KEY]?.value ??
-                null);
-            const docMaxPersistance = Persistance.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance ?? Persistance.session);
+                params.sourceStoreType);
+            const docMaxPersistance = Persistance.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance);
             if (docMaxPersistance === Persistance.global) {
                 const docExistsInSession = config.sessionDocPersister.docExists(docId);
                 const isBeingDeleted = props[DELETED_KEY].value === true;
@@ -102,6 +102,9 @@ export function createDocStore(config) {
                     globalUpdates[docId][key] = value;
                 }
             });
+            sessionUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
+            localUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
+            globalUpdates[docId][MAX_PERSISTANCE_KEY] = docMaxPersistance;
         });
         // Changes are pushed to session store, but never come from there.
         config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
@@ -141,7 +144,9 @@ export function createDocStore(config) {
                 newDocsAreOnlyVirtual: false,
                 updates: Object.fromEntries(Object.entries(updates).map(([docId, props]) => [
                     docId,
-                    Object.fromEntries(Object.entries(props).map(([key, value]) => [
+                    Object.fromEntries(Object.entries(props)
+                        .filter(([key]) => key !== MAX_PERSISTANCE_KEY)
+                        .map(([key, value]) => [
                         key,
                         { value, maxPersistance: Persistance.global },
                     ])),
