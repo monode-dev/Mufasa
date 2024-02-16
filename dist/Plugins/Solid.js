@@ -63,5 +63,9 @@ export function solidPersister() {
         getAllDocs() {
             return getAllDocIds();
         },
+        docExists(docId) {
+            return (propSignals[docId]?.[IS_VIRTUAL][GET_FUNC]() === false &&
+                propSignals[docId]?.[DELETED_KEY]?.[GET_FUNC]() !== true);
+        },
     };
 }

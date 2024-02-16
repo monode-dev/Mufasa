@@ -37,6 +37,9 @@ export function createDocStore(config) {
         }), {}), true);
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => await config.globalDocPersister?.updateDoc(docChange));
+    function getMaxPersistance(docId) {
+        return config.sessionDocPersister.getProp(docId, MAX_PERSISTANCE_KEY, null);
+    }
     //
     async function batchUpdate(params) {
         // TODO: Handle "maxPersistance".
@@ -44,7 +47,26 @@ export function createDocStore(config) {
         const sessionUpdates = {};
         const localUpdates = {};
         const globalUpdates = {};
+        const globalCreates = new Set();
+        const globalDeletes = new Set();
         Object.entries(params.updates).forEach(([docId, props]) => {
+            const prevMaxPersistance = getMaxPersistance(docId);
+            const newMaxPersistance = props[MAX_PERSISTANCE_KEY].maxPersistance ?? null;
+            const willBePersistedGlobally = prevMaxPersistance === Persistance.global ||
+                newMaxPersistance === Persistance.global;
+            if (willBePersistedGlobally) {
+                const docExistsInSession = config.sessionDocPersister.docExists(docId);
+                const isBeingDeleted = props[DELETED_KEY].value === true;
+                const docIsBeingPromotedToGlobal = prevMaxPersistance !== Persistance.global &&
+                    newMaxPersistance === Persistance.global;
+                if (isBeingDeleted) {
+                    globalDeletes.add(docId);
+                }
+                else if (!docExistsInSession || docIsBeingPromotedToGlobal) {
+                    // Even if a doc is new, if it has the DELETED_KEY then it is actually deleted.
+                    globalCreates.add(docId);
+                }
+            }
             Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
                 if (maxPersistance === Persistance.session ||
                     maxPersistance === Persistance.local ||
@@ -66,28 +88,11 @@ export function createDocStore(config) {
                 }
             });
         });
-        // TODO: Base these off of config.sessionDocPersister.getMaxPersistance()
-        const docsBeingAddedToSession = new Set();
-        const docsBeingRemovedFromSession = new Set();
-        const docsBeingAddedToLocal = new Set();
-        const docsBeingRemovedFromLocal = new Set();
-        const docsBeingAddedToGlobal = new Set();
-        const docsBeingRemovedFromGlobal = new Set();
         // Changes are pushed to session store, but never come from there.
         config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
-        // TODO: Remove these
-        const docsBeingCreated = new Set();
-        const docsBeingDeleted = new Set();
         if (params.sourceStoreType !== Persistance.local) {
             localDocs.batchUpdate((data) => {
                 Object.entries(localUpdates).forEach(([docId, props]) => {
-                    if (props[DELETED_KEY] === true) {
-                        docsBeingDeleted.add(docId);
-                    }
-                    else {
-                        // Even if a doc is new, if it has the DELETED_KEY then it is actually deleted.
-                        docsBeingCreated.add(docId);
-                    }
                     data.docs[docId] = {
                         ...(data.docs[docId] ?? {}),
                         ...props,
@@ -101,13 +106,15 @@ export function createDocStore(config) {
                 pushGlobalChange({
                     docId,
                     props,
-                    isBeingCreatedOrDeleted: (docsBeingCreated.has(docId) || docsBeingDeleted.has(docId)) &&
+                    isBeingCreatedOrDeleted: (globalCreates.has(docId) || globalDeletes.has(docId)) &&
                         params.sourceStoreType === Persistance.session,
                 });
             });
         }
-        docsBeingCreated.forEach((docId) => config.onIncomingCreate?.(docId));
-        docsBeingDeleted.forEach((docId) => config.onIncomingDelete?.(docId));
+        if (params.sourceStoreType === Persistance.global) {
+            globalCreates.forEach((docId) => config.onIncomingCreate?.(docId));
+            globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));
+        }
     }
     // Watch cloud.
     localDocs.loadedFromLocalStorage.then(() => {
@@ -173,9 +180,7 @@ export function createDocStore(config) {
         },
         getProp: config.sessionDocPersister.getProp,
         getAllDocs: config.sessionDocPersister.getAllDocs,
-        getMaxPersistance(docId) {
-            return this.getProp(docId, MAX_PERSISTANCE_KEY, null);
-        },
+        getMaxPersistance,
         promoteDocPersistance(docId, newPersistance) {
             batchUpdate({
                 sourceStoreType: Persistance.session,

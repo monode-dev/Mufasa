@@ -27,6 +27,7 @@ export type SessionDocPersister = {
     batchUpdate(updates: UpdateBatch, newDocsAreOnlyVirtual: boolean): void;
     getProp(id: string, key: string, initValue: PrimVal | (() => PrimVal)): PrimVal;
     getAllDocs(): string[];
+    docExists(docId: string): boolean;
 };
 /** TODO: We can make this simpler by giving it the format
  * `{ persist: <T extends JsonObj>(fileId: string, initValue: T) => Promise<T> }`
