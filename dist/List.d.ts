@@ -7,6 +7,7 @@ export declare class List<T extends Doc> {
     readonly remove: (value: T) => void;
     [Symbol.iterator](): IterableIterator<T>;
     forEach(callbackfn: (value: T) => void): void;
+    map<U>(callbackfn: (value: T) => U): U[];
     has(toFind: T): boolean;
     get count(): number;
     constructor(getArray: () => T[], add: (value: T) => void, remove: (value: T) => void);

@@ -94,6 +94,9 @@ export class List {
     forEach(callbackfn) {
         this.getArray().forEach(callbackfn);
     }
+    map(callbackfn) {
+        return this.getArray().map(callbackfn);
+    }
     has(toFind) {
         return this.getArray().some((item) => item.docId === toFind.docId);
     }

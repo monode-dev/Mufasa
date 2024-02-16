@@ -81,16 +81,45 @@ export class Student extends Doc {
   // `list(DocClass, "propName") to define many-to-many lists
   readonly courses = list(Course, `students`);
 }
+```
 
-function runExample() {
-  // Documents must be created using the `create` method
-  const student = Student.create({ firstName: `John`, lastName: `Doe` });
+#### Use Documents in your UI
 
-  /* Simply assign to a prop and the update will be sent to the database
-   * and then to any other mobile devices that are listening. */
-  student.lastName = `Smith`;
+```tsx
+import { For } from "solid-js";
+
+function TeacherUI(teacher: Teacher) {
+  return (
+    <div>
+      {/* Will automatically update when this device or any other device renames the teacher. */}
+      <h1>{teacher.fullName}</h1>
+      <button
+        onClick={() => {
+          // Documents must be created using the `create` method
+          Course.create({
+            name: `Math 101`,
+            teacher: teacher,
+          });
+        }}
+      >
+        Add Course
+      </button>
+      <button
+        onClick={() => {
+          /* Simply assign to a prop and the update will be sent to the database
+           * and then to any other mobile devices that are listening. */
+          student.lastName = ``;
+        }}
+      >
+        Change Last Name
+      </button>
+      <For each={teacher.courses}>{(course) => <li>{course.name}</li>}</For>
+    </div>
+  );
 }
 ```
+
+#### See More
 
 That should be enough to get you something useful. For more take a look at the "Deep Dive" section.
 

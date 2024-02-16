@@ -145,6 +145,9 @@ export class List<T extends Doc> {
   forEach(callbackfn: (value: T) => void) {
     this.getArray().forEach(callbackfn);
   }
+  map<U>(callbackfn: (value: T) => U): U[] {
+    return this.getArray().map(callbackfn);
+  }
   has(toFind: T) {
     return this.getArray().some((item) => item.docId === toFind.docId);
   }
