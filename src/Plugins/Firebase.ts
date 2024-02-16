@@ -31,19 +31,13 @@ export function firestoreDocPersister(
         lastChangeDatePosix: 0,
       });
       metaData.loadedFromLocalStorage.then(() => {
+        const testDate = new Date(
+          Math.max(metaData.data.lastChangeDatePosix - 30000, 0),
+        );
         onSnapshot(
           query(
             collectionRef,
-            and(
-              where(
-                CHANGE_DATE_KEY,
-                ">",
-                new Date(
-                  Math.max(metaData.data.lastChangeDatePosix - 30000, 0),
-                ),
-              ),
-              ...queryConstraints,
-            ),
+            and(where(CHANGE_DATE_KEY, ">", testDate), ...queryConstraints),
           ),
           (snapshot) => {
             const updates: {
@@ -64,6 +58,7 @@ export function firestoreDocPersister(
                 is not currently configured to handle documents being deleted.`,
                   change.doc.data(),
                 );
+                console.log(`latestChangeDate`, latestChangeDate, testDate);
                 return;
               }
 

@@ -9,7 +9,8 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 lastChangeDatePosix: 0,
             });
             metaData.loadedFromLocalStorage.then(() => {
-                onSnapshot(query(collectionRef, and(where(CHANGE_DATE_KEY, ">", new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0))), ...queryConstraints)), (snapshot) => {
+                const testDate = new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0));
+                onSnapshot(query(collectionRef, and(where(CHANGE_DATE_KEY, ">", testDate), ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     snapshot.docChanges().forEach((change) => {
@@ -18,6 +19,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                         if (change.type === "removed") {
                             console.error(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
                 is not currently configured to handle documents being deleted.`, change.doc.data());
+                            console.log(`latestChangeDate`, latestChangeDate, testDate);
                             return;
                         }
                         // Update doc store.
