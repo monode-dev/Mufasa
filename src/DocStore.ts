@@ -192,6 +192,9 @@ export function createDocStore(config: DocPersisters) {
           docMaxPersistance,
           propMaxPersistance,
         );
+        console.log(
+          `docMaxPersistance: ${docMaxPersistance}, propMaxPersistance: ${propMaxPersistance}, actualMaxPersistance: ${actualMaxPersistance}`,
+        );
         if (actualMaxPersistance >= Persistance.session) {
           if (!isValid(sessionUpdates[docId])) sessionUpdates[docId] = {};
           sessionUpdates[docId][key] = value;
