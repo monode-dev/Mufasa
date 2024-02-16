@@ -4,23 +4,9 @@ import { createPersistedFunction } from "./PersistedFunction.js";
 export const DELETED_KEY = `mx_deleted`;
 export const MAX_PERSISTANCE_KEY = `maxPersistance`;
 export const Persistance = {
-    session: `session`,
-    local: `local`,
-    global: `global`,
-    max: (a, b) => {
-        if ([a, b].includes(Persistance.global))
-            return Persistance.global;
-        if ([a, b].includes(Persistance.local))
-            return Persistance.local;
-        return Persistance.session;
-    },
-    min: (a, b) => {
-        if ([a, b].includes(Persistance.session))
-            return Persistance.session;
-        if ([a, b].includes(Persistance.local))
-            return Persistance.local;
-        return Persistance.global;
-    },
+    session: 0,
+    local: 1,
+    global: 2,
 };
 const fakeLocalJsonPersister = {
     jsonFile: (fileId) => ({
@@ -67,7 +53,7 @@ export function createDocStore(config) {
             const prevMaxPersistance = getMaxPersistance(docId);
             const newMaxPersistance = (props[MAX_PERSISTANCE_KEY]?.value ??
                 params.sourceStoreType);
-            const docMaxPersistance = Persistance.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance);
+            const docMaxPersistance = Math.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance);
             if (docMaxPersistance === Persistance.global) {
                 const docExistsInSession = config.sessionDocPersister.docExists(docId);
                 const isBeingDeleted = props[DELETED_KEY].value === true;
@@ -82,16 +68,13 @@ export function createDocStore(config) {
                 }
             }
             Object.entries(props).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
-                const actualMaxPersistance = Persistance.min(docMaxPersistance, propMaxPersistance);
-                if (actualMaxPersistance === Persistance.session ||
-                    actualMaxPersistance === Persistance.local ||
-                    actualMaxPersistance === Persistance.global) {
+                const actualMaxPersistance = Math.min(docMaxPersistance, propMaxPersistance);
+                if (actualMaxPersistance >= Persistance.session) {
                     if (!isValid(sessionUpdates[docId]))
                         sessionUpdates[docId] = {};
                     sessionUpdates[docId][key] = value;
                 }
-                if (actualMaxPersistance === Persistance.local ||
-                    actualMaxPersistance === Persistance.global) {
+                if (actualMaxPersistance >= Persistance.local) {
                     if (!isValid(localUpdates[docId]))
                         localUpdates[docId] = {};
                     localUpdates[docId][key] = value;
