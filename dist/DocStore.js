@@ -51,7 +51,7 @@ export function createDocStore(config) {
         const globalDeletes = new Set();
         Object.entries(params.updates).forEach(([docId, props]) => {
             const prevMaxPersistance = getMaxPersistance(docId);
-            const newMaxPersistance = props[MAX_PERSISTANCE_KEY].maxPersistance ?? null;
+            const newMaxPersistance = props[MAX_PERSISTANCE_KEY]?.value ?? null;
             const willBePersistedGlobally = prevMaxPersistance === Persistance.global ||
                 newMaxPersistance === Persistance.global;
             if (willBePersistedGlobally) {
@@ -68,6 +68,8 @@ export function createDocStore(config) {
                 }
             }
             Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
+                // TODO: Prevent persisting beyond the doc's maxPersistance.
+                const actualMaxPersistance = maxPersistance ?? newMaxPersistance;
                 if (maxPersistance === Persistance.session ||
                     maxPersistance === Persistance.local ||
                     maxPersistance === Persistance.global) {
