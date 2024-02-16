@@ -229,7 +229,11 @@ export function createDocStore(config: DocPersisters) {
       Object.entries(globalUpdates).forEach(([docId, props]) => {
         pushGlobalChange({
           docId,
-          props,
+          props: Object.fromEntries(
+            Object.entries(props).filter(
+              ([key]) => key !== MAX_PERSISTANCE_KEY,
+            ),
+          ),
           isBeingCreatedOrDeleted:
             (globalCreates.has(docId) || globalDeletes.has(docId)) &&
             params.sourceStoreType === Persistance.session,
@@ -253,12 +257,10 @@ export function createDocStore(config: DocPersisters) {
           Object.entries(updates).map(([docId, props]) => [
             docId,
             Object.fromEntries(
-              Object.entries(props)
-                .filter(([key]) => key !== MAX_PERSISTANCE_KEY)
-                .map(([key, value]) => [
-                  key,
-                  { value, maxPersistance: Persistance.global },
-                ]),
+              Object.entries(props).map(([key, value]) => [
+                key,
+                { value, maxPersistance: Persistance.global },
+              ]),
             ),
           ]),
         ),
