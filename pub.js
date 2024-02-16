@@ -30,7 +30,7 @@ try {
   }
 
   // Replace the old version with the new version
-  packageJson.version = newVersion;
+  packageJson.version = `0.2.0`; //newVersion;
 
   // Write the updated JSON back to package.json
   const updatedPackageJsonData = JSON.stringify(packageJson, null, 2);
