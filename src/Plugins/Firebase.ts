@@ -31,16 +31,17 @@ export function firestoreDocPersister(
         lastChangeDatePosix: 0,
       });
       metaData.loadedFromLocalStorage.then(() => {
-        const changeDateAtStart = Math.max(
-          metaData.data.lastChangeDatePosix - 30000,
-          0,
-        );
-        console.log(`Change date at start: ${changeDateAtStart}`);
         onSnapshot(
           query(
             collectionRef,
             and(
-              where(CHANGE_DATE_KEY, ">", changeDateAtStart),
+              where(
+                CHANGE_DATE_KEY,
+                ">",
+                new Date(
+                  Math.max(metaData.data.lastChangeDatePosix - 30000, 0),
+                ),
+              ),
               ...queryConstraints,
             ),
           ),
