@@ -174,9 +174,9 @@ export function createDocStore(config: DocPersisters) {
         const docIsBeingPromotedToGlobal =
           prevMaxPersistance !== Persistance.global &&
           newMaxPersistance === Persistance.global;
-        console.log(
-          `docId: ${docId}, docExistsInSession: ${docExistsInSession}, isBeingDeleted: ${isBeingDeleted}, docIsBeingPromotedToGlobal: ${docIsBeingPromotedToGlobal}`,
-        );
+        // console.log(
+        //   `docId: ${docId}, docExistsInSession: ${docExistsInSession}, isBeingDeleted: ${isBeingDeleted}, docIsBeingPromotedToGlobal: ${docIsBeingPromotedToGlobal}`,
+        // );
         if (isBeingDeleted) {
           globalDeletes.add(docId);
         } else if (!docExistsInSession || docIsBeingPromotedToGlobal) {
@@ -213,6 +213,8 @@ export function createDocStore(config: DocPersisters) {
         }
       });
     });
+    console.log(`docsBeingCreated: ${Array.from(globalCreates)}`);
+    console.log(`docsBeingDeleted: ${Array.from(globalDeletes)}`);
 
     // Changes are pushed to session store, but never come from there.
     config.sessionDocPersister.batchUpdate(
