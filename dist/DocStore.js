@@ -76,7 +76,9 @@ export function createDocStore(config) {
             }).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
                 const actualMaxPersistance = Math.min(docMaxPersistance, propMaxPersistance);
                 console.log(`docId: ${docId}, key: ${key}, value: ${value}`);
-                console.log(`docMaxPersistance: ${docMaxPersistance}, propMaxPersistance: ${propMaxPersistance}, actualMaxPersistance: ${actualMaxPersistance}, prevMaxPersistance: ${prevMaxPersistance}, newMaxPersistance: ${newMaxPersistance}`);
+                // console.log(
+                //   `docMaxPersistance: ${docMaxPersistance}, propMaxPersistance: ${propMaxPersistance}, actualMaxPersistance: ${actualMaxPersistance}, prevMaxPersistance: ${prevMaxPersistance}, newMaxPersistance: ${newMaxPersistance}`,
+                // );
                 if (actualMaxPersistance >= Persistance.session) {
                     if (!isValid(sessionUpdates[docId]))
                         sessionUpdates[docId] = {};
@@ -96,9 +98,9 @@ export function createDocStore(config) {
         });
         // Changes are pushed to session store, but never come from there.
         config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
-        console.log("Firebase.batchUpdate.session", sessionUpdates);
+        // console.log("Firebase.batchUpdate.session", sessionUpdates);
         if (params.sourceStoreType !== Persistance.local) {
-            console.log("Firebase.batchUpdate.local", localUpdates);
+            // console.log("Firebase.batchUpdate.local", localUpdates);
             localDocs.batchUpdate((data) => {
                 Object.entries(localUpdates).forEach(([docId, props]) => {
                     data.docs[docId] = {
@@ -110,7 +112,7 @@ export function createDocStore(config) {
         }
         // Persist updates to cloud.
         if (params.sourceStoreType !== Persistance.global) {
-            console.log("Firebase.batchUpdate.global", globalUpdates);
+            // console.log("Firebase.batchUpdate.global", globalUpdates);
             Object.entries(globalUpdates).forEach(([docId, props]) => {
                 pushGlobalChange({
                     docId,
