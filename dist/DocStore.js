@@ -75,7 +75,7 @@ export function createDocStore(config) {
                 },
             }).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
                 const actualMaxPersistance = Math.min(docMaxPersistance, propMaxPersistance);
-                console.log(`key: ${key}, value: ${value}`);
+                console.log(`docId: ${docId}, key: ${key}, value: ${value}`);
                 console.log(`docMaxPersistance: ${docMaxPersistance}, propMaxPersistance: ${propMaxPersistance}, actualMaxPersistance: ${actualMaxPersistance}, prevMaxPersistance: ${prevMaxPersistance}, newMaxPersistance: ${newMaxPersistance}`);
                 if (actualMaxPersistance >= Persistance.session) {
                     if (!isValid(sessionUpdates[docId]))
