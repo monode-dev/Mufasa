@@ -89,7 +89,12 @@ function _initializeInst<T extends Doc>(
                   `Doc.set ${key}: ${value} - ${propConfig.toPrim!(value)}`,
                 );
                 this._docStore.batchUpdate({
-                  [docId]: { [key]: propConfig.toPrim!(value) },
+                  [docId]: {
+                    [key]: {
+                      value: propConfig.toPrim!(value),
+                      maxPersistance: propConfig.persistance,
+                    },
+                  },
                 });
               },
             }
