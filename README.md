@@ -19,6 +19,8 @@ Install Mufasa via `npm i mufasa`. To update to the latest version run `npm i mu
 Import and initialize Mufasa anywhere in your app.
 
 ```ts
+import { Teacher } from "./Teacher";
+import { Course } from "./Course";
 import { initializeMufasa } from "mufasa";
 
 // Export "Doc" so it can be used in other files too.
