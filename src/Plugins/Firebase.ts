@@ -69,6 +69,7 @@ export function firestoreDocPersister(
 
               // Update doc store.
               updates[change.doc.id] = change.doc.data() as DocJson;
+              console.log(`latestChangeDate`, latestChangeDate);
               latestChangeDate = Math.max(
                 latestChangeDate,
                 change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
