@@ -7,6 +7,20 @@ export const Persistance = {
     session: `session`,
     local: `local`,
     global: `global`,
+    max: (a, b) => {
+        if ([a, b].includes(Persistance.global))
+            return Persistance.global;
+        if ([a, b].includes(Persistance.local))
+            return Persistance.local;
+        return Persistance.session;
+    },
+    min: (a, b) => {
+        if ([a, b].includes(Persistance.session))
+            return Persistance.session;
+        if ([a, b].includes(Persistance.local))
+            return Persistance.local;
+        return Persistance.global;
+    },
 };
 const fakeLocalJsonPersister = {
     jsonFile: (fileId) => ({
@@ -51,10 +65,10 @@ export function createDocStore(config) {
         const globalDeletes = new Set();
         Object.entries(params.updates).forEach(([docId, props]) => {
             const prevMaxPersistance = getMaxPersistance(docId);
-            const newMaxPersistance = props[MAX_PERSISTANCE_KEY]?.value ?? null;
-            const willBePersistedGlobally = prevMaxPersistance === Persistance.global ||
-                newMaxPersistance === Persistance.global;
-            if (willBePersistedGlobally) {
+            const newMaxPersistance = (props[MAX_PERSISTANCE_KEY]?.value ??
+                null);
+            const docMaxPersistance = Persistance.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance ?? Persistance.session);
+            if (docMaxPersistance === Persistance.global) {
                 const docExistsInSession = config.sessionDocPersister.docExists(docId);
                 const isBeingDeleted = props[DELETED_KEY].value === true;
                 const docIsBeingPromotedToGlobal = prevMaxPersistance !== Persistance.global &&
@@ -67,23 +81,22 @@ export function createDocStore(config) {
                     globalCreates.add(docId);
                 }
             }
-            Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
-                // TODO: Prevent persisting beyond the doc's maxPersistance.
-                const actualMaxPersistance = maxPersistance ?? newMaxPersistance;
-                if (maxPersistance === Persistance.session ||
-                    maxPersistance === Persistance.local ||
-                    maxPersistance === Persistance.global) {
+            Object.entries(props).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
+                const actualMaxPersistance = Persistance.min(docMaxPersistance, propMaxPersistance);
+                if (actualMaxPersistance === Persistance.session ||
+                    actualMaxPersistance === Persistance.local ||
+                    actualMaxPersistance === Persistance.global) {
                     if (!isValid(sessionUpdates[docId]))
                         sessionUpdates[docId] = {};
                     sessionUpdates[docId][key] = value;
                 }
-                if (maxPersistance === Persistance.local ||
-                    maxPersistance === Persistance.global) {
+                if (actualMaxPersistance === Persistance.local ||
+                    actualMaxPersistance === Persistance.global) {
                     if (!isValid(localUpdates[docId]))
                         localUpdates[docId] = {};
                     localUpdates[docId][key] = value;
                 }
-                if (maxPersistance === Persistance.global) {
+                if (actualMaxPersistance === Persistance.global) {
                     if (!isValid(globalUpdates[docId]))
                         globalUpdates[docId] = {};
                     globalUpdates[docId][key] = value;

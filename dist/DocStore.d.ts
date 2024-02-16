@@ -1,10 +1,12 @@
 export declare const DELETED_KEY = "mx_deleted";
 export declare const MAX_PERSISTANCE_KEY = "maxPersistance";
-export type Persistance = (typeof Persistance)[keyof typeof Persistance];
+export type Persistance = `session` | `local` | `global`;
 export declare const Persistance: {
     readonly session: "session";
     readonly local: "local";
     readonly global: "global";
+    readonly max: (a: Persistance, b: Persistance) => "session" | "global" | "local";
+    readonly min: (a: Persistance, b: Persistance) => "session" | "global" | "local";
 };
 export type PrimVal = boolean | number | string | null;
 export type DocJson = {
