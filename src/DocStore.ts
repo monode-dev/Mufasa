@@ -212,8 +212,10 @@ export function createDocStore(config: DocPersisters) {
       sessionUpdates,
       params.newDocsAreOnlyVirtual,
     );
+    console.log("Firebase.batchUpdate.session", sessionUpdates);
 
     if (params.sourceStoreType !== Persistance.local) {
+      console.log("Firebase.batchUpdate.local", localUpdates);
       localDocs.batchUpdate((data) => {
         Object.entries(localUpdates).forEach(([docId, props]) => {
           data.docs[docId] = {
@@ -226,6 +228,7 @@ export function createDocStore(config: DocPersisters) {
 
     // Persist updates to cloud.
     if (params.sourceStoreType !== Persistance.global) {
+      console.log("Firebase.batchUpdate.global", globalUpdates);
       Object.entries(globalUpdates).forEach(([docId, props]) => {
         pushGlobalChange({
           docId,

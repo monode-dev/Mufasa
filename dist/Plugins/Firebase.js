@@ -13,6 +13,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     snapshot.docChanges().forEach((change) => {
+                        console.log("Firebase.firestoreDocPersister", change);
                         // Skip removed documents. Documents should never be deleted only flagged.
                         if (change.type === "removed") {
                             console.error(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
