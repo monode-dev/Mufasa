@@ -86,6 +86,7 @@ export function firestoreDocPersister(
       const setOrUpdateDoc = change.isBeingCreatedOrDeleted
         ? setDoc
         : updateDoc;
+      console.log("Firebase.firestoreDocPersister.updateDoc", change);
       await setOrUpdateDoc(docRef(collectionRef, change.docId), {
         ...change.props,
         [CHANGE_DATE_KEY]: serverTimestamp(),
