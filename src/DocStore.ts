@@ -210,7 +210,9 @@ export function createDocStore(config: DocPersisters) {
     }
     if (params.sourceStoreType === Persistance.global) {
       globalCreates.forEach((docId) => {
-        console.log(`onIncomingCreate`, docId);
+        if (docId === `0BTXNPIa7AjYOi7Isiy6`) {
+          console.log(`onIncomingCreate`, docId);
+        }
         config.onIncomingCreate?.(docId);
       });
       globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));
