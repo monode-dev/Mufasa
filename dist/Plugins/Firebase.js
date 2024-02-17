@@ -3,6 +3,7 @@ import { uploadString, deleteObject, getBytes, } from "firebase/storage";
 import { isValid } from "../Utils.js";
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
+    const useServerTimestamp = serverTimestamp();
     return {
         start: async (batchUpdate, localJsonFilePersister) => {
             const metaData = localJsonFilePersister.start({
@@ -10,7 +11,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
             });
             metaData.loadedFromLocalStorage.then(() => {
                 const testDate = new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0));
-                onSnapshot(query(collectionRef, and(or(where(CHANGE_DATE_KEY, ">", testDate), where(CHANGE_DATE_KEY, "==", null)), ...queryConstraints)), (snapshot) => {
+                onSnapshot(query(collectionRef, and(or(where(CHANGE_DATE_KEY, ">", testDate), where(CHANGE_DATE_KEY, "==", null), where(CHANGE_DATE_KEY, "==", useServerTimestamp)), ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     console.log(snapshot.metadata.hasPendingWrites);
@@ -41,7 +42,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 : updateDoc;
             await setOrUpdateDoc(docRef(collectionRef, change.docId), {
                 ...change.props,
-                [CHANGE_DATE_KEY]: serverTimestamp(),
+                [CHANGE_DATE_KEY]: useServerTimestamp,
             });
         },
     };

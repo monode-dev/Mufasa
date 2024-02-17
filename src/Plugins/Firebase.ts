@@ -26,6 +26,7 @@ export function firestoreDocPersister(
   ...queryConstraints: QueryFilterConstraint[]
 ): GlobalDocPersister {
   const CHANGE_DATE_KEY = `mx_changeDate`;
+  const useServerTimestamp = serverTimestamp();
   return {
     start: async (batchUpdate, localJsonFilePersister) => {
       const metaData = localJsonFilePersister.start({
@@ -42,6 +43,7 @@ export function firestoreDocPersister(
               or(
                 where(CHANGE_DATE_KEY, ">", testDate),
                 where(CHANGE_DATE_KEY, "==", null),
+                where(CHANGE_DATE_KEY, "==", useServerTimestamp),
               ),
               ...queryConstraints,
             ),
@@ -95,7 +97,7 @@ export function firestoreDocPersister(
         : updateDoc;
       await setOrUpdateDoc(docRef(collectionRef, change.docId), {
         ...change.props,
-        [CHANGE_DATE_KEY]: serverTimestamp(),
+        [CHANGE_DATE_KEY]: useServerTimestamp,
       });
     },
   };
