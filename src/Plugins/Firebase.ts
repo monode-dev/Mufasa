@@ -39,14 +39,14 @@ export function firestoreDocPersister(
         onSnapshot(
           query(
             collectionRef,
-            and(
-              or(
-                where(CHANGE_DATE_KEY, ">", testDate),
-                where(CHANGE_DATE_KEY, "==", null),
-                where(CHANGE_DATE_KEY, "==", useServerTimestamp),
-              ),
-              ...queryConstraints,
-            ),
+            // and(
+            //   or(
+            //     where(CHANGE_DATE_KEY, ">", testDate),
+            //     where(CHANGE_DATE_KEY, "==", null),
+            //     where(CHANGE_DATE_KEY, "==", useServerTimestamp),
+            //   ),
+            //   ...queryConstraints,
+            // ),
           ),
           (snapshot) => {
             const updates: {
