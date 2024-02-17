@@ -115,10 +115,12 @@ export function firebaseFilePersister(
       const bytes = await getBytes(getStorageRef(fileId)).catch(
         () => undefined,
       );
+      console.log(`got bytes`);
       if (!isValid(bytes)) return undefined;
       const base64 = btoa(
         String.fromCharCode.apply(null, new Uint8Array(bytes) as any),
       );
+      console.log(`got base64`);
       return base64ToUtf8(base64);
     },
     async deleteFile(fileId) {
@@ -134,11 +136,13 @@ function utf8ToBase64(string: string) {
   return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)));
 }
 function base64ToUtf8(encoded: string) {
+  console.log(`base64ToUtf8`);
   const binary = atob(encoded);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < bytes.length; i++) {
     bytes[i] = binary.charCodeAt(i);
   }
+  console.log(`finish base64ToUtf8`);
   return String.fromCharCode(...new Uint16Array(bytes.buffer));
 }
 // function blobToBase64(blob: Blob): Promise<string> {
