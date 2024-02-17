@@ -13,18 +13,17 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 onSnapshot(query(collectionRef, and(where(CHANGE_DATE_KEY, ">", testDate), ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
+                    console.log(snapshot.metadata.hasPendingWrites);
                     snapshot.docChanges().forEach((change) => {
                         console.log("Firebase.firestoreDocPersister", change.type, change.doc.id, change.doc.data());
                         // Skip removed documents. Documents should never be deleted only flagged.
                         if (change.type === "removed") {
                             console.error(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
                 is not currently configured to handle documents being removed.`, change.doc.data());
-                            console.log(`latestChangeDate`, latestChangeDate, testDate);
                             return;
                         }
                         // Update doc store.
                         updates[change.doc.id] = change.doc.data();
-                        console.log(`latestChangeDate`, latestChangeDate);
                         latestChangeDate = Math.max(latestChangeDate, change.doc.data()[CHANGE_DATE_KEY].seconds * 1000);
                     });
                     batchUpdate(updates);
@@ -40,7 +39,6 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
             const setOrUpdateDoc = change.isBeingCreatedOrDeleted
                 ? setDoc
                 : updateDoc;
-            console.log("Firebase.firestoreDocPersister.updateDoc", change);
             await setOrUpdateDoc(docRef(collectionRef, change.docId), {
                 ...change.props,
                 [CHANGE_DATE_KEY]: serverTimestamp(),

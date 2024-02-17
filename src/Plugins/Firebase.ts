@@ -44,6 +44,7 @@ export function firestoreDocPersister(
               [docId: string]: DocJson;
             } = {};
             let latestChangeDate = metaData.data.lastChangeDatePosix;
+            console.log(snapshot.metadata.hasPendingWrites);
             snapshot.docChanges().forEach((change) => {
               console.log(
                 "Firebase.firestoreDocPersister",
@@ -58,13 +59,11 @@ export function firestoreDocPersister(
                 is not currently configured to handle documents being removed.`,
                   change.doc.data(),
                 );
-                console.log(`latestChangeDate`, latestChangeDate, testDate);
                 return;
               }
 
               // Update doc store.
               updates[change.doc.id] = change.doc.data() as DocJson;
-              console.log(`latestChangeDate`, latestChangeDate);
               latestChangeDate = Math.max(
                 latestChangeDate,
                 change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
@@ -87,7 +86,6 @@ export function firestoreDocPersister(
       const setOrUpdateDoc = change.isBeingCreatedOrDeleted
         ? setDoc
         : updateDoc;
-      console.log("Firebase.firestoreDocPersister.updateDoc", change);
       await setOrUpdateDoc(docRef(collectionRef, change.docId), {
         ...change.props,
         [CHANGE_DATE_KEY]: serverTimestamp(),

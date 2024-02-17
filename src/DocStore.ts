@@ -174,9 +174,6 @@ export function createDocStore(config: DocPersisters) {
         const docIsBeingPromotedToGlobal =
           prevMaxPersistance !== Persistance.global &&
           newMaxPersistance === Persistance.global;
-        // console.log(
-        //   `docId: ${docId}, docExistsInSession: ${docExistsInSession}, isBeingDeleted: ${isBeingDeleted}, docIsBeingPromotedToGlobal: ${docIsBeingPromotedToGlobal}`,
-        // );
         if (isBeingDeleted) {
           globalDeletes.add(docId);
         } else if (!docExistsInSession || docIsBeingPromotedToGlobal) {
@@ -195,10 +192,6 @@ export function createDocStore(config: DocPersisters) {
           docMaxPersistance,
           propMaxPersistance,
         );
-        console.log(`docId: ${docId}, key: ${key}, value: ${value}`);
-        console.log(
-          `docMaxPersistance: ${docMaxPersistance}, propMaxPersistance: ${propMaxPersistance}, actualMaxPersistance: ${actualMaxPersistance}, prevMaxPersistance: ${prevMaxPersistance}, newMaxPersistance: ${newMaxPersistance}`,
-        );
         if (actualMaxPersistance >= Persistance.session) {
           if (!isValid(sessionUpdates[docId])) sessionUpdates[docId] = {};
           sessionUpdates[docId][key] = value;
@@ -213,18 +206,14 @@ export function createDocStore(config: DocPersisters) {
         }
       });
     });
-    console.log(`docsBeingCreated: ${Array.from(globalCreates)}`);
-    console.log(`docsBeingDeleted: ${Array.from(globalDeletes)}`);
 
     // Changes are pushed to session store, but never come from there.
     config.sessionDocPersister.batchUpdate(
       sessionUpdates,
       params.newDocsAreOnlyVirtual,
     );
-    console.log("Firebase.batchUpdate.session", sessionUpdates);
 
     if (params.sourceStoreType !== Persistance.local) {
-      console.log("Firebase.batchUpdate.local", localUpdates);
       localDocs.batchUpdate((data) => {
         Object.entries(localUpdates).forEach(([docId, props]) => {
           data.docs[docId] = {
@@ -237,7 +226,6 @@ export function createDocStore(config: DocPersisters) {
 
     // Persist updates to cloud.
     if (params.sourceStoreType !== Persistance.global) {
-      console.log("Firebase.batchUpdate.global", globalUpdates);
       Object.entries(globalUpdates).forEach(([docId, props]) => {
         pushGlobalChange({
           docId,
