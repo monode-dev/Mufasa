@@ -1,4 +1,4 @@
-import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, } from "firebase/firestore";
+import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, and, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, } from "firebase/storage";
 import { isValid } from "../Utils.js";
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
@@ -41,7 +41,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 : updateDoc;
             await setOrUpdateDoc(docRef(collectionRef, change.docId), {
                 ...change.props,
-                [CHANGE_DATE_KEY]: serverTimestamp(),
+                // [CHANGE_DATE_KEY]: serverTimestamp(),
             });
         },
     };

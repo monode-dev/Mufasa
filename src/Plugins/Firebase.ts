@@ -88,7 +88,7 @@ export function firestoreDocPersister(
         : updateDoc;
       await setOrUpdateDoc(docRef(collectionRef, change.docId), {
         ...change.props,
-        [CHANGE_DATE_KEY]: serverTimestamp(),
+        // [CHANGE_DATE_KEY]: serverTimestamp(),
       });
     },
   };
