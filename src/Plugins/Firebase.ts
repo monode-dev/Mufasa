@@ -9,6 +9,7 @@ import {
   serverTimestamp,
   and,
   QueryFilterConstraint,
+  or,
 } from "firebase/firestore";
 import { DocJson, GlobalDocChange, GlobalDocPersister } from "../DocStore.js";
 import {
@@ -37,7 +38,13 @@ export function firestoreDocPersister(
         onSnapshot(
           query(
             collectionRef,
-            and(where(CHANGE_DATE_KEY, ">", testDate), ...queryConstraints),
+            and(
+              or(
+                where(CHANGE_DATE_KEY, ">", testDate),
+                where(CHANGE_DATE_KEY, "==", null),
+              ),
+              ...queryConstraints,
+            ),
           ),
           (snapshot) => {
             const updates: {
@@ -88,7 +95,7 @@ export function firestoreDocPersister(
         : updateDoc;
       await setOrUpdateDoc(docRef(collectionRef, change.docId), {
         ...change.props,
-        // [CHANGE_DATE_KEY]: serverTimestamp(),
+        [CHANGE_DATE_KEY]: serverTimestamp(),
       });
     },
   };
