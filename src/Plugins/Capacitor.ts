@@ -2,6 +2,7 @@ import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Json, LocalJsonPersister, ToReadonlyJson } from "../DocStore.js";
 import { doNow } from "../Utils.js";
 import { LocalFilePersister } from "../FileStore.js";
+import { Capacitor } from "@capacitor/core";
 
 // SECTION: Doc Persister
 export function capacitorJsonPersister(
@@ -32,7 +33,7 @@ export function capacitorJsonPersister(
               const saveIndexAtStart = saveIndex;
               if (lastSaveIndex !== saveIndexAtStart) {
                 lastSaveIndex = saveIndexAtStart;
-                await writeFile(filePath, JSON.stringify(data));
+                await writeStringFile(filePath, JSON.stringify(data));
               }
               await new Promise((resolve) => setTimeout(resolve, 10));
             }
@@ -79,7 +80,7 @@ export function capacitorFilePersister(
         .catch(() => undefined),
     // TODO: We need to use strings for this.
     readFile: (fileId) => readFile(getLocalPath(fileId)),
-    writeFile: (fileId, data) => writeFile(getLocalPath(fileId), data),
+    writeFile: (fileId, data) => writeBinaryFile(getLocalPath(fileId), data),
     deleteFile: (fileId) => deleteFile(getLocalPath(fileId)),
     localJsonPersister: capacitorJsonPersister(`${directoryName}.json`),
   };
@@ -101,7 +102,7 @@ async function readFile(path: string): Promise<string | undefined> {
     return undefined;
   }
 }
-async function writeFile(path: string, contents: string) {
+async function writeStringFile(path: string, contents: string) {
   await Filesystem.writeFile({
     path: path,
     data: contents,
@@ -109,6 +110,19 @@ async function writeFile(path: string, contents: string) {
     directory: Directory.Data,
     encoding: Encoding.UTF8,
   });
+}
+async function writeBinaryFile(path: string, contents: string) {
+  if (Capacitor.isNativePlatform()) {
+    await writeStringFile(path, contents);
+  } else {
+    const blob = new Blob([contents], { type: "application/octet-stream" });
+    await Filesystem.writeFile({
+      path: path,
+      data: blob,
+      recursive: true,
+      directory: Directory.Data,
+    });
+  }
 }
 async function deleteFile(path: string) {
   try {

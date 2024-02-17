@@ -1,5 +1,6 @@
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { doNow } from "../Utils.js";
+import { Capacitor } from "@capacitor/core";
 // SECTION: Doc Persister
 export function capacitorJsonPersister(directoryName) {
     return {
@@ -26,7 +27,7 @@ export function capacitorJsonPersister(directoryName) {
                             const saveIndexAtStart = saveIndex;
                             if (lastSaveIndex !== saveIndexAtStart) {
                                 lastSaveIndex = saveIndexAtStart;
-                                await writeFile(filePath, JSON.stringify(data));
+                                await writeStringFile(filePath, JSON.stringify(data));
                             }
                             await new Promise((resolve) => setTimeout(resolve, 10));
                         }
@@ -64,7 +65,7 @@ export function capacitorFilePersister(directoryName) {
             .catch(() => undefined),
         // TODO: We need to use strings for this.
         readFile: (fileId) => readFile(getLocalPath(fileId)),
-        writeFile: (fileId, data) => writeFile(getLocalPath(fileId), data),
+        writeFile: (fileId, data) => writeBinaryFile(getLocalPath(fileId), data),
         deleteFile: (fileId) => deleteFile(getLocalPath(fileId)),
         localJsonPersister: capacitorJsonPersister(`${directoryName}.json`),
     };
@@ -86,7 +87,7 @@ async function readFile(path) {
         return undefined;
     }
 }
-async function writeFile(path, contents) {
+async function writeStringFile(path, contents) {
     await Filesystem.writeFile({
         path: path,
         data: contents,
@@ -94,6 +95,20 @@ async function writeFile(path, contents) {
         directory: Directory.Data,
         encoding: Encoding.UTF8,
     });
+}
+async function writeBinaryFile(path, contents) {
+    if (Capacitor.isNativePlatform()) {
+        await writeStringFile(path, contents);
+    }
+    else {
+        const blob = new Blob([contents], { type: "application/octet-stream" });
+        await Filesystem.writeFile({
+            path: path,
+            data: blob,
+            recursive: true,
+            directory: Directory.Data,
+        });
+    }
 }
 async function deleteFile(path) {
     try {
