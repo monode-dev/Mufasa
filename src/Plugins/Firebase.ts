@@ -108,8 +108,8 @@ export function firebaseFilePersister(
   getStorageRef: (fileId: string) => StorageReference,
 ): GlobalFilePersister {
   return {
-    async uploadFile(fileId, utf8String) {
-      await uploadString(getStorageRef(fileId), await utf8ToBase64(utf8String));
+    async uploadFile(fileId, binaryString) {
+      await uploadString(getStorageRef(fileId), btoa(binaryString));
     },
     async downloadFile(fileId) {
       const bytes = await getBytes(getStorageRef(fileId)).catch(
@@ -117,60 +117,11 @@ export function firebaseFilePersister(
       );
       console.log(`got bytes`);
       if (!isValid(bytes)) return undefined;
-      const base64 = btoa(
-        String.fromCharCode.apply(null, new Uint8Array(bytes) as any),
-      );
-      console.log(`got base64`);
-      return base64ToUtf8(base64);
+      const base64String = new TextDecoder("utf-8").decode(bytes);
+      return atob(base64String);
     },
     async deleteFile(fileId) {
       await deleteObject(getStorageRef(fileId));
     },
   };
 }
-function utf8ToBase64(string: string) {
-  const codeUnits = new Uint16Array(string.length);
-  for (let i = 0; i < codeUnits.length; i++) {
-    codeUnits[i] = string.charCodeAt(i);
-  }
-  return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)));
-}
-function base64ToUtf8(encoded: string) {
-  console.log(`base64ToUtf8`);
-  const binary = atob(encoded);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  console.log(`finish base64ToUtf8`);
-  return String.fromCharCode(...new Uint16Array(bytes.buffer));
-}
-// function blobToBase64(blob: Blob): Promise<string> {
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader();
-//     reader.onloadend = () => {
-//       resolve(reader.result as string);
-//     };
-//     reader.onerror = reject;
-//     reader.readAsDataURL(blob);
-//   });
-// }
-// function base64DataUrlToBlob(base64DataUrl: string) {
-//   // Split the base64 string into parts: the data URL scheme and the base64 encoded data
-//   const parts = base64DataUrl.split(";base64,");
-//   const contentType = parts[0].split(":")[1]; // Extract MIME type (e.g., 'image/png')
-//   const base64 = parts[1];
-//   const binaryString = window.atob(base64); // Decode base64
-
-//   // Convert binary string to a Uint8Array
-//   const length = binaryString.length;
-//   const uint8Array = new Uint8Array(length);
-
-//   for (let i = 0; i < length; i++) {
-//     uint8Array[i] = binaryString.charCodeAt(i);
-//   }
-
-//   // Create the blob object with the typed array and MIME type
-//   const blob = new Blob([uint8Array], { type: contentType });
-//   return blob;
-// }
