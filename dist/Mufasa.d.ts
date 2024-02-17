@@ -15,6 +15,7 @@ export declare function initializeMufasa(mfsConfig: {
     }) => {
         new (): {
             readonly webPath: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+            readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {
@@ -32,22 +33,20 @@ export declare function initializeMufasa(mfsConfig: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
-                }, maxPersistance?: import("./DocStore.js").Persistance | undefined, manualDocId?: string | undefined) => string;
+                }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
-                readonly getMaxPersistance: (docId: string) => import("./DocStore.js").Persistance | null;
-                readonly promoteDocPersistance: (docId: string, newPersistance: import("./DocStore.js").Persistance) => void;
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            readonly maxPersistance: import("./DocStore.js").Persistance | null;
             delete(): void;
         };
         readonly typeName: string;
         createFromBinaryString(byteString: string): Promise<{
             readonly webPath: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+            readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {
@@ -65,17 +64,14 @@ export declare function initializeMufasa(mfsConfig: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
-                }, maxPersistance?: import("./DocStore.js").Persistance | undefined, manualDocId?: string | undefined) => string;
+                }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
-                readonly getMaxPersistance: (docId: string) => import("./DocStore.js").Persistance | null;
-                readonly promoteDocPersistance: (docId: string, newPersistance: import("./DocStore.js").Persistance) => void;
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            readonly maxPersistance: import("./DocStore.js").Persistance | null;
             delete(): void;
         }>;
         getPersisters(): import("./DocStore.js").DocPersisters;
@@ -95,13 +91,11 @@ export declare function initializeMufasa(mfsConfig: {
                     readonly value: import("./DocStore.js").PrimVal;
                     readonly maxPersistance: import("./DocStore.js").Persistance;
                 };
-            }, maxPersistance?: import("./DocStore.js").Persistance | undefined, manualDocId?: string | undefined) => string;
+            }, manualDocId?: string | undefined) => string;
             readonly deleteDoc: (docId: string) => void;
             readonly isDocDeleted: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
-            readonly getMaxPersistance: (docId: string) => import("./DocStore.js").Persistance | null;
-            readonly promoteDocPersistance: (docId: string, newPersistance: import("./DocStore.js").Persistance) => void;
         };
         newTypeFromPersisters(persisters: import("./DocStore.js").DocPersisters): {
             new (): {
@@ -121,17 +115,14 @@ export declare function initializeMufasa(mfsConfig: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: import("./DocStore.js").Persistance;
                         };
-                    }, maxPersistance?: import("./DocStore.js").Persistance | undefined, manualDocId?: string | undefined) => string;
+                    }, manualDocId?: string | undefined) => string;
                     readonly deleteDoc: (docId: string) => void;
                     readonly isDocDeleted: (docId: string) => boolean;
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
-                    readonly getMaxPersistance: (docId: string) => import("./DocStore.js").Persistance | null;
-                    readonly promoteDocPersistance: (docId: string, newPersistance: import("./DocStore.js").Persistance) => void;
                 };
                 readonly docId: string;
                 readonly isDeleted: boolean;
-                readonly maxPersistance: import("./DocStore.js").Persistance | null;
                 onDelete(): void;
                 delete(): void;
             };
@@ -152,13 +143,11 @@ export declare function initializeMufasa(mfsConfig: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
-                }, maxPersistance?: import("./DocStore.js").Persistance | undefined, manualDocId?: string | undefined) => string;
+                }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
-                readonly getMaxPersistance: (docId: string) => import("./DocStore.js").Persistance | null;
-                readonly promoteDocPersistance: (docId: string, newPersistance: import("./DocStore.js").Persistance) => void;
             };
             newTypeFromPersisters(persisters: import("./DocStore.js").DocPersisters): any;
             getAllDocs<T extends typeof import("./Doc.js").Doc>(this: T): InstanceType<T>[];

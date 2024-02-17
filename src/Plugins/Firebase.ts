@@ -43,7 +43,7 @@ export function firestoreDocPersister(
               or(
                 // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
                 where(CHANGE_DATE_KEY, ">", testDate),
-                // where(CHANGE_DATE_KEY, "==", null),
+                where(CHANGE_DATE_KEY, "==", null),
                 // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
               ),
               ...queryConstraints,

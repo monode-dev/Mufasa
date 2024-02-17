@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 export const DELETED_KEY = `mx_deleted`;
-export const MAX_PERSISTANCE_KEY = `maxPersistance`;
 export const Persistance = {
     session: 0,
     local: 1,
@@ -37,9 +36,6 @@ export function createDocStore(config) {
         }), {}), true);
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => await config.globalDocPersister?.updateDoc(docChange));
-    function getMaxPersistance(docId) {
-        return config.sessionDocPersister.getProp(docId, MAX_PERSISTANCE_KEY, null);
-    }
     //
     async function batchUpdate(params) {
         // TODO: Handle "maxPersistance".
@@ -50,47 +46,35 @@ export function createDocStore(config) {
         const globalCreates = new Set();
         const globalDeletes = new Set();
         Object.entries(params.updates).forEach(([docId, props]) => {
-            const prevMaxPersistance = getMaxPersistance(docId);
-            const newMaxPersistance = (props[MAX_PERSISTANCE_KEY]?.value ??
-                params.sourceStoreType);
-            const docMaxPersistance = Math.max(prevMaxPersistance ?? Persistance.session, newMaxPersistance);
-            if (docMaxPersistance === Persistance.global) {
-                const docExistsInSession = config.sessionDocPersister.docExists(docId);
-                const isBeingDeleted = props[DELETED_KEY]?.value === true;
-                const docIsBeingPromotedToGlobal = prevMaxPersistance !== Persistance.global &&
-                    newMaxPersistance === Persistance.global;
-                if (isBeingDeleted) {
-                    globalDeletes.add(docId);
-                }
-                else if (!docExistsInSession || docIsBeingPromotedToGlobal) {
-                    // Even if a doc is new, if it has the DELETED_KEY then it is actually deleted.
-                    globalCreates.add(docId);
-                }
-            }
-            Object.entries({
-                ...props,
-                [MAX_PERSISTANCE_KEY]: {
-                    value: docMaxPersistance,
-                    maxPersistance: docMaxPersistance,
-                },
-            }).forEach(([key, { value, maxPersistance: propMaxPersistance }]) => {
-                const actualMaxPersistance = Math.min(docMaxPersistance, propMaxPersistance);
-                if (actualMaxPersistance >= Persistance.session) {
+            Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
+                if (maxPersistance >= Persistance.session) {
                     if (!isValid(sessionUpdates[docId]))
                         sessionUpdates[docId] = {};
                     sessionUpdates[docId][key] = value;
                 }
-                if (actualMaxPersistance >= Persistance.local) {
+                if (maxPersistance >= Persistance.local) {
                     if (!isValid(localUpdates[docId]))
                         localUpdates[docId] = {};
                     localUpdates[docId][key] = value;
                 }
-                if (actualMaxPersistance === Persistance.global) {
+                if (maxPersistance === Persistance.global) {
                     if (!isValid(globalUpdates[docId]))
                         globalUpdates[docId] = {};
                     globalUpdates[docId][key] = value;
                 }
             });
+            const hasGlobalProps = isValid(globalUpdates[docId]);
+            if (hasGlobalProps) {
+                const docExistsInSession = config.sessionDocPersister.docExists(docId);
+                const isBeingDeleted = props[DELETED_KEY]?.value === true;
+                if (isBeingDeleted) {
+                    globalDeletes.add(docId);
+                }
+                else if (!docExistsInSession && !params.newDocsAreOnlyVirtual) {
+                    // Even if a doc is new, if it has the DELETED_KEY then it is actually deleted.
+                    globalCreates.add(docId);
+                }
+            }
         });
         // Changes are pushed to session store, but never come from there.
         config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
@@ -109,7 +93,7 @@ export function createDocStore(config) {
             Object.entries(globalUpdates).forEach(([docId, props]) => {
                 pushGlobalChange({
                     docId,
-                    props: Object.fromEntries(Object.entries(props).filter(([key]) => key !== MAX_PERSISTANCE_KEY)),
+                    props,
                     isBeingCreatedOrDeleted: (globalCreates.has(docId) || globalDeletes.has(docId)) &&
                         params.sourceStoreType === Persistance.session,
                 });
@@ -148,19 +132,13 @@ export function createDocStore(config) {
                 updates,
             });
         },
-        createDoc(props, maxPersistance, manualDocId) {
+        createDoc(props, manualDocId) {
             const docId = manualDocId ?? uuidv4();
             batchUpdate({
                 sourceStoreType: Persistance.session,
                 newDocsAreOnlyVirtual: false,
                 updates: {
-                    [docId]: {
-                        ...props,
-                        [MAX_PERSISTANCE_KEY]: {
-                            value: maxPersistance ?? Persistance.global,
-                            maxPersistance: maxPersistance ?? Persistance.global,
-                        },
-                    },
+                    [docId]: props,
                 },
             });
             return docId;
@@ -184,20 +162,5 @@ export function createDocStore(config) {
         },
         getProp: config.sessionDocPersister.getProp,
         getAllDocs: config.sessionDocPersister.getAllDocs,
-        getMaxPersistance,
-        promoteDocPersistance(docId, newPersistance) {
-            batchUpdate({
-                sourceStoreType: Persistance.session,
-                newDocsAreOnlyVirtual: false,
-                updates: {
-                    [docId]: {
-                        [MAX_PERSISTANCE_KEY]: {
-                            value: newPersistance,
-                            maxPersistance: newPersistance,
-                        },
-                    },
-                },
-            });
-        },
     };
 }

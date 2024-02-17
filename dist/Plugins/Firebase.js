@@ -13,7 +13,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 const testDate = new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0));
                 onSnapshot(query(collectionRef, and(or(
                 // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
-                where(CHANGE_DATE_KEY, ">", testDate)), ...queryConstraints)), (snapshot) => {
+                where(CHANGE_DATE_KEY, ">", testDate), where(CHANGE_DATE_KEY, "==", null)), ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     console.log(snapshot.metadata.hasPendingWrites);

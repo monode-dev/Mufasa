@@ -46,8 +46,15 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       const fileData = await config.localFilePersister.readFile(fileId);
       if (!isValid(fileData)) return;
       config.globalFilePersister?.uploadFile(fileId, fileData);
-      // We wait to actually create the doc until the file is uploaded so that others can know when the file is available.
-      SyncedFile._docStore.promoteDocPersistance(fileId, Persistance.global);
+      // Manually persist globally to signify that the file is uploaded.
+      SyncedFile._docStore.batchUpdate({
+        [fileId]: {
+          fileIsUploaded: {
+            value: true,
+            maxPersistance: Persistance.global,
+          },
+        },
+      });
     });
     const pullCreate = createPersistedFunction(
       config.localJsonPersister.jsonFile(`pullCreate`),
@@ -93,6 +100,7 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       }
 
       readonly webPath = prop([String, null], null, Persistance.local);
+      readonly fileIsUploaded = prop(Boolean, false, Persistance.local);
 
       static async createFromBinaryString(byteString: string) {
         console.log(`Start createFromBinaryString`);
@@ -100,7 +108,7 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
         await config.localFilePersister.writeFile(docId, byteString);
         console.log(`Wrote file.`);
         pushCreate(docId);
-        SyncedFile._docStore.createDoc({}, Persistance.local, docId);
+        SyncedFile._docStore.createDoc({}, docId);
         return SyncedFile._fromId(docId);
       }
 
