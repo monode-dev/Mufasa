@@ -61,7 +61,7 @@ export function capacitorFilePersister(directoryName) {
             path: getLocalPath(fileId),
             directory: Directory.Data,
         })
-            .then(({ uri }) => uri)
+            .then(({ uri }) => Capacitor.convertFileSrc(uri))
             .catch(() => undefined),
         // TODO: We need to use strings for this.
         readFile: (fileId) => readFile(getLocalPath(fileId)),
@@ -97,18 +97,18 @@ async function writeStringFile(path, contents) {
     });
 }
 async function writeBinaryFile(path, contents) {
-    if (Capacitor.isNativePlatform()) {
-        await writeStringFile(path, contents);
-    }
-    else {
-        const blob = new Blob([contents], { type: "application/octet-stream" });
-        await Filesystem.writeFile({
-            path: path,
-            data: blob,
-            recursive: true,
-            directory: Directory.Data,
-        });
-    }
+    await writeStringFile(path, contents);
+    // if (Capacitor.isNativePlatform()) {
+    //   await writeStringFile(path, contents);
+    // } else {
+    //   const blob = new Blob([contents], { type: "application/octet-stream" });
+    //   await Filesystem.writeFile({
+    //     path: path,
+    //     data: blob,
+    //     recursive: true,
+    //     directory: Directory.Data,
+    //   });
+    // }
 }
 async function deleteFile(path) {
     try {
