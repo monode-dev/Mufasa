@@ -1,4 +1,4 @@
-import { onSnapshot, query, updateDoc, doc as docRef, setDoc, serverTimestamp, } from "firebase/firestore";
+import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, } from "firebase/storage";
 import { isValid } from "../Utils.js";
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
@@ -11,7 +11,9 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
             });
             metaData.loadedFromLocalStorage.then(() => {
                 const testDate = new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0));
-                onSnapshot(query(collectionRef), (snapshot) => {
+                onSnapshot(query(collectionRef, and(or(
+                // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
+                where(CHANGE_DATE_KEY, ">", testDate)), ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     console.log(snapshot.metadata.hasPendingWrites);
