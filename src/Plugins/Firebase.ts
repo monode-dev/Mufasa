@@ -54,14 +54,14 @@ export function firestoreDocPersister(
               [docId: string]: DocJson;
             } = {};
             let latestChangeDate = metaData.data.lastChangeDatePosix;
-            console.log(snapshot.metadata.hasPendingWrites);
+            // console.log(snapshot.metadata.hasPendingWrites);
             snapshot.docChanges().forEach((change) => {
-              console.log(
-                "Firebase.firestoreDocPersister",
-                change.type,
-                change.doc.id,
-                change.doc.data(),
-              );
+              // console.log(
+              //   "Firebase.firestoreDocPersister",
+              //   change.type,
+              //   change.doc.id,
+              //   change.doc.data(),
+              // );
               // Skip removed documents. Documents should never be deleted only flagged.
               if (change.type === "removed") {
                 console.error(

@@ -100,7 +100,10 @@ export function createDocStore(config) {
             });
         }
         if (params.sourceStoreType === Persistance.global) {
-            globalCreates.forEach((docId) => config.onIncomingCreate?.(docId));
+            globalCreates.forEach((docId) => {
+                console.log(`onIncomingCreate`, docId);
+                config.onIncomingCreate?.(docId);
+            });
             globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));
         }
     }
