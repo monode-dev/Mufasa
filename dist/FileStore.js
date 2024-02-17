@@ -31,7 +31,9 @@ export function initializeFileStoreFactory(factoryConfig) {
             });
         });
         const pullCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pullCreate`), async (fileId) => {
+            console.log(`Start pullCreate.`);
             const fileData = await config.globalFilePersister?.downloadFile(fileId);
+            console.log(`Downloaded file.`);
             if (!isValid(fileData))
                 return null;
             await config.localFilePersister.writeFile(fileId, fileData);
@@ -39,10 +41,13 @@ export function initializeFileStoreFactory(factoryConfig) {
         }).addStep(async (fileId) => {
             if (!isValid(fileId))
                 return;
+            console.log(`Start pullCreate, step 2.`);
             const webPath = await config.localFilePersister.getWebPath(fileId);
+            console.log(`Got webPath.`);
             if (!isValid(webPath))
                 return;
             SyncedFile._fromId(fileId).webPath = webPath;
+            console.log(`Set webPath.`);
         });
         const pushDelete = createPersistedFunction(config.localJsonPersister.jsonFile(`pushDelete`), async (fileId) => {
             await config.localFilePersister.deleteFile(fileId);
