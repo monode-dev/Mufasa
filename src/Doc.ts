@@ -182,11 +182,10 @@ export class Doc {
   onDelete() {}
 
   /** Permanently deletes this object. */
-  deleteDoc() {
-    console.log(this);
+  readonly deleteDoc = () => {
     this.onDelete();
     this._docStore.deleteDoc(this.docId);
-  }
+  };
 }
 
 // TODO: Add Local and Session flags.

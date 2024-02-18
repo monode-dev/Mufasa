@@ -46,7 +46,7 @@ export declare function initializeMufasa(mfsConfig: {
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            deleteDoc(): void;
+            readonly deleteDoc: () => void;
         };
         readonly typeName: string;
         createFromBase64String(base64String: string): Promise<{
@@ -82,7 +82,7 @@ export declare function initializeMufasa(mfsConfig: {
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            deleteDoc(): void;
+            readonly deleteDoc: () => void;
         }>;
         getPersisters(): import("./DocStore.js").DocPersisters;
         readonly docType: string;
@@ -138,7 +138,7 @@ export declare function initializeMufasa(mfsConfig: {
                 readonly docId: string;
                 readonly isDeleted: boolean;
                 onDelete(): void;
-                deleteDoc(): void;
+                readonly deleteDoc: () => void;
             };
             getPersisters(): import("./DocStore.js").DocPersisters;
             readonly docType: string;

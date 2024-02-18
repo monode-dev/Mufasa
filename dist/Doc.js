@@ -129,11 +129,10 @@ export class Doc {
     /** Override to run code just before an object is deleted. */
     onDelete() { }
     /** Permanently deletes this object. */
-    deleteDoc() {
-        console.log(this);
+    deleteDoc = () => {
         this.onDelete();
         this._docStore.deleteDoc(this.docId);
-    }
+    };
 }
 export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
