@@ -42,9 +42,7 @@ export function createDocStore(config) {
         docUploadCount -= 1;
     });
     //
-    async function batchUpdate(params) {
-        // TODO: Handle "maxPersistance".
-        await localDocs.loadedFromLocalStorage;
+    function batchUpdate(params) {
         const sessionUpdates = {};
         const localUpdates = {};
         const globalUpdates = {};
@@ -83,36 +81,38 @@ export function createDocStore(config) {
         });
         // Changes are pushed to session store, but never come from there.
         config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
-        if (params.sourceStoreType !== Persistance.local) {
-            localDocs.batchUpdate((data) => {
-                Object.entries(localUpdates).forEach(([docId, props]) => {
-                    data.docs[docId] = {
-                        ...(data.docs[docId] ?? {}),
-                        ...props,
-                    };
+        localDocs.loadedFromLocalStorage.then(() => {
+            if (params.sourceStoreType !== Persistance.local) {
+                localDocs.batchUpdate((data) => {
+                    Object.entries(localUpdates).forEach(([docId, props]) => {
+                        data.docs[docId] = {
+                            ...(data.docs[docId] ?? {}),
+                            ...props,
+                        };
+                    });
                 });
-            });
-        }
-        // Persist updates to cloud.
-        if (params.sourceStoreType !== Persistance.global) {
-            Object.entries(globalUpdates).forEach(([docId, props]) => {
-                pushGlobalChange({
-                    docId,
-                    props,
-                    isBeingCreatedOrDeleted: params.overwriteGlobally &&
-                        params.sourceStoreType === Persistance.session,
+            }
+            // Persist updates to cloud.
+            if (params.sourceStoreType !== Persistance.global) {
+                Object.entries(globalUpdates).forEach(([docId, props]) => {
+                    pushGlobalChange({
+                        docId,
+                        props,
+                        isBeingCreatedOrDeleted: params.overwriteGlobally &&
+                            params.sourceStoreType === Persistance.session,
+                    });
                 });
-            });
-        }
-        if (params.sourceStoreType === Persistance.global) {
-            globalCreates.forEach((docId) => {
-                if (docId === `0BTXNPIa7AjYOi7Isiy6`) {
-                    console.log(`onIncomingCreate`, docId);
-                }
-                config.onIncomingCreate?.(docId);
-            });
-            globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));
-        }
+            }
+            if (params.sourceStoreType === Persistance.global) {
+                globalCreates.forEach((docId) => {
+                    if (docId === `0BTXNPIa7AjYOi7Isiy6`) {
+                        console.log(`onIncomingCreate`, docId);
+                    }
+                    config.onIncomingCreate?.(docId);
+                });
+                globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));
+            }
+        });
     }
     // Watch cloud.
     localDocs.loadedFromLocalStorage.then(() => {
