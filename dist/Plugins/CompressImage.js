@@ -13,8 +13,9 @@ export async function compressImage(config) {
             else if (typeof config.maxSize === `number`) {
                 if (image.width * image.height > config.maxSize) {
                     const aspectRatio = image.width / image.height;
+                    const outWidth = Math.sqrt(config.maxSize * aspectRatio);
                     return {
-                        outWidth: Math.sqrt(config.maxSize * aspectRatio),
+                        outWidth,
                         outHeight: outWidth / aspectRatio,
                     };
                 }
@@ -26,8 +27,9 @@ export async function compressImage(config) {
                 if (image.width * image.height >
                     config.maxSize.width * config.maxSize.height) {
                     const aspectRatio = image.width / image.height;
+                    const outWidth = Math.sqrt(config.maxSize.width * config.maxSize.height * aspectRatio);
                     return {
-                        outWidth: Math.sqrt(config.maxSize.width * config.maxSize.height * aspectRatio),
+                        outWidth,
                         outHeight: outWidth / aspectRatio,
                     };
                 }

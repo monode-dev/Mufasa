@@ -10,7 +10,7 @@ type AddStep<PrevIn extends Json[], PrevOut> = {
 export function createPersistedFunction<Params extends Json[], Return>(
   localJsonFilePersister: LocalJsonFilePersister,
   func: (...args: Params) => Promise<Return>,
-): ((...args: Params) => Return) & AddStep<Params, Return> {
+): ((...args: Params) => Promise<Return>) & AddStep<Params, Return> {
   const steps: Function[] = [func];
   const savedJson = localJsonFilePersister.start({
     activeFunctions: {} as {
