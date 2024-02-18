@@ -13,6 +13,7 @@ export function list(OtherClass, tableConfig) {
                 getSecondaryClass: (inst) => inst.constructor,
                 gePrimaryProp: () => otherProp,
                 getPersisters,
+                otherDocsToStartSyncing: [OtherClass],
             });
         }
         else {
@@ -20,12 +21,12 @@ export function list(OtherClass, tableConfig) {
                 [IsCustomProp]: true,
                 isFullCustom: true,
                 init: (inst, key) => {
-                    OtherClass._docStore;
                     const listInst = new List(() => OtherClass.getAllDocs().filter((other) => other[otherProp].docId === inst.docId), () => { }, () => { });
                     Object.defineProperty(inst, key, {
                         get: () => listInst,
                     });
                 },
+                otherDocsToStartSyncing: [OtherClass],
             };
         }
     }
@@ -37,6 +38,7 @@ export function list(OtherClass, tableConfig) {
                 getSecondaryClass: () => OtherClass,
                 gePrimaryProp: (thisProp) => thisProp,
                 getPersisters,
+                otherDocsToStartSyncing: [OtherClass],
             }),
         };
     }
@@ -48,8 +50,6 @@ function listProp(config) {
         init: (inst, key) => {
             const PrimaryClass = config.getPrimaryClass(inst);
             const SecondaryClass = config.getSecondaryClass(inst);
-            PrimaryClass._docStore;
-            SecondaryClass._docStore;
             if (!relTables.has(PrimaryClass))
                 relTables.set(PrimaryClass, new Map());
             const relTablesForThisType = relTables.get(PrimaryClass);
@@ -82,6 +82,7 @@ function listProp(config) {
                 get: () => listInst,
             });
         },
+        otherDocsToStartSyncing: config.otherDocsToStartSyncing,
     };
 }
 export class List {

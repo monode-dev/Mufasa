@@ -119,6 +119,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
         };
+        startSyncing(): void;
         newTypeFromPersisters(persisters: import("./DocStore.js").DocPersisters): {
             new (): {
                 readonly docType: string;
@@ -175,6 +176,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };
+            startSyncing(): void;
             newTypeFromPersisters(persisters: import("./DocStore.js").DocPersisters): any;
             getAllDocs<T extends typeof import("./Doc.js").Doc>(this: T): InstanceType<T>[];
             _fromId<T_1 extends typeof import("./Doc.js").Doc>(this: T_1, docId: string): InstanceType<T_1>;

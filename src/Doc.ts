@@ -134,6 +134,17 @@ export class Doc {
   get _docStore() {
     return (this.constructor as typeof Doc)._docStore;
   }
+  /** Docs don't start syncing until they are read the first time. This is a simple way to manually start syncing. It will also start syncing any related  */
+  static startSyncing() {
+    const hasAlreadyStarted = docStores.has(this.docType);
+    if (hasAlreadyStarted) return;
+    this._docStore;
+    const uninitializedInst = new this();
+    Object.values(uninitializedInst).forEach((prop) => {
+      if (isCustomProp(prop)) {
+      }
+    });
+  }
   // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
   static newTypeFromPersisters(persisters: DocPersisters) {
     return class extends Doc {
@@ -183,6 +194,8 @@ export class Doc {
 
   /** Permanently deletes this object. */
   readonly deleteDoc = () => {
+    // NOTE: If we try to declare this using the "function" format, like deleteDoc() {}, then
+    // the "this" keyword will not work correctly.
     this.onDelete();
     this._docStore.deleteDoc(this.docId);
   };
@@ -275,6 +288,7 @@ export function prop<
       toPrim: (inst: InstanceType<typeof TypeClass> | null) =>
         inst?.docId ?? null,
       persistance,
+      otherDocsToStartSyncing: [TypeClass],
     } satisfies CustomProp as any;
   } else {
     return {
@@ -285,6 +299,7 @@ export function prop<
       fromPrim: (prim: PrimVal) => prim,
       toPrim: (inst: PrimVal) => inst,
       persistance,
+      otherDocsToStartSyncing: [],
     } satisfies CustomProp as any;
   }
 }
@@ -296,12 +311,14 @@ export function formula<T>(compute: () => T): T {
     getDefaultValue: () => compute,
     fromPrim: (prim: PrimVal) => prim,
     persistance: Persistance.session,
+    otherDocsToStartSyncing: [],
   } satisfies CustomProp as any;
 }
 export type IsCustomProp = typeof IsCustomProp;
 export const IsCustomProp = Symbol(`IsCustomProp`);
 export type CustomProp = {
   [IsCustomProp]: true;
+  otherDocsToStartSyncing: (typeof Doc)[];
 } & (
   | {
       isFullCustom: false;

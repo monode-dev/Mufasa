@@ -99,6 +99,18 @@ export class Doc {
     get _docStore() {
         return this.constructor._docStore;
     }
+    /** Docs don't start syncing until they are read the first time. This is a simple way to manually start syncing. It will also start syncing any related  */
+    static startSyncing() {
+        const hasAlreadyStarted = docStores.has(this.docType);
+        if (hasAlreadyStarted)
+            return;
+        this._docStore;
+        const uninitializedInst = new this();
+        Object.values(uninitializedInst).forEach((prop) => {
+            if (isCustomProp(prop)) {
+            }
+        });
+    }
     // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
     static newTypeFromPersisters(persisters) {
         return class extends Doc {
@@ -130,6 +142,8 @@ export class Doc {
     onDelete() { }
     /** Permanently deletes this object. */
     deleteDoc = () => {
+        // NOTE: If we try to declare this using the "function" format, like deleteDoc() {}, then
+        // the "this" keyword will not work correctly.
         this.onDelete();
         this._docStore.deleteDoc(this.docId);
     };
@@ -164,6 +178,7 @@ export function prop(firstParam, secondParam, persistance = Persistance.global) 
             fromPrim: (prim) => TypeClass._fromId(prim),
             toPrim: (inst) => inst?.docId ?? null,
             persistance,
+            otherDocsToStartSyncing: [TypeClass],
         };
     }
     else {
@@ -175,6 +190,7 @@ export function prop(firstParam, secondParam, persistance = Persistance.global) 
             fromPrim: (prim) => prim,
             toPrim: (inst) => inst,
             persistance,
+            otherDocsToStartSyncing: [],
         };
     }
 }
@@ -186,6 +202,7 @@ export function formula(compute) {
         getDefaultValue: () => compute,
         fromPrim: (prim) => prim,
         persistance: Persistance.session,
+        otherDocsToStartSyncing: [],
     };
 }
 export const IsCustomProp = Symbol(`IsCustomProp`);
