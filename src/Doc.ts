@@ -128,11 +128,13 @@ export class Doc {
   static get _docStore() {
     if (!docStores.has(this.docType)) {
       docStores.set(this.docType, createDocStore(this.getPersisters()));
+      /** Docs don't start syncing until they are accessed the first time. So as soon as
+       * the first one is accessed we start syncing all the connected doc types too. */
       const uninitializedInst = new this();
       Object.values(uninitializedInst).forEach((prop) => {
         if (isCustomProp(prop)) {
-          prop.otherDocsToStartSyncing.forEach((docClass) =>
-            docClass.startSyncing(),
+          prop.otherDocsToStartSyncing.forEach(
+            (docClass) => docClass._docStore,
           );
         }
       });
@@ -141,11 +143,6 @@ export class Doc {
   }
   get _docStore() {
     return (this.constructor as typeof Doc)._docStore;
-  }
-  /** Docs don't start syncing until they are read the first time. This is a simple
-   * way to manually start syncing. It will also start syncing any related  */
-  static startSyncing() {
-    this._docStore;
   }
   // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
   static newTypeFromPersisters(persisters: DocPersisters) {
