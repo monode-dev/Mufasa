@@ -33,7 +33,7 @@ export function createDocStore(config) {
             .reduce((result, [id, props]) => ({
             ...result,
             [id]: props,
-        }), {}), true);
+        }), {}), false);
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => await config.globalDocPersister?.updateDoc(docChange));
     //

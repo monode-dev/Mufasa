@@ -128,7 +128,7 @@ export function createDocStore(config: DocPersisters) {
           }),
           {},
         ),
-      true,
+      false,
     );
   });
 
