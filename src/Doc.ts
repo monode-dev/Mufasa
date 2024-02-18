@@ -85,12 +85,14 @@ function _initializeInst<T extends Doc>(
         ...(isValid(propConfig.toPrim)
           ? {
               set: function (value) {
+                const asPrim = propConfig.toPrim!(value);
+                console.log(`asPrim`, asPrim);
                 // TODO: Only do update if value is different.
                 this._docStore.batchUpdate(
                   {
                     [docId]: {
                       [key]: {
-                        value: propConfig.toPrim!(value),
+                        value: asPrim,
                         maxPersistance: propConfig.persistance,
                       },
                     },
