@@ -142,6 +142,9 @@ export class Doc {
     const uninitializedInst = new this();
     Object.values(uninitializedInst).forEach((prop) => {
       if (isCustomProp(prop)) {
+        prop.otherDocsToStartSyncing.forEach((docClass) =>
+          docClass.startSyncing(),
+        );
       }
     });
   }
