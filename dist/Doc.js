@@ -130,6 +130,7 @@ export class Doc {
     onDelete() { }
     /** Permanently deletes this object. */
     deleteDoc() {
+        console.log(this);
         this.onDelete();
         this._docStore.deleteDoc(this.docId);
     }
