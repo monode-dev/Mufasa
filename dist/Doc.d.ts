@@ -22,6 +22,8 @@ export declare class Doc {
                     readonly maxPersistance: Persistance;
                 };
             };
+        }, options: {
+            overwriteGlobally: boolean;
         }) => void;
         readonly createDoc: (props: {
             readonly [x: string]: {
@@ -43,6 +45,8 @@ export declare class Doc {
                     readonly maxPersistance: Persistance;
                 };
             };
+        }, options: {
+            overwriteGlobally: boolean;
         }) => void;
         readonly createDoc: (props: {
             readonly [x: string]: {
@@ -67,6 +71,8 @@ export declare class Doc {
                             readonly maxPersistance: Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {
@@ -98,6 +104,8 @@ export declare class Doc {
                         readonly maxPersistance: Persistance;
                     };
                 };
+            }, options: {
+                overwriteGlobally: boolean;
             }) => void;
             readonly createDoc: (props: {
                 readonly [x: string]: {

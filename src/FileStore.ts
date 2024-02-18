@@ -85,14 +85,17 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       readonly fileIsUploaded = prop(Boolean, false, Persistance.local);
       flagFileAsUploaded() {
         // Manually persist globally to signify that the file is uploaded.
-        SyncedFile._docStore.batchUpdate({
-          [this.docId]: {
-            fileIsUploaded: {
-              value: true,
-              maxPersistance: Persistance.global,
+        SyncedFile._docStore.batchUpdate(
+          {
+            [this.docId]: {
+              fileIsUploaded: {
+                value: true,
+                maxPersistance: Persistance.global,
+              },
             },
           },
-        });
+          { overwriteGlobally: true },
+        );
       }
       readonly fileIsDownloaded = prop(Boolean, false, Persistance.local);
       flagFileAsDownloaded() {

@@ -64,6 +64,8 @@ getDocId) {
                                         maxPersistance: propConfig.persistance,
                                     },
                                 },
+                            }, {
+                                overwriteGlobally: false,
                             });
                         },
                     }

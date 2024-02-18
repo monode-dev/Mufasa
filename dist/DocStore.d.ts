@@ -69,7 +69,9 @@ export type DocPersisters = {
 };
 export declare function createDocStore(config: DocPersisters): {
     readonly loadedFromLocalStorage: Promise<void>;
-    readonly batchUpdate: (updates: PersistanceTaggedUpdateBatch) => void;
+    readonly batchUpdate: (updates: PersistanceTaggedUpdateBatch, options: {
+        overwriteGlobally: boolean;
+    }) => void;
     readonly createDoc: (props: PersistanceTaggedUpdateBatch[string], manualDocId?: string) => string;
     readonly deleteDoc: (docId: string) => void;
     readonly isDocDeleted: (docId: string) => boolean;

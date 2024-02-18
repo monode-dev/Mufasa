@@ -86,14 +86,19 @@ function _initializeInst<T extends Doc>(
           ? {
               set: function (value) {
                 // TODO: Only do update if value is different.
-                this._docStore.batchUpdate({
-                  [docId]: {
-                    [key]: {
-                      value: propConfig.toPrim!(value),
-                      maxPersistance: propConfig.persistance,
+                this._docStore.batchUpdate(
+                  {
+                    [docId]: {
+                      [key]: {
+                        value: propConfig.toPrim!(value),
+                        maxPersistance: propConfig.persistance,
+                      },
                     },
                   },
-                });
+                  {
+                    overwriteGlobally: false,
+                  },
+                );
               },
             }
           : {}),

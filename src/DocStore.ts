@@ -143,6 +143,7 @@ export function createDocStore(config: DocPersisters) {
     sourceStoreType: Persistance;
     newDocsAreOnlyVirtual: boolean;
     updates: PersistanceTaggedUpdateBatch;
+    overwriteGlobally: boolean;
   }) {
     // TODO: Handle "maxPersistance".
     await localDocs.loadedFromLocalStorage;
@@ -203,7 +204,7 @@ export function createDocStore(config: DocPersisters) {
           docId,
           props,
           isBeingCreatedOrDeleted:
-            (globalCreates.has(docId) || globalDeletes.has(docId)) &&
+            params.overwriteGlobally &&
             params.sourceStoreType === Persistance.session,
         });
       });
@@ -237,6 +238,7 @@ export function createDocStore(config: DocPersisters) {
             ),
           ]),
         ),
+        overwriteGlobally: false,
       });
     }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
   });
@@ -245,11 +247,17 @@ export function createDocStore(config: DocPersisters) {
   return {
     loadedFromLocalStorage: localDocs.loadedFromLocalStorage,
 
-    batchUpdate(updates: PersistanceTaggedUpdateBatch) {
+    batchUpdate(
+      updates: PersistanceTaggedUpdateBatch,
+      options: {
+        overwriteGlobally: boolean;
+      },
+    ) {
       batchUpdate({
         sourceStoreType: Persistance.session,
         newDocsAreOnlyVirtual: true,
         updates,
+        overwriteGlobally: options.overwriteGlobally,
       });
     },
 
@@ -264,6 +272,7 @@ export function createDocStore(config: DocPersisters) {
         updates: {
           [docId]: props,
         },
+        overwriteGlobally: true,
       });
       return docId;
     },
@@ -280,6 +289,7 @@ export function createDocStore(config: DocPersisters) {
             },
           },
         },
+        overwriteGlobally: true,
       });
     },
 

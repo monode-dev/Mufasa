@@ -39,6 +39,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                             readonly maxPersistance: Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {
@@ -74,6 +76,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                             readonly maxPersistance: Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {
@@ -101,6 +105,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                         readonly maxPersistance: Persistance;
                     };
                 };
+            }, options: {
+                overwriteGlobally: boolean;
             }) => void;
             readonly createDoc: (props: {
                 readonly [x: string]: {
@@ -125,6 +131,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                                 readonly maxPersistance: Persistance;
                             };
                         };
+                    }, options: {
+                        overwriteGlobally: boolean;
                     }) => void;
                     readonly createDoc: (props: {
                         readonly [x: string]: {
@@ -153,6 +161,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                             readonly maxPersistance: Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {

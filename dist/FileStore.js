@@ -56,7 +56,7 @@ export function initializeFileStoreFactory(factoryConfig) {
                             maxPersistance: Persistance.global,
                         },
                     },
-                });
+                }, { overwriteGlobally: true });
             }
             fileIsDownloaded = prop(Boolean, false, Persistance.local);
             flagFileAsDownloaded() {

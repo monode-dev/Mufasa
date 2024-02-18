@@ -94,7 +94,7 @@ export function createDocStore(config) {
                 pushGlobalChange({
                     docId,
                     props,
-                    isBeingCreatedOrDeleted: (globalCreates.has(docId) || globalDeletes.has(docId)) &&
+                    isBeingCreatedOrDeleted: params.overwriteGlobally &&
                         params.sourceStoreType === Persistance.session,
                 });
             });
@@ -124,17 +124,19 @@ export function createDocStore(config) {
                         { value, maxPersistance: Persistance.global },
                     ])),
                 ])),
+                overwriteGlobally: false,
             });
         }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
     });
     // This Interface should be all the Class API needs to interface with the store.
     return {
         loadedFromLocalStorage: localDocs.loadedFromLocalStorage,
-        batchUpdate(updates) {
+        batchUpdate(updates, options) {
             batchUpdate({
                 sourceStoreType: Persistance.session,
                 newDocsAreOnlyVirtual: true,
                 updates,
+                overwriteGlobally: options.overwriteGlobally,
             });
         },
         createDoc(props, manualDocId) {
@@ -145,6 +147,7 @@ export function createDocStore(config) {
                 updates: {
                     [docId]: props,
                 },
+                overwriteGlobally: true,
             });
             return docId;
         },
@@ -160,6 +163,7 @@ export function createDocStore(config) {
                         },
                     },
                 },
+                overwriteGlobally: true,
             });
         },
         isDocDeleted(docId) {

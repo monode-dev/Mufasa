@@ -30,6 +30,8 @@ export declare function initializeMufasa(mfsConfig: {
                             readonly maxPersistance: import("./DocStore.js").Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {
@@ -64,6 +66,8 @@ export declare function initializeMufasa(mfsConfig: {
                             readonly maxPersistance: import("./DocStore.js").Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {
@@ -91,6 +95,8 @@ export declare function initializeMufasa(mfsConfig: {
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
                 };
+            }, options: {
+                overwriteGlobally: boolean;
             }) => void;
             readonly createDoc: (props: {
                 readonly [x: string]: {
@@ -115,6 +121,8 @@ export declare function initializeMufasa(mfsConfig: {
                                 readonly maxPersistance: import("./DocStore.js").Persistance;
                             };
                         };
+                    }, options: {
+                        overwriteGlobally: boolean;
                     }) => void;
                     readonly createDoc: (props: {
                         readonly [x: string]: {
@@ -143,6 +151,8 @@ export declare function initializeMufasa(mfsConfig: {
                             readonly maxPersistance: import("./DocStore.js").Persistance;
                         };
                     };
+                }, options: {
+                    overwriteGlobally: boolean;
                 }) => void;
                 readonly createDoc: (props: {
                     readonly [x: string]: {
