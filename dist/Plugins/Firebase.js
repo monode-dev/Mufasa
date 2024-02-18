@@ -56,16 +56,15 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
 }
 export function firebaseFilePersister(getStorageRef) {
     return {
-        async uploadFile(fileId, binaryString) {
-            await uploadString(getStorageRef(fileId), btoa(binaryString));
+        async uploadFile(fileId, base64String) {
+            await uploadString(getStorageRef(fileId), base64String);
         },
         async downloadFile(fileId) {
             const bytes = await getBytes(getStorageRef(fileId)).catch(() => undefined);
-            console.log(`got bytes`);
             if (!isValid(bytes))
                 return undefined;
             const base64String = new TextDecoder("utf-8").decode(bytes);
-            return atob(base64String);
+            return base64String;
         },
         async deleteFile(fileId) {
             await deleteObject(getStorageRef(fileId));

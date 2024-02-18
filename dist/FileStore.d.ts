@@ -1,14 +1,14 @@
 import { DocExports } from "./Doc.js";
 import { GlobalDocPersister, LocalJsonPersister, Persistance, SessionDocPersister } from "./DocStore.js";
 export type GlobalFilePersister = {
-    uploadFile: (fileId: string, data: string) => Promise<void>;
+    uploadFile: (fileId: string, base64String: string) => Promise<void>;
     downloadFile: (fileId: string) => Promise<string | undefined>;
     deleteFile: (fileId: string) => Promise<void>;
 };
 export type LocalFilePersister = {
     getWebPath: (fileId: string) => Promise<string | undefined>;
     readFile: (fileId: string) => Promise<string | undefined>;
-    writeFile: (fileId: string, data: string) => Promise<void>;
+    writeFile: (fileId: string, base64String: string) => Promise<void>;
     deleteFile: (fileId: string) => Promise<void>;
     localJsonPersister: LocalJsonPersister;
 };
@@ -22,8 +22,14 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
         globalFilePersister?: GlobalFilePersister;
     }) => {
         new (): {
-            readonly webPath: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsUploaded(): void;
+            readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsDownloaded(): void;
+            readonly base64String: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+            readonly _shouldAutoLoadFile: false;
+            loadFile(): Promise<void>;
+            unloadFile(): void;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {
@@ -52,9 +58,15 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             delete(): void;
         };
         readonly typeName: string;
-        createFromBinaryString(byteString: string): Promise<{
-            readonly webPath: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+        createFromBase64String(base64String: string): Promise<{
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsUploaded(): void;
+            readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsDownloaded(): void;
+            readonly base64String: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+            readonly _shouldAutoLoadFile: false;
+            loadFile(): Promise<void>;
+            unloadFile(): void;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {

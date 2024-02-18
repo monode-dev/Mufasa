@@ -10,14 +10,14 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
 export type GlobalFilePersister = {
-  uploadFile: (fileId: string, data: string) => Promise<void>;
+  uploadFile: (fileId: string, base64String: string) => Promise<void>;
   downloadFile: (fileId: string) => Promise<string | undefined>;
   deleteFile: (fileId: string) => Promise<void>;
 };
 export type LocalFilePersister = {
   getWebPath: (fileId: string) => Promise<string | undefined>;
   readFile: (fileId: string) => Promise<string | undefined>;
-  writeFile: (fileId: string, data: string) => Promise<void>;
+  writeFile: (fileId: string, base64String: string) => Promise<void>;
   deleteFile: (fileId: string) => Promise<void>;
   localJsonPersister: LocalJsonPersister;
 };
@@ -35,27 +35,13 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       config.localJsonPersister.jsonFile(`pushCreate`),
       async (fileId: string) => {
         console.log(`Start pushCreate.`);
-        const webPath = await config.localFilePersister.getWebPath(fileId);
-        if (!isValid(webPath)) return null;
-        (SyncedFile._fromId(fileId).webPath as any) = webPath;
-        return fileId;
+        if (!isValid(fileId)) return;
+        const fileData = await config.localFilePersister.readFile(fileId);
+        if (!isValid(fileData)) return;
+        config.globalFilePersister?.uploadFile(fileId, fileData);
+        SyncedFile._fromId(fileId).flagFileAsUploaded();
       },
-    ).addStep(async (fileId) => {
-      console.log(`Start pushCreate, step 2.`);
-      if (!isValid(fileId)) return;
-      const fileData = await config.localFilePersister.readFile(fileId);
-      if (!isValid(fileData)) return;
-      config.globalFilePersister?.uploadFile(fileId, fileData);
-      // Manually persist globally to signify that the file is uploaded.
-      SyncedFile._docStore.batchUpdate({
-        [fileId]: {
-          fileIsUploaded: {
-            value: true,
-            maxPersistance: Persistance.global,
-          },
-        },
-      });
-    });
+    );
     const pullCreate = createPersistedFunction(
       config.localJsonPersister.jsonFile(`pullCreate`),
       async (fileId: string) => {
@@ -64,17 +50,10 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
         console.log(`Downloaded file.`);
         if (!isValid(fileData)) return null;
         await config.localFilePersister.writeFile(fileId, fileData);
+        SyncedFile._fromId(fileId).flagFileAsDownloaded();
         return fileId;
       },
-    ).addStep(async (fileId) => {
-      if (!isValid(fileId)) return;
-      console.log(`Start pullCreate, step 2.`);
-      const webPath = await config.localFilePersister.getWebPath(fileId);
-      console.log(`Got webPath.`);
-      if (!isValid(webPath)) return;
-      (SyncedFile._fromId(fileId).webPath as any) = webPath;
-      console.log(`Set webPath.`);
-    });
+    );
     const pushDelete = createPersistedFunction(
       config.localJsonPersister.jsonFile(`pushDelete`),
       async (fileId: string) => {
@@ -103,17 +82,58 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       static get typeName() {
         return config.storeName;
       }
-
-      readonly webPath = prop([String, null], null, Persistance.local);
       readonly fileIsUploaded = prop(Boolean, false, Persistance.local);
+      flagFileAsUploaded() {
+        // Manually persist globally to signify that the file is uploaded.
+        SyncedFile._docStore.batchUpdate({
+          [this.docId]: {
+            fileIsUploaded: {
+              value: true,
+              maxPersistance: Persistance.global,
+            },
+          },
+        });
+      }
+      readonly fileIsDownloaded = prop(Boolean, false, Persistance.local);
+      flagFileAsDownloaded() {
+        (this.fileIsDownloaded as any) = true;
+        if (this._shouldAutoLoadFile) {
+          (this._shouldAutoLoadFile as any) = false;
+          this.loadFile();
+        }
+      }
 
-      static async createFromBinaryString(byteString: string) {
+      readonly base64String = prop([String, null], null, Persistance.session);
+      readonly _shouldAutoLoadFile = false;
+      async loadFile() {
+        if (!this.fileIsDownloaded) {
+          (this._shouldAutoLoadFile as any) = true;
+        } else {
+          const fileData = await config.localFilePersister.readFile(this.docId);
+          if (!isValid(fileData)) return;
+          (this.base64String as any) = fileData;
+        }
+      }
+      unloadFile() {
+        (this._shouldAutoLoadFile as any) = false;
+        (this.base64String as any) = null;
+      }
+
+      static async createFromBase64String(base64String: string) {
         console.log(`Start createFromBinaryString`);
         const docId = uuidv4();
-        await config.localFilePersister.writeFile(docId, byteString);
+        await config.localFilePersister.writeFile(docId, base64String);
         console.log(`Wrote file.`);
         pushCreate(docId);
-        SyncedFile._docStore.createDoc({}, docId);
+        SyncedFile._docStore.createDoc(
+          {
+            fileIsDownloaded: {
+              value: true,
+              maxPersistance: Persistance.local,
+            },
+          },
+          docId,
+        );
         return SyncedFile._fromId(docId);
       }
 

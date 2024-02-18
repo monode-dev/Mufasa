@@ -14,8 +14,14 @@ export declare function initializeMufasa(mfsConfig: {
         globalFilePersister?: import("./FileStore.js").GlobalFilePersister | undefined;
     }) => {
         new (): {
-            readonly webPath: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsUploaded(): void;
+            readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsDownloaded(): void;
+            readonly base64String: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+            readonly _shouldAutoLoadFile: false;
+            loadFile(): Promise<void>;
+            unloadFile(): void;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {
@@ -44,9 +50,15 @@ export declare function initializeMufasa(mfsConfig: {
             delete(): void;
         };
         readonly typeName: string;
-        createFromBinaryString(byteString: string): Promise<{
-            readonly webPath: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+        createFromBase64String(base64String: string): Promise<{
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsUploaded(): void;
+            readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
+            flagFileAsDownloaded(): void;
+            readonly base64String: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
+            readonly _shouldAutoLoadFile: false;
+            loadFile(): Promise<void>;
+            unloadFile(): void;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {
