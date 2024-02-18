@@ -76,7 +76,7 @@ function listProp(config) {
                 RelTable.getAllDocs()
                     .filter((rel) => rel.primary.docId === inst.docId &&
                     rel.secondary.docId === value.docId)
-                    .forEach((rel) => rel.delete());
+                    .forEach((rel) => rel.deleteDoc());
             });
             Object.defineProperty(inst, key, {
                 get: () => listInst,

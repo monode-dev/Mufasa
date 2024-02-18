@@ -55,7 +55,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            delete(): void;
+            deleteDoc(): void;
         };
         readonly typeName: string;
         createFromBase64String(base64String: string): Promise<{
@@ -92,7 +92,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            delete(): void;
+            deleteDoc(): void;
         }>;
         getPersisters(): import("./DocStore.js").DocPersisters;
         readonly docType: string;
@@ -148,7 +148,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                 readonly docId: string;
                 readonly isDeleted: boolean;
                 onDelete(): void;
-                delete(): void;
+                deleteDoc(): void;
             };
             getPersisters(): import("./DocStore.js").DocPersisters;
             readonly docType: string;

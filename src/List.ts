@@ -129,7 +129,7 @@ function listProp(config: {
                 (rel as any).primary.docId === inst.docId &&
                 (rel as any).secondary.docId === value.docId,
             )
-            .forEach((rel) => rel.delete());
+            .forEach((rel) => rel.deleteDoc());
         },
       );
       Object.defineProperty(inst, key, {

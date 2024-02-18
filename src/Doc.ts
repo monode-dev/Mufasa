@@ -182,7 +182,7 @@ export class Doc {
   onDelete() {}
 
   /** Permanently deletes this object. */
-  delete() {
+  deleteDoc() {
     this.onDelete();
     this._docStore.deleteDoc(this.docId);
   }

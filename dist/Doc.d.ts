@@ -90,7 +90,7 @@ export declare class Doc {
             /** Override to run code just before an object is deleted. */
             onDelete(): void;
             /** Permanently deletes this object. */
-            delete(): void;
+            deleteDoc(): void;
         };
         getPersisters(): DocPersisters;
         /*** NOTE: This can be overridden to manually specify a type name. */
@@ -131,7 +131,7 @@ export declare class Doc {
     /** Override to run code just before an object is deleted. */
     onDelete(): void;
     /** Permanently deletes this object. */
-    delete(): void;
+    deleteDoc(): void;
 }
 type CreateParams<T extends typeof Doc> = CreateParamsFromInst<InstanceType<T>>;
 type OptionalParameter<T, IsOptional extends boolean> = Parameters<IsOptional extends true ? (prop?: T) => void : (prop: T) => void>;

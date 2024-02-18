@@ -129,7 +129,7 @@ export class Doc {
     /** Override to run code just before an object is deleted. */
     onDelete() { }
     /** Permanently deletes this object. */
-    delete() {
+    deleteDoc() {
         this.onDelete();
         this._docStore.deleteDoc(this.docId);
     }
