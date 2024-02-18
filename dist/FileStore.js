@@ -65,12 +65,14 @@ export function initializeFileStoreFactory(factoryConfig) {
             /** Won't resolve until it retrieves and returns the base64String. */
             async getBase64String() {
                 let base64String;
+                console.log(`Start getBase64String`);
                 while (!isValid(base64String)) {
                     base64String = await config.localFilePersister.readFile(this.docId);
                     if (!isValid(base64String)) {
                         await new Promise((resolve) => setTimeout(resolve, 100));
                     }
                 }
+                console.log(`Got base64String.`);
                 return base64String;
             }
             static async createFromBase64String(base64String) {

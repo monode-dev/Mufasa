@@ -132,10 +132,14 @@ export function createDocStore(config: DocPersisters) {
     );
   });
 
+  let docUploadCount = 0;
   const pushGlobalChange = createPersistedFunction(
     localJsonPersister.jsonFile(`pushGlobalChange`),
-    async (docChange: GlobalDocChange) =>
-      await config.globalDocPersister?.updateDoc(docChange),
+    async (docChange: GlobalDocChange) => {
+      docUploadCount += 1;
+      await config.globalDocPersister?.updateDoc(docChange);
+      docUploadCount -= 1;
+    },
   );
 
   //

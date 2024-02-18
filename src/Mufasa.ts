@@ -12,8 +12,9 @@ export function initializeMufasa(mfsConfig: {
     getDefaultPersistersFromDocType:
       mfsConfig.getDefaultPersistersFromDocType ?? (() => ({})),
   });
+  const fileStoreFactory = initializeFileStoreFactory(docClassStuff);
   return {
     ...docClassStuff,
-    ...initializeFileStoreFactory(docClassStuff),
+    ...fileStoreFactory,
   } as const;
 }

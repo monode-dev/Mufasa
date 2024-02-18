@@ -35,7 +35,12 @@ export function createDocStore(config) {
             [id]: props,
         }), {}), false);
     });
-    const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => await config.globalDocPersister?.updateDoc(docChange));
+    let docUploadCount = 0;
+    const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
+        docUploadCount += 1;
+        await config.globalDocPersister?.updateDoc(docChange);
+        docUploadCount -= 1;
+    });
     //
     async function batchUpdate(params) {
         // TODO: Handle "maxPersistance".
