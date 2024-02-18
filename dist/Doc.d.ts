@@ -59,7 +59,8 @@ export declare class Doc {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
     };
-    /** Docs don't start syncing until they are read the first time. This is a simple way to manually start syncing. It will also start syncing any related  */
+    /** Docs don't start syncing until they are read the first time. This is a simple
+     * way to manually start syncing. It will also start syncing any related  */
     static startSyncing(): void;
     static newTypeFromPersisters(persisters: DocPersisters): {
         new (): {
@@ -120,7 +121,8 @@ export declare class Doc {
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
         };
-        /** Docs don't start syncing until they are read the first time. This is a simple way to manually start syncing. It will also start syncing any related  */
+        /** Docs don't start syncing until they are read the first time. This is a simple
+         * way to manually start syncing. It will also start syncing any related  */
         startSyncing(): void;
         newTypeFromPersisters(persisters: DocPersisters): any;
         getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[];

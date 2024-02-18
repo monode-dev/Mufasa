@@ -93,24 +93,22 @@ export class Doc {
     static get _docStore() {
         if (!docStores.has(this.docType)) {
             docStores.set(this.docType, createDocStore(this.getPersisters()));
+            const uninitializedInst = new this();
+            Object.values(uninitializedInst).forEach((prop) => {
+                if (isCustomProp(prop)) {
+                    prop.otherDocsToStartSyncing.forEach((docClass) => docClass.startSyncing());
+                }
+            });
         }
         return docStores.get(this.docType);
     }
     get _docStore() {
         return this.constructor._docStore;
     }
-    /** Docs don't start syncing until they are read the first time. This is a simple way to manually start syncing. It will also start syncing any related  */
+    /** Docs don't start syncing until they are read the first time. This is a simple
+     * way to manually start syncing. It will also start syncing any related  */
     static startSyncing() {
-        const hasAlreadyStarted = docStores.has(this.docType);
-        if (hasAlreadyStarted)
-            return;
         this._docStore;
-        const uninitializedInst = new this();
-        Object.values(uninitializedInst).forEach((prop) => {
-            if (isCustomProp(prop)) {
-                prop.otherDocsToStartSyncing.forEach((docClass) => docClass.startSyncing());
-            }
-        });
     }
     // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
     static newTypeFromPersisters(persisters) {
