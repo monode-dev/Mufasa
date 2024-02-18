@@ -53,6 +53,7 @@ export function solidPersister(): SessionDocPersister {
             if (!isValid(propSignals[docId]?.[key])) {
               propSignals[docId][key] = untrack(() => createSignal(newValue));
             }
+            console.log("solidPersister setting", docId, key, newValue);
             propSignals[docId][key]![SET_FUNC](newValue);
             haveAddedOrRemovedDocs ||= key === DELETED_KEY && newValue === true;
           });
