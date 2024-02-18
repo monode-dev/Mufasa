@@ -26,10 +26,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             flagFileAsUploaded(): void;
             readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             flagFileAsDownloaded(): void;
-            readonly base64String: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
-            readonly _shouldAutoLoadFile: false;
-            loadFile(): Promise<void>;
-            unloadFile(): void;
+            /** Won't resolve until it retrieves and returns the base64String. */
+            getBase64String(): Promise<string>;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {
@@ -63,10 +61,8 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             flagFileAsUploaded(): void;
             readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             flagFileAsDownloaded(): void;
-            readonly base64String: import("./Utils.js").Flagged<string | null, typeof import("./Doc.js").OptionalPropFlag>;
-            readonly _shouldAutoLoadFile: false;
-            loadFile(): Promise<void>;
-            unloadFile(): void;
+            /** Won't resolve until it retrieves and returns the base64String. */
+            getBase64String(): Promise<string>;
             onDelete(): void;
             readonly docType: string;
             readonly _docStore: {

@@ -61,27 +61,17 @@ export function initializeFileStoreFactory(factoryConfig) {
             fileIsDownloaded = prop(Boolean, false, Persistance.local);
             flagFileAsDownloaded() {
                 this.fileIsDownloaded = true;
-                if (this._shouldAutoLoadFile) {
-                    this._shouldAutoLoadFile = false;
-                    this.loadFile();
-                }
             }
-            base64String = prop([String, null], null, Persistance.session);
-            _shouldAutoLoadFile = false;
-            async loadFile() {
-                if (!this.fileIsDownloaded) {
-                    this._shouldAutoLoadFile = true;
+            /** Won't resolve until it retrieves and returns the base64String. */
+            async getBase64String() {
+                let base64String;
+                while (!isValid(base64String)) {
+                    base64String = await config.localFilePersister.readFile(this.docId);
+                    if (!isValid(base64String)) {
+                        await new Promise((resolve) => setTimeout(resolve, 100));
+                    }
                 }
-                else {
-                    const fileData = await config.localFilePersister.readFile(this.docId);
-                    if (!isValid(fileData))
-                        return;
-                    this.base64String = fileData;
-                }
-            }
-            unloadFile() {
-                this._shouldAutoLoadFile = false;
-                this.base64String = null;
+                return base64String;
             }
             static async createFromBase64String(base64String) {
                 console.log(`Start createFromBinaryString`);
