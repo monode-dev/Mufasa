@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils.js";
+import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
 export const DELETED_KEY = `mx_deleted`;
@@ -92,6 +92,34 @@ export type GlobalDocChange = {
   props: DocJson;
   isBeingCreatedOrDeleted: boolean;
 };
+export type UploadEvents = {
+  onStartUploadBatch: () => void;
+  onFinishUploadBatch: () => void;
+};
+export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
+  let uploadCount = 0;
+  let uploadEvents: UploadEvents | null = null;
+  return {
+    trackUpload() {
+      uploadCount++;
+      if (uploadCount === 1) {
+        uploadEvents?.onStartUploadBatch();
+      }
+    },
+    untrackUpload() {
+      uploadCount--;
+      if (uploadCount === 0) {
+        uploadEvents?.onFinishUploadBatch();
+      }
+    },
+    setUpUploadEvents(events: UploadEvents | undefined) {
+      uploadEvents = events ?? null;
+      if (uploadCount > 0) {
+        uploadEvents?.onStartUploadBatch();
+      }
+    },
+  };
+});
 
 // TODO: Support type unions.
 // TODO: Support files.
@@ -132,13 +160,12 @@ export function createDocStore(config: DocPersisters) {
     );
   });
 
-  let docUploadCount = 0;
   const pushGlobalChange = createPersistedFunction(
     localJsonPersister.jsonFile(`pushGlobalChange`),
     async (docChange: GlobalDocChange) => {
-      docUploadCount += 1;
+      trackUpload();
       await config.globalDocPersister?.updateDoc(docChange);
-      docUploadCount -= 1;
+      untrackUpload();
     },
   );
 
@@ -214,9 +241,6 @@ export function createDocStore(config: DocPersisters) {
       }
       if (params.sourceStoreType === Persistance.global) {
         globalCreates.forEach((docId) => {
-          if (docId === `0BTXNPIa7AjYOi7Isiy6`) {
-            console.log(`onIncomingCreate`, docId);
-          }
           config.onIncomingCreate?.(docId);
         });
         globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));

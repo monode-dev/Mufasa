@@ -21,11 +21,10 @@ export type GetDefaultPersistersFromDocType = (
 ) => DocPersisters;
 let getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
 export type DocExports = ReturnType<typeof initializeDocClass>;
-export function initializeDocClass(getDocClassOptions: {
+export function initializeDocClass(config: {
   getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
 }) {
-  getDefaultPersistersFromDocType =
-    getDocClassOptions.getDefaultPersistersFromDocType;
+  getDefaultPersistersFromDocType = config.getDefaultPersistersFromDocType;
 
   return { Doc, getDefaultPersistersFromDocType };
 }
@@ -86,7 +85,6 @@ function _initializeInst<T extends Doc>(
           ? {
               set: function (value) {
                 const asPrim = propConfig.toPrim!(value);
-                console.log(`asPrim`, asPrim);
                 // TODO: Only do update if value is different.
                 this._docStore.batchUpdate(
                   {

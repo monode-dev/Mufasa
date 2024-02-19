@@ -4,6 +4,8 @@ import {
   LocalJsonPersister,
   Persistance,
   SessionDocPersister,
+  trackUpload,
+  untrackUpload,
 } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
@@ -34,20 +36,19 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
     const pushCreate = createPersistedFunction(
       config.localJsonPersister.jsonFile(`pushCreate`),
       async (fileId: string) => {
-        console.log(`Start pushCreate.`);
+        trackUpload();
         if (!isValid(fileId)) return;
         const fileData = await config.localFilePersister.readFile(fileId);
         if (!isValid(fileData)) return;
         config.globalFilePersister?.uploadFile(fileId, fileData);
         SyncedFile._fromId(fileId).flagFileAsUploaded();
+        untrackUpload();
       },
     );
     const pullCreate = createPersistedFunction(
       config.localJsonPersister.jsonFile(`pullCreate`),
       async (fileId: string) => {
-        console.log(`Start pullCreate.`);
         const fileData = await config.globalFilePersister?.downloadFile(fileId);
-        console.log(`Downloaded file.`);
         if (!isValid(fileData)) return null;
         await config.localFilePersister.writeFile(fileId, fileData);
         SyncedFile._fromId(fileId).flagFileAsDownloaded();
@@ -57,7 +58,9 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
     const pushDelete = createPersistedFunction(
       config.localJsonPersister.jsonFile(`pushDelete`),
       async (fileId: string) => {
+        trackUpload();
         await config.localFilePersister.deleteFile(fileId);
+        untrackUpload();
         return fileId;
       },
     ).addStep(async (fileId) => {
@@ -105,22 +108,18 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       /** Won't resolve until it retrieves and returns the base64String. */
       async getBase64String(): Promise<string> {
         let base64String: string | undefined;
-        console.log(`Start getBase64String ${this.docId}`);
         while (!isValid(base64String)) {
           base64String = await config.localFilePersister.readFile(this.docId);
           if (!isValid(base64String)) {
             await new Promise((resolve) => setTimeout(resolve, 100));
           }
         }
-        console.log(`Got base64String.`);
         return base64String;
       }
 
       static async createFromBase64String(base64String: string) {
-        console.log(`Start createFromBinaryString`);
         const docId = uuidv4();
         await config.localFilePersister.writeFile(docId, base64String);
-        console.log(`Wrote file.`);
         pushCreate(docId);
         SyncedFile._docStore.createDoc(
           {

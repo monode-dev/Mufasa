@@ -2,7 +2,7 @@ import { DocPersisters, Persistance, PrimVal } from "./DocStore.js";
 import { Flagged, PickFlagged, StripFlag } from "./Utils.js";
 export type GetDefaultPersistersFromDocType = (docType: string) => DocPersisters;
 export type DocExports = ReturnType<typeof initializeDocClass>;
-export declare function initializeDocClass(getDocClassOptions: {
+export declare function initializeDocClass(config: {
     getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
 }): {
     Doc: typeof Doc;

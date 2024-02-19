@@ -1,9 +1,8 @@
 import { Persistance, createDocStore, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
 let getDefaultPersistersFromDocType;
-export function initializeDocClass(getDocClassOptions) {
-    getDefaultPersistersFromDocType =
-        getDocClassOptions.getDefaultPersistersFromDocType;
+export function initializeDocClass(config) {
+    getDefaultPersistersFromDocType = config.getDefaultPersistersFromDocType;
     return { Doc, getDefaultPersistersFromDocType };
 }
 const _allDocInstances = new Map();
@@ -57,7 +56,6 @@ getDocId) {
                     ? {
                         set: function (value) {
                             const asPrim = propConfig.toPrim(value);
-                            console.log(`asPrim`, asPrim);
                             // TODO: Only do update if value is different.
                             this._docStore.batchUpdate({
                                 [docId]: {

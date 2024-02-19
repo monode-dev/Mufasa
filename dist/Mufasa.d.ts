@@ -1,9 +1,11 @@
 import { GetDefaultPersistersFromDocType } from "./Doc.js";
+import { UploadEvents } from "./DocStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export declare function initializeMufasa(mfsConfig: {
     getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
+    isUploading?: UploadEvents;
 }): {
     readonly fileStore: (config: {
         storeName: string;

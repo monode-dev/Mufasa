@@ -59,6 +59,11 @@ export type GlobalDocChange = {
     props: DocJson;
     isBeingCreatedOrDeleted: boolean;
 };
+export type UploadEvents = {
+    onStartUploadBatch: () => void;
+    onFinishUploadBatch: () => void;
+};
+export declare const trackUpload: () => void, untrackUpload: () => void, setUpUploadEvents: (events: UploadEvents | undefined) => void;
 export type DocStore = ReturnType<typeof createDocStore>;
 export type DocPersisters = {
     sessionDocPersister: SessionDocPersister;

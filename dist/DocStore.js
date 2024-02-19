@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils.js";
+import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 export const DELETED_KEY = `mx_deleted`;
 export const Persistance = {
@@ -18,6 +18,30 @@ const fakeLocalJsonPersister = {
         }),
     }),
 };
+export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
+    let uploadCount = 0;
+    let uploadEvents = null;
+    return {
+        trackUpload() {
+            uploadCount++;
+            if (uploadCount === 1) {
+                uploadEvents?.onStartUploadBatch();
+            }
+        },
+        untrackUpload() {
+            uploadCount--;
+            if (uploadCount === 0) {
+                uploadEvents?.onFinishUploadBatch();
+            }
+        },
+        setUpUploadEvents(events) {
+            uploadEvents = events ?? null;
+            if (uploadCount > 0) {
+                uploadEvents?.onStartUploadBatch();
+            }
+        },
+    };
+});
 export function createDocStore(config) {
     const localJsonPersister = config.localJsonPersister ?? fakeLocalJsonPersister;
     /** NOTE: Rather than break this up into sub systems we keep it all here so
@@ -35,11 +59,10 @@ export function createDocStore(config) {
             [id]: props,
         }), {}), false);
     });
-    let docUploadCount = 0;
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
-        docUploadCount += 1;
+        trackUpload();
         await config.globalDocPersister?.updateDoc(docChange);
-        docUploadCount -= 1;
+        untrackUpload();
     });
     //
     function batchUpdate(params) {
@@ -105,9 +128,6 @@ export function createDocStore(config) {
             }
             if (params.sourceStoreType === Persistance.global) {
                 globalCreates.forEach((docId) => {
-                    if (docId === `0BTXNPIa7AjYOi7Isiy6`) {
-                        console.log(`onIncomingCreate`, docId);
-                    }
                     config.onIncomingCreate?.(docId);
                 });
                 globalDeletes.forEach((docId) => config.onIncomingDelete?.(docId));
