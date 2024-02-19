@@ -55,7 +55,7 @@ export function list<
           const listInst = new List(
             () =>
               OtherClass.getAllDocs().filter(
-                (other) => (other[otherProp] as Doc).docId === inst.docId,
+                (other) => (other[otherProp] as Doc)?.docId === inst.docId,
               ),
             () => {},
             () => {},

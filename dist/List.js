@@ -21,7 +21,7 @@ export function list(OtherClass, tableConfig) {
                 [IsCustomProp]: true,
                 isFullCustom: true,
                 init: (inst, key) => {
-                    const listInst = new List(() => OtherClass.getAllDocs().filter((other) => other[otherProp].docId === inst.docId), () => { }, () => { });
+                    const listInst = new List(() => OtherClass.getAllDocs().filter((other) => other[otherProp]?.docId === inst.docId), () => { }, () => { });
                     Object.defineProperty(inst, key, {
                         get: () => listInst,
                     });
