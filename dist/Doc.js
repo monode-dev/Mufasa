@@ -180,7 +180,7 @@ export function prop(firstParam, secondParam, persistance = Persistance.global) 
                     console.error(`Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`);
                     return null;
                 }
-                TypeClass._fromId(prim);
+                return TypeClass._fromId(prim);
             },
             toPrim: (inst) => inst?.docId ?? null,
             persistance,

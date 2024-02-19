@@ -293,7 +293,7 @@ export function prop<
           );
           return null;
         }
-        TypeClass._fromId(prim);
+        return TypeClass._fromId(prim);
       },
       toPrim: (inst: InstanceType<typeof TypeClass> | null) =>
         inst?.docId ?? null,
