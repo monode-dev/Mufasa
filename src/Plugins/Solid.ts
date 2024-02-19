@@ -87,6 +87,10 @@ export function solidPersister(): SessionDocPersister {
       return propSignals[docId][key]![GET_FUNC]();
     },
 
+    peekProp(docId, key) {
+      return propSignals[docId]?.[key]?.[GET_FUNC]();
+    },
+
     getAllDocs() {
       return getAllDocIds();
     },

@@ -60,6 +60,9 @@ export function solidPersister() {
             }
             return propSignals[docId][key][GET_FUNC]();
         },
+        peekProp(docId, key) {
+            return propSignals[docId]?.[key]?.[GET_FUNC]();
+        },
         getAllDocs() {
             return getAllDocIds();
         },

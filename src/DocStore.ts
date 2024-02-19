@@ -36,6 +36,7 @@ export type SessionDocPersister = {
     key: string,
     initValue: PrimVal | (() => PrimVal),
   ): PrimVal;
+  peekProp(id: string, key: string): PrimVal | undefined;
   getAllDocs(): string[];
   docExists(docId: string): boolean;
 };
@@ -184,6 +185,7 @@ export function createDocStore(config: DocPersisters) {
     Object.entries(params.updates).forEach(([docId, props]) => {
       Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
         if (maxPersistance >= Persistance.session) {
+          if (config.sessionDocPersister.peekProp(docId, key) === value) return;
           if (!isValid(sessionUpdates[docId])) sessionUpdates[docId] = {};
           sessionUpdates[docId][key] = value;
         }

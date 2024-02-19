@@ -74,6 +74,8 @@ export function createDocStore(config) {
         Object.entries(params.updates).forEach(([docId, props]) => {
             Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
                 if (maxPersistance >= Persistance.session) {
+                    if (config.sessionDocPersister.peekProp(docId, key) === value)
+                        return;
                     if (!isValid(sessionUpdates[docId]))
                         sessionUpdates[docId] = {};
                     sessionUpdates[docId][key] = value;

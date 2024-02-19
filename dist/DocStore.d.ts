@@ -25,6 +25,7 @@ export type PersistanceTaggedUpdateBatch = ToReadonlyJson<WritablePersistanceTag
 export type SessionDocPersister = {
     batchUpdate(updates: UpdateBatch, newDocsAreOnlyVirtual: boolean): void;
     getProp(id: string, key: string, initValue: PrimVal | (() => PrimVal)): PrimVal;
+    peekProp(id: string, key: string): PrimVal | undefined;
     getAllDocs(): string[];
     docExists(docId: string): boolean;
 };
