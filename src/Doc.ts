@@ -285,7 +285,16 @@ export function prop<
       getInitValue: () =>
         initValue instanceof Doc ? initValue.docId : initValue,
       getDefaultValue: () => null,
-      fromPrim: (prim: PrimVal) => TypeClass._fromId(prim as string),
+      fromPrim: (prim: PrimVal) => {
+        if (prim === null) return null;
+        if (typeof prim !== `string`) {
+          console.error(
+            `Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`,
+          );
+          return null;
+        }
+        TypeClass._fromId(prim);
+      },
       toPrim: (inst: InstanceType<typeof TypeClass> | null) =>
         inst?.docId ?? null,
       persistance,

@@ -173,7 +173,15 @@ export function prop(firstParam, secondParam, persistance = Persistance.global) 
             isFullCustom: false,
             getInitValue: () => initValue instanceof Doc ? initValue.docId : initValue,
             getDefaultValue: () => null,
-            fromPrim: (prim) => TypeClass._fromId(prim),
+            fromPrim: (prim) => {
+                if (prim === null)
+                    return null;
+                if (typeof prim !== `string`) {
+                    console.error(`Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`);
+                    return null;
+                }
+                TypeClass._fromId(prim);
+            },
             toPrim: (inst) => inst?.docId ?? null,
             persistance,
             otherDocsToStartSyncing: [TypeClass],
