@@ -20,24 +20,24 @@ const fakeLocalJsonPersister = {
 };
 export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
     let uploadCount = 0;
-    let uploadEvents = null;
+    let uploadEvents = undefined;
     return {
         trackUpload() {
             uploadCount++;
             if (uploadCount === 1) {
-                uploadEvents?.onStartUploadBatch();
+                uploadEvents?.onStartUploadBatch?.();
             }
         },
         untrackUpload() {
             uploadCount--;
             if (uploadCount === 0) {
-                uploadEvents?.onFinishUploadBatch();
+                uploadEvents?.onFinishUploadBatch?.();
             }
         },
-        setUpUploadEvents(events) {
-            uploadEvents = events ?? null;
+        setUpUploadEvents(newUploadEvents) {
+            uploadEvents = newUploadEvents;
             if (uploadCount > 0) {
-                uploadEvents?.onStartUploadBatch();
+                uploadEvents?.onStartUploadBatch?.();
             }
         },
     };

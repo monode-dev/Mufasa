@@ -93,29 +93,29 @@ export type GlobalDocChange = {
   isBeingCreatedOrDeleted: boolean;
 };
 export type UploadEvents = {
-  onStartUploadBatch: () => void;
-  onFinishUploadBatch: () => void;
+  onStartUploadBatch?: () => void;
+  onFinishUploadBatch?: () => void;
 };
 export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
   let uploadCount = 0;
-  let uploadEvents: UploadEvents | null = null;
+  let uploadEvents: UploadEvents | undefined = undefined;
   return {
     trackUpload() {
       uploadCount++;
       if (uploadCount === 1) {
-        uploadEvents?.onStartUploadBatch();
+        uploadEvents?.onStartUploadBatch?.();
       }
     },
     untrackUpload() {
       uploadCount--;
       if (uploadCount === 0) {
-        uploadEvents?.onFinishUploadBatch();
+        uploadEvents?.onFinishUploadBatch?.();
       }
     },
-    setUpUploadEvents(events: UploadEvents | undefined) {
-      uploadEvents = events ?? null;
+    setUpUploadEvents(newUploadEvents: UploadEvents | undefined) {
+      uploadEvents = newUploadEvents;
       if (uploadCount > 0) {
-        uploadEvents?.onStartUploadBatch();
+        uploadEvents?.onStartUploadBatch?.();
       }
     },
   };

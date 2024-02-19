@@ -60,10 +60,10 @@ export type GlobalDocChange = {
     isBeingCreatedOrDeleted: boolean;
 };
 export type UploadEvents = {
-    onStartUploadBatch: () => void;
-    onFinishUploadBatch: () => void;
+    onStartUploadBatch?: () => void;
+    onFinishUploadBatch?: () => void;
 };
-export declare const trackUpload: () => void, untrackUpload: () => void, setUpUploadEvents: (events: UploadEvents | undefined) => void;
+export declare const trackUpload: () => void, untrackUpload: () => void, setUpUploadEvents: (newUploadEvents: UploadEvents | undefined) => void;
 export type DocStore = ReturnType<typeof createDocStore>;
 export type DocPersisters = {
     sessionDocPersister: SessionDocPersister;
