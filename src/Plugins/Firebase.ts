@@ -11,7 +11,12 @@ import {
   QueryFilterConstraint,
   or,
 } from "firebase/firestore";
-import { DocJson, GlobalDocChange, GlobalDocPersister } from "../DocStore.js";
+import {
+  DELETED_KEY,
+  DocJson,
+  GlobalDocChange,
+  GlobalDocPersister,
+} from "../DocStore.js";
 import {
   uploadString,
   deleteObject,
@@ -46,6 +51,7 @@ export function firestoreDocPersister(
                 where(CHANGE_DATE_KEY, "==", null),
                 // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
               ),
+              // TODO: Maybe there is some way to avoid already deleted docs.
               ...queryConstraints,
             ),
           ),
@@ -64,7 +70,7 @@ export function firestoreDocPersister(
               // );
               // Skip removed documents. Documents should never be deleted only flagged.
               if (change.type === "removed") {
-                console.error(
+                console.warn(
                   `The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
                 is not currently configured to handle documents being removed.`,
                   change.doc.data(),

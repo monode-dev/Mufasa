@@ -13,7 +13,9 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 const testDate = new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0));
                 onSnapshot(query(collectionRef, and(or(
                 // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
-                where(CHANGE_DATE_KEY, ">", testDate), where(CHANGE_DATE_KEY, "==", null)), ...queryConstraints)), (snapshot) => {
+                where(CHANGE_DATE_KEY, ">", testDate), where(CHANGE_DATE_KEY, "==", null)), 
+                // TODO: Maybe there is some way to avoid already deleted docs.
+                ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     // console.log(snapshot.metadata.hasPendingWrites);
@@ -26,7 +28,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                         // );
                         // Skip removed documents. Documents should never be deleted only flagged.
                         if (change.type === "removed") {
-                            console.error(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
+                            console.warn(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
                 is not currently configured to handle documents being removed.`, change.doc.data());
                             return;
                         }
