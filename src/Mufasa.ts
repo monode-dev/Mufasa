@@ -15,6 +15,7 @@ export {
   DocJson,
   DocPersisters,
   DocStore,
+  UpdateBatch,
   DELETED_KEY,
 } from "./DocStore.js";
 export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";

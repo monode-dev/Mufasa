@@ -28,6 +28,7 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
   function fileStore(config: {
     storeName: string;
     sessionDocPersister: SessionDocPersister;
+    // TODO: Make local and global doc persisters optional.
     localJsonPersister: LocalJsonPersister;
     globalDocPersister?: GlobalDocPersister;
     localFilePersister: LocalFilePersister;
