@@ -11,12 +11,7 @@ import {
   QueryFilterConstraint,
   or,
 } from "firebase/firestore";
-import {
-  DELETED_KEY,
-  DocJson,
-  GlobalDocChange,
-  GlobalDocPersister,
-} from "../DocStore.js";
+import { DocJson, GlobalDocChange, GlobalDocPersister } from "../DocStore.js";
 import {
   uploadString,
   deleteObject,
@@ -25,6 +20,8 @@ import {
 } from "firebase/storage";
 import { isValid } from "../Utils.js";
 import { GlobalFilePersister } from "../FileStore.js";
+
+const DELETED_KEY = `mx_deleted`;
 
 export function firestoreDocPersister(
   collectionRef: CollectionReference,
@@ -60,14 +57,7 @@ export function firestoreDocPersister(
               [docId: string]: DocJson;
             } = {};
             let latestChangeDate = metaData.data.lastChangeDatePosix;
-            // console.log(snapshot.metadata.hasPendingWrites);
             snapshot.docChanges().forEach((change) => {
-              // console.log(
-              //   "Firebase.firestoreDocPersister",
-              //   change.type,
-              //   change.doc.id,
-              //   change.doc.data(),
-              // );
               // Skip removed documents. Documents should never be deleted only flagged.
               if (change.type === "removed") {
                 console.warn(
@@ -79,7 +69,11 @@ export function firestoreDocPersister(
               }
 
               // Update doc store.
-              updates[change.doc.id] = change.doc.data() as DocJson;
+              updates[change.doc.id] = Object.fromEntries(
+                Object.entries(change.doc.data() as DocJson).filter(
+                  ([key]) => ![CHANGE_DATE_KEY, DELETED_KEY].includes(key),
+                ),
+              );
               latestChangeDate = Math.max(
                 latestChangeDate,
                 change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
@@ -99,13 +93,18 @@ export function firestoreDocPersister(
       });
     },
     updateDoc: async (change: GlobalDocChange) => {
-      const setOrUpdateDoc = change.isBeingCreatedOrDeleted
-        ? setDoc
-        : updateDoc;
-      await setOrUpdateDoc(docRef(collectionRef, change.docId), {
-        ...change.props,
-        [CHANGE_DATE_KEY]: useServerTimestamp,
-      });
+      const isDelete = change.props === null;
+      const props = isDelete ? { [DELETED_KEY]: true } : change.props;
+      await setDoc(
+        docRef(collectionRef, change.docId),
+        {
+          ...props,
+          [CHANGE_DATE_KEY]: useServerTimestamp,
+        },
+        {
+          merge: !isDelete,
+        },
+      );
     },
   };
 }

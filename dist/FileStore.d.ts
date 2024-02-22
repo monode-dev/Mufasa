@@ -33,7 +33,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: Persistance;
@@ -42,14 +42,14 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };
@@ -70,7 +70,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: Persistance;
@@ -79,14 +79,14 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };
@@ -99,7 +99,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
         readonly _docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
             readonly batchUpdate: (updates: {
-                readonly [x: string]: {
+                readonly [x: string]: Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: Persistance;
@@ -108,14 +108,14 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             }, options: {
                 overwriteGlobally: boolean;
             }) => void;
-            readonly createDoc: (props: {
+            readonly createDoc: (props: Persistance | {
                 readonly [x: string]: {
                     readonly value: import("./DocStore.js").PrimVal;
                     readonly maxPersistance: Persistance;
                 };
             }, manualDocId?: string | undefined) => string;
             readonly deleteDoc: (docId: string) => void;
-            readonly isDocDeleted: (docId: string) => boolean;
+            readonly docExists: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
         };
@@ -125,7 +125,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                 readonly _docStore: {
                     readonly loadedFromLocalStorage: Promise<void>;
                     readonly batchUpdate: (updates: {
-                        readonly [x: string]: {
+                        readonly [x: string]: Persistance | {
                             readonly [x: string]: {
                                 readonly value: import("./DocStore.js").PrimVal;
                                 readonly maxPersistance: Persistance;
@@ -134,20 +134,19 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                     }, options: {
                         overwriteGlobally: boolean;
                     }) => void;
-                    readonly createDoc: (props: {
+                    readonly createDoc: (props: Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: Persistance;
                         };
                     }, manualDocId?: string | undefined) => string;
                     readonly deleteDoc: (docId: string) => void;
-                    readonly isDocDeleted: (docId: string) => boolean;
+                    readonly docExists: (docId: string) => boolean;
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
                 };
                 readonly docId: string;
                 readonly isDeleted: boolean;
-                onDelete(): void;
                 readonly deleteDoc: () => void;
             };
             getPersisters(): import("./DocStore.js").DocPersisters;
@@ -155,7 +154,7 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: Persistance;
@@ -164,14 +163,14 @@ export declare function initializeFileStoreFactory(factoryConfig: DocExports): {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };

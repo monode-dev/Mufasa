@@ -157,7 +157,7 @@ export class Doc {
     return ``;
   }
   get isDeleted(): boolean {
-    return this._docStore.isDocDeleted(this.docId);
+    return !this._docStore.docExists(this.docId);
   }
 
   static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
@@ -188,14 +188,9 @@ export class Doc {
     ) as any;
   }
 
-  /** Override to run code just before an object is deleted. */
-  onDelete() {}
-
-  /** Permanently deletes this object. */
+  /** Permanently deletes this object. Override to run code just before
+   * or after this doc is deleted. */
   readonly deleteDoc = () => {
-    // NOTE: If we try to declare this using the "function" format, like deleteDoc() {}, then
-    // the "this" keyword will not work correctly.
-    this.onDelete();
     this._docStore.deleteDoc(this.docId);
   };
 }

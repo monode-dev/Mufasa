@@ -1,5 +1,5 @@
 import { Signal, batch, createMemo, createSignal, untrack } from "solid-js";
-import { DELETED_KEY, PrimVal, SessionDocPersister } from "../DocStore.js";
+import { PrimVal, SessionDocPersister } from "../DocStore.js";
 import { isValid } from "../Utils.js";
 
 const GET_FUNC = 0;
@@ -21,7 +21,6 @@ export function solidPersister(): SessionDocPersister {
       [propName: string]: Signal<PrimVal> | undefined;
     } & {
       [IS_VIRTUAL]: Signal<boolean>;
-      [DELETED_KEY]?: Signal<boolean>;
     };
   };
 
@@ -38,34 +37,36 @@ export function solidPersister(): SessionDocPersister {
               [IS_VIRTUAL]: untrack(() => createSignal(true)),
             };
           }
-
-          // Flag docs that have just been added to the store.
-          if (
-            !newDocsAreOnlyVirtual &&
-            propSignals[docId][IS_VIRTUAL][GET_FUNC]()
-          ) {
-            propSignals[docId][IS_VIRTUAL][SET_FUNC](false);
-            haveAddedOrRemovedDocs = true;
-          }
-
-          // Update props
-          Object.entries(props).forEach(([key, newValue]) => {
-            if (!isValid(propSignals[docId]?.[key])) {
-              propSignals[docId][key] = untrack(() => createSignal(newValue));
+          const isBeingDeleted = props === null;
+          if (isBeingDeleted) {
+            if (propSignals[docId][IS_VIRTUAL][GET_FUNC]()) {
+              propSignals[docId][IS_VIRTUAL][SET_FUNC](false);
+              haveAddedOrRemovedDocs = true;
             }
-            propSignals[docId][key]![SET_FUNC](newValue);
-            haveAddedOrRemovedDocs ||= key === DELETED_KEY && newValue === true;
-          });
+          } else {
+            // Flag docs that have just been added to the store.
+            if (
+              !newDocsAreOnlyVirtual &&
+              propSignals[docId][IS_VIRTUAL][GET_FUNC]()
+            ) {
+              propSignals[docId][IS_VIRTUAL][SET_FUNC](false);
+              haveAddedOrRemovedDocs = true;
+            }
+
+            // Update props
+            Object.entries(props).forEach(([key, newValue]) => {
+              if (!isValid(propSignals[docId]?.[key])) {
+                propSignals[docId][key] = untrack(() => createSignal(newValue));
+              }
+              propSignals[docId][key]![SET_FUNC](newValue);
+            });
+          }
         });
 
         // If docs have been added or removed, then update the list of all docs.
         if (haveAddedOrRemovedDocs) {
           setAllDocIds(
-            Object.keys(propSignals).filter(
-              (docId) =>
-                !propSignals[docId]?.[DELETED_KEY]?.[GET_FUNC]() &&
-                !propSignals[docId]?.[IS_VIRTUAL][GET_FUNC](),
-            ),
+            Object.keys(propSignals).filter((docId) => this.docExists(docId)),
           );
         }
       });
@@ -97,8 +98,8 @@ export function solidPersister(): SessionDocPersister {
 
     docExists(docId) {
       return (
-        propSignals[docId]?.[IS_VIRTUAL][GET_FUNC]() === false &&
-        propSignals[docId]?.[DELETED_KEY]?.[GET_FUNC]() !== true
+        isValid(propSignals[docId]) &&
+        !propSignals[docId][IS_VIRTUAL][GET_FUNC]()
       );
     },
   };

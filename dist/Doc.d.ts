@@ -16,7 +16,7 @@ export declare class Doc {
     static get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
         readonly batchUpdate: (updates: {
-            readonly [x: string]: {
+            readonly [x: string]: Persistance | {
                 readonly [x: string]: {
                     readonly value: PrimVal;
                     readonly maxPersistance: Persistance;
@@ -25,21 +25,21 @@ export declare class Doc {
         }, options: {
             overwriteGlobally: boolean;
         }) => void;
-        readonly createDoc: (props: {
+        readonly createDoc: (props: Persistance | {
             readonly [x: string]: {
                 readonly value: PrimVal;
                 readonly maxPersistance: Persistance;
             };
         }, manualDocId?: string | undefined) => string;
         readonly deleteDoc: (docId: string) => void;
-        readonly isDocDeleted: (docId: string) => boolean;
+        readonly docExists: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
     };
     get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
         readonly batchUpdate: (updates: {
-            readonly [x: string]: {
+            readonly [x: string]: Persistance | {
                 readonly [x: string]: {
                     readonly value: PrimVal;
                     readonly maxPersistance: Persistance;
@@ -48,14 +48,14 @@ export declare class Doc {
         }, options: {
             overwriteGlobally: boolean;
         }) => void;
-        readonly createDoc: (props: {
+        readonly createDoc: (props: Persistance | {
             readonly [x: string]: {
                 readonly value: PrimVal;
                 readonly maxPersistance: Persistance;
             };
         }, manualDocId?: string | undefined) => string;
         readonly deleteDoc: (docId: string) => void;
-        readonly isDocDeleted: (docId: string) => boolean;
+        readonly docExists: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
     };
@@ -65,7 +65,7 @@ export declare class Doc {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: Persistance | {
                         readonly [x: string]: {
                             readonly value: PrimVal;
                             readonly maxPersistance: Persistance;
@@ -74,22 +74,21 @@ export declare class Doc {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: Persistance | {
                     readonly [x: string]: {
                         readonly value: PrimVal;
                         readonly maxPersistance: Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
                 readonly getAllDocs: () => string[];
             };
             readonly docId: string;
             readonly isDeleted: boolean;
-            /** Override to run code just before an object is deleted. */
-            onDelete(): void;
-            /** Permanently deletes this object. */
+            /** Permanently deletes this object. Override to run code just before
+             * or after this doc is deleted. */
             readonly deleteDoc: () => void;
         };
         getPersisters(): DocPersisters;
@@ -98,7 +97,7 @@ export declare class Doc {
         readonly _docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
             readonly batchUpdate: (updates: {
-                readonly [x: string]: {
+                readonly [x: string]: Persistance | {
                     readonly [x: string]: {
                         readonly value: PrimVal;
                         readonly maxPersistance: Persistance;
@@ -107,14 +106,14 @@ export declare class Doc {
             }, options: {
                 overwriteGlobally: boolean;
             }) => void;
-            readonly createDoc: (props: {
+            readonly createDoc: (props: Persistance | {
                 readonly [x: string]: {
                     readonly value: PrimVal;
                     readonly maxPersistance: Persistance;
                 };
             }, manualDocId?: string | undefined) => string;
             readonly deleteDoc: (docId: string) => void;
-            readonly isDocDeleted: (docId: string) => boolean;
+            readonly docExists: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
         };
@@ -128,9 +127,8 @@ export declare class Doc {
     static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[];
     static _fromId<T extends typeof Doc>(this: T, docId: string): InstanceType<T>;
     static create<T extends typeof Doc>(this: T, ...overrideProps: CreateParams<T>): InstanceType<T>;
-    /** Override to run code just before an object is deleted. */
-    onDelete(): void;
-    /** Permanently deletes this object. */
+    /** Permanently deletes this object. Override to run code just before
+     * or after this doc is deleted. */
     readonly deleteDoc: () => void;
 }
 type CreateParams<T extends typeof Doc> = CreateParamsFromInst<InstanceType<T>>;

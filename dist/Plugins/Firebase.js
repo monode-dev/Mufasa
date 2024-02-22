@@ -1,6 +1,7 @@
-import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, } from "firebase/firestore";
+import { onSnapshot, query, where, doc as docRef, setDoc, serverTimestamp, and, or, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, } from "firebase/storage";
 import { isValid } from "../Utils.js";
+const DELETED_KEY = `mx_deleted`;
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     const useServerTimestamp = serverTimestamp();
@@ -18,14 +19,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                 ...queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
-                    // console.log(snapshot.metadata.hasPendingWrites);
                     snapshot.docChanges().forEach((change) => {
-                        // console.log(
-                        //   "Firebase.firestoreDocPersister",
-                        //   change.type,
-                        //   change.doc.id,
-                        //   change.doc.data(),
-                        // );
                         // Skip removed documents. Documents should never be deleted only flagged.
                         if (change.type === "removed") {
                             console.warn(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
@@ -33,7 +27,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                             return;
                         }
                         // Update doc store.
-                        updates[change.doc.id] = change.doc.data();
+                        updates[change.doc.id] = Object.fromEntries(Object.entries(change.doc.data()).filter(([key]) => ![CHANGE_DATE_KEY, DELETED_KEY].includes(key)));
                         latestChangeDate = Math.max(latestChangeDate, change.doc.data()[CHANGE_DATE_KEY].seconds * 1000);
                     });
                     batchUpdate(updates);
@@ -46,12 +40,13 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
             });
         },
         updateDoc: async (change) => {
-            const setOrUpdateDoc = change.isBeingCreatedOrDeleted
-                ? setDoc
-                : updateDoc;
-            await setOrUpdateDoc(docRef(collectionRef, change.docId), {
-                ...change.props,
+            const isDelete = change.props === null;
+            const props = isDelete ? { [DELETED_KEY]: true } : change.props;
+            await setDoc(docRef(collectionRef, change.docId), {
+                ...props,
                 [CHANGE_DATE_KEY]: useServerTimestamp,
+            }, {
+                merge: !isDelete,
             });
         },
     };

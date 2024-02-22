@@ -1,4 +1,3 @@
-export declare const DELETED_KEY = "mx_deleted";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
 export declare const Persistance: {
     readonly session: 0;
@@ -10,7 +9,7 @@ export type DocJson = {
     [key: string]: PrimVal;
 };
 export type WritableUpdateBatch = {
-    [docId: string]: DocJson;
+    [docId: string]: DocJson | null;
 };
 export type UpdateBatch = ToReadonlyJson<WritableUpdateBatch>;
 export type WritablePersistanceTaggedUpdateBatch = {
@@ -19,7 +18,7 @@ export type WritablePersistanceTaggedUpdateBatch = {
             value: PrimVal;
             maxPersistance: Persistance;
         };
-    };
+    } | Persistance;
 };
 export type PersistanceTaggedUpdateBatch = ToReadonlyJson<WritablePersistanceTaggedUpdateBatch>;
 export type SessionDocPersister = {
@@ -57,7 +56,7 @@ export type GlobalDocPersister = {
 };
 export type GlobalDocChange = {
     docId: string;
-    props: DocJson;
+    props: DocJson | null;
     isBeingCreatedOrDeleted: boolean;
 };
 export type UploadEvents = {
@@ -80,7 +79,7 @@ export declare function createDocStore(config: DocPersisters): {
     }) => void;
     readonly createDoc: (props: PersistanceTaggedUpdateBatch[string], manualDocId?: string) => string;
     readonly deleteDoc: (docId: string) => void;
-    readonly isDocDeleted: (docId: string) => boolean;
+    readonly docExists: (docId: string) => boolean;
     readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
     readonly getAllDocs: () => string[];
 };

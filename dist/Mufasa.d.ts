@@ -3,7 +3,7 @@ import { UploadEvents } from "./DocStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
-export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocPersisters, DocStore, UpdateBatch, DELETED_KEY, } from "./DocStore.js";
+export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocPersisters, DocStore, UpdateBatch, } from "./DocStore.js";
 export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";
 export declare function initializeMufasa(mfsConfig: {
     getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
@@ -28,7 +28,7 @@ export declare function initializeMufasa(mfsConfig: {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: import("./DocStore.js").Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: import("./DocStore.js").Persistance;
@@ -37,14 +37,14 @@ export declare function initializeMufasa(mfsConfig: {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: import("./DocStore.js").Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };
@@ -64,7 +64,7 @@ export declare function initializeMufasa(mfsConfig: {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: import("./DocStore.js").Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: import("./DocStore.js").Persistance;
@@ -73,14 +73,14 @@ export declare function initializeMufasa(mfsConfig: {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: import("./DocStore.js").Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };
@@ -93,7 +93,7 @@ export declare function initializeMufasa(mfsConfig: {
         readonly _docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
             readonly batchUpdate: (updates: {
-                readonly [x: string]: {
+                readonly [x: string]: import("./DocStore.js").Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
@@ -102,14 +102,14 @@ export declare function initializeMufasa(mfsConfig: {
             }, options: {
                 overwriteGlobally: boolean;
             }) => void;
-            readonly createDoc: (props: {
+            readonly createDoc: (props: import("./DocStore.js").Persistance | {
                 readonly [x: string]: {
                     readonly value: import("./DocStore.js").PrimVal;
                     readonly maxPersistance: import("./DocStore.js").Persistance;
                 };
             }, manualDocId?: string | undefined) => string;
             readonly deleteDoc: (docId: string) => void;
-            readonly isDocDeleted: (docId: string) => boolean;
+            readonly docExists: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
         };
@@ -119,7 +119,7 @@ export declare function initializeMufasa(mfsConfig: {
                 readonly _docStore: {
                     readonly loadedFromLocalStorage: Promise<void>;
                     readonly batchUpdate: (updates: {
-                        readonly [x: string]: {
+                        readonly [x: string]: import("./DocStore.js").Persistance | {
                             readonly [x: string]: {
                                 readonly value: import("./DocStore.js").PrimVal;
                                 readonly maxPersistance: import("./DocStore.js").Persistance;
@@ -128,20 +128,19 @@ export declare function initializeMufasa(mfsConfig: {
                     }, options: {
                         overwriteGlobally: boolean;
                     }) => void;
-                    readonly createDoc: (props: {
+                    readonly createDoc: (props: import("./DocStore.js").Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: import("./DocStore.js").Persistance;
                         };
                     }, manualDocId?: string | undefined) => string;
                     readonly deleteDoc: (docId: string) => void;
-                    readonly isDocDeleted: (docId: string) => boolean;
+                    readonly docExists: (docId: string) => boolean;
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
                 };
                 readonly docId: string;
                 readonly isDeleted: boolean;
-                onDelete(): void;
                 readonly deleteDoc: () => void;
             };
             getPersisters(): import("./DocStore.js").DocPersisters;
@@ -149,7 +148,7 @@ export declare function initializeMufasa(mfsConfig: {
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
+                    readonly [x: string]: import("./DocStore.js").Persistance | {
                         readonly [x: string]: {
                             readonly value: import("./DocStore.js").PrimVal;
                             readonly maxPersistance: import("./DocStore.js").Persistance;
@@ -158,14 +157,14 @@ export declare function initializeMufasa(mfsConfig: {
                 }, options: {
                     overwriteGlobally: boolean;
                 }) => void;
-                readonly createDoc: (props: {
+                readonly createDoc: (props: import("./DocStore.js").Persistance | {
                     readonly [x: string]: {
                         readonly value: import("./DocStore.js").PrimVal;
                         readonly maxPersistance: import("./DocStore.js").Persistance;
                     };
                 }, manualDocId?: string | undefined) => string;
                 readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
+                readonly docExists: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };

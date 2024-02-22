@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
-export const DELETED_KEY = `mx_deleted`;
 export const Persistance = {
     session: 0,
     local: 1,
@@ -72,34 +71,48 @@ export function createDocStore(config) {
         const globalCreates = new Set();
         const globalDeletes = new Set();
         Object.entries(params.updates).forEach(([docId, props]) => {
-            Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
-                if (maxPersistance >= Persistance.session) {
-                    if (config.sessionDocPersister.peekProp(docId, key) === value)
+            if (typeof props === `number`) {
+                if (props >= Persistance.session) {
+                    if (!config.sessionDocPersister.docExists(docId))
                         return;
-                    if (!isValid(sessionUpdates[docId]))
-                        sessionUpdates[docId] = {};
-                    sessionUpdates[docId][key] = value;
+                    sessionUpdates[docId] = null;
                 }
-                if (maxPersistance >= Persistance.local) {
-                    if (!isValid(localUpdates[docId]))
-                        localUpdates[docId] = {};
-                    localUpdates[docId][key] = value;
+                if (props >= Persistance.local) {
+                    localUpdates[docId] = null;
                 }
-                if (maxPersistance === Persistance.global) {
-                    if (!isValid(globalUpdates[docId]))
-                        globalUpdates[docId] = {};
-                    globalUpdates[docId][key] = value;
+                if (props === Persistance.global) {
+                    globalUpdates[docId] = null;
                 }
-            });
-            const hasGlobalProps = isValid(globalUpdates[docId]);
-            if (hasGlobalProps) {
+            }
+            else {
+                Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
+                    if (maxPersistance >= Persistance.session) {
+                        if (config.sessionDocPersister.peekProp(docId, key) === value)
+                            return;
+                        if (!isValid(sessionUpdates[docId]))
+                            sessionUpdates[docId] = {};
+                        sessionUpdates[docId][key] = value;
+                    }
+                    if (maxPersistance >= Persistance.local) {
+                        if (!isValid(localUpdates[docId]))
+                            localUpdates[docId] = {};
+                        localUpdates[docId][key] = value;
+                    }
+                    if (maxPersistance === Persistance.global) {
+                        if (!isValid(globalUpdates[docId]))
+                            globalUpdates[docId] = {};
+                        globalUpdates[docId][key] = value;
+                    }
+                });
+            }
+            const hasGlobalUpdates = globalUpdates[docId] !== undefined;
+            if (hasGlobalUpdates) {
                 const docExistsInSession = config.sessionDocPersister.docExists(docId);
-                const isBeingDeleted = props[DELETED_KEY]?.value === true;
+                const isBeingDeleted = globalUpdates[docId] === null;
                 if (isBeingDeleted) {
                     globalDeletes.add(docId);
                 }
                 else if (!docExistsInSession && !params.newDocsAreOnlyVirtual) {
-                    // Even if a doc is new, if it has the DELETED_KEY then it is actually deleted.
                     globalCreates.add(docId);
                 }
             }
@@ -146,10 +159,12 @@ export function createDocStore(config) {
                 newDocsAreOnlyVirtual: false,
                 updates: Object.fromEntries(Object.entries(updates).map(([docId, props]) => [
                     docId,
-                    Object.fromEntries(Object.entries(props).map(([key, value]) => [
-                        key,
-                        { value, maxPersistance: Persistance.global },
-                    ])),
+                    props === null
+                        ? Persistance.global
+                        : Object.fromEntries(Object.entries(props).map(([key, value]) => [
+                            key,
+                            { value, maxPersistance: Persistance.global },
+                        ])),
                 ])),
                 overwriteGlobally: false,
             });
@@ -183,19 +198,12 @@ export function createDocStore(config) {
                 sourceStoreType: Persistance.session,
                 newDocsAreOnlyVirtual: false,
                 updates: {
-                    [docId]: {
-                        [DELETED_KEY]: {
-                            value: true,
-                            maxPersistance: Persistance.global,
-                        },
-                    },
+                    [docId]: Persistance.global,
                 },
                 overwriteGlobally: true,
             });
         },
-        isDocDeleted(docId) {
-            return this.getProp(docId, DELETED_KEY, false);
-        },
+        docExists: config.sessionDocPersister.docExists,
         getProp: config.sessionDocPersister.getProp,
         getAllDocs: config.sessionDocPersister.getAllDocs,
     };

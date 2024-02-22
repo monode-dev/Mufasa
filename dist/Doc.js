@@ -120,7 +120,7 @@ export class Doc {
         return ``;
     }
     get isDeleted() {
-        return this._docStore.isDocDeleted(this.docId);
+        return !this._docStore.docExists(this.docId);
     }
     static getAllDocs() {
         return this._docStore.getAllDocs().map(this._fromId.bind(this));
@@ -134,13 +134,9 @@ export class Doc {
     static create(...overrideProps) {
         return _initializeInst(new this(), overrideProps[0] ?? {}, this._docStore.createDoc);
     }
-    /** Override to run code just before an object is deleted. */
-    onDelete() { }
-    /** Permanently deletes this object. */
+    /** Permanently deletes this object. Override to run code just before
+     * or after this doc is deleted. */
     deleteDoc = () => {
-        // NOTE: If we try to declare this using the "function" format, like deleteDoc() {}, then
-        // the "this" keyword will not work correctly.
-        this.onDelete();
         this._docStore.deleteDoc(this.docId);
     };
 }
