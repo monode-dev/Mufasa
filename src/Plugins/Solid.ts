@@ -71,7 +71,7 @@ export function solidPersister(): SessionDocPersister {
       });
     },
 
-    getProp(docId, key, initValue) {
+    getProp(docId, key, fallbackValue) {
       if (!isValid(propSignals[docId])) {
         propSignals[docId] = {
           [IS_VIRTUAL]: untrack(() => createSignal(true)),
@@ -79,9 +79,9 @@ export function solidPersister(): SessionDocPersister {
       }
       if (!isValid(propSignals[docId]?.[key])) {
         propSignals[docId][key] = untrack(() =>
-          typeof initValue === "function"
-            ? [createMemo(initValue), () => {}]
-            : createSignal(initValue),
+          typeof fallbackValue === "function"
+            ? [createMemo(fallbackValue), () => {}]
+            : createSignal(fallbackValue),
         );
       }
       return propSignals[docId][key]![GET_FUNC]();

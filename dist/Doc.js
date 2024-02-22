@@ -49,7 +49,7 @@ getDocId) {
         else {
             Object.defineProperty(inst, key, {
                 get: function () {
-                    const storeValue = this._docStore.getProp(docId, key, propConfig.getDefaultValue());
+                    const storeValue = this._docStore.getProp(docId, key, propConfig.getFallbackValue());
                     return propConfig.fromPrim(storeValue);
                 },
                 ...(isValid(propConfig.toPrim)
@@ -170,7 +170,7 @@ export function prop(firstParam, secondParam, persistance = Persistance.global) 
             [IsCustomProp]: true,
             isFullCustom: false,
             getInitValue: () => initValue instanceof Doc ? initValue.docId : initValue,
-            getDefaultValue: () => null,
+            getFallbackValue: () => null,
             fromPrim: (prim) => {
                 if (prim === null)
                     return null;
@@ -190,7 +190,7 @@ export function prop(firstParam, secondParam, persistance = Persistance.global) 
             [IsCustomProp]: true,
             isFullCustom: false,
             getInitValue: () => initValue,
-            getDefaultValue: () => initValue,
+            getFallbackValue: () => initValue,
             fromPrim: (prim) => prim,
             toPrim: (inst) => inst,
             persistance,
@@ -203,7 +203,7 @@ export function formula(compute) {
         [IsCustomProp]: true,
         isFullCustom: false,
         getInitValue: () => undefined,
-        getDefaultValue: () => compute,
+        getFallbackValue: () => compute,
         fromPrim: (prim) => prim,
         persistance: Persistance.session,
         otherDocsToStartSyncing: [],

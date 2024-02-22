@@ -77,7 +77,7 @@ function _initializeInst<T extends Doc>(
           const storeValue: PrimVal = this._docStore.getProp(
             docId,
             key,
-            propConfig.getDefaultValue(),
+            propConfig.getFallbackValue(),
           );
           return propConfig.fromPrim(storeValue);
         },
@@ -282,8 +282,8 @@ export function prop<
       isFullCustom: false,
       getInitValue: () =>
         initValue instanceof Doc ? initValue.docId : initValue,
-      getDefaultValue: () => null,
-      fromPrim: (prim: PrimVal) => {
+      getFallbackValue: () => null,
+      fromPrim: (prim) => {
         if (prim === null) return null;
         if (typeof prim !== `string`) {
           console.error(
@@ -303,9 +303,9 @@ export function prop<
       [IsCustomProp]: true,
       isFullCustom: false,
       getInitValue: () => initValue as any,
-      getDefaultValue: () => initValue as PrimVal,
+      getFallbackValue: () => initValue as PrimVal,
       fromPrim: (prim: PrimVal) => prim,
-      toPrim: (inst: PrimVal) => inst,
+      toPrim: (inst) => inst,
       persistance,
       otherDocsToStartSyncing: [],
     } satisfies CustomProp as any;
@@ -316,8 +316,8 @@ export function formula<T>(compute: () => T): T {
     [IsCustomProp]: true,
     isFullCustom: false,
     getInitValue: () => undefined,
-    getDefaultValue: () => compute,
-    fromPrim: (prim: PrimVal) => prim,
+    getFallbackValue: () => compute,
+    fromPrim: (prim) => prim,
     persistance: Persistance.session,
     otherDocsToStartSyncing: [],
   } satisfies CustomProp as any;
@@ -331,7 +331,7 @@ export type CustomProp = {
   | {
       isFullCustom: false;
       getInitValue: () => PrimVal | undefined;
-      getDefaultValue: () => PrimVal | (() => any);
+      getFallbackValue: () => PrimVal | (() => any);
       fromPrim: (prim: PrimVal) => any;
       toPrim?: (inst: any) => PrimVal;
       isNewList?: boolean;

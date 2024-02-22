@@ -86,6 +86,7 @@ export type GlobalDocPersister = {
     localMetaDataPersister: LocalJsonFilePersister,
   ) => void;
   updateDoc: (change: GlobalDocChange) => Promise<void>;
+  // dispose: () => void;
   // TODO: Maybe this should require a local persister of some sort so that we can complete unfinished uploads.
 };
 export type GlobalDocChange = {

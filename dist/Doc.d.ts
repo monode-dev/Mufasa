@@ -158,7 +158,7 @@ export type CustomProp = {
 } & ({
     isFullCustom: false;
     getInitValue: () => PrimVal | undefined;
-    getDefaultValue: () => PrimVal | (() => any);
+    getFallbackValue: () => PrimVal | (() => any);
     fromPrim: (prim: PrimVal) => any;
     toPrim?: (inst: any) => PrimVal;
     isNewList?: boolean;
