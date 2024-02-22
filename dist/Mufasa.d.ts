@@ -3,7 +3,7 @@ import { UploadEvents } from "./DocStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
-export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DELETED_KEY, } from "./DocStore.js";
+export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocPersisters, DocStore, DELETED_KEY, } from "./DocStore.js";
 export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";
 export declare function initializeMufasa(mfsConfig: {
     getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;

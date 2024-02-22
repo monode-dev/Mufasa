@@ -13,6 +13,8 @@ export {
   SessionDocPersister,
   GlobalDocChange,
   DocJson,
+  DocPersisters,
+  DocStore,
   DELETED_KEY,
 } from "./DocStore.js";
 export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";
