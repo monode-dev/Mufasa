@@ -94,6 +94,7 @@ export type GlobalDocChange = {
   docId: string;
   props: DocJson | null;
   isBeingCreatedOrDeleted: boolean;
+  metadata: JsonObj;
 };
 export type UploadEvents = {
   onStartUploadBatch?: () => void;
@@ -134,6 +135,11 @@ export type DocPersisters = {
   globalDocPersister?: GlobalDocPersister;
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
+  collectDocMetadata?: (
+    docId: string,
+    docUpdates: UpdateBatch[string],
+  ) => JsonObj;
+  shouldRetryUpload?: (update: GlobalDocChange) => Promise<boolean> | boolean;
 };
 export function createDocStore(config: DocPersisters) {
   const localJsonPersister =
@@ -167,7 +173,17 @@ export function createDocStore(config: DocPersisters) {
     localJsonPersister.jsonFile(`pushGlobalChange`),
     async (docChange: GlobalDocChange) => {
       trackUpload();
-      await config.globalDocPersister?.updateDoc(docChange);
+      let haveSuccessfullyUploaded = false;
+      while (!haveSuccessfullyUploaded) {
+        try {
+          await config.globalDocPersister?.updateDoc(docChange);
+          haveSuccessfullyUploaded = true;
+        } catch (error) {
+          const shouldRetry =
+            (await config.shouldRetryUpload?.(docChange)) ?? true;
+          haveSuccessfullyUploaded = !shouldRetry;
+        }
+      }
       untrackUpload();
     },
   );
@@ -181,7 +197,12 @@ export function createDocStore(config: DocPersisters) {
   }) {
     const sessionUpdates: WritableUpdateBatch = {};
     const localUpdates: WritableUpdateBatch = {};
-    const globalUpdates: WritableUpdateBatch = {};
+    const globalUpdates: {
+      [docId: string]: {
+        metadata: JsonObj;
+        props: WritableUpdateBatch[string];
+      };
+    } = {};
     const globalCreates = new Set<string>();
     const globalDeletes = new Set<string>();
     Object.entries(params.updates).forEach(([docId, props]) => {
@@ -194,7 +215,10 @@ export function createDocStore(config: DocPersisters) {
           localUpdates[docId] = null;
         }
         if (props === Persistance.global) {
-          globalUpdates[docId] = null;
+          globalUpdates[docId] = {
+            metadata: {},
+            props: null,
+          };
         }
       } else {
         Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
@@ -209,15 +233,21 @@ export function createDocStore(config: DocPersisters) {
             localUpdates[docId]![key] = value;
           }
           if (maxPersistance === Persistance.global) {
-            if (!isValid(globalUpdates[docId])) globalUpdates[docId] = {};
-            globalUpdates[docId]![key] = value;
+            if (!isValid(globalUpdates[docId]))
+              globalUpdates[docId] = {
+                metadata: {},
+                props: {},
+              };
+            globalUpdates[docId].props![key] = value;
           }
         });
       }
       const hasGlobalUpdates = globalUpdates[docId] !== undefined;
       if (hasGlobalUpdates) {
+        globalUpdates[docId].metadata =
+          config.collectDocMetadata?.(docId, globalUpdates[docId].props) ?? {};
         const docExistsInSession = config.sessionDocPersister.docExists(docId);
-        const isBeingDeleted = globalUpdates[docId] === null;
+        const isBeingDeleted = globalUpdates[docId].props === null;
         if (isBeingDeleted) {
           globalDeletes.add(docId);
         } else if (!docExistsInSession && !params.newDocsAreOnlyVirtual) {
@@ -246,10 +276,11 @@ export function createDocStore(config: DocPersisters) {
 
       // Persist updates to cloud.
       if (params.sourceStoreType !== Persistance.global) {
-        Object.entries(globalUpdates).forEach(([docId, props]) => {
+        Object.entries(globalUpdates).forEach(([docId, updates]) => {
           pushGlobalChange({
             docId,
-            props,
+            props: updates.props,
+            metadata: updates.metadata,
             isBeingCreatedOrDeleted:
               params.overwriteGlobally &&
               params.sourceStoreType === Persistance.session,

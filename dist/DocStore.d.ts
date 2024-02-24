@@ -58,6 +58,7 @@ export type GlobalDocChange = {
     docId: string;
     props: DocJson | null;
     isBeingCreatedOrDeleted: boolean;
+    metadata: JsonObj;
 };
 export type UploadEvents = {
     onStartUploadBatch?: () => void;
@@ -71,6 +72,8 @@ export type DocPersisters = {
     globalDocPersister?: GlobalDocPersister;
     onIncomingCreate?: (docId: string) => void;
     onIncomingDelete?: (docId: string) => void;
+    collectDocMetadata?: (docId: string, docUpdates: UpdateBatch[string]) => JsonObj;
+    shouldRetryUpload?: (update: GlobalDocChange) => Promise<boolean> | boolean;
 };
 export declare function createDocStore(config: DocPersisters): {
     readonly loadedFromLocalStorage: Promise<void>;

@@ -60,7 +60,17 @@ export function createDocStore(config) {
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
         trackUpload();
-        await config.globalDocPersister?.updateDoc(docChange);
+        let haveSuccessfullyUploaded = false;
+        while (!haveSuccessfullyUploaded) {
+            try {
+                await config.globalDocPersister?.updateDoc(docChange);
+                haveSuccessfullyUploaded = true;
+            }
+            catch (error) {
+                const shouldRetry = (await config.shouldRetryUpload?.(docChange)) ?? true;
+                haveSuccessfullyUploaded = !shouldRetry;
+            }
+        }
         untrackUpload();
     });
     //
@@ -81,7 +91,10 @@ export function createDocStore(config) {
                     localUpdates[docId] = null;
                 }
                 if (props === Persistance.global) {
-                    globalUpdates[docId] = null;
+                    globalUpdates[docId] = {
+                        metadata: {},
+                        props: null,
+                    };
                 }
             }
             else {
@@ -100,15 +113,20 @@ export function createDocStore(config) {
                     }
                     if (maxPersistance === Persistance.global) {
                         if (!isValid(globalUpdates[docId]))
-                            globalUpdates[docId] = {};
-                        globalUpdates[docId][key] = value;
+                            globalUpdates[docId] = {
+                                metadata: {},
+                                props: {},
+                            };
+                        globalUpdates[docId].props[key] = value;
                     }
                 });
             }
             const hasGlobalUpdates = globalUpdates[docId] !== undefined;
             if (hasGlobalUpdates) {
+                globalUpdates[docId].metadata =
+                    config.collectDocMetadata?.(docId, globalUpdates[docId].props) ?? {};
                 const docExistsInSession = config.sessionDocPersister.docExists(docId);
-                const isBeingDeleted = globalUpdates[docId] === null;
+                const isBeingDeleted = globalUpdates[docId].props === null;
                 if (isBeingDeleted) {
                     globalDeletes.add(docId);
                 }
@@ -132,10 +150,11 @@ export function createDocStore(config) {
             }
             // Persist updates to cloud.
             if (params.sourceStoreType !== Persistance.global) {
-                Object.entries(globalUpdates).forEach(([docId, props]) => {
+                Object.entries(globalUpdates).forEach(([docId, updates]) => {
                     pushGlobalChange({
                         docId,
-                        props,
+                        props: updates.props,
+                        metadata: updates.metadata,
                         isBeingCreatedOrDeleted: params.overwriteGlobally &&
                             params.sourceStoreType === Persistance.session,
                     });
