@@ -1,4 +1,3 @@
-import { from } from "solid-js";
 import { GetDefaultPersistersFromDocType, initializeDocClass } from "./Doc.js";
 import { UploadEvents, setUpUploadEvents } from "./DocStore.js";
 import { initializeFileStoreFactory } from "./FileStore.js";
