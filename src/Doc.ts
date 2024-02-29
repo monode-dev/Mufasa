@@ -1,5 +1,5 @@
 import {
-  DocStoreConfig,
+  DocPersisters,
   DocStore,
   Persistance,
   PersistanceTaggedUpdateBatch,
@@ -16,17 +16,17 @@ import {
   isValid,
 } from "./Utils.js";
 
-let databaseId: string | null;
-let defaultDocStoreConfig: DocStoreConfig;
+export type GetDefaultPersistersFromDocType = (
+  docType: string,
+) => DocPersisters;
+let getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
 export type DocExports = ReturnType<typeof initializeDocClass>;
 export function initializeDocClass(config: {
-  databaseId: string;
-  defaultDocStoreConfig: DocStoreConfig;
+  getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
 }) {
-  databaseId = config.databaseId;
-  defaultDocStoreConfig = config.defaultDocStoreConfig;
+  getDefaultPersistersFromDocType = config.getDefaultPersistersFromDocType;
 
-  return { Doc, defaultDocStoreConfig };
+  return { Doc, getDefaultPersistersFromDocType };
 }
 const _allDocInstances = new Map<string, Doc>();
 function _initializeInst<T extends Doc>(
@@ -122,14 +122,12 @@ export class Doc {
   get docType() {
     return (this.constructor as typeof Doc).docType;
   }
-  static getDocStoreConfig<This extends typeof Doc>(
-    this: This,
-  ): DocStoreConfig {
-    return defaultDocStoreConfig;
+  static getPersisters<This extends typeof Doc>(this: This): DocPersisters {
+    return getDefaultPersistersFromDocType?.(this.docType);
   }
   static get _docStore() {
     if (!docStores.has(this.docType)) {
-      docStores.set(this.docType, createDocStore(this.getDocStoreConfig()));
+      docStores.set(this.docType, createDocStore(this.getPersisters()));
       /** Docs don't start syncing until they are accessed the first time. So as soon as
        * the first one is accessed we start syncing all the connected doc types too. */
       const uninitializedInst = new this();
@@ -147,17 +145,10 @@ export class Doc {
     return (this.constructor as typeof Doc)._docStore;
   }
   // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
-  static customize(customizations: {
-    docType?: string;
-    docStoreConfig?: DocStoreConfig;
-  }) {
+  static newTypeFromPersisters(persisters: DocPersisters) {
     return class extends Doc {
-      static get docType() {
-        return customizations.docType ?? this.name;
-      }
-
-      static getDocStoreConfig<This extends typeof Doc>(this: This) {
-        return customizations.docStoreConfig ?? defaultDocStoreConfig!;
+      static getPersisters() {
+        return persisters;
       }
     };
   }

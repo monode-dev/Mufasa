@@ -1,10 +1,10 @@
 import {
   CustomProp,
   Doc,
+  GetDefaultPersistersFromDocType,
   IsCustomProp,
   prop,
 } from "./Doc.js";
-import { DocStoreConfig } from "./DocStore.js";
 import { isValid } from "./Utils.js";
 
 const relTables = new Map<typeof Doc, Map<string, typeof Doc>>();
@@ -14,7 +14,7 @@ type GetListFromTableConfig<
   TableConfig,
 > = undefined extends TableConfig
   ? List<OtherInst>
-  : TableConfig extends DocStoreConfig
+  : TableConfig extends GetDefaultPersistersFromDocType
   ? List<OtherInst>
   : TableConfig extends keyof OtherInst
   ? OtherInst[TableConfig] extends Doc
@@ -25,7 +25,7 @@ export function list<
   OtherClass extends typeof Doc,
   TableConfig extends
     | undefined
-    | DocStoreConfig
+    | GetDefaultPersistersFromDocType
     | keyof InstanceType<OtherClass>,
 >(
   OtherClass: OtherClass,
@@ -33,7 +33,7 @@ export function list<
 ): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig> {
   const otherProp: (keyof InstanceType<OtherClass> & string) | null =
     typeof tableConfig === `string` ? (tableConfig as any) : null;
-  const docStoreConfig: DocStoreConfig | null =
+  const getPersisters: GetDefaultPersistersFromDocType | null =
     tableConfig instanceof Function ? tableConfig : null;
   if (isValid(otherProp)) {
     const emptyOtherInst = new OtherClass();
@@ -44,7 +44,7 @@ export function list<
         getPrimaryClass: () => OtherClass,
         getSecondaryClass: (inst) => inst.constructor as any,
         gePrimaryProp: () => otherProp,
-        getDocStoreConfig: docStoreConfig,
+        getPersisters,
         otherDocsToStartSyncing: [OtherClass],
       }) as any;
     } else {
@@ -74,7 +74,7 @@ export function list<
         getPrimaryClass: (inst) => inst.constructor as any,
         getSecondaryClass: () => OtherClass,
         gePrimaryProp: (thisProp) => thisProp,
-        getDocStoreConfig: getPersisters,
+        getPersisters,
         otherDocsToStartSyncing: [OtherClass],
       }),
     } as any;
@@ -84,7 +84,7 @@ function listProp(config: {
   getPrimaryClass: (inst: Doc) => typeof Doc;
   getSecondaryClass: (inst: Doc) => typeof Doc;
   gePrimaryProp: (thisProp: string) => string;
-  getDocStoreConfig: GetDocStoreConfig | null;
+  getPersisters: GetDefaultPersistersFromDocType | null;
   otherDocsToStartSyncing: (typeof Doc)[];
 }) {
   return {
@@ -96,12 +96,16 @@ function listProp(config: {
       if (!relTables.has(PrimaryClass)) relTables.set(PrimaryClass, new Map());
       const relTablesForThisType = relTables.get(PrimaryClass)!;
       if (!relTablesForThisType.has(key)) {
+        const docType = `${PrimaryClass.docType}_${key}`;
+        const DocClass = isValid(config.getPersisters)
+          ? Doc.newTypeFromPersisters(config.getPersisters(docType))
+          : Doc;
         relTablesForThisType.set(
           key,
-          class extends Doc.customize({
-            docType: `${PrimaryClass.docType}_${key}`,
-            getDocStoreConfig: config.getDocStoreConfig ?? undefined,
-          }) {
+          class extends DocClass {
+            static get docType() {
+              return docType;
+            }
             primary = prop(PrimaryClass);
             secondary = prop(SecondaryClass);
           },
