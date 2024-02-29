@@ -127,14 +127,30 @@ export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
 // TODO: Support files.
 // TODO: Figure out how to ignore changes incoming server changes that have been overridden by more recent local changes.
 export type DocStore = ReturnType<typeof createDocStore>;
-export type DocPersisters = {
-  sessionDocPersister: SessionDocPersister;
-  localJsonPersister?: LocalJsonPersister;
-  globalDocPersister?: GlobalDocPersister;
+export type GetPersister<T> = (config: {
+  docType: string;
+  workspaceId: string;
+}) => T;
+export type DocStoreConfig = {
+  getSessionDocPersister: GetPersister<SessionDocPersister>;
+  getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
+  getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
 };
-export function createDocStore(config: DocPersisters) {
+export function createDocStore(
+  _config: DocStoreConfig & {
+    docType: string;
+    workspaceId: string;
+  },
+) {
+  const config = {
+    sessionDocPersister: _config.getSessionDocPersister(_config),
+    localJsonPersister: _config.getLocalJsonPersister?.(_config),
+    globalDocPersister: _config.getGlobalDocPersister?.(_config),
+    onIncomingCreate: _config.onIncomingCreate,
+    onIncomingDelete: _config.onIncomingDelete,
+  };
   const localJsonPersister =
     config.localJsonPersister ?? fakeLocalJsonPersister;
   /** NOTE: Rather than break this up into sub systems we keep it all here so

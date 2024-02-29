@@ -74,12 +74,14 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       },
     );
 
-    const Doc = factoryConfig.Doc.newTypeFromPersisters({
-      sessionDocPersister: config.sessionDocPersister,
-      localJsonPersister: config.localJsonPersister,
-      globalDocPersister: config.globalDocPersister,
-      onIncomingCreate: pullCreate,
-      onIncomingDelete: pullDelete,
+    const Doc = factoryConfig.Doc.customize({
+      getDocStoreConfig: () => ({
+        sessionDocPersister: config.sessionDocPersister,
+        localJsonPersister: config.localJsonPersister,
+        globalDocPersister: config.globalDocPersister,
+        onIncomingCreate: pullCreate,
+        onIncomingDelete: pullDelete,
+      }),
     });
     // TODO: Maybe prevent this file from being directly created.
     class SyncedFile extends Doc {

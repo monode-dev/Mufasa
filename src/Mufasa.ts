@@ -1,5 +1,5 @@
 import { from } from "solid-js";
-import { GetDefaultPersistersFromDocType, initializeDocClass } from "./Doc.js";
+import { GetDocStoreConfig, initializeDocClass } from "./Doc.js";
 import { UploadEvents, setUpUploadEvents } from "./DocStore.js";
 import { initializeFileStoreFactory } from "./FileStore.js";
 
@@ -13,7 +13,7 @@ export {
   SessionDocPersister,
   GlobalDocChange,
   DocJson,
-  DocPersisters,
+  DocStoreConfig as DocPersisters,
   DocStore,
   UpdateBatch,
   DELETED_KEY,
@@ -21,17 +21,28 @@ export {
 export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";
 
 export function initializeMufasa(mfsConfig: {
-  getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
+  getDefaultPersistersFromDocType: GetDocStoreConfig;
+  initDatabaseId?: string | null;
   isUploading?: UploadEvents;
 }) {
+  const initDatabaseId = mfsConfig.initDatabaseId ?? `default-database`;
   setUpUploadEvents(mfsConfig.isUploading);
   const docClassStuff = initializeDocClass({
-    getDefaultPersistersFromDocType:
+    databaseId: initDatabaseId,
+    getDocStoreConfig:
       mfsConfig.getDefaultPersistersFromDocType ?? (() => ({})),
   });
   const fileStoreFactory = initializeFileStoreFactory(docClassStuff);
   return {
     ...docClassStuff,
     ...fileStoreFactory,
+    // swapToDatabase(dbId: string | null) {
+    //   docClassStuff.swapToDatabase(dbId);
+    //   fileStoreFactory.swapToDatabase(dbId);
+    // },
+    // deleteDatabaseLocally(dbId: string) {
+    //   docClassStuff.deleteDatabaseLocally(dbId);
+    //   fileStoreFactory.deleteDatabaseLocally(dbId);
+    // },
   } as const;
 }
