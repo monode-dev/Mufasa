@@ -2,11 +2,11 @@ import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { doNow } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 // SECTION: Doc Persister
-export function capacitorJsonPersister(directoryName) {
+export function capacitorJsonPersister(directoryPath) {
     return {
         jsonFile: (fileName) => ({
             start(initJson) {
-                const filePath = `${directoryName}/${fileName}`;
+                const filePath = `${directoryPath}/${fileName}`;
                 let data = JSON.parse(JSON.stringify(initJson));
                 // Load json from storage.
                 const loadedFromLocalStorage = doNow(async () => {
@@ -54,8 +54,8 @@ export function capacitorJsonPersister(directoryName) {
         }),
     };
 }
-export function capacitorFilePersister(directoryName) {
-    const getLocalPath = (fileId) => `${directoryName}/${fileId}`;
+export function capacitorFilePersister(directoryPath) {
+    const getLocalPath = (fileId) => `${directoryPath}/${fileId}`;
     return {
         getWebPath: (fileId) => Filesystem.getUri({
             path: getLocalPath(fileId),
@@ -67,7 +67,7 @@ export function capacitorFilePersister(directoryName) {
         readFile: (fileId) => readFile(getLocalPath(fileId)),
         writeFile: (fileId, base64String) => writeStringFile(getLocalPath(fileId), base64String),
         deleteFile: (fileId) => deleteFile(getLocalPath(fileId)),
-        localJsonPersister: capacitorJsonPersister(`${directoryName}.json`),
+        localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
     };
 }
 // SECTION: Capacitor Storage

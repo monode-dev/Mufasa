@@ -16,6 +16,7 @@ import {
   DocJson,
   GlobalDocChange,
   GlobalDocPersister,
+  GlobalFilePersister,
 } from "../DocStore.js";
 import {
   uploadString,
@@ -24,7 +25,6 @@ import {
   StorageReference,
 } from "firebase/storage";
 import { isValid } from "../Utils.js";
-import { GlobalFilePersister } from "../FileStore.js";
 
 export function firestoreDocPersister(
   collectionRef: CollectionReference,

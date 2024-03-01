@@ -1,9 +1,10 @@
 import { DocExports, prop } from "./Doc.js";
 import {
-  GlobalDocPersister,
+  DocStoreConfig,
+  GetPersister,
+  LocalFilePersister,
   LocalJsonPersister,
   Persistance,
-  SessionDocPersister,
   trackUpload,
   untrackUpload,
 } from "./DocStore.js";
@@ -11,83 +12,97 @@ import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
-export type GlobalFilePersister = {
-  uploadFile: (fileId: string, base64String: string) => Promise<void>;
-  downloadFile: (fileId: string) => Promise<string | undefined>;
-  deleteFile: (fileId: string) => Promise<void>;
-};
-export type LocalFilePersister = {
-  getWebPath: (fileId: string) => Promise<string | undefined>;
-  readFile: (fileId: string) => Promise<string | undefined>;
-  writeFile: (fileId: string, base64String: string) => Promise<void>;
-  deleteFile: (fileId: string) => Promise<void>;
-  localJsonPersister: LocalJsonPersister;
-};
-
-export function initializeFileStoreFactory(factoryConfig: DocExports) {
-  function fileStore(config: {
-    storeName: string;
-    sessionDocPersister: SessionDocPersister;
-    // TODO: Make local and global doc persisters optional.
-    localJsonPersister: LocalJsonPersister;
-    globalDocPersister?: GlobalDocPersister;
-    localFilePersister: LocalFilePersister;
-    globalFilePersister?: GlobalFilePersister;
-  }) {
+export function initializeFileStoreFactory<T extends DocExports>(
+  factoryConfig: T,
+) {
+  function fileStore(
+    config: {
+      storeName: string;
+    } & Partial<DocStoreConfig> &
+      (undefined extends T[`defaultDocStoreConfig`][`getLocalJsonPersister`]
+        ? {
+            getLocalJsonPersister: GetPersister<LocalJsonPersister>;
+          }
+        : {}) &
+      (undefined extends T[`defaultDocStoreConfig`][`getLocalFilePersister`]
+        ? {
+            getLocalFilePersister: GetPersister<LocalFilePersister>;
+          }
+        : {}),
+  ) {
+    const docStoreConfig = {
+      ...factoryConfig.defaultDocStoreConfig,
+      ...config,
+    } as DocStoreConfig & {
+      getLocalJsonPersister: GetPersister<LocalJsonPersister>;
+      getLocalFilePersister: GetPersister<LocalFilePersister>;
+    };
+    const persisterConfig = {
+      workspaceId: factoryConfig.workspaceId,
+      docType: config.storeName,
+    };
+    const localJsonPersister =
+      docStoreConfig.getLocalJsonPersister(persisterConfig);
+    const localFilePersister =
+      docStoreConfig.getLocalFilePersister(persisterConfig);
+    const globalFilePersister =
+      docStoreConfig.getGlobalFilePersister?.(persisterConfig);
     const pushCreate = createPersistedFunction(
-      config.localJsonPersister.jsonFile(`pushCreate`),
+      localJsonPersister.jsonFile(`pushCreate`),
       async (fileId: string) => {
         trackUpload();
         if (!isValid(fileId)) return;
-        const fileData = await config.localFilePersister.readFile(fileId);
+        const fileData = await localFilePersister.readFile(fileId);
         if (!isValid(fileData)) return;
-        config.globalFilePersister?.uploadFile(fileId, fileData);
+        globalFilePersister?.uploadFile(fileId, fileData);
         SyncedFile._fromId(fileId).flagFileAsUploaded();
         untrackUpload();
       },
     );
     const pullCreate = createPersistedFunction(
-      config.localJsonPersister.jsonFile(`pullCreate`),
+      localJsonPersister.jsonFile(`pullCreate`),
       async (fileId: string) => {
-        const fileData = await config.globalFilePersister?.downloadFile(fileId);
+        const fileData = await globalFilePersister?.downloadFile(fileId);
         if (!isValid(fileData)) return null;
-        await config.localFilePersister.writeFile(fileId, fileData);
+        await localFilePersister.writeFile(fileId, fileData);
         SyncedFile._fromId(fileId).flagFileAsDownloaded();
         return fileId;
       },
     );
     const pushDelete = createPersistedFunction(
-      config.localJsonPersister.jsonFile(`pushDelete`),
+      localJsonPersister.jsonFile(`pushDelete`),
       async (fileId: string) => {
         trackUpload();
-        await config.localFilePersister.deleteFile(fileId);
+        await localFilePersister.deleteFile(fileId);
         untrackUpload();
         return fileId;
       },
     ).addStep(async (fileId) => {
-      await config.globalFilePersister?.deleteFile(fileId);
+      await globalFilePersister?.deleteFile(fileId);
     });
     const pullDelete = createPersistedFunction(
-      config.localJsonPersister.jsonFile(`pullDelete`),
+      localJsonPersister.jsonFile(`pullDelete`),
       async (fileId: string) => {
-        await config.localFilePersister.deleteFile(fileId);
+        await localFilePersister.deleteFile(fileId);
       },
     );
 
     const Doc = factoryConfig.Doc.customize({
-      getDocStoreConfig: () => ({
-        sessionDocPersister: config.sessionDocPersister,
-        localJsonPersister: config.localJsonPersister,
-        globalDocPersister: config.globalDocPersister,
-        onIncomingCreate: pullCreate,
-        onIncomingDelete: pullDelete,
-      }),
+      docType: config.storeName,
+      docStoreConfig: {
+        ...docStoreConfig,
+        onIncomingCreate: (docId) => {
+          pullCreate(docId);
+          docStoreConfig.onIncomingCreate?.(docId);
+        },
+        onIncomingDelete: (docId) => {
+          pullDelete(docId);
+          docStoreConfig.onIncomingDelete?.(docId);
+        },
+      },
     });
     // TODO: Maybe prevent this file from being directly created.
     class SyncedFile extends Doc {
-      static get typeName() {
-        return config.storeName;
-      }
       readonly fileIsUploaded = prop(Boolean, false, Persistance.local);
       flagFileAsUploaded() {
         // Manually persist globally to signify that the file is uploaded.
@@ -112,7 +127,7 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
       async getBase64String(): Promise<string> {
         let base64String: string | undefined;
         while (!isValid(base64String)) {
-          base64String = await config.localFilePersister.readFile(this.docId);
+          base64String = await localFilePersister.readFile(this.docId);
           if (!isValid(base64String)) {
             await new Promise((resolve) => setTimeout(resolve, 100));
           }
@@ -122,7 +137,7 @@ export function initializeFileStoreFactory(factoryConfig: DocExports) {
 
       static async createFromBase64String(base64String: string) {
         const docId = uuidv4();
-        await config.localFilePersister.writeFile(docId, base64String);
+        await localFilePersister.writeFile(docId, base64String);
         pushCreate(docId);
         SyncedFile._docStore.createDoc(
           {

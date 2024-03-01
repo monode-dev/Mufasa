@@ -1,21 +1,19 @@
-import { GetDefaultPersistersFromDocType } from "./Doc.js";
-import { UploadEvents } from "./DocStore.js";
+import { UploadEvents, DocStoreConfig } from "./DocStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
-export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocPersisters, DocStore, UpdateBatch, DELETED_KEY, } from "./DocStore.js";
-export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";
+export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocStoreConfig as DocPersisters, DocStore, UpdateBatch, GlobalFilePersister, LocalFilePersister, DELETED_KEY, } from "./DocStore.js";
 export declare function initializeMufasa(mfsConfig: {
-    getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
+    defaultDocConfig: DocStoreConfig;
+    initWorkspaceId?: string | null;
     isUploading?: UploadEvents;
 }): {
     readonly fileStore: (config: {
         storeName: string;
-        sessionDocPersister: import("./DocStore.js").SessionDocPersister;
-        localJsonPersister: import("./DocStore.js").LocalJsonPersister;
-        globalDocPersister?: import("./DocStore.js").GlobalDocPersister | undefined;
-        localFilePersister: import("./FileStore.js").LocalFilePersister;
-        globalFilePersister?: import("./FileStore.js").GlobalFilePersister | undefined;
+    } & Partial<DocStoreConfig> & {
+        getLocalJsonPersister: import("./DocStore.js").GetPersister<import("./DocStore.js").LocalJsonPersister>;
+    } & {
+        getLocalFilePersister: import("./DocStore.js").GetPersister<import("./DocStore.js").LocalFilePersister>;
     }) => {
         new (): {
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
@@ -52,7 +50,6 @@ export declare function initializeMufasa(mfsConfig: {
             readonly isDeleted: boolean;
             readonly deleteDoc: () => void;
         };
-        readonly typeName: string;
         createFromBase64String(base64String: string): Promise<{
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             flagFileAsUploaded(): void;
@@ -88,8 +85,8 @@ export declare function initializeMufasa(mfsConfig: {
             readonly isDeleted: boolean;
             readonly deleteDoc: () => void;
         }>;
-        getPersisters(): import("./DocStore.js").DocPersisters;
         readonly docType: string;
+        getDocStoreConfig<This extends typeof import("./Doc.js").Doc>(this: This): DocStoreConfig;
         readonly _docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
             readonly batchUpdate: (updates: {
@@ -113,7 +110,10 @@ export declare function initializeMufasa(mfsConfig: {
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
         };
-        newTypeFromPersisters(persisters: import("./DocStore.js").DocPersisters): {
+        customize(customizations: {
+            docType?: string | undefined;
+            docStoreConfig?: DocStoreConfig | undefined;
+        }): {
             new (): {
                 readonly docType: string;
                 readonly _docStore: {
@@ -144,8 +144,8 @@ export declare function initializeMufasa(mfsConfig: {
                 onDelete(): void;
                 readonly deleteDoc: () => void;
             };
-            getPersisters(): import("./DocStore.js").DocPersisters;
             readonly docType: string;
+            getDocStoreConfig<This extends typeof import("./Doc.js").Doc>(this: This): DocStoreConfig;
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
                 readonly batchUpdate: (updates: {
@@ -169,7 +169,10 @@ export declare function initializeMufasa(mfsConfig: {
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
             };
-            newTypeFromPersisters(persisters: import("./DocStore.js").DocPersisters): any;
+            customize(customizations: {
+                docType?: string | undefined;
+                docStoreConfig?: DocStoreConfig | undefined;
+            }): any;
             getAllDocs<T extends typeof import("./Doc.js").Doc>(this: T): InstanceType<T>[];
             _fromId<T_1 extends typeof import("./Doc.js").Doc>(this: T_1, docId: string): InstanceType<T_1>;
             create<T_2 extends typeof import("./Doc.js").Doc>(this: T_2, ...overrideProps: Parameters<(import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) extends infer T_3 ? T_3 extends (import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) ? T_3 extends true ? (prop?: ({ [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
@@ -179,5 +182,6 @@ export declare function initializeMufasa(mfsConfig: {
         create<T_2 extends typeof import("./Doc.js").Doc>(this: T_2, ...overrideProps: Parameters<(import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) extends infer T_4 ? T_4 extends (import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) ? T_4 extends true ? (prop?: ({ [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
     };
     readonly Doc: typeof import("./Doc.js").Doc;
-    readonly getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
+    readonly defaultDocStoreConfig: DocStoreConfig;
+    readonly workspaceId: string;
 };

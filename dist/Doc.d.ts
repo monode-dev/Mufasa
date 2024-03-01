@@ -1,18 +1,19 @@
-import { DocPersisters, Persistance, PrimVal } from "./DocStore.js";
+import { DocStoreConfig, Persistance, PrimVal } from "./DocStore.js";
 import { Flagged, PickFlagged, StripFlag } from "./Utils.js";
-export type GetDefaultPersistersFromDocType = (docType: string) => DocPersisters;
 export type DocExports = ReturnType<typeof initializeDocClass>;
 export declare function initializeDocClass(config: {
-    getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
+    workspaceId: string;
+    defaultDocStoreConfig: DocStoreConfig;
 }): {
     Doc: typeof Doc;
-    getDefaultPersistersFromDocType: GetDefaultPersistersFromDocType;
+    defaultDocStoreConfig: DocStoreConfig;
+    workspaceId: string;
 };
 export declare class Doc {
     /*** NOTE: This can be overridden to manually specify a type name. */
     static get docType(): string;
     get docType(): string;
-    static getPersisters<This extends typeof Doc>(this: This): DocPersisters;
+    static getDocStoreConfig<This extends typeof Doc>(this: This): DocStoreConfig;
     static get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
         readonly batchUpdate: (updates: {
@@ -59,7 +60,10 @@ export declare class Doc {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
     };
-    static newTypeFromPersisters(persisters: DocPersisters): {
+    static customize(customizations: {
+        docType?: string;
+        docStoreConfig?: DocStoreConfig;
+    }): {
         new (): {
             readonly docType: string;
             readonly _docStore: {
@@ -92,9 +96,8 @@ export declare class Doc {
             /** Permanently deletes this object. */
             readonly deleteDoc: () => void;
         };
-        getPersisters(): DocPersisters;
-        /*** NOTE: This can be overridden to manually specify a type name. */
         readonly docType: string;
+        getDocStoreConfig<This extends typeof Doc>(this: This): DocStoreConfig;
         readonly _docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
             readonly batchUpdate: (updates: {
@@ -118,7 +121,10 @@ export declare class Doc {
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
         };
-        newTypeFromPersisters(persisters: DocPersisters): any;
+        customize(customizations: {
+            docType?: string;
+            docStoreConfig?: DocStoreConfig;
+        }): any;
         getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[];
         _fromId<T_1 extends typeof Doc>(this: T_1, docId: string): InstanceType<T_1>;
         create<T_2 extends typeof Doc>(this: T_2, ...overrideProps: Parameters<(PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag> extends never ? true : false) extends infer T_3 ? T_3 extends (PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag> extends never ? true : false) ? T_3 extends true ? (prop?: ({ [K in PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag>]: StripFlag<InstanceType<T_2>[K], typeof RequiredPropFlag>; } & Partial<{ [K_1 in PickFlagged<InstanceType<T_2>, typeof OptionalPropFlag>]: StripFlag<InstanceType<T_2>[K_1], typeof OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag>]: StripFlag<InstanceType<T_2>[K], typeof RequiredPropFlag>; } & Partial<{ [K_1 in PickFlagged<InstanceType<T_2>, typeof OptionalPropFlag>]: StripFlag<InstanceType<T_2>[K_1], typeof OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;

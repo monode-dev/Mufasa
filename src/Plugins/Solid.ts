@@ -1,4 +1,4 @@
-import { Signal, batch, createMemo, createSignal, untrack } from "solid-js";
+import { Signal, batch, createMemo, createSignal, createRoot } from "solid-js";
 import { DELETED_KEY, PrimVal, SessionDocPersister } from "../DocStore.js";
 import { isValid } from "../Utils.js";
 
@@ -11,7 +11,7 @@ const IS_VIRTUAL = Symbol("IS_VIRTUAL");
  * to work even when data is delayed. */
 export function solidPersister(): SessionDocPersister {
   // TODO: We might be able to track signal disposal and discard currently unused signals.
-  const [getAllDocIds, setAllDocIds] = untrack(() =>
+  const [getAllDocIds, setAllDocIds] = createRoot(() =>
     createSignal<string[]>([], {
       equals: (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
     }),
@@ -35,7 +35,7 @@ export function solidPersister(): SessionDocPersister {
           // Create an object for any new docs
           if (!isValid(propSignals[docId])) {
             propSignals[docId] = {
-              [IS_VIRTUAL]: untrack(() => createSignal(true)),
+              [IS_VIRTUAL]: createRoot(() => createSignal(true)),
             };
           }
 
@@ -51,7 +51,9 @@ export function solidPersister(): SessionDocPersister {
           // Update props
           Object.entries(props).forEach(([key, newValue]) => {
             if (!isValid(propSignals[docId]?.[key])) {
-              propSignals[docId][key] = untrack(() => createSignal(newValue));
+              propSignals[docId][key] = createRoot(() =>
+                createSignal(newValue),
+              );
             }
             propSignals[docId][key]![SET_FUNC](newValue);
             haveAddedOrRemovedDocs ||= key === DELETED_KEY && newValue === true;
@@ -74,11 +76,11 @@ export function solidPersister(): SessionDocPersister {
     getProp(docId, key, fallbackValue) {
       if (!isValid(propSignals[docId])) {
         propSignals[docId] = {
-          [IS_VIRTUAL]: untrack(() => createSignal(true)),
+          [IS_VIRTUAL]: createRoot(() => createSignal(true)),
         };
       }
       if (!isValid(propSignals[docId]?.[key])) {
-        propSignals[docId][key] = untrack(() =>
+        propSignals[docId][key] = createRoot(() =>
           typeof fallbackValue === "function"
             ? [createMemo(fallbackValue), () => {}]
             : createSignal(fallbackValue),

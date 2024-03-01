@@ -65,15 +65,36 @@ export type UploadEvents = {
     onFinishUploadBatch?: () => void;
 };
 export declare const trackUpload: () => void, untrackUpload: () => void, setUpUploadEvents: (newUploadEvents: UploadEvents | undefined) => void;
+export type GlobalFilePersister = {
+    uploadFile: (fileId: string, base64String: string) => Promise<void>;
+    downloadFile: (fileId: string) => Promise<string | undefined>;
+    deleteFile: (fileId: string) => Promise<void>;
+};
+export type LocalFilePersister = {
+    getWebPath: (fileId: string) => Promise<string | undefined>;
+    readFile: (fileId: string) => Promise<string | undefined>;
+    writeFile: (fileId: string, base64String: string) => Promise<void>;
+    deleteFile: (fileId: string) => Promise<void>;
+    localJsonPersister: LocalJsonPersister;
+};
 export type DocStore = ReturnType<typeof createDocStore>;
-export type DocPersisters = {
-    sessionDocPersister: SessionDocPersister;
-    localJsonPersister?: LocalJsonPersister;
-    globalDocPersister?: GlobalDocPersister;
+export type GetPersister<T> = (config: {
+    docType: string;
+    workspaceId: string;
+}) => T;
+export type DocStoreConfig = {
+    getSessionDocPersister: GetPersister<SessionDocPersister>;
+    getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
+    getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
+    getLocalFilePersister?: GetPersister<LocalFilePersister>;
+    getGlobalFilePersister?: GetPersister<GlobalFilePersister>;
     onIncomingCreate?: (docId: string) => void;
     onIncomingDelete?: (docId: string) => void;
 };
-export declare function createDocStore(config: DocPersisters): {
+export declare function createDocStore(_config: DocStoreConfig & {
+    docType: string;
+    workspaceId: string;
+}): {
     readonly loadedFromLocalStorage: Promise<void>;
     readonly batchUpdate: (updates: PersistanceTaggedUpdateBatch, options: {
         overwriteGlobally: boolean;

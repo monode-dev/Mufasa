@@ -5,48 +5,63 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 export function initializeFileStoreFactory(factoryConfig) {
     function fileStore(config) {
-        const pushCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pushCreate`), async (fileId) => {
+        const docStoreConfig = {
+            ...factoryConfig.defaultDocStoreConfig,
+            ...config,
+        };
+        const persisterConfig = {
+            workspaceId: factoryConfig.workspaceId,
+            docType: config.storeName,
+        };
+        const localJsonPersister = docStoreConfig.getLocalJsonPersister(persisterConfig);
+        const localFilePersister = docStoreConfig.getLocalFilePersister(persisterConfig);
+        const globalFilePersister = docStoreConfig.getGlobalFilePersister?.(persisterConfig);
+        const pushCreate = createPersistedFunction(localJsonPersister.jsonFile(`pushCreate`), async (fileId) => {
             trackUpload();
             if (!isValid(fileId))
                 return;
-            const fileData = await config.localFilePersister.readFile(fileId);
+            const fileData = await localFilePersister.readFile(fileId);
             if (!isValid(fileData))
                 return;
-            config.globalFilePersister?.uploadFile(fileId, fileData);
+            globalFilePersister?.uploadFile(fileId, fileData);
             SyncedFile._fromId(fileId).flagFileAsUploaded();
             untrackUpload();
         });
-        const pullCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pullCreate`), async (fileId) => {
-            const fileData = await config.globalFilePersister?.downloadFile(fileId);
+        const pullCreate = createPersistedFunction(localJsonPersister.jsonFile(`pullCreate`), async (fileId) => {
+            const fileData = await globalFilePersister?.downloadFile(fileId);
             if (!isValid(fileData))
                 return null;
-            await config.localFilePersister.writeFile(fileId, fileData);
+            await localFilePersister.writeFile(fileId, fileData);
             SyncedFile._fromId(fileId).flagFileAsDownloaded();
             return fileId;
         });
-        const pushDelete = createPersistedFunction(config.localJsonPersister.jsonFile(`pushDelete`), async (fileId) => {
+        const pushDelete = createPersistedFunction(localJsonPersister.jsonFile(`pushDelete`), async (fileId) => {
             trackUpload();
-            await config.localFilePersister.deleteFile(fileId);
+            await localFilePersister.deleteFile(fileId);
             untrackUpload();
             return fileId;
         }).addStep(async (fileId) => {
-            await config.globalFilePersister?.deleteFile(fileId);
+            await globalFilePersister?.deleteFile(fileId);
         });
-        const pullDelete = createPersistedFunction(config.localJsonPersister.jsonFile(`pullDelete`), async (fileId) => {
-            await config.localFilePersister.deleteFile(fileId);
+        const pullDelete = createPersistedFunction(localJsonPersister.jsonFile(`pullDelete`), async (fileId) => {
+            await localFilePersister.deleteFile(fileId);
         });
-        const Doc = factoryConfig.Doc.newTypeFromPersisters({
-            sessionDocPersister: config.sessionDocPersister,
-            localJsonPersister: config.localJsonPersister,
-            globalDocPersister: config.globalDocPersister,
-            onIncomingCreate: pullCreate,
-            onIncomingDelete: pullDelete,
+        const Doc = factoryConfig.Doc.customize({
+            docType: config.storeName,
+            docStoreConfig: {
+                ...docStoreConfig,
+                onIncomingCreate: (docId) => {
+                    pullCreate(docId);
+                    docStoreConfig.onIncomingCreate?.(docId);
+                },
+                onIncomingDelete: (docId) => {
+                    pullDelete(docId);
+                    docStoreConfig.onIncomingDelete?.(docId);
+                },
+            },
         });
         // TODO: Maybe prevent this file from being directly created.
         class SyncedFile extends Doc {
-            static get typeName() {
-                return config.storeName;
-            }
             fileIsUploaded = prop(Boolean, false, Persistance.local);
             flagFileAsUploaded() {
                 // Manually persist globally to signify that the file is uploaded.
@@ -67,7 +82,7 @@ export function initializeFileStoreFactory(factoryConfig) {
             async getBase64String() {
                 let base64String;
                 while (!isValid(base64String)) {
-                    base64String = await config.localFilePersister.readFile(this.docId);
+                    base64String = await localFilePersister.readFile(this.docId);
                     if (!isValid(base64String)) {
                         await new Promise((resolve) => setTimeout(resolve, 100));
                     }
@@ -76,7 +91,7 @@ export function initializeFileStoreFactory(factoryConfig) {
             }
             static async createFromBase64String(base64String) {
                 const docId = uuidv4();
-                await config.localFilePersister.writeFile(docId, base64String);
+                await localFilePersister.writeFile(docId, base64String);
                 pushCreate(docId);
                 SyncedFile._docStore.createDoc({
                     fileIsDownloaded: {

@@ -1,18 +1,17 @@
-import { Doc, IsCustomProp, prop, } from "./Doc.js";
-import { isValid } from "./Utils.js";
+import { Doc, IsCustomProp, prop } from "./Doc.js";
 const relTables = new Map();
 export function list(OtherClass, tableConfig) {
-    const otherProp = typeof tableConfig === `string` ? tableConfig : null;
-    const getPersisters = tableConfig instanceof Function ? tableConfig : null;
-    if (isValid(otherProp)) {
+    if (typeof tableConfig === `string`) {
+        const otherProp = tableConfig;
         const emptyOtherInst = new OtherClass();
         const otherPropIsNewList = emptyOtherInst[otherProp].isNewList ?? false;
+        const docStoreConfig = emptyOtherInst[otherProp].docStoreConfig;
         if (otherPropIsNewList) {
             return listProp({
                 getPrimaryClass: () => OtherClass,
                 getSecondaryClass: (inst) => inst.constructor,
                 gePrimaryProp: () => otherProp,
-                getPersisters,
+                docStoreConfig: docStoreConfig,
                 otherDocsToStartSyncing: [OtherClass],
             });
         }
@@ -33,11 +32,12 @@ export function list(OtherClass, tableConfig) {
     else {
         return {
             isNewList: true,
+            docStoreConfig: tableConfig ?? null,
             ...listProp({
                 getPrimaryClass: (inst) => inst.constructor,
                 getSecondaryClass: () => OtherClass,
                 gePrimaryProp: (thisProp) => thisProp,
-                getPersisters,
+                docStoreConfig: tableConfig ?? null,
                 otherDocsToStartSyncing: [OtherClass],
             }),
         };
@@ -54,14 +54,10 @@ function listProp(config) {
                 relTables.set(PrimaryClass, new Map());
             const relTablesForThisType = relTables.get(PrimaryClass);
             if (!relTablesForThisType.has(key)) {
-                const docType = `${PrimaryClass.docType}_${key}`;
-                const DocClass = isValid(config.getPersisters)
-                    ? Doc.newTypeFromPersisters(config.getPersisters(docType))
-                    : Doc;
-                relTablesForThisType.set(key, class extends DocClass {
-                    static get docType() {
-                        return docType;
-                    }
+                relTablesForThisType.set(key, class extends Doc.customize({
+                    docType: `${PrimaryClass.docType}_${key}`,
+                    docStoreConfig: config.docStoreConfig ?? undefined,
+                }) {
                     primary = prop(PrimaryClass);
                     secondary = prop(SecondaryClass);
                 });

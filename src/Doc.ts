@@ -16,17 +16,17 @@ import {
   isValid,
 } from "./Utils.js";
 
-let databaseId: string | null;
+let workspaceId: string;
 let defaultDocStoreConfig: DocStoreConfig;
 export type DocExports = ReturnType<typeof initializeDocClass>;
 export function initializeDocClass(config: {
-  databaseId: string;
+  workspaceId: string;
   defaultDocStoreConfig: DocStoreConfig;
 }) {
-  databaseId = config.databaseId;
+  workspaceId = config.workspaceId;
   defaultDocStoreConfig = config.defaultDocStoreConfig;
 
-  return { Doc, defaultDocStoreConfig };
+  return { Doc, defaultDocStoreConfig, workspaceId };
 }
 const _allDocInstances = new Map<string, Doc>();
 function _initializeInst<T extends Doc>(
@@ -129,7 +129,14 @@ export class Doc {
   }
   static get _docStore() {
     if (!docStores.has(this.docType)) {
-      docStores.set(this.docType, createDocStore(this.getDocStoreConfig()));
+      docStores.set(
+        this.docType,
+        createDocStore({
+          ...this.getDocStoreConfig(),
+          docType: this.docType,
+          workspaceId: workspaceId,
+        }),
+      );
       /** Docs don't start syncing until they are accessed the first time. So as soon as
        * the first one is accessed we start syncing all the connected doc types too. */
       const uninitializedInst = new this();
@@ -257,6 +264,8 @@ export function prop<
 >(
   firstParam: FirstParam,
   secondParam?: SecondParam,
+  /* TODO: Make third param be an options obj. Both "key" and "persistance" should
+   * be options. Alternately we could do prop.customize({ ...options }); */
   persistance: Persistance = Persistance.global,
 ): Flagged<
   PropValue<FirstParam>,

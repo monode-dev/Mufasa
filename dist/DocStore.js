@@ -42,7 +42,14 @@ export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
         },
     };
 });
-export function createDocStore(config) {
+export function createDocStore(_config) {
+    const config = {
+        sessionDocPersister: _config.getSessionDocPersister(_config),
+        localJsonPersister: _config.getLocalJsonPersister?.(_config),
+        globalDocPersister: _config.getGlobalDocPersister?.(_config),
+        onIncomingCreate: _config.onIncomingCreate,
+        onIncomingDelete: _config.onIncomingDelete,
+    };
     const localJsonPersister = config.localJsonPersister ?? fakeLocalJsonPersister;
     /** NOTE: Rather than break this up into sub systems we keep it all here so
      * that there is no need to join stuff on save, and when loading we only need

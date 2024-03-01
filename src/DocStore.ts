@@ -123,8 +123,21 @@ export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
   };
 });
 
+// File Persister Types
+export type GlobalFilePersister = {
+  uploadFile: (fileId: string, base64String: string) => Promise<void>;
+  downloadFile: (fileId: string) => Promise<string | undefined>;
+  deleteFile: (fileId: string) => Promise<void>;
+};
+export type LocalFilePersister = {
+  getWebPath: (fileId: string) => Promise<string | undefined>;
+  readFile: (fileId: string) => Promise<string | undefined>;
+  writeFile: (fileId: string, base64String: string) => Promise<void>;
+  deleteFile: (fileId: string) => Promise<void>;
+  localJsonPersister: LocalJsonPersister;
+};
+
 // TODO: Support type unions.
-// TODO: Support files.
 // TODO: Figure out how to ignore changes incoming server changes that have been overridden by more recent local changes.
 export type DocStore = ReturnType<typeof createDocStore>;
 export type GetPersister<T> = (config: {
@@ -135,6 +148,8 @@ export type DocStoreConfig = {
   getSessionDocPersister: GetPersister<SessionDocPersister>;
   getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
   getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
+  getLocalFilePersister?: GetPersister<LocalFilePersister>;
+  getGlobalFilePersister?: GetPersister<GlobalFilePersister>;
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
 };

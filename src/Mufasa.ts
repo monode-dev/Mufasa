@@ -1,6 +1,6 @@
 import { from } from "solid-js";
-import { GetDocStoreConfig, initializeDocClass } from "./Doc.js";
-import { UploadEvents, setUpUploadEvents } from "./DocStore.js";
+import { initializeDocClass } from "./Doc.js";
+import { UploadEvents, setUpUploadEvents, DocStoreConfig } from "./DocStore.js";
 import { initializeFileStoreFactory } from "./FileStore.js";
 
 export { prop, formula } from "./Doc.js";
@@ -16,21 +16,22 @@ export {
   DocStoreConfig as DocPersisters,
   DocStore,
   UpdateBatch,
+  GlobalFilePersister,
+  LocalFilePersister,
   DELETED_KEY,
 } from "./DocStore.js";
-export { GlobalFilePersister, LocalFilePersister } from "./FileStore.js";
 
 export function initializeMufasa(mfsConfig: {
-  getDefaultPersistersFromDocType: GetDocStoreConfig;
-  initDatabaseId?: string | null;
+  defaultDocConfig: DocStoreConfig;
+  initWorkspaceId?: string | null;
   isUploading?: UploadEvents;
 }) {
-  const initDatabaseId = mfsConfig.initDatabaseId ?? `default-database`;
+  // TODO: Allow this to be initialized to null.
+  const initWorkspaceId = mfsConfig.initWorkspaceId ?? `default-database`;
   setUpUploadEvents(mfsConfig.isUploading);
   const docClassStuff = initializeDocClass({
-    databaseId: initDatabaseId,
-    getDocStoreConfig:
-      mfsConfig.getDefaultPersistersFromDocType ?? (() => ({})),
+    workspaceId: initWorkspaceId,
+    defaultDocStoreConfig: mfsConfig.defaultDocConfig,
   });
   const fileStoreFactory = initializeFileStoreFactory(docClassStuff);
   return {

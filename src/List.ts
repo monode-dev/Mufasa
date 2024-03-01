@@ -1,9 +1,4 @@
-import {
-  CustomProp,
-  Doc,
-  IsCustomProp,
-  prop,
-} from "./Doc.js";
+import { CustomProp, Doc, IsCustomProp, prop } from "./Doc.js";
 import { DocStoreConfig } from "./DocStore.js";
 import { isValid } from "./Utils.js";
 
@@ -26,25 +21,24 @@ export function list<
   TableConfig extends
     | undefined
     | DocStoreConfig
-    | keyof InstanceType<OtherClass>,
+    | (keyof InstanceType<OtherClass> & string),
 >(
   OtherClass: OtherClass,
   tableConfig?: TableConfig,
 ): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig> {
-  const otherProp: (keyof InstanceType<OtherClass> & string) | null =
-    typeof tableConfig === `string` ? (tableConfig as any) : null;
-  const docStoreConfig: DocStoreConfig | null =
-    tableConfig instanceof Function ? tableConfig : null;
-  if (isValid(otherProp)) {
+  if (typeof tableConfig === `string`) {
+    const otherProp: keyof InstanceType<OtherClass> & string =
+      tableConfig as any;
     const emptyOtherInst = new OtherClass();
     const otherPropIsNewList: boolean =
       (emptyOtherInst as any)[otherProp].isNewList ?? false;
+    const docStoreConfig = (emptyOtherInst as any)[otherProp].docStoreConfig;
     if (otherPropIsNewList) {
       return listProp({
         getPrimaryClass: () => OtherClass,
         getSecondaryClass: (inst) => inst.constructor as any,
         gePrimaryProp: () => otherProp,
-        getDocStoreConfig: docStoreConfig,
+        docStoreConfig: docStoreConfig,
         otherDocsToStartSyncing: [OtherClass],
       }) as any;
     } else {
@@ -70,11 +64,12 @@ export function list<
   } else {
     return {
       isNewList: true,
+      docStoreConfig: tableConfig ?? null,
       ...listProp({
         getPrimaryClass: (inst) => inst.constructor as any,
         getSecondaryClass: () => OtherClass,
         gePrimaryProp: (thisProp) => thisProp,
-        getDocStoreConfig: getPersisters,
+        docStoreConfig: tableConfig ?? null,
         otherDocsToStartSyncing: [OtherClass],
       }),
     } as any;
@@ -84,7 +79,7 @@ function listProp(config: {
   getPrimaryClass: (inst: Doc) => typeof Doc;
   getSecondaryClass: (inst: Doc) => typeof Doc;
   gePrimaryProp: (thisProp: string) => string;
-  getDocStoreConfig: GetDocStoreConfig | null;
+  docStoreConfig: DocStoreConfig | null;
   otherDocsToStartSyncing: (typeof Doc)[];
 }) {
   return {
@@ -100,7 +95,7 @@ function listProp(config: {
           key,
           class extends Doc.customize({
             docType: `${PrimaryClass.docType}_${key}`,
-            getDocStoreConfig: config.getDocStoreConfig ?? undefined,
+            docStoreConfig: config.docStoreConfig ?? undefined,
           }) {
             primary = prop(PrimaryClass);
             secondary = prop(SecondaryClass);

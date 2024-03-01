@@ -1,9 +1,11 @@
 import { Persistance, createDocStore, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
-let getDefaultPersistersFromDocType;
+let workspaceId;
+let defaultDocStoreConfig;
 export function initializeDocClass(config) {
-    getDefaultPersistersFromDocType = config.getDefaultPersistersFromDocType;
-    return { Doc, getDefaultPersistersFromDocType };
+    workspaceId = config.workspaceId;
+    defaultDocStoreConfig = config.defaultDocStoreConfig;
+    return { Doc, defaultDocStoreConfig, workspaceId };
 }
 const _allDocInstances = new Map();
 function _initializeInst(inst, overrideProps, 
@@ -87,12 +89,16 @@ export class Doc {
     get docType() {
         return this.constructor.docType;
     }
-    static getPersisters() {
-        return getDefaultPersistersFromDocType?.(this.docType);
+    static getDocStoreConfig() {
+        return defaultDocStoreConfig;
     }
     static get _docStore() {
         if (!docStores.has(this.docType)) {
-            docStores.set(this.docType, createDocStore(this.getPersisters()));
+            docStores.set(this.docType, createDocStore({
+                ...this.getDocStoreConfig(),
+                docType: this.docType,
+                workspaceId: workspaceId,
+            }));
             /** Docs don't start syncing until they are accessed the first time. So as soon as
              * the first one is accessed we start syncing all the connected doc types too. */
             const uninitializedInst = new this();
@@ -108,10 +114,13 @@ export class Doc {
         return this.constructor._docStore;
     }
     // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
-    static newTypeFromPersisters(persisters) {
+    static customize(customizations) {
         return class extends Doc {
-            static getPersisters() {
-                return persisters;
+            static get docType() {
+                return customizations.docType ?? this.name;
+            }
+            static getDocStoreConfig() {
+                return customizations.docStoreConfig ?? defaultDocStoreConfig;
             }
         };
     }
@@ -146,7 +155,10 @@ export class Doc {
 }
 export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
-export function prop(firstParam, secondParam, persistance = Persistance.global) {
+export function prop(firstParam, secondParam, 
+/* TODO: Make third param be an options obj. Both "key" and "persistance" should
+ * be options. Alternately we could do prop.customize({ ...options }); */
+persistance = Persistance.global) {
     const TypeClass = typeof firstParam === `function`
         ? firstParam
         : Array.isArray(firstParam)
