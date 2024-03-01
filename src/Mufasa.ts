@@ -21,8 +21,10 @@ export {
   DELETED_KEY,
 } from "./DocStore.js";
 
-export function initializeMufasa(mfsConfig: {
-  defaultDocConfig: DocStoreConfig;
+export function initializeMufasa<
+  DefaultDocConfig extends DocStoreConfig,
+>(mfsConfig: {
+  defaultDocConfig: DefaultDocConfig;
   initWorkspaceId?: string | null;
   isUploading?: UploadEvents;
 }) {

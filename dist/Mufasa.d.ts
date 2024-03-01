@@ -3,18 +3,18 @@ export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocStoreConfig as DocPersisters, DocStore, UpdateBatch, GlobalFilePersister, LocalFilePersister, DELETED_KEY, } from "./DocStore.js";
-export declare function initializeMufasa(mfsConfig: {
-    defaultDocConfig: DocStoreConfig;
+export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig>(mfsConfig: {
+    defaultDocConfig: DefaultDocConfig;
     initWorkspaceId?: string | null;
     isUploading?: UploadEvents;
 }): {
     readonly fileStore: (config: {
         storeName: string;
-    } & Partial<DocStoreConfig> & {
+    } & Partial<DocStoreConfig> & (undefined extends DefaultDocConfig["getLocalJsonPersister"] ? {
         getLocalJsonPersister: import("./DocStore.js").GetPersister<import("./DocStore.js").LocalJsonPersister>;
-    } & {
+    } : {}) & (undefined extends DefaultDocConfig["getLocalFilePersister"] ? {
         getLocalFilePersister: import("./DocStore.js").GetPersister<import("./DocStore.js").LocalFilePersister>;
-    }) => {
+    } : {})) => {
         new (): {
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             flagFileAsUploaded(): void;
@@ -182,6 +182,6 @@ export declare function initializeMufasa(mfsConfig: {
         create<T_2 extends typeof import("./Doc.js").Doc>(this: T_2, ...overrideProps: Parameters<(import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) extends infer T_4 ? T_4 extends (import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) ? T_4 extends true ? (prop?: ({ [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
     };
     readonly Doc: typeof import("./Doc.js").Doc;
-    readonly defaultDocStoreConfig: DocStoreConfig;
+    readonly defaultDocStoreConfig: DefaultDocConfig;
     readonly workspaceId: string;
 };

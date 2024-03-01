@@ -12,9 +12,9 @@ import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
-export function initializeFileStoreFactory<T extends DocExports>(
-  factoryConfig: T,
-) {
+export function initializeFileStoreFactory<
+  T extends DocExports<DocStoreConfig>,
+>(factoryConfig: T) {
   function fileStore(
     config: {
       storeName: string;

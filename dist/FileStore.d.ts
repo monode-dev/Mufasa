@@ -1,6 +1,6 @@
 import { DocExports } from "./Doc.js";
 import { DocStoreConfig, GetPersister, LocalFilePersister, LocalJsonPersister, Persistance } from "./DocStore.js";
-export declare function initializeFileStoreFactory<T extends DocExports>(factoryConfig: T): {
+export declare function initializeFileStoreFactory<T extends DocExports<DocStoreConfig>>(factoryConfig: T): {
     fileStore: (config: {
         storeName: string;
     } & Partial<DocStoreConfig> & (undefined extends T[`defaultDocStoreConfig`][`getLocalJsonPersister`] ? {

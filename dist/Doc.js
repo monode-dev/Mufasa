@@ -5,7 +5,11 @@ let defaultDocStoreConfig;
 export function initializeDocClass(config) {
     workspaceId = config.workspaceId;
     defaultDocStoreConfig = config.defaultDocStoreConfig;
-    return { Doc, defaultDocStoreConfig, workspaceId };
+    return {
+        Doc,
+        defaultDocStoreConfig: config.defaultDocStoreConfig,
+        workspaceId,
+    };
 }
 const _allDocInstances = new Map();
 function _initializeInst(inst, overrideProps, 

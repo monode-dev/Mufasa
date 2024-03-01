@@ -18,15 +18,21 @@ import {
 
 let workspaceId: string;
 let defaultDocStoreConfig: DocStoreConfig;
-export type DocExports = ReturnType<typeof initializeDocClass>;
-export function initializeDocClass(config: {
+export type DocExports<T extends DocStoreConfig> = ReturnType<
+  typeof initializeDocClass<T>
+>;
+export function initializeDocClass<T extends DocStoreConfig>(config: {
   workspaceId: string;
-  defaultDocStoreConfig: DocStoreConfig;
+  defaultDocStoreConfig: T;
 }) {
   workspaceId = config.workspaceId;
   defaultDocStoreConfig = config.defaultDocStoreConfig;
 
-  return { Doc, defaultDocStoreConfig, workspaceId };
+  return {
+    Doc,
+    defaultDocStoreConfig: config.defaultDocStoreConfig,
+    workspaceId,
+  };
 }
 const _allDocInstances = new Map<string, Doc>();
 function _initializeInst<T extends Doc>(
