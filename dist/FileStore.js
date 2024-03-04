@@ -188,12 +188,14 @@ class SyncedFile extends Doc {
     /** Won't resolve until it retrieves and returns the base64String. */
     async getBase64String() {
         let base64String;
+        console.log(`Getting base64String: ${this.docId}`);
         while (!isValid(base64String)) {
             base64String = await this._fileStore.readFile(this.docId);
             if (!isValid(base64String)) {
                 await new Promise((resolve) => setTimeout(resolve, 100));
             }
         }
+        console.log(`Got base64String: ${this.docId}`);
         return base64String;
     }
     static async createFromBase64String(base64String) {
