@@ -1,14 +1,15 @@
-import { Persistance, createDocStore, } from "./DocStore.js";
+import { Persistance, createDocStore, initDocStoreConfig, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
-let workspaceId;
+let _getWorkspaceId;
+export const getWorkspaceId = () => _getWorkspaceId();
 let defaultDocStoreConfig;
 export function initializeDocClass(config) {
-    workspaceId = config.workspaceId;
+    _getWorkspaceId = config.getWorkspaceId;
     defaultDocStoreConfig = config.defaultDocStoreConfig;
     return {
         Doc,
         defaultDocStoreConfig: config.defaultDocStoreConfig,
-        workspaceId,
+        getWorkspaceId,
     };
 }
 const _allDocInstances = new Map();
@@ -97,12 +98,16 @@ export class Doc {
         return defaultDocStoreConfig;
     }
     static get _docStore() {
-        if (!docStores.has(this.docType)) {
-            docStores.set(this.docType, createDocStore({
-                ...this.getDocStoreConfig(),
-                docType: this.docType,
+        const workspaceId = getWorkspaceId();
+        if (!docStores.has(workspaceId))
+            docStores.set(workspaceId, new Map());
+        const workspaceStore = docStores.get(workspaceId);
+        if (!workspaceStore.has(this.docType)) {
+            workspaceStore.set(this.docType, createDocStore(initDocStoreConfig({
+                config: this.getDocStoreConfig(),
                 workspaceId: workspaceId,
-            }));
+                docType: this.docType,
+            })));
             /** Docs don't start syncing until they are accessed the first time. So as soon as
              * the first one is accessed we start syncing all the connected doc types too. */
             const uninitializedInst = new this();
@@ -112,7 +117,7 @@ export class Doc {
                 }
             });
         }
-        return docStores.get(this.docType);
+        return workspaceStore.get(this.docType);
     }
     get _docStore() {
         return this.constructor._docStore;

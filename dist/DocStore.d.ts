@@ -29,6 +29,7 @@ export type SessionDocPersister = {
     getAllDocs(): string[];
     docExists(docId: string): boolean;
 };
+export declare const fakeSessionDocPersister: SessionDocPersister;
 /** TODO: We can make this simpler by giving it the format
  * `{ persist: <T extends JsonObj>(fileId: string, initValue: T) => Promise<T> }`
  * We can still batch updates by using `new Promise(() => save())`
@@ -55,6 +56,7 @@ export type GlobalDocPersister = {
     start: (batchUpdate: (updates: UpdateBatch) => void, localMetaDataPersister: LocalJsonFilePersister) => void;
     updateDoc: (change: GlobalDocChange) => Promise<void>;
 };
+export declare const fakeGlobalDocPersister: GlobalDocPersister;
 export type GlobalDocChange = {
     docId: string;
     props: DocJson;
@@ -70,6 +72,7 @@ export type GlobalFilePersister = {
     downloadFile: (fileId: string) => Promise<string | undefined>;
     deleteFile: (fileId: string) => Promise<void>;
 };
+export declare const fakeGlobalFilePersister: GlobalFilePersister;
 export type LocalFilePersister = {
     getWebPath: (fileId: string) => Promise<string | undefined>;
     readFile: (fileId: string) => Promise<string | undefined>;
@@ -77,6 +80,7 @@ export type LocalFilePersister = {
     deleteFile: (fileId: string) => Promise<void>;
     localJsonPersister: LocalJsonPersister;
 };
+export declare const fakeLocalFilePersister: LocalFilePersister;
 export type DocStore = ReturnType<typeof createDocStore>;
 export type GetPersister<T> = (config: {
     docType: string;
@@ -91,10 +95,21 @@ export type DocStoreConfig = {
     onIncomingCreate?: (docId: string) => void;
     onIncomingDelete?: (docId: string) => void;
 };
-export declare function createDocStore(_config: DocStoreConfig & {
+export type DocStoreParams = {
+    sessionDocPersister: SessionDocPersister;
+    localJsonPersister: LocalJsonPersister;
+    globalDocPersister: GlobalDocPersister;
+    localFilePersister: LocalFilePersister;
+    globalFilePersister: GlobalFilePersister;
+    onIncomingCreate: (docId: string) => void;
+    onIncomingDelete: (docId: string) => void;
+};
+export declare function initDocStoreConfig(params: {
+    config: DocStoreConfig;
+    workspaceId: string | null;
     docType: string;
-    workspaceId: string;
-}): {
+}): DocStoreParams;
+export declare function createDocStore(config: DocStoreParams): {
     readonly loadedFromLocalStorage: Promise<void>;
     readonly batchUpdate: (updates: PersistanceTaggedUpdateBatch, options: {
         overwriteGlobally: boolean;

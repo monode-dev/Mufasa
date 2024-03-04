@@ -6,6 +6,7 @@ import {
   PrimVal,
   WritablePersistanceTaggedUpdateBatch,
   createDocStore,
+  initDocStoreConfig,
 } from "./DocStore.js";
 import {
   Flagged,
@@ -16,22 +17,23 @@ import {
   isValid,
 } from "./Utils.js";
 
-let workspaceId: string;
+let _getWorkspaceId: () => string | null;
+export const getWorkspaceId = () => _getWorkspaceId();
 let defaultDocStoreConfig: DocStoreConfig;
 export type DocExports<T extends DocStoreConfig> = ReturnType<
   typeof initializeDocClass<T>
 >;
 export function initializeDocClass<T extends DocStoreConfig>(config: {
-  workspaceId: string;
+  getWorkspaceId: () => string | null;
   defaultDocStoreConfig: T;
 }) {
-  workspaceId = config.workspaceId;
+  _getWorkspaceId = config.getWorkspaceId;
   defaultDocStoreConfig = config.defaultDocStoreConfig;
 
   return {
     Doc,
     defaultDocStoreConfig: config.defaultDocStoreConfig,
-    workspaceId,
+    getWorkspaceId,
   };
 }
 const _allDocInstances = new Map<string, Doc>();
@@ -117,7 +119,7 @@ function _initializeInst<T extends Doc>(
 
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
-const docStores = new Map<string, DocStore>();
+const docStores = new Map<string | null, Map<string, DocStore>>();
 export class Doc {
   // private constructor() {}
 
@@ -134,14 +136,19 @@ export class Doc {
     return defaultDocStoreConfig;
   }
   static get _docStore() {
-    if (!docStores.has(this.docType)) {
-      docStores.set(
+    const workspaceId = getWorkspaceId();
+    if (!docStores.has(workspaceId)) docStores.set(workspaceId, new Map());
+    const workspaceStore = docStores.get(workspaceId)!;
+    if (!workspaceStore.has(this.docType)) {
+      workspaceStore.set(
         this.docType,
-        createDocStore({
-          ...this.getDocStoreConfig(),
-          docType: this.docType,
-          workspaceId: workspaceId,
-        }),
+        createDocStore(
+          initDocStoreConfig({
+            config: this.getDocStoreConfig(),
+            workspaceId: workspaceId,
+            docType: this.docType,
+          }),
+        ),
       );
       /** Docs don't start syncing until they are accessed the first time. So as soon as
        * the first one is accessed we start syncing all the connected doc types too. */
@@ -154,7 +161,7 @@ export class Doc {
         }
       });
     }
-    return docStores.get(this.docType)!;
+    return workspaceStore.get(this.docType)!;
   }
   get _docStore() {
     return (this.constructor as typeof Doc)._docStore;

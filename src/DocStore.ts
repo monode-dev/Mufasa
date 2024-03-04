@@ -40,6 +40,13 @@ export type SessionDocPersister = {
   getAllDocs(): string[];
   docExists(docId: string): boolean;
 };
+export const fakeSessionDocPersister: SessionDocPersister = {
+  batchUpdate: () => {},
+  getProp: (_, __, v) => (typeof v === `function` ? v() : v),
+  peekProp: () => undefined,
+  getAllDocs: () => [],
+  docExists: () => false,
+};
 
 // SECTION: Local Doc Persister Types
 /** TODO: We can make this simpler by giving it the format
@@ -89,6 +96,10 @@ export type GlobalDocPersister = {
   // dispose: () => void;
   // TODO: Maybe this should require a local persister of some sort so that we can complete unfinished uploads.
 };
+export const fakeGlobalDocPersister: GlobalDocPersister = {
+  start: () => {},
+  updateDoc: async () => {},
+};
 export type GlobalDocChange = {
   docId: string;
   props: DocJson;
@@ -129,12 +140,24 @@ export type GlobalFilePersister = {
   downloadFile: (fileId: string) => Promise<string | undefined>;
   deleteFile: (fileId: string) => Promise<void>;
 };
+export const fakeGlobalFilePersister: GlobalFilePersister = {
+  uploadFile: async () => {},
+  downloadFile: async () => undefined,
+  deleteFile: async () => {},
+};
 export type LocalFilePersister = {
   getWebPath: (fileId: string) => Promise<string | undefined>;
   readFile: (fileId: string) => Promise<string | undefined>;
   writeFile: (fileId: string, base64String: string) => Promise<void>;
   deleteFile: (fileId: string) => Promise<void>;
   localJsonPersister: LocalJsonPersister;
+};
+export const fakeLocalFilePersister: LocalFilePersister = {
+  getWebPath: async () => undefined,
+  readFile: async () => undefined,
+  writeFile: async () => {},
+  deleteFile: async () => {},
+  localJsonPersister: fakeLocalJsonPersister,
 };
 
 // TODO: Support type unions.
@@ -153,19 +176,71 @@ export type DocStoreConfig = {
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
 };
-export function createDocStore(
-  _config: DocStoreConfig & {
-    docType: string;
-    workspaceId: string;
-  },
-) {
-  const config = {
-    sessionDocPersister: _config.getSessionDocPersister(_config),
-    localJsonPersister: _config.getLocalJsonPersister?.(_config),
-    globalDocPersister: _config.getGlobalDocPersister?.(_config),
-    onIncomingCreate: _config.onIncomingCreate,
-    onIncomingDelete: _config.onIncomingDelete,
+export type DocStoreParams = {
+  sessionDocPersister: SessionDocPersister;
+  localJsonPersister: LocalJsonPersister;
+  globalDocPersister: GlobalDocPersister;
+  localFilePersister: LocalFilePersister;
+  globalFilePersister: GlobalFilePersister;
+  onIncomingCreate: (docId: string) => void;
+  onIncomingDelete: (docId: string) => void;
+};
+export function initDocStoreConfig(params: {
+  config: DocStoreConfig;
+  workspaceId: string | null;
+  docType: string;
+}): DocStoreParams {
+  return {
+    sessionDocPersister: isValid(params.workspaceId)
+      ? params.config.getSessionDocPersister({
+          docType: params.docType,
+          workspaceId: params.workspaceId,
+        })
+      : fakeSessionDocPersister,
+    localJsonPersister:
+      isValid(params.config.getLocalJsonPersister) &&
+      isValid(params.workspaceId)
+        ? params.config.getLocalJsonPersister({
+            docType: params.docType,
+            workspaceId: params.workspaceId,
+          })
+        : fakeLocalJsonPersister,
+    globalDocPersister:
+      isValid(params.config.getGlobalDocPersister) &&
+      isValid(params.workspaceId)
+        ? params.config.getGlobalDocPersister({
+            docType: params.docType,
+            workspaceId: params.workspaceId,
+          })
+        : fakeGlobalDocPersister,
+    localFilePersister:
+      isValid(params.config.getLocalFilePersister) &&
+      isValid(params.workspaceId)
+        ? params.config.getLocalFilePersister({
+            docType: params.docType,
+            workspaceId: params.workspaceId,
+          })
+        : fakeLocalFilePersister,
+    globalFilePersister:
+      isValid(params.config.getGlobalFilePersister) &&
+      isValid(params.workspaceId)
+        ? params.config.getGlobalFilePersister({
+            docType: params.docType,
+            workspaceId: params.workspaceId,
+          })
+        : fakeGlobalFilePersister,
+    onIncomingCreate: params.config.onIncomingCreate ?? (() => {}),
+    onIncomingDelete: params.config.onIncomingDelete ?? (() => {}),
   };
+}
+export function createDocStore(config: DocStoreParams) {
+  // const config = {
+  //   sessionDocPersister: _config.getSessionDocPersister(_config),
+  //   localJsonPersister: _config.getLocalJsonPersister?.(_config),
+  //   globalDocPersister: _config.getGlobalDocPersister?.(_config),
+  //   onIncomingCreate: _config.onIncomingCreate,
+  //   onIncomingDelete: _config.onIncomingDelete,
+  // };
   const localJsonPersister =
     config.localJsonPersister ?? fakeLocalJsonPersister;
   /** NOTE: Rather than break this up into sub systems we keep it all here so

@@ -1,23 +1,21 @@
 import { initializeDocClass } from "./Doc.js";
 import { setUpUploadEvents } from "./DocStore.js";
-import { initializeFileStoreFactory } from "./FileStore.js";
+import { initializeSyncedFileClass } from "./FileStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export { DELETED_KEY, } from "./DocStore.js";
 export function initializeMufasa(mfsConfig) {
-    // TODO: Allow this to be initialized to null.
-    const initWorkspaceId = mfsConfig.initWorkspaceId ?? `default-database`;
     setUpUploadEvents(mfsConfig.isUploading);
     const docClassStuff = initializeDocClass({
-        workspaceId: initWorkspaceId,
+        getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
         defaultDocStoreConfig: mfsConfig.defaultDocConfig,
     });
-    const fileStoreFactory = initializeFileStoreFactory(docClassStuff);
+    const fileStoreFactory = initializeSyncedFileClass(docClassStuff);
     return {
         ...docClassStuff,
         ...fileStoreFactory,
-        // swapToDatabase(dbId: string | null) {
+        // setWorkspace(workspaceId: string | null) {
         //   docClassStuff.swapToDatabase(dbId);
         //   fileStoreFactory.swapToDatabase(dbId);
         // },

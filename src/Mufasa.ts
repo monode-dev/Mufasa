@@ -1,7 +1,7 @@
 import { from } from "solid-js";
 import { initializeDocClass } from "./Doc.js";
 import { UploadEvents, setUpUploadEvents, DocStoreConfig } from "./DocStore.js";
-import { initializeFileStoreFactory } from "./FileStore.js";
+import { initializeSyncedFileClass } from "./FileStore.js";
 
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
@@ -25,21 +25,19 @@ export function initializeMufasa<
   DefaultDocConfig extends DocStoreConfig,
 >(mfsConfig: {
   defaultDocConfig: DefaultDocConfig;
-  initWorkspaceId?: string | null;
+  getWorkspaceId?: () => string | null;
   isUploading?: UploadEvents;
 }) {
-  // TODO: Allow this to be initialized to null.
-  const initWorkspaceId = mfsConfig.initWorkspaceId ?? `default-database`;
   setUpUploadEvents(mfsConfig.isUploading);
   const docClassStuff = initializeDocClass({
-    workspaceId: initWorkspaceId,
+    getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
     defaultDocStoreConfig: mfsConfig.defaultDocConfig,
   });
-  const fileStoreFactory = initializeFileStoreFactory(docClassStuff);
+  const fileStoreFactory = initializeSyncedFileClass(docClassStuff);
   return {
     ...docClassStuff,
     ...fileStoreFactory,
-    // swapToDatabase(dbId: string | null) {
+    // setWorkspace(workspaceId: string | null) {
     //   docClassStuff.swapToDatabase(dbId);
     //   fileStoreFactory.swapToDatabase(dbId);
     // },

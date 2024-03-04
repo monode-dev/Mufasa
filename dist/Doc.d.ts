@@ -1,13 +1,14 @@
 import { DocStoreConfig, Persistance, PrimVal } from "./DocStore.js";
 import { Flagged, PickFlagged, StripFlag } from "./Utils.js";
+export declare const getWorkspaceId: () => string | null;
 export type DocExports<T extends DocStoreConfig> = ReturnType<typeof initializeDocClass<T>>;
 export declare function initializeDocClass<T extends DocStoreConfig>(config: {
-    workspaceId: string;
+    getWorkspaceId: () => string | null;
     defaultDocStoreConfig: T;
 }): {
     Doc: typeof Doc;
     defaultDocStoreConfig: T;
-    workspaceId: string;
+    getWorkspaceId: () => string | null;
 };
 export declare class Doc {
     /*** NOTE: This can be overridden to manually specify a type name. */
