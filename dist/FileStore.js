@@ -102,6 +102,7 @@ function _createFileStore(config) {
 // TODO: Maybe prevent this file from being directly created.
 class SyncedFile extends Doc {
     static get _fileStore() {
+        console.log(`Getting fileStore: ${this.docType}`);
         return getFileStore({
             workspaceId: getWorkspaceId(),
             docType: this.docType,
