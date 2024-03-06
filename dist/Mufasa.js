@@ -5,6 +5,7 @@ export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export { DELETED_KEY, } from "./DocStore.js";
+// TODO: Implement database versioning.
 export function initializeMufasa(mfsConfig) {
     setUpUploadEvents(mfsConfig.isUploading);
     const docClassStuff = initializeDocClass({

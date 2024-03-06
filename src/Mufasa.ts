@@ -21,6 +21,7 @@ export {
   DELETED_KEY,
 } from "./DocStore.js";
 
+// TODO: Implement database versioning.
 export function initializeMufasa<
   DefaultDocConfig extends DocStoreConfig,
 >(mfsConfig: {

@@ -181,7 +181,6 @@ function _createFileStore(config: DocStoreParams) {
     async pushCreate(params: { base64String: string; manualDocId?: string }) {
       const docId = params.manualDocId ?? uuidv4();
       await config.localFilePersister.writeFile(docId, params.base64String);
-      pushCreate(docId);
       docStore.createDoc(
         {
           fileIsDownloaded: {
@@ -191,6 +190,7 @@ function _createFileStore(config: DocStoreParams) {
         },
         docId,
       );
+      pushCreate(docId);
       return docId;
     },
     pullCreate,

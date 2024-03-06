@@ -130,13 +130,13 @@ function _createFileStore(config) {
         async pushCreate(params) {
             const docId = params.manualDocId ?? uuidv4();
             await config.localFilePersister.writeFile(docId, params.base64String);
-            pushCreate(docId);
             docStore.createDoc({
                 fileIsDownloaded: {
                     value: true,
                     maxPersistance: Persistance.local,
                 },
             }, docId);
+            pushCreate(docId);
             return docId;
         },
         pullCreate,
