@@ -102,8 +102,8 @@ async function readFile(path: string): Promise<string | undefined> {
     const data = results.data;
     return typeof data === `string` ? data : await data.text();
   } catch (e) {
-    // console.log(`Failed to read: ${path}`);
-    // console.log(e);
+    console.log(`Failed to read: ${path}`);
+    console.log(e);
     return undefined;
   }
 }
