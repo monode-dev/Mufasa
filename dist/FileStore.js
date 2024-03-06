@@ -3,77 +3,7 @@ import { Persistance, createDocStore, initDocStoreConfig, trackUpload, untrackUp
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
-export function initializeSyncedFileClass(factoryConfig) {
-    function fileStore(config) {
-        const docStoreConfig = {
-            ...factoryConfig.defaultDocStoreConfig,
-            ...config,
-        };
-        // const persisterConfig = {
-        //   workspaceId: factoryConfig.getWorkspaceId(),
-        //   docType: config.storeName,
-        // };
-        // const localJsonPersister =
-        //   docStoreConfig.getLocalJsonPersister(persisterConfig);
-        // const localFilePersister =
-        //   docStoreConfig.getLocalFilePersister(persisterConfig);
-        // const globalFilePersister =
-        //   docStoreConfig.getGlobalFilePersister?.(persisterConfig);
-        // const pushCreate = createPersistedFunction(
-        //   localJsonPersister.jsonFile(`pushCreate`),
-        //   async (fileId: string) => {
-        //     trackUpload();
-        //     if (!isValid(fileId)) return;
-        //     const fileData = await localFilePersister.readFile(fileId);
-        //     if (!isValid(fileData)) return;
-        //     globalFilePersister?.uploadFile(fileId, fileData);
-        //     SyncedFile._fromId(fileId).flagFileAsUploaded();
-        //     untrackUpload();
-        //   },
-        // );
-        // const pullCreate = createPersistedFunction(
-        //   localJsonPersister.jsonFile(`pullCreate`),
-        //   async (fileId: string) => {
-        //     const fileData = await globalFilePersister?.downloadFile(fileId);
-        //     if (!isValid(fileData)) return null;
-        //     await localFilePersister.writeFile(fileId, fileData);
-        //     SyncedFile._fromId(fileId).flagFileAsDownloaded();
-        //     return fileId;
-        //   },
-        // );
-        // const pushDelete = createPersistedFunction(
-        //   localJsonPersister.jsonFile(`pushDelete`),
-        //   async (fileId: string) => {
-        //     trackUpload();
-        //     await localFilePersister.deleteFile(fileId);
-        //     untrackUpload();
-        //     return fileId;
-        //   },
-        // ).addStep(async (fileId) => {
-        //   await globalFilePersister?.deleteFile(fileId);
-        // });
-        // const pullDelete = createPersistedFunction(
-        //   localJsonPersister.jsonFile(`pullDelete`),
-        //   async (fileId: string) => {
-        //     await localFilePersister.deleteFile(fileId);
-        //   },
-        // );
-        // const Doc = factoryConfig.Doc.customize({
-        //   docType: config.storeName,
-        //   docStoreConfig: {
-        //     ...docStoreConfig,
-        //     onIncomingCreate: (docId) => {
-        //       pullCreate(docId);
-        //       docStoreConfig.onIncomingCreate?.(docId);
-        //     },
-        //     onIncomingDelete: (docId) => {
-        //       pullDelete(docId);
-        //       docStoreConfig.onIncomingDelete?.(docId);
-        //     },
-        //   },
-        // });
-        // return { SyncedFile };
-    }
+export function initializeSyncedFileClass() {
     return { SyncedFile };
 }
 const fileStores = new Map();
@@ -97,7 +27,14 @@ function _createFileStore(config) {
         if (!isValid(fileData))
             return null;
         await config.localFilePersister.writeFile(fileId, fileData);
-        SyncedFile._fromId(fileId).flagFileAsDownloaded();
+        docStore.batchUpdate({
+            [fileId]: {
+                fileIsDownloaded: {
+                    value: true,
+                    maxPersistance: Persistance.local,
+                },
+            },
+        }, { overwriteGlobally: false });
         return fileId;
     });
     const pullDelete = createPersistedFunction(config.localJsonPersister.jsonFile(`pullDelete`), async (fileId) => {
@@ -122,7 +59,15 @@ function _createFileStore(config) {
         if (!isValid(fileData))
             return;
         config.globalFilePersister.uploadFile(fileId, fileData);
-        SyncedFile._fromId(fileId).flagFileAsUploaded();
+        // Manually persist globally to signify that the file is uploaded.
+        docStore.batchUpdate({
+            [fileId]: {
+                fileIsUploaded: {
+                    value: true,
+                    maxPersistance: Persistance.global,
+                },
+            },
+        }, { overwriteGlobally: true });
         untrackUpload();
     });
     return {
@@ -170,21 +115,7 @@ class SyncedFile extends Doc {
         return this._fileStore.docStore;
     }
     fileIsUploaded = prop(Boolean, false, Persistance.local);
-    flagFileAsUploaded() {
-        // Manually persist globally to signify that the file is uploaded.
-        SyncedFile._docStore.batchUpdate({
-            [this.docId]: {
-                fileIsUploaded: {
-                    value: true,
-                    maxPersistance: Persistance.global,
-                },
-            },
-        }, { overwriteGlobally: true });
-    }
     fileIsDownloaded = prop(Boolean, false, Persistance.local);
-    flagFileAsDownloaded() {
-        this.fileIsDownloaded = true;
-    }
     /** Won't resolve until it retrieves and returns the base64String. */
     async getBase64String() {
         let base64String;
@@ -199,7 +130,7 @@ class SyncedFile extends Doc {
         return base64String;
     }
     static async createFromBase64String(base64String) {
-        return SyncedFile._fromId(await this._fileStore.pushCreate({ base64String }));
+        return this._fromId(await this._fileStore.pushCreate({ base64String }));
     }
     onDelete() {
         this._fileStore.pushDelete(this.docId);

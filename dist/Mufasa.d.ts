@@ -110,9 +110,7 @@ export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig
                 readFile(fileId: string): Promise<string | undefined>;
             };
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
-            flagFileAsUploaded(): void;
             readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
-            flagFileAsDownloaded(): void;
             getBase64String(): Promise<string>;
             onDelete(): void;
             readonly docType: string;
@@ -366,9 +364,7 @@ export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig
                 readFile(fileId: string): Promise<string | undefined>;
             };
             readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
-            flagFileAsUploaded(): void;
             readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
-            flagFileAsDownloaded(): void;
             getBase64String(): Promise<string>;
             onDelete(): void;
             readonly docType: string;

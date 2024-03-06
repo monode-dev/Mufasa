@@ -8,14 +8,12 @@ export { DELETED_KEY, } from "./DocStore.js";
 // TODO: Implement database versioning.
 export function initializeMufasa(mfsConfig) {
     setUpUploadEvents(mfsConfig.isUploading);
-    const docClassStuff = initializeDocClass({
-        getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
-        defaultDocStoreConfig: mfsConfig.defaultDocConfig,
-    });
-    const fileStoreFactory = initializeSyncedFileClass(docClassStuff);
     return {
-        ...docClassStuff,
-        ...fileStoreFactory,
+        ...initializeDocClass({
+            getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
+            defaultDocStoreConfig: mfsConfig.defaultDocConfig,
+        }),
+        ...initializeSyncedFileClass(),
         // setWorkspace(workspaceId: string | null) {
         //   docClassStuff.swapToDatabase(dbId);
         //   fileStoreFactory.swapToDatabase(dbId);

@@ -1,6 +1,6 @@
-import { DocExports, Doc } from "./Doc.js";
-import { DocStoreConfig, DocStoreParams, Persistance } from "./DocStore.js";
-export declare function initializeSyncedFileClass<T extends DocExports<DocStoreConfig>>(factoryConfig: T): {
+import { Doc } from "./Doc.js";
+import { DocStoreParams, Persistance } from "./DocStore.js";
+export declare function initializeSyncedFileClass(): {
     SyncedFile: typeof SyncedFile;
 };
 export type FileStore = ReturnType<typeof _createFileStore>;
@@ -228,9 +228,7 @@ declare class SyncedFile extends Doc {
         readonly getAllDocs: () => string[];
     };
     readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
-    flagFileAsUploaded(): void;
     readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
-    flagFileAsDownloaded(): void;
     /** Won't resolve until it retrieves and returns the base64String. */
     getBase64String(): Promise<string>;
     static createFromBase64String(base64String: string): Promise<SyncedFile>;

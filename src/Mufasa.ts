@@ -30,14 +30,12 @@ export function initializeMufasa<
   isUploading?: UploadEvents;
 }) {
   setUpUploadEvents(mfsConfig.isUploading);
-  const docClassStuff = initializeDocClass({
-    getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
-    defaultDocStoreConfig: mfsConfig.defaultDocConfig,
-  });
-  const fileStoreFactory = initializeSyncedFileClass(docClassStuff);
   return {
-    ...docClassStuff,
-    ...fileStoreFactory,
+    ...initializeDocClass({
+      getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
+      defaultDocStoreConfig: mfsConfig.defaultDocConfig,
+    }),
+    ...initializeSyncedFileClass(),
     // setWorkspace(workspaceId: string | null) {
     //   docClassStuff.swapToDatabase(dbId);
     //   fileStoreFactory.swapToDatabase(dbId);
