@@ -110,9 +110,11 @@ class SyncedFile extends Doc {
         });
     }
     get _fileStore() {
+        console.log(`Getting fileStore: ${this.docType}`);
         return this.constructor._fileStore;
     }
     static get _docStore() {
+        console.log(`Getting docStore: ${this.docType}`);
         return this._fileStore.docStore;
     }
     fileIsUploaded = prop(Boolean, false, Persistance.local);
