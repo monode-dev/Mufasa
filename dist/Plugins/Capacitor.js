@@ -82,8 +82,8 @@ async function readFile(path) {
         return typeof data === `string` ? data : await data.text();
     }
     catch (e) {
-        console.log(`Failed to read: ${path}`);
-        console.log(e);
+        // console.log(`Failed to read: ${path}`);
+        // console.log(e);
         return undefined;
     }
 }

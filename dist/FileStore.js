@@ -102,7 +102,6 @@ function _createFileStore(config) {
 // TODO: Maybe prevent this file from being directly created.
 class SyncedFile extends Doc {
     static get _fileStore() {
-        console.log(`Getting fileStore: ${this.docType}`);
         return getFileStore({
             workspaceId: getWorkspaceId(),
             docType: this.docType,
@@ -110,11 +109,9 @@ class SyncedFile extends Doc {
         });
     }
     get _fileStore() {
-        console.log(`Getting fileStore: ${this.docType}`);
         return this.constructor._fileStore;
     }
     static get _docStore() {
-        console.log(`Getting docStore: ${this.docType}`);
         return this._fileStore.docStore;
     }
     fileIsUploaded = prop(Boolean, false, Persistance.local);
@@ -122,14 +119,12 @@ class SyncedFile extends Doc {
     /** Won't resolve until it retrieves and returns the base64String. */
     async getBase64String() {
         let base64String;
-        console.log(`Getting base64String: ${this.docId}`);
         while (!isValid(base64String)) {
             base64String = await this._fileStore.readFile(this.docId);
             if (!isValid(base64String)) {
                 await new Promise((resolve) => setTimeout(resolve, 100));
             }
         }
-        console.log(`Got base64String: ${this.docId}`);
         return base64String;
     }
     static async createFromBase64String(base64String) {
