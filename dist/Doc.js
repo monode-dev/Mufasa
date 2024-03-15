@@ -131,7 +131,10 @@ export class MfsDoc {
                 return customizations.docType ?? this.name;
             }
             static getDocStoreConfig() {
-                return customizations.docStoreConfig ?? defaultDocStoreConfig;
+                return {
+                    ...defaultDocStoreConfig,
+                    ...customizations.docStoreConfig,
+                };
             }
         };
     }

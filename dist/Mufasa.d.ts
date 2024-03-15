@@ -10,7 +10,7 @@ export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig
 }): {
     readonly MfsFile: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: DocStoreConfig | undefined;
+        docStoreConfig?: Partial<DocStoreConfig> | undefined;
     }, "docType"> | undefined) => {
         new (): {
             readonly _fileStore: {
@@ -402,7 +402,7 @@ export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig
         getDocStoreConfig<This extends typeof import("./Doc.js").MfsDoc>(this: This): DocStoreConfig;
         customize<This_1 extends typeof import("./Doc.js").MfsDoc>(this: This_1, customizations: {
             docType?: string | undefined;
-            docStoreConfig?: DocStoreConfig | undefined;
+            docStoreConfig?: Partial<DocStoreConfig> | undefined;
         }): This_1;
         getAllDocs<T extends typeof import("./Doc.js").MfsDoc>(this: T): InstanceType<T>[];
         _fromId<T_1 extends typeof import("./Doc.js").MfsDoc>(this: T_1, docId: string): InstanceType<T_1>;
@@ -410,7 +410,7 @@ export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig
     };
     readonly MfsDoc: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: DocStoreConfig | undefined;
+        docStoreConfig?: Partial<DocStoreConfig> | undefined;
     }, "docType"> | undefined) => typeof import("./Doc.js").MfsDoc;
     readonly defaultDocStoreConfig: DefaultDocConfig;
     readonly getWorkspaceId: () => string | null;

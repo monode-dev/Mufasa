@@ -3,7 +3,7 @@ import { DocStoreConfig, DocStoreParams, Persistance } from "./DocStore.js";
 export declare function initializeSyncedFileClass(): {
     MfsFile(docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: DocStoreConfig | undefined;
+        docStoreConfig?: Partial<DocStoreConfig> | undefined;
     }, "docType"> | undefined): typeof MfsFile;
 };
 export type FileStore = ReturnType<typeof _createFileStore>;

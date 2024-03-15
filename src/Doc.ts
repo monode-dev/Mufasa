@@ -176,7 +176,7 @@ export class MfsDoc {
     this: This,
     customizations: {
       docType?: string;
-      docStoreConfig?: DocStoreConfig;
+      docStoreConfig?: Partial<DocStoreConfig>;
     },
   ): This {
     return class extends (this as any) {
@@ -184,8 +184,13 @@ export class MfsDoc {
         return customizations.docType ?? this.name;
       }
 
-      static getDocStoreConfig<This extends typeof MfsDoc>(this: This) {
-        return customizations.docStoreConfig ?? defaultDocStoreConfig!;
+      static getDocStoreConfig<This extends typeof MfsDoc>(
+        this: This,
+      ): DocStoreConfig {
+        return {
+          ...defaultDocStoreConfig!,
+          ...customizations.docStoreConfig,
+        };
       }
     } as any;
   }

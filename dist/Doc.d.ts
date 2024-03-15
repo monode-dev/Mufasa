@@ -63,7 +63,7 @@ export declare class MfsDoc {
     };
     static customize<This extends typeof MfsDoc>(this: This, customizations: {
         docType?: string;
-        docStoreConfig?: DocStoreConfig;
+        docStoreConfig?: Partial<DocStoreConfig>;
     }): This;
     get docId(): string;
     get isDeleted(): boolean;
