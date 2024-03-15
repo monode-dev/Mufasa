@@ -49,7 +49,7 @@ Define your document types in any file.
 ```ts
 import { prop, list, formula } from "mufasa";
 
-export class Course extends MfsDoc {
+export class Course extends MfsDoc(`Course`) {
   // Use `prop(TypeClass)` to specify a property that will be saved to the database
   name = prop(String);
 
@@ -66,7 +66,7 @@ export class Course extends MfsDoc {
   readonly students = list(Student);
 }
 
-export class Teacher extends MfsDoc {
+export class Teacher extends MfsDoc(`Teacher`) {
   firstName = prop(String);
   lastName = prop(String);
   // Use formula to make reactive, read-only props
@@ -76,7 +76,7 @@ export class Teacher extends MfsDoc {
   readonly courses = list(Course, `teacher`);
 }
 
-export class Student extends MfsDoc {
+export class Student extends MfsDoc(`Student`) {
   firstName = prop(String);
   lastName = prop(String);
   readonly fullName = formula(() => `${this.firstName} ${this.lastName}`);
