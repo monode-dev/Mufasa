@@ -172,11 +172,14 @@ export class MfsDoc {
     return (this.constructor as typeof MfsDoc)._docStore;
   }
   // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
-  static customize(customizations: {
-    docType?: string;
-    docStoreConfig?: DocStoreConfig;
-  }) {
-    return class extends MfsDoc {
+  static customize<This extends typeof MfsDoc>(
+    this: This,
+    customizations: {
+      docType?: string;
+      docStoreConfig?: DocStoreConfig;
+    },
+  ): This {
+    return class extends (this as any) {
       static get docType() {
         return customizations.docType ?? this.name;
       }
@@ -184,7 +187,7 @@ export class MfsDoc {
       static getDocStoreConfig<This extends typeof MfsDoc>(this: This) {
         return customizations.docStoreConfig ?? defaultDocStoreConfig!;
       }
-    };
+    } as any;
   }
   // TODO: Let this be defined as a hash of two keys for rel-tables.
   get docId() {

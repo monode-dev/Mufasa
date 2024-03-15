@@ -126,7 +126,7 @@ export class MfsDoc {
     }
     // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
     static customize(customizations) {
-        return class extends MfsDoc {
+        return class extends this {
             static get docType() {
                 return customizations.docType ?? this.name;
             }

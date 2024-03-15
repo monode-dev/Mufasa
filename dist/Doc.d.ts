@@ -6,72 +6,7 @@ export declare function initializeDocClass<T extends DocStoreConfig>(config: {
     getWorkspaceId: () => string | null;
     defaultDocStoreConfig: T;
 }): {
-    MfsDoc(docType: string, customizations?: Omit<Parameters<typeof MfsDoc.customize>[0], `docType`>): {
-        new (): {
-            readonly docType: string;
-            readonly _docStore: {
-                readonly loadedFromLocalStorage: Promise<void>;
-                readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
-                        readonly [x: string]: {
-                            readonly value: PrimVal;
-                            readonly maxPersistance: Persistance;
-                        };
-                    };
-                }, options: {
-                    overwriteGlobally: boolean;
-                }) => void;
-                readonly createDoc: (props: {
-                    readonly [x: string]: {
-                        readonly value: PrimVal;
-                        readonly maxPersistance: Persistance;
-                    };
-                }, manualDocId?: string | undefined) => string;
-                readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
-                readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
-                readonly getAllDocs: () => string[];
-            };
-            readonly docId: string;
-            readonly isDeleted: boolean;
-            /** Override to run code just before an object is deleted. */
-            onDelete(): void;
-            /** Permanently deletes this object. */
-            readonly deleteDoc: () => void;
-        };
-        readonly docType: string;
-        getDocStoreConfig<This extends typeof MfsDoc>(this: This): DocStoreConfig;
-        readonly _docStore: {
-            readonly loadedFromLocalStorage: Promise<void>;
-            readonly batchUpdate: (updates: {
-                readonly [x: string]: {
-                    readonly [x: string]: {
-                        readonly value: PrimVal;
-                        readonly maxPersistance: Persistance;
-                    };
-                };
-            }, options: {
-                overwriteGlobally: boolean;
-            }) => void;
-            readonly createDoc: (props: {
-                readonly [x: string]: {
-                    readonly value: PrimVal;
-                    readonly maxPersistance: Persistance;
-                };
-            }, manualDocId?: string | undefined) => string;
-            readonly deleteDoc: (docId: string) => void;
-            readonly isDocDeleted: (docId: string) => boolean;
-            readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
-            readonly getAllDocs: () => string[];
-        };
-        customize(customizations: {
-            docType?: string | undefined;
-            docStoreConfig?: DocStoreConfig | undefined;
-        }): any;
-        getAllDocs<T extends typeof MfsDoc>(this: T): InstanceType<T>[];
-        _fromId<T_1 extends typeof MfsDoc>(this: T_1, docId: string): InstanceType<T_1>;
-        create<T_2 extends typeof MfsDoc>(this: T_2, ...overrideProps: Parameters<(PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag> extends never ? true : false) extends infer T_3 ? T_3 extends (PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag> extends never ? true : false) ? T_3 extends true ? (prop?: ({ [K in PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag>]: StripFlag<InstanceType<T_2>[K], typeof RequiredPropFlag>; } & Partial<{ [K_1 in PickFlagged<InstanceType<T_2>, typeof OptionalPropFlag>]: StripFlag<InstanceType<T_2>[K_1], typeof OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag>]: StripFlag<InstanceType<T_2>[K], typeof RequiredPropFlag>; } & Partial<{ [K_1 in PickFlagged<InstanceType<T_2>, typeof OptionalPropFlag>]: StripFlag<InstanceType<T_2>[K_1], typeof OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
-    };
+    MfsDoc(docType: string, customizations?: Omit<Parameters<typeof MfsDoc.customize>[0], `docType`>): typeof MfsDoc;
     defaultDocStoreConfig: T;
     getWorkspaceId: () => string | null;
 };
@@ -126,75 +61,10 @@ export declare class MfsDoc {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
     };
-    static customize(customizations: {
+    static customize<This extends typeof MfsDoc>(this: This, customizations: {
         docType?: string;
         docStoreConfig?: DocStoreConfig;
-    }): {
-        new (): {
-            readonly docType: string;
-            readonly _docStore: {
-                readonly loadedFromLocalStorage: Promise<void>;
-                readonly batchUpdate: (updates: {
-                    readonly [x: string]: {
-                        readonly [x: string]: {
-                            readonly value: PrimVal;
-                            readonly maxPersistance: Persistance;
-                        };
-                    };
-                }, options: {
-                    overwriteGlobally: boolean;
-                }) => void;
-                readonly createDoc: (props: {
-                    readonly [x: string]: {
-                        readonly value: PrimVal;
-                        readonly maxPersistance: Persistance;
-                    };
-                }, manualDocId?: string | undefined) => string;
-                readonly deleteDoc: (docId: string) => void;
-                readonly isDocDeleted: (docId: string) => boolean;
-                readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
-                readonly getAllDocs: () => string[];
-            };
-            readonly docId: string;
-            readonly isDeleted: boolean;
-            /** Override to run code just before an object is deleted. */
-            onDelete(): void;
-            /** Permanently deletes this object. */
-            readonly deleteDoc: () => void;
-        };
-        readonly docType: string;
-        getDocStoreConfig<This extends typeof MfsDoc>(this: This): DocStoreConfig;
-        readonly _docStore: {
-            readonly loadedFromLocalStorage: Promise<void>;
-            readonly batchUpdate: (updates: {
-                readonly [x: string]: {
-                    readonly [x: string]: {
-                        readonly value: PrimVal;
-                        readonly maxPersistance: Persistance;
-                    };
-                };
-            }, options: {
-                overwriteGlobally: boolean;
-            }) => void;
-            readonly createDoc: (props: {
-                readonly [x: string]: {
-                    readonly value: PrimVal;
-                    readonly maxPersistance: Persistance;
-                };
-            }, manualDocId?: string | undefined) => string;
-            readonly deleteDoc: (docId: string) => void;
-            readonly isDocDeleted: (docId: string) => boolean;
-            readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
-            readonly getAllDocs: () => string[];
-        };
-        customize(customizations: {
-            docType?: string;
-            docStoreConfig?: DocStoreConfig;
-        }): any;
-        getAllDocs<T extends typeof MfsDoc>(this: T): InstanceType<T>[];
-        _fromId<T_1 extends typeof MfsDoc>(this: T_1, docId: string): InstanceType<T_1>;
-        create<T_2 extends typeof MfsDoc>(this: T_2, ...overrideProps: Parameters<(PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag> extends never ? true : false) extends infer T_3 ? T_3 extends (PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag> extends never ? true : false) ? T_3 extends true ? (prop?: ({ [K in PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag>]: StripFlag<InstanceType<T_2>[K], typeof RequiredPropFlag>; } & Partial<{ [K_1 in PickFlagged<InstanceType<T_2>, typeof OptionalPropFlag>]: StripFlag<InstanceType<T_2>[K_1], typeof OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in PickFlagged<InstanceType<T_2>, typeof RequiredPropFlag>]: StripFlag<InstanceType<T_2>[K], typeof RequiredPropFlag>; } & Partial<{ [K_1 in PickFlagged<InstanceType<T_2>, typeof OptionalPropFlag>]: StripFlag<InstanceType<T_2>[K_1], typeof OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
-    };
+    }): This;
     get docId(): string;
     get isDeleted(): boolean;
     static getAllDocs<T extends typeof MfsDoc>(this: T): InstanceType<T>[];
