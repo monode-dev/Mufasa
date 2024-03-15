@@ -1,4 +1,10 @@
-import { DocExports, prop, getWorkspaceId, MfsDoc } from "./Doc.js";
+import {
+  DocExports,
+  prop,
+  getWorkspaceId,
+  MfsDoc,
+  initializeDocClass,
+} from "./Doc.js";
 import {
   DocStoreConfig,
   DocStoreParams,
@@ -16,7 +22,16 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
 export function initializeSyncedFileClass() {
-  return { MfsFile };
+  return {
+    MfsFile(
+      ...params: Parameters<ReturnType<typeof initializeDocClass>[`MfsDoc`]>
+    ) {
+      return MfsFile.customize({
+        docType: params[0],
+        ...(params[1] as DocStoreConfig),
+      });
+    },
+  };
 }
 
 const fileStores = new Map<string | null, Map<string, FileStore>>();

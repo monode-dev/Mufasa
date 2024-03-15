@@ -31,7 +31,12 @@ export function initializeDocClass<T extends DocStoreConfig>(config: {
   defaultDocStoreConfig = config.defaultDocStoreConfig;
 
   return {
-    MfsDoc,
+    MfsDoc(
+      docType: string,
+      customizations?: Omit<Parameters<typeof MfsDoc.customize>[0], `docType`>,
+    ) {
+      return MfsDoc.customize({ docType, ...(customizations ?? {}) });
+    },
     defaultDocStoreConfig: config.defaultDocStoreConfig,
     getWorkspaceId,
   };

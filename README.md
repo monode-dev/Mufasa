@@ -24,8 +24,8 @@ import { solidPersister } from "mufasa/solid";
 import { capacitorJsonPersister } from "mufasa/capacitor";
 import { firestoreDocPersister } from "mufasa/firebase";
 
-// Export "Doc" so it can be used in other files too.
-export const { Doc } = initializeMufasa({
+// Export "MfsDoc" so it can be used in other files too.
+export const { MfsDoc } = initializeMufasa({
   getDefaultPersistersFromDocType: (docType) => {
     const stagedName = `${import.meta.env.PROD ? `Prod` : `Dev`}_${docType}`;
     return {
@@ -49,7 +49,7 @@ Define your document types in any file.
 ```ts
 import { prop, list, formula } from "mufasa";
 
-export class Course extends Doc {
+export class Course extends MfsDoc {
   // Use `prop(TypeClass)` to specify a property that will be saved to the database
   name = prop(String);
 
@@ -66,7 +66,7 @@ export class Course extends Doc {
   readonly students = list(Student);
 }
 
-export class Teacher extends Doc {
+export class Teacher extends MfsDoc {
   firstName = prop(String);
   lastName = prop(String);
   // Use formula to make reactive, read-only props
@@ -76,7 +76,7 @@ export class Teacher extends Doc {
   readonly courses = list(Course, `teacher`);
 }
 
-export class Student extends Doc {
+export class Student extends MfsDoc {
   firstName = prop(String);
   lastName = prop(String);
   readonly fullName = formula(() => `${this.firstName} ${this.lastName}`);

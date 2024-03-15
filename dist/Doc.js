@@ -7,7 +7,9 @@ export function initializeDocClass(config) {
     _getWorkspaceId = config.getWorkspaceId;
     defaultDocStoreConfig = config.defaultDocStoreConfig;
     return {
-        MfsDoc,
+        MfsDoc(docType, customizations) {
+            return MfsDoc.customize({ docType, ...(customizations ?? {}) });
+        },
         defaultDocStoreConfig: config.defaultDocStoreConfig,
         getWorkspaceId,
     };
