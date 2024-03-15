@@ -14,13 +14,5 @@ export function initializeMufasa(mfsConfig) {
             defaultDocStoreConfig: mfsConfig.defaultDocConfig,
         }),
         ...initializeSyncedFileClass(),
-        // setWorkspace(workspaceId: string | null) {
-        //   docClassStuff.swapToDatabase(dbId);
-        //   fileStoreFactory.swapToDatabase(dbId);
-        // },
-        // deleteDatabaseLocally(dbId: string) {
-        //   docClassStuff.deleteDatabaseLocally(dbId);
-        //   fileStoreFactory.deleteDatabaseLocally(dbId);
-        // },
     };
 }

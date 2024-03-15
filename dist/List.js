@@ -1,4 +1,4 @@
-import { Doc, IsCustomProp, prop } from "./Doc.js";
+import { MfsDoc, IsCustomProp, prop } from "./Doc.js";
 const relTables = new Map();
 export function list(OtherClass, tableConfig) {
     if (typeof tableConfig === `string`) {
@@ -54,7 +54,7 @@ function listProp(config) {
                 relTables.set(PrimaryClass, new Map());
             const relTablesForThisType = relTables.get(PrimaryClass);
             if (!relTablesForThisType.has(key)) {
-                relTablesForThisType.set(key, class extends Doc.customize({
+                relTablesForThisType.set(key, class extends MfsDoc.customize({
                     docType: `${PrimaryClass.docType}_${key}`,
                     docStoreConfig: config.docStoreConfig ?? undefined,
                 }) {

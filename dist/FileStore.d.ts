@@ -1,7 +1,7 @@
-import { Doc } from "./Doc.js";
+import { MfsDoc } from "./Doc.js";
 import { DocStoreParams, Persistance } from "./DocStore.js";
 export declare function initializeSyncedFileClass(): {
-    SyncedFile: typeof SyncedFile;
+    MfsFile: typeof MfsFile;
 };
 export type FileStore = ReturnType<typeof _createFileStore>;
 declare function _createFileStore(config: DocStoreParams): {
@@ -103,7 +103,7 @@ declare function _createFileStore(config: DocStoreParams): {
     };
     readFile(fileId: string): Promise<string | undefined>;
 };
-declare class SyncedFile extends Doc {
+declare class MfsFile extends MfsDoc {
     static get _fileStore(): FileStore;
     get _fileStore(): {
         docStore: {
@@ -231,7 +231,7 @@ declare class SyncedFile extends Doc {
     readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
     /** Won't resolve until it retrieves and returns the base64String. */
     getBase64String(): Promise<string>;
-    static createFromBase64String(base64String: string): Promise<SyncedFile>;
+    static createFromBase64String(base64String: string): Promise<MfsFile>;
     onDelete(): void;
 }
 export {};

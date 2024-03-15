@@ -1,23 +1,23 @@
-import { CustomProp, Doc, IsCustomProp, prop } from "./Doc.js";
+import { CustomProp, MfsDoc, IsCustomProp, prop } from "./Doc.js";
 import { DocStoreConfig } from "./DocStore.js";
 import { isValid } from "./Utils.js";
 
-const relTables = new Map<typeof Doc, Map<string, typeof Doc>>();
+const relTables = new Map<typeof MfsDoc, Map<string, typeof MfsDoc>>();
 
 type GetListFromTableConfig<
-  OtherInst extends Doc,
+  OtherInst extends MfsDoc,
   TableConfig,
 > = undefined extends TableConfig
   ? List<OtherInst>
   : TableConfig extends DocStoreConfig
   ? List<OtherInst>
   : TableConfig extends keyof OtherInst
-  ? OtherInst[TableConfig] extends Doc
+  ? OtherInst[TableConfig] extends MfsDoc
     ? ReadonlyList<OtherInst>
     : List<OtherInst>
   : List<OtherInst>;
 export function list<
-  OtherClass extends typeof Doc,
+  OtherClass extends typeof MfsDoc,
   TableConfig extends
     | undefined
     | DocStoreConfig
@@ -49,7 +49,7 @@ export function list<
           const listInst = new List(
             () =>
               OtherClass.getAllDocs().filter(
-                (other) => (other[otherProp] as Doc)?.docId === inst.docId,
+                (other) => (other[otherProp] as MfsDoc)?.docId === inst.docId,
               ),
             () => {},
             () => {},
@@ -76,11 +76,11 @@ export function list<
   }
 }
 function listProp(config: {
-  getPrimaryClass: (inst: Doc) => typeof Doc;
-  getSecondaryClass: (inst: Doc) => typeof Doc;
+  getPrimaryClass: (inst: MfsDoc) => typeof MfsDoc;
+  getSecondaryClass: (inst: MfsDoc) => typeof MfsDoc;
   gePrimaryProp: (thisProp: string) => string;
   docStoreConfig: DocStoreConfig | null;
-  otherDocsToStartSyncing: (typeof Doc)[];
+  otherDocsToStartSyncing: (typeof MfsDoc)[];
 }) {
   return {
     [IsCustomProp]: true,
@@ -93,7 +93,7 @@ function listProp(config: {
       if (!relTablesForThisType.has(key)) {
         relTablesForThisType.set(
           key,
-          class extends Doc.customize({
+          class extends MfsDoc.customize({
             docType: `${PrimaryClass.docType}_${key}`,
             docStoreConfig: config.docStoreConfig ?? undefined,
           }) {
@@ -131,7 +131,7 @@ function listProp(config: {
     otherDocsToStartSyncing: config.otherDocsToStartSyncing,
   } satisfies CustomProp;
 }
-export class List<T extends Doc> {
+export class List<T extends MfsDoc> {
   [Symbol.iterator](): IterableIterator<T> {
     return this.getArray()[Symbol.iterator]();
   }
@@ -153,4 +153,4 @@ export class List<T extends Doc> {
     public readonly remove: (value: T) => void,
   ) {}
 }
-export type ReadonlyList<T extends Doc> = Omit<List<T>, `add` | `remove`>;
+export type ReadonlyList<T extends MfsDoc> = Omit<List<T>, `add` | `remove`>;

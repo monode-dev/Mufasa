@@ -1,10 +1,10 @@
-import { prop, getWorkspaceId, Doc } from "./Doc.js";
+import { prop, getWorkspaceId, MfsDoc } from "./Doc.js";
 import { Persistance, createDocStore, initDocStoreConfig, trackUpload, untrackUpload, } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 export function initializeSyncedFileClass() {
-    return { SyncedFile };
+    return { MfsFile };
 }
 const fileStores = new Map();
 function getFileStore(params) {
@@ -100,7 +100,7 @@ function _createFileStore(config) {
     };
 }
 // TODO: Maybe prevent this file from being directly created.
-class SyncedFile extends Doc {
+class MfsFile extends MfsDoc {
     static get _fileStore() {
         return getFileStore({
             workspaceId: getWorkspaceId(),

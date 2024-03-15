@@ -7,7 +7,7 @@ export function initializeDocClass(config) {
     _getWorkspaceId = config.getWorkspaceId;
     defaultDocStoreConfig = config.defaultDocStoreConfig;
     return {
-        Doc,
+        MfsDoc,
         defaultDocStoreConfig: config.defaultDocStoreConfig,
         getWorkspaceId,
     };
@@ -85,7 +85,7 @@ getDocId) {
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
 const docStores = new Map();
-export class Doc {
+export class MfsDoc {
     // private constructor() {}
     /*** NOTE: This can be overridden to manually specify a type name. */
     static get docType() {
@@ -124,7 +124,7 @@ export class Doc {
     }
     // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
     static customize(customizations) {
-        return class extends Doc {
+        return class extends MfsDoc {
             static get docType() {
                 return customizations.docType ?? this.name;
             }
@@ -172,8 +172,8 @@ persistance = Persistance.global) {
         ? firstParam
         : Array.isArray(firstParam)
             ? firstParam[0]
-            : firstParam instanceof Doc
-                ? Doc
+            : firstParam instanceof MfsDoc
+                ? MfsDoc
                 : typeof firstParam === `boolean`
                     ? Boolean
                     : typeof firstParam === `number`
@@ -190,7 +190,7 @@ persistance = Persistance.global) {
         return {
             [IsCustomProp]: true,
             isFullCustom: false,
-            getInitValue: () => initValue instanceof Doc ? initValue.docId : initValue,
+            getInitValue: () => initValue instanceof MfsDoc ? initValue.docId : initValue,
             getFallbackValue: () => null,
             fromPrim: (prim) => {
                 if (prim === null)
@@ -235,5 +235,5 @@ function isCustomProp(arg) {
     return arg?.[IsCustomProp] === true;
 }
 function isDocClass(possibleDocClass) {
-    return Object.prototype.isPrototypeOf.call(Doc.prototype, possibleDocClass.prototype);
+    return Object.prototype.isPrototypeOf.call(MfsDoc.prototype, possibleDocClass.prototype);
 }

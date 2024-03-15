@@ -1,4 +1,4 @@
-import { DocExports, prop, getWorkspaceId, Doc } from "./Doc.js";
+import { DocExports, prop, getWorkspaceId, MfsDoc } from "./Doc.js";
 import {
   DocStoreConfig,
   DocStoreParams,
@@ -16,7 +16,7 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 
 export function initializeSyncedFileClass() {
-  return { SyncedFile };
+  return { MfsFile };
 }
 
 const fileStores = new Map<string | null, Map<string, FileStore>>();
@@ -142,7 +142,7 @@ function _createFileStore(config: DocStoreParams) {
 }
 
 // TODO: Maybe prevent this file from being directly created.
-class SyncedFile extends Doc {
+class MfsFile extends MfsDoc {
   static get _fileStore(): FileStore {
     return getFileStore({
       workspaceId: getWorkspaceId(),
@@ -151,7 +151,7 @@ class SyncedFile extends Doc {
     });
   }
   get _fileStore() {
-    return (this.constructor as typeof SyncedFile)._fileStore;
+    return (this.constructor as typeof MfsFile)._fileStore;
   }
   static get _docStore() {
     return this._fileStore.docStore;
