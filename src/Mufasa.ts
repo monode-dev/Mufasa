@@ -19,6 +19,7 @@ export {
   GlobalFilePersister,
   LocalFilePersister,
   DELETED_KEY,
+  Persistance,
 } from "./DocStore.js";
 
 // TODO: Implement database versioning.
