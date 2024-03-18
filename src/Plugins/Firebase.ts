@@ -10,6 +10,9 @@ import {
   and,
   QueryFilterConstraint,
   or,
+  DocumentReference,
+  addDoc,
+  collection,
 } from "firebase/firestore";
 import {
   DocJson,
@@ -27,11 +30,13 @@ import { doNow, isValid } from "../Utils.js";
 import {
   Auth,
   GoogleAuthProvider,
+  UserMetadata,
   createUserWithEmailAndPassword,
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { UserInfo } from "../Auth.js";
+import { Functions, httpsCallable } from "firebase/functions";
 
 // SECTION: Doc Persister
 export function firestoreDocPersister(
@@ -194,5 +199,52 @@ export function firebaseAuthIntegration(config: {
         console.error("Error during Sign-Out:", error);
       }
     },
+  };
+}
+
+// SECTION: Workspace
+type WorkspaceIntegration = ReturnType<typeof firebaseWorkspace>;
+export function firebaseWorkspace(config: {
+  firebaseFunctions: Functions;
+  userMetadataDoc: DocumentReference;
+  workspaceInvitesCollection: CollectionReference;
+}) {
+  return {
+    onUserMetadata(handle: (metadata: UserMetadata | null) => void) {
+      return onSnapshot(config.userMetadataDoc, (snapshot) => {
+        const metadata = snapshot.data() as undefined | UserMetadata;
+        handle(metadata ?? null);
+      });
+    },
+    createWorkspace: httpsCallable<{ stage: string }, void>(
+      config.firebaseFunctions,
+      "createWorkspace",
+    ),
+    async createWorkspaceInterface(params: {
+      inviteCode: string;
+      workspaceId: string;
+      validForDays: number;
+    }) {
+      return await setDoc(
+        docRef(config.workspaceInvitesCollection, params.inviteCode),
+        {
+          workspaceId: params.workspaceId,
+          validForDays: params.validForDays,
+          createdAt: serverTimestamp(),
+        },
+      );
+    },
+    joinWorkspace: httpsCallable<{ inviteCode: string; stage: string }, void>(
+      config.firebaseFunctions,
+      "joinWorkspace",
+    ),
+    leaveWorkspace: httpsCallable<{ stage: string } | undefined, void>(
+      config.firebaseFunctions,
+      "leaveWorkspace",
+    ),
+    // deleteWorkspace: httpsCallable<{ stage: string } | undefined, void>(
+    //   config.firebaseFunctions,
+    //   "deleteWorkspace",
+    // ),
   };
 }

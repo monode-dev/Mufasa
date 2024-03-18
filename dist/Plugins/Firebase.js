@@ -2,6 +2,7 @@ import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimes
 import { uploadString, deleteObject, getBytes, } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredential, signInWithEmailAndPassword, } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 // SECTION: Doc Persister
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
@@ -123,5 +124,29 @@ export function firebaseAuthIntegration(config) {
                 console.error("Error during Sign-Out:", error);
             }
         },
+    };
+}
+export function firebaseWorkspace(config) {
+    return {
+        onUserMetadata(handle) {
+            return onSnapshot(config.userMetadataDoc, (snapshot) => {
+                const metadata = snapshot.data();
+                handle(metadata ?? null);
+            });
+        },
+        createWorkspace: httpsCallable(config.firebaseFunctions, "createWorkspace"),
+        async createWorkspaceInterface(params) {
+            return await setDoc(docRef(config.workspaceInvitesCollection, params.inviteCode), {
+                workspaceId: params.workspaceId,
+                validForDays: params.validForDays,
+                createdAt: serverTimestamp(),
+            });
+        },
+        joinWorkspace: httpsCallable(config.firebaseFunctions, "joinWorkspace"),
+        leaveWorkspace: httpsCallable(config.firebaseFunctions, "leaveWorkspace"),
+        // deleteWorkspace: httpsCallable<{ stage: string } | undefined, void>(
+        //   config.firebaseFunctions,
+        //   "deleteWorkspace",
+        // ),
     };
 }
