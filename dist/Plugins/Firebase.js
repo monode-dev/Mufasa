@@ -101,7 +101,7 @@ export function firebaseAuthIntegration(config) {
         async signInWithGoogle() {
             await doNow(async () => {
                 try {
-                    const idToken = await config.signInWithGoogleFromPlatform();
+                    const idToken = await config.signInToGoogleFromPlatform();
                     if (!isValid(idToken))
                         return;
                     const credential = GoogleAuthProvider.credential(idToken);

@@ -142,7 +142,7 @@ export function firebaseFilePersister(
 
 // SECTION: Auth
 export function firebaseAuthIntegration(config: {
-  signInWithGoogleFromPlatform: () => Promise<string | undefined | null>;
+  signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
   signOutFromPlatform: () => Promise<void>;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
@@ -175,7 +175,7 @@ export function firebaseAuthIntegration(config: {
     async signInWithGoogle() {
       await doNow(async () => {
         try {
-          const idToken = await config.signInWithGoogleFromPlatform();
+          const idToken = await config.signInToGoogleFromPlatform();
           if (!isValid(idToken)) return;
           const credential = GoogleAuthProvider.credential(idToken);
           await signInWithCredential(config.firebaseAuth, credential);
