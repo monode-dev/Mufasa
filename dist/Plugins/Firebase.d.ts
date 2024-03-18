@@ -5,7 +5,12 @@ import { Auth } from "firebase/auth";
 import { UserInfo } from "../Auth.js";
 export declare function firestoreDocPersister(collectionRef: CollectionReference, ...queryConstraints: QueryFilterConstraint[]): GlobalDocPersister;
 export declare function firebaseFilePersister(getStorageRef: (fileId: string) => StorageReference): GlobalFilePersister;
-export declare function firebaseAuthIntegration(firebaseAuth: Auth, onAuthStateChanged: (user: UserInfo | null) => void): {
+export declare function firebaseAuthIntegration(config: {
+    signInWithGoogleFromPlatform: () => Promise<string | undefined | null>;
+    signOutFromPlatform: () => Promise<void>;
+    firebaseAuth: Auth;
+    onAuthStateChanged: (user: UserInfo | null) => void;
+}): {
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
     signInWithGoogle(): Promise<void>;

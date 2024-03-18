@@ -12,7 +12,6 @@ import {
   or,
 } from "firebase/firestore";
 import {
-  DELETED_KEY,
   DocJson,
   GlobalDocChange,
   GlobalDocPersister,
@@ -28,6 +27,7 @@ import { doNow, isValid } from "../Utils.js";
 import {
   Auth,
   GoogleAuthProvider,
+  User,
   createUserWithEmailAndPassword,
   getAuth,
   indexedDBLocalPersistence,
@@ -35,7 +35,6 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
 import { UserInfo } from "../Auth.js";
 
 // SECTION: Doc Persister
@@ -146,12 +145,14 @@ export function firebaseFilePersister(
 }
 
 // SECTION: Auth
-export function firebaseAuthIntegration(
-  firebaseAuth: Auth,
-  onAuthStateChanged: (user: UserInfo | null) => void,
-) {
-  firebaseAuth.onAuthStateChanged((user) => {
-    onAuthStateChanged(
+export function firebaseAuthIntegration(config: {
+  signInWithGoogleFromPlatform: () => Promise<string | undefined | null>;
+  signOutFromPlatform: () => Promise<void>;
+  firebaseAuth: Auth;
+  onAuthStateChanged: (user: UserInfo | null) => void;
+}) {
+  config.firebaseAuth.onAuthStateChanged((user) => {
+    config.onAuthStateChanged(
       user !== null ? { uid: user.uid, email: user.email } : null,
     );
   });
@@ -159,14 +160,18 @@ export function firebaseAuthIntegration(
   return {
     signUpWithEmail: async (email: string, password: string) => {
       try {
-        await createUserWithEmailAndPassword(firebaseAuth, email, password);
+        await createUserWithEmailAndPassword(
+          config.firebaseAuth,
+          email,
+          password,
+        );
       } catch (error) {
         console.error("Error during email sign-up:", error);
       }
     },
     signInWithEmail: async (email: string, password: string) => {
       try {
-        signInWithEmailAndPassword(firebaseAuth, email, password);
+        signInWithEmailAndPassword(config.firebaseAuth, email, password);
       } catch (error) {
         console.error("Error during email sign-in:", error);
       }
@@ -174,12 +179,10 @@ export function firebaseAuthIntegration(
     async signInWithGoogle() {
       await doNow(async () => {
         try {
-          const userObject = await GoogleAuth.signIn();
-          if (!isValid(userObject)) return;
-          const credential = GoogleAuthProvider.credential(
-            userObject?.authentication.idToken,
-          );
-          await signInWithCredential(firebaseAuth, credential);
+          const idToken = await config.signInWithGoogleFromPlatform();
+          if (!isValid(idToken)) return;
+          const credential = GoogleAuthProvider.credential(idToken);
+          await signInWithCredential(config.firebaseAuth, credential);
           // console.log("Google Sign-In Success:", credential);
         } catch (error) {
           console.error("Error during Google Sign-In:", error);
@@ -189,8 +192,8 @@ export function firebaseAuthIntegration(
     async signOut() {
       try {
         // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-        await firebaseAuth.signOut();
-        await GoogleAuth.signOut();
+        await config.firebaseAuth.signOut();
+        await config.signOutFromPlatform();
       } catch (error) {
         console.error("Error during Sign-Out:", error);
       }
