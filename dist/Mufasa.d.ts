@@ -3,6 +3,7 @@ export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocStoreConfig as DocPersisters, DocStore, UpdateBatch, GlobalFilePersister, LocalFilePersister, DELETED_KEY, Persistance, } from "./DocStore.js";
+export { UserInfo } from "./Auth.js";
 export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig>(mfsConfig: {
     defaultDocConfig: DefaultDocConfig;
     getWorkspaceId?: () => string | null;

@@ -21,6 +21,7 @@ export {
   DELETED_KEY,
   Persistance,
 } from "./DocStore.js";
+export { UserInfo } from "./Auth.js";
 
 // TODO: Implement database versioning.
 export function initializeMufasa<

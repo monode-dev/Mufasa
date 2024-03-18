@@ -1,6 +1,9 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, } from "firebase/storage";
-import { isValid } from "../Utils.js";
+import { doNow, isValid } from "../Utils.js";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredential, signInWithEmailAndPassword, } from "firebase/auth";
+import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
+// SECTION: Doc Persister
 export function firestoreDocPersister(collectionRef, ...queryConstraints) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     const useServerTimestamp = serverTimestamp();
@@ -56,6 +59,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
         },
     };
 }
+// SECTION: File Persister
 export function firebaseFilePersister(getStorageRef) {
     return {
         async uploadFile(fileId, base64String) {
@@ -70,6 +74,55 @@ export function firebaseFilePersister(getStorageRef) {
         },
         async deleteFile(fileId) {
             await deleteObject(getStorageRef(fileId));
+        },
+    };
+}
+// SECTION: Auth
+export function firebaseAuthIntegration(firebaseAuth, onAuthStateChanged) {
+    firebaseAuth.onAuthStateChanged((user) => {
+        onAuthStateChanged(user !== null ? { uid: user.uid, email: user.email } : null);
+    });
+    return {
+        signUpWithEmail: async (email, password) => {
+            try {
+                await createUserWithEmailAndPassword(firebaseAuth, email, password);
+            }
+            catch (error) {
+                console.error("Error during email sign-up:", error);
+            }
+        },
+        signInWithEmail: async (email, password) => {
+            try {
+                signInWithEmailAndPassword(firebaseAuth, email, password);
+            }
+            catch (error) {
+                console.error("Error during email sign-in:", error);
+            }
+        },
+        async signInWithGoogle() {
+            await doNow(async () => {
+                try {
+                    const userObject = await GoogleAuth.signIn();
+                    if (!isValid(userObject))
+                        return;
+                    const credential = GoogleAuthProvider.credential(userObject?.authentication.idToken);
+                    await signInWithCredential(firebaseAuth, credential);
+                    // console.log("Google Sign-In Success:", credential);
+                }
+                catch (error) {
+                    console.error("Error during Google Sign-In:", error);
+                }
+            });
+        },
+        async signOut() {
+            try {
+                // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
+                await firebaseAuth.signOut();
+                await GoogleAuth.signOut();
+            }
+            catch (error) {
+                console.error("Error during Sign-Out:", error);
+            }
         },
     };
 }
