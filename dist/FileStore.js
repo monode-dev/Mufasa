@@ -1,4 +1,4 @@
-import { prop, getWorkspaceId, MfsDoc, } from "./Doc.js";
+import { prop, getWorkspaceId, MfsDoc, getStage, } from "./Doc.js";
 import { Persistance, createDocStore, initDocStoreConfig, trackUpload, untrackUpload, } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
@@ -21,6 +21,7 @@ function getFileStore(params) {
     const workspaceFileStores = fileStores.get(params.workspaceId);
     if (!workspaceFileStores.has(params.docType)) {
         workspaceFileStores.set(params.docType, _createFileStore(initDocStoreConfig({
+            stage: params.stage,
             workspaceId: params.workspaceId,
             docType: params.docType,
             config: params.defaultConfig,
@@ -110,6 +111,7 @@ function _createFileStore(config) {
 class MfsFile extends MfsDoc {
     static get _fileStore() {
         return getFileStore({
+            stage: getStage(),
             workspaceId: getWorkspaceId(),
             docType: this.docType,
             defaultConfig: this.getDocStoreConfig(),

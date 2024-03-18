@@ -6,6 +6,7 @@ export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, Session
 export { UserInfo } from "./Auth.js";
 export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig>(mfsConfig: {
     defaultDocConfig: DefaultDocConfig;
+    getStage?: () => string | null;
     getWorkspaceId?: () => string | null;
     isUploading?: UploadEvents;
 }): {

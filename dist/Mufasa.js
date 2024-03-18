@@ -10,6 +10,7 @@ export function initializeMufasa(mfsConfig) {
     setUpUploadEvents(mfsConfig.isUploading);
     return {
         ...initializeDocClass({
+            getStage: mfsConfig.getStage ?? (() => `Dev`),
             getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
             defaultDocStoreConfig: mfsConfig.defaultDocConfig,
         }),

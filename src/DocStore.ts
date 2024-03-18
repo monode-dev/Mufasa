@@ -164,6 +164,7 @@ export const fakeLocalFilePersister: LocalFilePersister = {
 // TODO: Figure out how to ignore changes incoming server changes that have been overridden by more recent local changes.
 export type DocStore = ReturnType<typeof createDocStore>;
 export type GetPersister<T> = (config: {
+  stage: string | null;
   docType: string;
   workspaceId: string;
 }) => T;
@@ -187,12 +188,14 @@ export type DocStoreParams = {
 };
 export function initDocStoreConfig(params: {
   config: DocStoreConfig;
+  stage: string | null;
   workspaceId: string | null;
   docType: string;
 }): DocStoreParams {
   return {
     sessionDocPersister: isValid(params.workspaceId)
       ? params.config.getSessionDocPersister({
+          stage: params.stage,
           docType: params.docType,
           workspaceId: params.workspaceId,
         })
@@ -201,6 +204,7 @@ export function initDocStoreConfig(params: {
       isValid(params.config.getLocalJsonPersister) &&
       isValid(params.workspaceId)
         ? params.config.getLocalJsonPersister({
+            stage: params.stage,
             docType: params.docType,
             workspaceId: params.workspaceId,
           })
@@ -209,6 +213,7 @@ export function initDocStoreConfig(params: {
       isValid(params.config.getGlobalDocPersister) &&
       isValid(params.workspaceId)
         ? params.config.getGlobalDocPersister({
+            stage: params.stage,
             docType: params.docType,
             workspaceId: params.workspaceId,
           })
@@ -217,6 +222,7 @@ export function initDocStoreConfig(params: {
       isValid(params.config.getLocalFilePersister) &&
       isValid(params.workspaceId)
         ? params.config.getLocalFilePersister({
+            stage: params.stage,
             docType: params.docType,
             workspaceId: params.workspaceId,
           })
@@ -225,6 +231,7 @@ export function initDocStoreConfig(params: {
       isValid(params.config.getGlobalFilePersister) &&
       isValid(params.workspaceId)
         ? params.config.getGlobalFilePersister({
+            stage: params.stage,
             docType: params.docType,
             workspaceId: params.workspaceId,
           })

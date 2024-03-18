@@ -19,14 +19,18 @@ import {
 
 let _getWorkspaceId: () => string | null;
 export const getWorkspaceId = () => _getWorkspaceId();
+let _getStage: () => string | null;
+export const getStage = () => _getStage();
 let defaultDocStoreConfig: DocStoreConfig;
 export type DocExports<T extends DocStoreConfig> = ReturnType<
   typeof initializeDocClass<T>
 >;
 export function initializeDocClass<T extends DocStoreConfig>(config: {
+  getStage: () => string | null;
   getWorkspaceId: () => string | null;
   defaultDocStoreConfig: T;
 }) {
+  _getStage = config.getStage;
   _getWorkspaceId = config.getWorkspaceId;
   defaultDocStoreConfig = config.defaultDocStoreConfig;
 
@@ -141,6 +145,7 @@ export class MfsDoc {
     return defaultDocStoreConfig;
   }
   static get _docStore() {
+    const stage = getStage();
     const workspaceId = getWorkspaceId();
     if (!docStores.has(workspaceId)) docStores.set(workspaceId, new Map());
     const workspaceStore = docStores.get(workspaceId)!;
@@ -150,6 +155,7 @@ export class MfsDoc {
         createDocStore(
           initDocStoreConfig({
             config: this.getDocStoreConfig(),
+            stage: stage,
             workspaceId: workspaceId,
             docType: this.docType,
           }),

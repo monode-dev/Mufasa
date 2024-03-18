@@ -83,6 +83,7 @@ export type LocalFilePersister = {
 export declare const fakeLocalFilePersister: LocalFilePersister;
 export type DocStore = ReturnType<typeof createDocStore>;
 export type GetPersister<T> = (config: {
+    stage: string | null;
     docType: string;
     workspaceId: string;
 }) => T;
@@ -106,6 +107,7 @@ export type DocStoreParams = {
 };
 export declare function initDocStoreConfig(params: {
     config: DocStoreConfig;
+    stage: string | null;
     workspaceId: string | null;
     docType: string;
 }): DocStoreParams;

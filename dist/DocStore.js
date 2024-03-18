@@ -69,6 +69,7 @@ export function initDocStoreConfig(params) {
     return {
         sessionDocPersister: isValid(params.workspaceId)
             ? params.config.getSessionDocPersister({
+                stage: params.stage,
                 docType: params.docType,
                 workspaceId: params.workspaceId,
             })
@@ -76,6 +77,7 @@ export function initDocStoreConfig(params) {
         localJsonPersister: isValid(params.config.getLocalJsonPersister) &&
             isValid(params.workspaceId)
             ? params.config.getLocalJsonPersister({
+                stage: params.stage,
                 docType: params.docType,
                 workspaceId: params.workspaceId,
             })
@@ -83,6 +85,7 @@ export function initDocStoreConfig(params) {
         globalDocPersister: isValid(params.config.getGlobalDocPersister) &&
             isValid(params.workspaceId)
             ? params.config.getGlobalDocPersister({
+                stage: params.stage,
                 docType: params.docType,
                 workspaceId: params.workspaceId,
             })
@@ -90,6 +93,7 @@ export function initDocStoreConfig(params) {
         localFilePersister: isValid(params.config.getLocalFilePersister) &&
             isValid(params.workspaceId)
             ? params.config.getLocalFilePersister({
+                stage: params.stage,
                 docType: params.docType,
                 workspaceId: params.workspaceId,
             })
@@ -97,6 +101,7 @@ export function initDocStoreConfig(params) {
         globalFilePersister: isValid(params.config.getGlobalFilePersister) &&
             isValid(params.workspaceId)
             ? params.config.getGlobalFilePersister({
+                stage: params.stage,
                 docType: params.docType,
                 workspaceId: params.workspaceId,
             })

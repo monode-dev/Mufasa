@@ -28,12 +28,14 @@ export function initializeMufasa<
   DefaultDocConfig extends DocStoreConfig,
 >(mfsConfig: {
   defaultDocConfig: DefaultDocConfig;
+  getStage?: () => string | null;
   getWorkspaceId?: () => string | null;
   isUploading?: UploadEvents;
 }) {
   setUpUploadEvents(mfsConfig.isUploading);
   return {
     ...initializeDocClass({
+      getStage: mfsConfig.getStage ?? (() => `Dev`),
       getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => `default-workspace`),
       defaultDocStoreConfig: mfsConfig.defaultDocConfig,
     }),

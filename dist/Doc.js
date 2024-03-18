@@ -2,8 +2,11 @@ import { Persistance, createDocStore, initDocStoreConfig, } from "./DocStore.js"
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
 let _getWorkspaceId;
 export const getWorkspaceId = () => _getWorkspaceId();
+let _getStage;
+export const getStage = () => _getStage();
 let defaultDocStoreConfig;
 export function initializeDocClass(config) {
+    _getStage = config.getStage;
     _getWorkspaceId = config.getWorkspaceId;
     defaultDocStoreConfig = config.defaultDocStoreConfig;
     return {
@@ -100,6 +103,7 @@ export class MfsDoc {
         return defaultDocStoreConfig;
     }
     static get _docStore() {
+        const stage = getStage();
         const workspaceId = getWorkspaceId();
         if (!docStores.has(workspaceId))
             docStores.set(workspaceId, new Map());
@@ -107,6 +111,7 @@ export class MfsDoc {
         if (!workspaceStore.has(this.docType)) {
             workspaceStore.set(this.docType, createDocStore(initDocStoreConfig({
                 config: this.getDocStoreConfig(),
+                stage: stage,
                 workspaceId: workspaceId,
                 docType: this.docType,
             })));

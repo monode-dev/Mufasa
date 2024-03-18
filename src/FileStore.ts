@@ -4,6 +4,7 @@ import {
   getWorkspaceId,
   MfsDoc,
   initializeDocClass,
+  getStage,
 } from "./Doc.js";
 import {
   DocStoreConfig,
@@ -36,6 +37,7 @@ export function initializeSyncedFileClass() {
 
 const fileStores = new Map<string | null, Map<string, FileStore>>();
 function getFileStore(params: {
+  stage: string | null;
   workspaceId: string | null;
   docType: string;
   defaultConfig: DocStoreConfig;
@@ -49,6 +51,7 @@ function getFileStore(params: {
       params.docType,
       _createFileStore(
         initDocStoreConfig({
+          stage: params.stage,
           workspaceId: params.workspaceId,
           docType: params.docType,
           config: params.defaultConfig,
@@ -160,6 +163,7 @@ function _createFileStore(config: DocStoreParams) {
 class MfsFile extends MfsDoc {
   static get _fileStore(): FileStore {
     return getFileStore({
+      stage: getStage(),
       workspaceId: getWorkspaceId(),
       docType: this.docType,
       defaultConfig: this.getDocStoreConfig(),

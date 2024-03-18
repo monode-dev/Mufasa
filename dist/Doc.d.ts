@@ -1,8 +1,10 @@
 import { DocStoreConfig, Persistance, PrimVal } from "./DocStore.js";
 import { Flagged, PickFlagged, StripFlag } from "./Utils.js";
 export declare const getWorkspaceId: () => string | null;
+export declare const getStage: () => string | null;
 export type DocExports<T extends DocStoreConfig> = ReturnType<typeof initializeDocClass<T>>;
 export declare function initializeDocClass<T extends DocStoreConfig>(config: {
+    getStage: () => string | null;
     getWorkspaceId: () => string | null;
     defaultDocStoreConfig: T;
 }): {
