@@ -4,6 +4,7 @@ export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocStoreConfig as DocPersisters, DocStore, UpdateBatch, GlobalFilePersister, LocalFilePersister, DELETED_KEY, Persistance, } from "./DocStore.js";
 export { UserInfo } from "./Auth.js";
+export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
 export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig>(mfsConfig: {
     defaultDocConfig: DefaultDocConfig;
     getStage?: () => string | null;

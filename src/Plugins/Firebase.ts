@@ -11,8 +11,6 @@ import {
   QueryFilterConstraint,
   or,
   DocumentReference,
-  addDoc,
-  collection,
 } from "firebase/firestore";
 import {
   DocJson,
@@ -30,13 +28,13 @@ import { doNow, isValid } from "../Utils.js";
 import {
   Auth,
   GoogleAuthProvider,
-  UserMetadata,
   createUserWithEmailAndPassword,
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { UserInfo } from "../Auth.js";
 import { Functions, httpsCallable } from "firebase/functions";
+import { UserMetadata, WorkspaceIntegration } from "../Workspace.js";
 
 // SECTION: Doc Persister
 export function firestoreDocPersister(
@@ -203,12 +201,11 @@ export function firebaseAuthIntegration(config: {
 }
 
 // SECTION: Workspace
-type WorkspaceIntegration = ReturnType<typeof firebaseWorkspace>;
 export function firebaseWorkspace(config: {
   firebaseFunctions: Functions;
   userMetadataDoc: DocumentReference;
   workspaceInvitesCollection: CollectionReference;
-}) {
+}): WorkspaceIntegration {
   return {
     onUserMetadata(handle: (metadata: UserMetadata | null) => void) {
       return onSnapshot(config.userMetadataDoc, (snapshot) => {
@@ -216,10 +213,14 @@ export function firebaseWorkspace(config: {
         handle(metadata ?? null);
       });
     },
-    createWorkspace: httpsCallable<{ stage: string }, void>(
-      config.firebaseFunctions,
-      "createWorkspace",
-    ),
+    async createWorkspace(params: { stage: string }) {
+      return (
+        await httpsCallable<{ stage: string }, void>(
+          config.firebaseFunctions,
+          "createWorkspace",
+        )(params)
+      ).data;
+    },
     async createWorkspaceInterface(params: {
       inviteCode: string;
       workspaceId: string;
@@ -234,17 +235,29 @@ export function firebaseWorkspace(config: {
         },
       );
     },
-    joinWorkspace: httpsCallable<{ inviteCode: string; stage: string }, void>(
-      config.firebaseFunctions,
-      "joinWorkspace",
-    ),
-    leaveWorkspace: httpsCallable<{ stage: string } | undefined, void>(
-      config.firebaseFunctions,
-      "leaveWorkspace",
-    ),
-    // deleteWorkspace: httpsCallable<{ stage: string } | undefined, void>(
-    //   config.firebaseFunctions,
-    //   "deleteWorkspace",
-    // ),
+    async joinWorkspace(params: { inviteCode: string; stage: string }) {
+      return (
+        await httpsCallable<{ inviteCode: string; stage: string }, void>(
+          config.firebaseFunctions,
+          "joinWorkspace",
+        )(params)
+      ).data;
+    },
+    async leaveWorkspace(params: { stage: string } | undefined) {
+      return (
+        await httpsCallable<{ stage: string } | undefined, void>(
+          config.firebaseFunctions,
+          "leaveWorkspace",
+        )(params)
+      ).data;
+    },
+    // async deleteWorkspace(params: { stage: string } | undefined) {
+    //   return (
+    //     await httpsCallable<{ stage: string } | undefined, void>(
+    //       config.firebaseFunctions,
+    //       "deleteWorkspace",
+    //     )(params)
+    //   ).data;
+    // },
   };
 }

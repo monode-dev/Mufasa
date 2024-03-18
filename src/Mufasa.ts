@@ -22,6 +22,7 @@ export {
   Persistance,
 } from "./DocStore.js";
 export { UserInfo } from "./Auth.js";
+export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
 
 // TODO: Implement database versioning.
 export function initializeMufasa<

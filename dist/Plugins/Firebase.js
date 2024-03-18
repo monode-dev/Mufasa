@@ -126,6 +126,7 @@ export function firebaseAuthIntegration(config) {
         },
     };
 }
+// SECTION: Workspace
 export function firebaseWorkspace(config) {
     return {
         onUserMetadata(handle) {
@@ -134,7 +135,9 @@ export function firebaseWorkspace(config) {
                 handle(metadata ?? null);
             });
         },
-        createWorkspace: httpsCallable(config.firebaseFunctions, "createWorkspace"),
+        async createWorkspace(params) {
+            return (await httpsCallable(config.firebaseFunctions, "createWorkspace")(params)).data;
+        },
         async createWorkspaceInterface(params) {
             return await setDoc(docRef(config.workspaceInvitesCollection, params.inviteCode), {
                 workspaceId: params.workspaceId,
@@ -142,11 +145,19 @@ export function firebaseWorkspace(config) {
                 createdAt: serverTimestamp(),
             });
         },
-        joinWorkspace: httpsCallable(config.firebaseFunctions, "joinWorkspace"),
-        leaveWorkspace: httpsCallable(config.firebaseFunctions, "leaveWorkspace"),
-        // deleteWorkspace: httpsCallable<{ stage: string } | undefined, void>(
-        //   config.firebaseFunctions,
-        //   "deleteWorkspace",
-        // ),
+        async joinWorkspace(params) {
+            return (await httpsCallable(config.firebaseFunctions, "joinWorkspace")(params)).data;
+        },
+        async leaveWorkspace(params) {
+            return (await httpsCallable(config.firebaseFunctions, "leaveWorkspace")(params)).data;
+        },
+        // async deleteWorkspace(params: { stage: string } | undefined) {
+        //   return (
+        //     await httpsCallable<{ stage: string } | undefined, void>(
+        //       config.firebaseFunctions,
+        //       "deleteWorkspace",
+        //     )(params)
+        //   ).data;
+        // },
     };
 }
