@@ -27,11 +27,7 @@ import { doNow, isValid } from "../Utils.js";
 import {
   Auth,
   GoogleAuthProvider,
-  User,
   createUserWithEmailAndPassword,
-  getAuth,
-  indexedDBLocalPersistence,
-  initializeAuth,
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
