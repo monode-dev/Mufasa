@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.2.120",
+  "version": "0.2.121",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     }
   },
   "dependencies": {
-    "@monode/mosa": "^0.0.17",
+    "@monode/mosa": "^0.0.21",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
