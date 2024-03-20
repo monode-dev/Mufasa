@@ -44,7 +44,9 @@ export type LocalJsonFilePersister = {
 export type SavedJson<T extends Json> = {
     readonly loadedFromLocalStorage: Promise<void>;
     readonly data: ToReadonlyJson<T>;
-    readonly batchUpdate: (doUpdate: (json: T, doNotSave: () => void) => Promise<unknown> | unknown) => Promise<void>;
+    readonly batchUpdate: (doUpdate: (json: {
+        value: T;
+    }, doNotSave: () => void) => Promise<unknown> | unknown) => Promise<void>;
 };
 export type Json = string | number | boolean | null | Json[] | JsonObj;
 export type JsonObj = {

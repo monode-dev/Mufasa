@@ -28,7 +28,7 @@ export function createPersistedFunction<Params extends Json[], Return>(
     const nextStepIndex = funcConfig.step + 1;
     if (nextStepIndex < steps.length) {
       savedJson.batchUpdate((data) => {
-        data.activeFunctions[instanceId] = {
+        data.value.activeFunctions[instanceId] = {
           step: nextStepIndex,
           args: [stepResult],
         };
@@ -36,7 +36,7 @@ export function createPersistedFunction<Params extends Json[], Return>(
       return await doNextStep(instanceId);
     } else {
       savedJson.batchUpdate((data) => {
-        delete data.activeFunctions[instanceId];
+        delete data.value.activeFunctions[instanceId];
       });
       return stepResult;
     }
@@ -48,7 +48,7 @@ export function createPersistedFunction<Params extends Json[], Return>(
     async (...args: Params) => {
       const instanceId = uuidv4();
       savedJson.batchUpdate(async (data) => {
-        data.activeFunctions[instanceId] = { step: 0, args };
+        data.value.activeFunctions[instanceId] = { step: 0, args };
       });
       return await doNextStep(instanceId);
     },

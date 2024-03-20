@@ -99,7 +99,7 @@ export function firestoreDocPersister(
             batchUpdate(updates);
             if (latestChangeDate > metaData.data.lastChangeDatePosix) {
               metaData.batchUpdate(
-                (data) => (data.lastChangeDatePosix = latestChangeDate),
+                (data) => (data.value.lastChangeDatePosix = latestChangeDate),
               );
             }
           },

@@ -76,7 +76,10 @@ export type SavedJson<T extends Json> = {
   readonly loadedFromLocalStorage: Promise<void>;
   readonly data: ToReadonlyJson<T>;
   readonly batchUpdate: (
-    doUpdate: (json: T, doNotSave: () => void) => Promise<unknown> | unknown,
+    doUpdate: (
+      json: { value: T },
+      doNotSave: () => void,
+    ) => Promise<unknown> | unknown,
   ) => Promise<void>;
 };
 export type Json = string | number | boolean | null | Json[] | JsonObj;
@@ -333,8 +336,8 @@ export function createDocStore(config: DocStoreParams) {
       if (params.sourceStoreType !== Persistance.local) {
         localDocs.batchUpdate((data) => {
           Object.entries(localUpdates).forEach(([docId, props]) => {
-            data.docs[docId] = {
-              ...(data.docs[docId] ?? {}),
+            data.value.docs[docId] = {
+              ...(data.value.docs[docId] ?? {}),
               ...props,
             };
           });

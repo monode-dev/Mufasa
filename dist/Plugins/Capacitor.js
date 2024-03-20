@@ -7,13 +7,15 @@ export function capacitorJsonPersister(directoryPath) {
         jsonFile: (fileName) => ({
             start(initJson) {
                 const filePath = `${directoryPath}/${fileName}`;
-                let data = JSON.parse(JSON.stringify(initJson));
+                const data = {
+                    value: JSON.parse(JSON.stringify(initJson)),
+                };
                 // Load json from storage.
                 const loadedFromLocalStorage = doNow(async () => {
                     const fileString = await readFile(filePath);
                     if (!fileString)
                         return;
-                    data = JSON.parse(fileString);
+                    data.value = JSON.parse(fileString);
                 });
                 // Save doc store to device.
                 const requestSave = doNow(() => {
@@ -40,7 +42,7 @@ export function capacitorJsonPersister(directoryPath) {
                         return loadedFromLocalStorage;
                     },
                     get data() {
-                        return data;
+                        return data.value;
                     },
                     // This allows us to save after a write batch.
                     async batchUpdate(doUpdate) {

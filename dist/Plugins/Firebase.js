@@ -41,7 +41,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                     });
                     batchUpdate(updates);
                     if (latestChangeDate > metaData.data.lastChangeDatePosix) {
-                        metaData.batchUpdate((data) => (data.lastChangeDatePosix = latestChangeDate));
+                        metaData.batchUpdate((data) => (data.value.lastChangeDatePosix = latestChangeDate));
                     }
                 }, (error) => {
                     console.log(`Encountered error: ${error}`);

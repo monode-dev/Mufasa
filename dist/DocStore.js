@@ -182,8 +182,8 @@ export function createDocStore(config) {
             if (params.sourceStoreType !== Persistance.local) {
                 localDocs.batchUpdate((data) => {
                     Object.entries(localUpdates).forEach(([docId, props]) => {
-                        data.docs[docId] = {
-                            ...(data.docs[docId] ?? {}),
+                        data.value.docs[docId] = {
+                            ...(data.value.docs[docId] ?? {}),
                             ...props,
                         };
                     });
