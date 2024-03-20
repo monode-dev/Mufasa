@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.2.113",
+  "version": "0.2.114",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,12 +18,16 @@
   "types": "./dist/Mufasa.d.ts",
   "exports": {
     ".": "./dist/Mufasa.js",
+    "./solid-js": "./dist/Plugins/SolidJs.js",
     "./capacitor": "./dist/Plugins/Capacitor.js",
     "./firebase": "./dist/Plugins/Firebase.js",
     "./compress-image": "./dist/Plugins/CompressImage.js"
   },
   "typesVersions": {
     "*": {
+      "solid-js": [
+        "./dist/Plugins/SolidJs.d.ts"
+      ],
       "capacitor": [
         "./dist/Plugins/Capacitor.d.ts"
       ],
@@ -41,10 +45,11 @@
   "peerDependencies": {
     "@capacitor/core": "^5.7.0",
     "@capacitor/filesystem": "^5.0.0",
-    "firebase": "^10.0.0"
+    "firebase": "^10.0.0",
+    "solid-js": "^1.8.16"
   },
   "devDependencies": {
-    "@monode/mosa": "^0.0.9",
+    "@monode/mosa": "^0.0.15",
     "@types/node": "^20.4.2",
     "@types/uuid": "^9.0.8",
     "semver": "^7.5.4",
