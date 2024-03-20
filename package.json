@@ -1,6 +1,6 @@
 {
   "name": "mufasa",
-  "version": "0.2.117",
+  "version": "0.2.118",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -49,7 +49,7 @@
     "solid-js": "^1.8.0"
   },
   "devDependencies": {
-    "@monode/mosa": "^0.0.16",
+    "@monode/mosa": "^0.0.17",
     "@types/node": "^20.4.2",
     "@types/uuid": "^9.0.8",
     "semver": "^7.5.4",
