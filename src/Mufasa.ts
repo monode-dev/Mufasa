@@ -1,4 +1,3 @@
-import { from } from "solid-js";
 import { initializeDocClass } from "./Doc.js";
 import { UploadEvents, setUpUploadEvents, DocStoreConfig } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./FileStore.js";

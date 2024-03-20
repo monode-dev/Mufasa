@@ -1,3 +1,4 @@
+import type { MosaApi } from "@monode/mosa";
 export declare const DELETED_KEY = "mx_deleted";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
 export declare const Persistance: {
@@ -88,7 +89,7 @@ export type GetPersister<T> = (config: {
     workspaceId: string;
 }) => T;
 export type DocStoreConfig = {
-    getSessionDocPersister: GetPersister<SessionDocPersister>;
+    sessionInterface: MosaApi;
     getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
     getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
     getLocalFilePersister?: GetPersister<LocalFilePersister>;

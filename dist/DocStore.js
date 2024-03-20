@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
+import { sessionDocPersister } from "./SessionDocPersister.js";
 export const DELETED_KEY = `mx_deleted`;
 export const Persistance = {
     session: 0,
@@ -68,11 +69,7 @@ export const fakeLocalFilePersister = {
 export function initDocStoreConfig(params) {
     return {
         sessionDocPersister: isValid(params.workspaceId)
-            ? params.config.getSessionDocPersister({
-                stage: params.stage,
-                docType: params.docType,
-                workspaceId: params.workspaceId,
-            })
+            ? sessionDocPersister(params.config.sessionInterface)
             : fakeSessionDocPersister,
         localJsonPersister: isValid(params.config.getLocalJsonPersister) &&
             isValid(params.workspaceId)

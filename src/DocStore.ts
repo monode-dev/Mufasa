@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
+import type { MosaApi } from "@monode/mosa";
+import { sessionDocPersister } from "./SessionDocPersister.js";
 
 export const DELETED_KEY = `mx_deleted`;
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
@@ -169,7 +171,7 @@ export type GetPersister<T> = (config: {
   workspaceId: string;
 }) => T;
 export type DocStoreConfig = {
-  getSessionDocPersister: GetPersister<SessionDocPersister>;
+  sessionInterface: MosaApi;
   getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
   getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
   getLocalFilePersister?: GetPersister<LocalFilePersister>;
@@ -194,11 +196,7 @@ export function initDocStoreConfig(params: {
 }): DocStoreParams {
   return {
     sessionDocPersister: isValid(params.workspaceId)
-      ? params.config.getSessionDocPersister({
-          stage: params.stage,
-          docType: params.docType,
-          workspaceId: params.workspaceId,
-        })
+      ? sessionDocPersister(params.config.sessionInterface)
       : fakeSessionDocPersister,
     localJsonPersister:
       isValid(params.config.getLocalJsonPersister) &&

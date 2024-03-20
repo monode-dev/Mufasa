@@ -20,7 +20,7 @@ Import and initialize Mufasa anywhere in your app.
 
 ```ts
 import { initializeMufasa } from "mufasa";
-import { solidPersister } from "mufasa/solid";
+import { solidMosa } from "miwi";
 import { capacitorJsonPersister } from "mufasa/capacitor";
 import { firestoreDocPersister } from "mufasa/firebase";
 
@@ -30,7 +30,7 @@ export const { MfsDoc } = initializeMufasa({
     const stagedName = `${import.meta.env.PROD ? `Prod` : `Dev`}_${docType}`;
     return {
       // Connect to front-end
-      sessionDocPersister: solidPersister(),
+      sessionInterface: solidMosa,
       // Connect to local file system
       localJsonPersister: capacitorJsonPersister(`${stagedName}.json`),
       // Connect to database
