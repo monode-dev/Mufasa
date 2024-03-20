@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
-import type { MosaApi } from "@monode/mosa";
+import { MosaApi } from "@monode/mosa";
 import { sessionDocPersister } from "./SessionDocPersister.js";
 
 export const DELETED_KEY = `mx_deleted`;

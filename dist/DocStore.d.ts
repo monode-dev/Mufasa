@@ -1,4 +1,4 @@
-import type { MosaApi } from "@monode/mosa";
+import { MosaApi } from "@monode/mosa";
 export declare const DELETED_KEY = "mx_deleted";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
 export declare const Persistance: {
