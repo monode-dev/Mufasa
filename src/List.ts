@@ -1,26 +1,26 @@
-import { CustomProp, MfsDoc, IsCustomProp, prop } from "./Doc.js";
-import { DocStoreConfig } from "./DocStore.js";
+import { CustomProp, Doc, IsCustomProp, prop } from "./Doc.js";
+import { PersistanceConfig } from "./DocStore.js";
 import { isValid } from "./Utils.js";
 
-const relTables = new Map<typeof MfsDoc, Map<string, typeof MfsDoc>>();
+const relTables = new Map<typeof Doc, Map<string, typeof Doc>>();
 
 type GetListFromTableConfig<
-  OtherInst extends MfsDoc,
+  OtherInst extends Doc,
   TableConfig,
 > = undefined extends TableConfig
   ? List<OtherInst>
-  : TableConfig extends DocStoreConfig
+  : TableConfig extends PersistanceConfig
   ? List<OtherInst>
   : TableConfig extends keyof OtherInst
-  ? OtherInst[TableConfig] extends MfsDoc
+  ? OtherInst[TableConfig] extends Doc
     ? ReadonlyList<OtherInst>
     : List<OtherInst>
   : List<OtherInst>;
 export function list<
-  OtherClass extends typeof MfsDoc,
+  OtherClass extends typeof Doc,
   TableConfig extends
     | undefined
-    | DocStoreConfig
+    | PersistanceConfig
     | (keyof InstanceType<OtherClass> & string),
 >(
   OtherClass: OtherClass,
@@ -49,7 +49,7 @@ export function list<
           const listInst = new List(
             () =>
               OtherClass.getAllDocs().filter(
-                (other) => (other[otherProp] as MfsDoc)?.docId === inst.docId,
+                (other) => (other[otherProp] as Doc)?.docId === inst.docId,
               ),
             () => {},
             () => {},
@@ -76,11 +76,11 @@ export function list<
   }
 }
 function listProp(config: {
-  getPrimaryClass: (inst: MfsDoc) => typeof MfsDoc;
-  getSecondaryClass: (inst: MfsDoc) => typeof MfsDoc;
+  getPrimaryClass: (inst: Doc) => typeof Doc;
+  getSecondaryClass: (inst: Doc) => typeof Doc;
   gePrimaryProp: (thisProp: string) => string;
-  docStoreConfig: DocStoreConfig | null;
-  otherDocsToStartSyncing: (typeof MfsDoc)[];
+  docStoreConfig: PersistanceConfig | null;
+  otherDocsToStartSyncing: (typeof Doc)[];
 }) {
   return {
     [IsCustomProp]: true,
@@ -93,7 +93,7 @@ function listProp(config: {
       if (!relTablesForThisType.has(key)) {
         relTablesForThisType.set(
           key,
-          class extends MfsDoc.customize({
+          class extends Doc.customize({
             docType: `${PrimaryClass.docType}_${key}`,
             docStoreConfig: config.docStoreConfig ?? undefined,
           }) {
@@ -131,7 +131,7 @@ function listProp(config: {
     otherDocsToStartSyncing: config.otherDocsToStartSyncing,
   } satisfies CustomProp;
 }
-export class List<T extends MfsDoc> {
+export class List<T extends Doc> {
   [Symbol.iterator](): IterableIterator<T> {
     return this.getArray()[Symbol.iterator]();
   }
@@ -153,4 +153,4 @@ export class List<T extends MfsDoc> {
     public readonly remove: (value: T) => void,
   ) {}
 }
-export type ReadonlyList<T extends MfsDoc> = Omit<List<T>, `add` | `remove`>;
+export type ReadonlyList<T extends Doc> = Omit<List<T>, `add` | `remove`>;

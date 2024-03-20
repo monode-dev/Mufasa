@@ -3,6 +3,7 @@ import { doNow } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 // SECTION: Doc Persister
 export function capacitorJsonPersister(directoryPath) {
+    const getFilePath = (fileId) => `${directoryPath}/${fileId}`;
     return {
         jsonFile: (fileName) => ({
             start(initJson) {
@@ -54,24 +55,39 @@ export function capacitorJsonPersister(directoryPath) {
                 };
             },
         }),
-    };
-}
-export function capacitorFilePersister(directoryPath) {
-    const getLocalPath = (fileId) => `${directoryPath}/${fileId}`;
-    return {
         getWebPath: (fileId) => Filesystem.getUri({
-            path: getLocalPath(fileId),
+            path: getFilePath(fileId),
             directory: Directory.Data,
         })
             .then(({ uri }) => Capacitor.convertFileSrc(uri))
             .catch(() => undefined),
         // TODO: We need to use strings for this.
-        readFile: (fileId) => readFile(getLocalPath(fileId)),
-        writeFile: (fileId, base64String) => writeStringFile(getLocalPath(fileId), base64String),
-        deleteFile: (fileId) => deleteFile(getLocalPath(fileId)),
-        localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
+        readFile: (fileId) => readFile(getFilePath(fileId)),
+        writeFile: (fileId, base64String) => writeStringFile(getFilePath(fileId), base64String),
+        deleteFile: (fileId) => deleteFile(getFilePath(fileId)),
+        // localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
     };
 }
+// export function capacitorFilePersister(
+//   directoryPath: string,
+// ): LocalFilePersister {
+//   const getFilePath = (fileId: string) => `${directoryPath}/${fileId}`;
+//   return {
+//     getWebPath: (fileId) =>
+//       Filesystem.getUri({
+//         path: getFilePath(fileId),
+//         directory: Directory.Data,
+//       })
+//         .then(({ uri }) => Capacitor.convertFileSrc(uri))
+//         .catch(() => undefined),
+//     // TODO: We need to use strings for this.
+//     readFile: (fileId) => readFile(getFilePath(fileId)),
+//     writeFile: (fileId, base64String) =>
+//       writeStringFile(getFilePath(fileId), base64String),
+//     deleteFile: (fileId) => deleteFile(getFilePath(fileId)),
+//     localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
+//   };
+// }
 // SECTION: Capacitor Storage
 async function readFile(path) {
     try {

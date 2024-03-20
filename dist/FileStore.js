@@ -1,12 +1,12 @@
-import { prop, getWorkspaceId, MfsDoc, getStage, } from "./Doc.js";
-import { Persistance, createDocStore, initDocStoreConfig, trackUpload, untrackUpload, } from "./DocStore.js";
+import { prop, getWorkspaceId, Doc, getStage, trackUpload, untrackUpload, } from "./Doc.js";
+import { Persistance, createDocStore, initDocStoreConfig, } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 export function initializeSyncedFileClass() {
     return {
-        MfsFile(...params) {
-            return MfsFile.customize({
+        File(...params) {
+            return File.customize({
                 docType: params[0],
                 ...params[1],
             });
@@ -24,17 +24,17 @@ function getFileStore(params) {
             stage: params.stage,
             workspaceId: params.workspaceId,
             docType: params.docType,
-            config: params.defaultConfig,
+            persistance: params.defaultConfig,
         })));
     }
     return workspaceFileStores.get(params.docType);
 }
 function _createFileStore(config) {
     const pullCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pullCreate`), async (fileId) => {
-        const fileData = await config.globalFilePersister.downloadFile(fileId);
+        const fileData = await config.globalDocPersister.downloadFile(fileId);
         if (!isValid(fileData))
             return null;
-        await config.localFilePersister.writeFile(fileId, fileData);
+        await config.localJsonPersister.writeFile(fileId, fileData);
         docStore.batchUpdate({
             [fileId]: {
                 fileIsDownloaded: {
@@ -46,7 +46,7 @@ function _createFileStore(config) {
         return fileId;
     });
     const pullDelete = createPersistedFunction(config.localJsonPersister.jsonFile(`pullDelete`), async (fileId) => {
-        await config.localFilePersister.deleteFile(fileId);
+        await config.localJsonPersister.deleteFile(fileId);
     });
     const docStore = createDocStore({
         ...config,
@@ -63,10 +63,10 @@ function _createFileStore(config) {
         trackUpload();
         if (!isValid(fileId))
             return;
-        const fileData = await config.localFilePersister.readFile(fileId);
+        const fileData = await config.localJsonPersister.readFile(fileId);
         if (!isValid(fileData))
             return;
-        config.globalFilePersister.uploadFile(fileId, fileData);
+        config.globalDocPersister.uploadFile(fileId, fileData);
         // Manually persist globally to signify that the file is uploaded.
         docStore.batchUpdate({
             [fileId]: {
@@ -82,7 +82,7 @@ function _createFileStore(config) {
         docStore: docStore,
         async pushCreate(params) {
             const docId = params.manualDocId ?? uuidv4();
-            await config.localFilePersister.writeFile(docId, params.base64String);
+            await config.localJsonPersister.writeFile(docId, params.base64String);
             docStore.createDoc({
                 fileIsDownloaded: {
                     value: true,
@@ -95,20 +95,20 @@ function _createFileStore(config) {
         pullCreate,
         pushDelete: createPersistedFunction(config.localJsonPersister.jsonFile(`pushDelete`), async (fileId) => {
             trackUpload();
-            await config.localFilePersister.deleteFile(fileId);
+            await config.localJsonPersister.deleteFile(fileId);
             untrackUpload();
             return fileId;
         }).addStep(async (fileId) => {
-            await config.globalFilePersister.deleteFile(fileId);
+            await config.globalDocPersister.deleteFile(fileId);
         }),
         pullDelete,
         async readFile(fileId) {
-            return await config.localFilePersister.readFile(fileId);
+            return await config.localJsonPersister.readFile(fileId);
         },
     };
 }
 // TODO: Maybe prevent this file from being directly created.
-class MfsFile extends MfsDoc {
+class File extends Doc {
     static get _fileStore() {
         return getFileStore({
             stage: getStage(),

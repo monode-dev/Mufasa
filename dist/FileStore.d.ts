@@ -1,10 +1,10 @@
-import { MfsDoc } from "./Doc.js";
-import { DocStoreConfig, DocStoreParams, Persistance } from "./DocStore.js";
+import { Doc } from "./Doc.js";
+import { PersistanceConfig, DocStoreParams, Persistance } from "./DocStore.js";
 export declare function initializeSyncedFileClass(): {
-    MfsFile(docType: string, customizations?: Omit<{
+    File(docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: Partial<DocStoreConfig> | undefined;
-    }, "docType"> | undefined): typeof MfsFile;
+        docStoreConfig?: Partial<PersistanceConfig> | undefined;
+    }, "docType"> | undefined): typeof File;
 };
 export type FileStore = ReturnType<typeof _createFileStore>;
 declare function _createFileStore(config: DocStoreParams): {
@@ -106,7 +106,7 @@ declare function _createFileStore(config: DocStoreParams): {
     };
     readFile(fileId: string): Promise<string | undefined>;
 };
-declare class MfsFile extends MfsDoc {
+declare class File extends Doc {
     static get _fileStore(): FileStore;
     get _fileStore(): {
         docStore: {
@@ -234,7 +234,7 @@ declare class MfsFile extends MfsDoc {
     readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
     /** Won't resolve until it retrieves and returns the base64String. */
     getBase64String(): Promise<string>;
-    static createFromBase64String(base64String: string): Promise<MfsFile>;
+    static createFromBase64String(base64String: string): Promise<File>;
     onDelete(): void;
 }
 export {};

@@ -2,21 +2,20 @@ import {
   DocExports,
   prop,
   getWorkspaceId,
-  MfsDoc,
+  Doc,
   initializeDocClass,
   getStage,
+  trackUpload,
+  untrackUpload,
 } from "./Doc.js";
 import {
-  DocStoreConfig,
+  PersistanceConfig,
   DocStoreParams,
   GetPersister,
-  LocalFilePersister,
   LocalJsonPersister,
   Persistance,
   createDocStore,
   initDocStoreConfig,
-  trackUpload,
-  untrackUpload,
 } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
@@ -24,12 +23,12 @@ import { createPersistedFunction } from "./PersistedFunction.js";
 
 export function initializeSyncedFileClass() {
   return {
-    MfsFile(
+    File(
       ...params: Parameters<ReturnType<typeof initializeDocClass>[`MfsDoc`]>
     ) {
-      return MfsFile.customize({
+      return File.customize({
         docType: params[0],
-        ...(params[1] as DocStoreConfig),
+        ...(params[1] as PersistanceConfig),
       });
     },
   };
@@ -40,7 +39,7 @@ function getFileStore(params: {
   stage: string | null;
   workspaceId: string | null;
   docType: string;
-  defaultConfig: DocStoreConfig;
+  defaultConfig: PersistanceConfig;
 }) {
   if (!fileStores.has(params.workspaceId)) {
     fileStores.set(params.workspaceId, new Map());
@@ -54,7 +53,7 @@ function getFileStore(params: {
           stage: params.stage,
           workspaceId: params.workspaceId,
           docType: params.docType,
-          config: params.defaultConfig,
+          persistance: params.defaultConfig,
         }),
       ),
     );
@@ -66,9 +65,9 @@ function _createFileStore(config: DocStoreParams) {
   const pullCreate = createPersistedFunction(
     config.localJsonPersister.jsonFile(`pullCreate`),
     async (fileId: string) => {
-      const fileData = await config.globalFilePersister.downloadFile(fileId);
+      const fileData = await config.globalDocPersister.downloadFile(fileId);
       if (!isValid(fileData)) return null;
-      await config.localFilePersister.writeFile(fileId, fileData);
+      await config.localJsonPersister.writeFile(fileId, fileData);
       docStore.batchUpdate(
         {
           [fileId]: {
@@ -86,7 +85,7 @@ function _createFileStore(config: DocStoreParams) {
   const pullDelete = createPersistedFunction(
     config.localJsonPersister.jsonFile(`pullDelete`),
     async (fileId: string) => {
-      await config.localFilePersister.deleteFile(fileId);
+      await config.localJsonPersister.deleteFile(fileId);
     },
   );
   const docStore = createDocStore({
@@ -105,9 +104,9 @@ function _createFileStore(config: DocStoreParams) {
     async (fileId: string) => {
       trackUpload();
       if (!isValid(fileId)) return;
-      const fileData = await config.localFilePersister.readFile(fileId);
+      const fileData = await config.localJsonPersister.readFile(fileId);
       if (!isValid(fileData)) return;
-      config.globalFilePersister.uploadFile(fileId, fileData);
+      config.globalDocPersister.uploadFile(fileId, fileData);
       // Manually persist globally to signify that the file is uploaded.
       docStore.batchUpdate(
         {
@@ -127,7 +126,7 @@ function _createFileStore(config: DocStoreParams) {
     docStore: docStore,
     async pushCreate(params: { base64String: string; manualDocId?: string }) {
       const docId = params.manualDocId ?? uuidv4();
-      await config.localFilePersister.writeFile(docId, params.base64String);
+      await config.localJsonPersister.writeFile(docId, params.base64String);
       docStore.createDoc(
         {
           fileIsDownloaded: {
@@ -145,22 +144,22 @@ function _createFileStore(config: DocStoreParams) {
       config.localJsonPersister.jsonFile(`pushDelete`),
       async (fileId: string) => {
         trackUpload();
-        await config.localFilePersister.deleteFile(fileId);
+        await config.localJsonPersister.deleteFile(fileId);
         untrackUpload();
         return fileId;
       },
     ).addStep(async (fileId) => {
-      await config.globalFilePersister.deleteFile(fileId);
+      await config.globalDocPersister.deleteFile(fileId);
     }),
     pullDelete,
     async readFile(fileId: string) {
-      return await config.localFilePersister.readFile(fileId);
+      return await config.localJsonPersister.readFile(fileId);
     },
   };
 }
 
 // TODO: Maybe prevent this file from being directly created.
-class MfsFile extends MfsDoc {
+class File extends Doc {
   static get _fileStore(): FileStore {
     return getFileStore({
       stage: getStage(),
@@ -170,7 +169,7 @@ class MfsFile extends MfsDoc {
     });
   }
   get _fileStore() {
-    return (this.constructor as typeof MfsFile)._fileStore;
+    return (this.constructor as typeof File)._fileStore;
   }
   static get _docStore() {
     return this._fileStore.docStore;

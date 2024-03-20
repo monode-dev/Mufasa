@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { doNow, isValid } from "./Utils.js";
+import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionDocPersister } from "./SessionDocPersister.js";
 export const DELETED_KEY = `mx_deleted`;
@@ -16,7 +16,7 @@ export const fakeSessionDocPersister = {
     docExists: () => false,
 };
 const fakeLocalJsonPersister = {
-    jsonFile: (fileId) => ({
+    jsonFile: () => ({
         start: (initValue) => ({
             loadedFromLocalStorage: Promise.resolve(),
             data: initValue,
@@ -25,86 +25,40 @@ const fakeLocalJsonPersister = {
             },
         }),
     }),
-};
-export const fakeGlobalDocPersister = {
-    start: () => { },
-    updateDoc: async () => { },
-};
-export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
-    let uploadCount = 0;
-    let uploadEvents = undefined;
-    return {
-        trackUpload() {
-            uploadCount++;
-            if (uploadCount === 1) {
-                uploadEvents?.onStartUploadBatch?.();
-            }
-        },
-        untrackUpload() {
-            uploadCount--;
-            if (uploadCount === 0) {
-                uploadEvents?.onFinishUploadBatch?.();
-            }
-        },
-        setUpUploadEvents(newUploadEvents) {
-            uploadEvents = newUploadEvents;
-            if (uploadCount > 0) {
-                uploadEvents?.onStartUploadBatch?.();
-            }
-        },
-    };
-});
-export const fakeGlobalFilePersister = {
-    uploadFile: async () => { },
-    downloadFile: async () => undefined,
-    deleteFile: async () => { },
-};
-export const fakeLocalFilePersister = {
     getWebPath: async () => undefined,
     readFile: async () => undefined,
     writeFile: async () => { },
     deleteFile: async () => { },
-    localJsonPersister: fakeLocalJsonPersister,
+};
+export const fakeGlobalDocPersister = {
+    start: () => { },
+    updateDoc: async () => { },
+    uploadFile: async () => { },
+    downloadFile: async () => undefined,
+    deleteFile: async () => { },
 };
 export function initDocStoreConfig(params) {
+    const persisterConfig = isValid(params.workspaceId)
+        ? {
+            stage: params.stage,
+            docType: params.docType,
+            workspaceId: params.workspaceId,
+        }
+        : undefined;
     return {
-        sessionDocPersister: isValid(params.workspaceId)
-            ? sessionDocPersister(params.config.sessionInterface)
+        sessionDocPersister: isValid(persisterConfig)
+            ? sessionDocPersister(params.persistance.sessionConfig)
             : fakeSessionDocPersister,
-        localJsonPersister: isValid(params.config.getLocalJsonPersister) &&
-            isValid(params.workspaceId)
-            ? params.config.getLocalJsonPersister({
-                stage: params.stage,
-                docType: params.docType,
-                workspaceId: params.workspaceId,
-            })
+        localJsonPersister: isValid(params.persistance.getDevicePersister) && isValid(persisterConfig)
+            ? params.persistance.getDevicePersister(persisterConfig)
             : fakeLocalJsonPersister,
-        globalDocPersister: isValid(params.config.getGlobalDocPersister) &&
-            isValid(params.workspaceId)
-            ? params.config.getGlobalDocPersister({
-                stage: params.stage,
-                docType: params.docType,
-                workspaceId: params.workspaceId,
-            })
+        globalDocPersister: isValid(params.persistance.getCloudPersister) && isValid(persisterConfig)
+            ? params.persistance.getCloudPersister(persisterConfig)
             : fakeGlobalDocPersister,
-        localFilePersister: isValid(params.config.getLocalFilePersister) &&
-            isValid(params.workspaceId)
-            ? params.config.getLocalFilePersister({
-                stage: params.stage,
-                docType: params.docType,
-                workspaceId: params.workspaceId,
-            })
-            : fakeLocalFilePersister,
-        globalFilePersister: isValid(params.config.getGlobalFilePersister) &&
-            isValid(params.workspaceId)
-            ? params.config.getGlobalFilePersister({
-                stage: params.stage,
-                docType: params.docType,
-                workspaceId: params.workspaceId,
-            })
-            : fakeGlobalFilePersister,
-        onIncomingCreate: params.config.onIncomingCreate ?? (() => { }),
-        onIncomingDelete: params.config.onIncomingDelete ?? (() => { }),
+        trackUpload: params.persistance.trackUpload,
+        untrackUpload: params.persistance.untrackUpload,
+        onIncomingCreate: params.persistance.onIncomingCreate ?? (() => { }),
+        onIncomingDelete: params.persistance.onIncomingDelete ?? (() => { }),
     };
 }
 export function createDocStore(config) {
@@ -132,9 +86,9 @@ export function createDocStore(config) {
         }), {}), false);
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
-        trackUpload();
+        config.trackUpload();
         await config.globalDocPersister?.updateDoc(docChange);
-        untrackUpload();
+        config.untrackUpload();
     });
     //
     function batchUpdate(params) {

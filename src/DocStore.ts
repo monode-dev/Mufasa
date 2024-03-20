@@ -57,12 +57,16 @@ export const fakeSessionDocPersister: SessionDocPersister = {
  * This will delay the save until the end of the current thread. */
 export type LocalJsonPersister = {
   readonly jsonFile: (fileId: string) => LocalJsonFilePersister;
+  getWebPath: (fileId: string) => Promise<string | undefined>;
+  readFile: (fileId: string) => Promise<string | undefined>;
+  writeFile: (fileId: string, base64String: string) => Promise<void>;
+  deleteFile: (fileId: string) => Promise<void>;
 };
 export type LocalJsonFilePersister = {
   readonly start: <T extends Json>(initValue: T) => SavedJson<T>;
 };
 const fakeLocalJsonPersister: LocalJsonPersister = {
-  jsonFile: (fileId: string) => ({
+  jsonFile: () => ({
     start: (initValue) => ({
       loadedFromLocalStorage: Promise.resolve(),
       data: initValue as ToReadonlyJson<typeof initValue>,
@@ -71,6 +75,10 @@ const fakeLocalJsonPersister: LocalJsonPersister = {
       },
     }),
   }),
+  getWebPath: async () => undefined,
+  readFile: async () => undefined,
+  writeFile: async () => {},
+  deleteFile: async () => {},
 };
 export type SavedJson<T extends Json> = {
   readonly loadedFromLocalStorage: Promise<void>;
@@ -98,12 +106,18 @@ export type GlobalDocPersister = {
     localMetaDataPersister: LocalJsonFilePersister,
   ) => void;
   updateDoc: (change: GlobalDocChange) => Promise<void>;
+  uploadFile: (fileId: string, base64String: string) => Promise<void>;
+  downloadFile: (fileId: string) => Promise<string | undefined>;
+  deleteFile: (fileId: string) => Promise<void>;
   // dispose: () => void;
   // TODO: Maybe this should require a local persister of some sort so that we can complete unfinished uploads.
 };
 export const fakeGlobalDocPersister: GlobalDocPersister = {
   start: () => {},
   updateDoc: async () => {},
+  uploadFile: async () => {},
+  downloadFile: async () => undefined,
+  deleteFile: async () => {},
 };
 export type GlobalDocChange = {
   docId: string;
@@ -114,131 +128,70 @@ export type UploadEvents = {
   onStartUploadBatch?: () => void;
   onFinishUploadBatch?: () => void;
 };
-export const { trackUpload, untrackUpload, setUpUploadEvents } = doNow(() => {
-  let uploadCount = 0;
-  let uploadEvents: UploadEvents | undefined = undefined;
-  return {
-    trackUpload() {
-      uploadCount++;
-      if (uploadCount === 1) {
-        uploadEvents?.onStartUploadBatch?.();
-      }
-    },
-    untrackUpload() {
-      uploadCount--;
-      if (uploadCount === 0) {
-        uploadEvents?.onFinishUploadBatch?.();
-      }
-    },
-    setUpUploadEvents(newUploadEvents: UploadEvents | undefined) {
-      uploadEvents = newUploadEvents;
-      if (uploadCount > 0) {
-        uploadEvents?.onStartUploadBatch?.();
-      }
-    },
-  };
-});
-
-// File Persister Types
-export type GlobalFilePersister = {
-  uploadFile: (fileId: string, base64String: string) => Promise<void>;
-  downloadFile: (fileId: string) => Promise<string | undefined>;
-  deleteFile: (fileId: string) => Promise<void>;
-};
-export const fakeGlobalFilePersister: GlobalFilePersister = {
-  uploadFile: async () => {},
-  downloadFile: async () => undefined,
-  deleteFile: async () => {},
-};
-export type LocalFilePersister = {
-  getWebPath: (fileId: string) => Promise<string | undefined>;
-  readFile: (fileId: string) => Promise<string | undefined>;
-  writeFile: (fileId: string, base64String: string) => Promise<void>;
-  deleteFile: (fileId: string) => Promise<void>;
-  localJsonPersister: LocalJsonPersister;
-};
-export const fakeLocalFilePersister: LocalFilePersister = {
-  getWebPath: async () => undefined,
-  readFile: async () => undefined,
-  writeFile: async () => {},
-  deleteFile: async () => {},
-  localJsonPersister: fakeLocalJsonPersister,
-};
 
 // TODO: Support type unions.
 // TODO: Figure out how to ignore changes incoming server changes that have been overridden by more recent local changes.
 export type DocStore = ReturnType<typeof createDocStore>;
-export type GetPersister<T> = (config: {
+export type GetPersister<T> = (options: {
   stage: string | null;
-  docType: string;
   workspaceId: string;
+  docType: string;
+  //version: number;
 }) => T;
-export type DocStoreConfig = {
-  sessionInterface: MosaApi;
-  getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
-  getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
-  getLocalFilePersister?: GetPersister<LocalFilePersister>;
-  getGlobalFilePersister?: GetPersister<GlobalFilePersister>;
+export type PersistanceConfig = {
+  sessionConfig: MosaApi;
+  getDevicePersister?: GetPersister<LocalJsonPersister>;
+  getCloudPersister?: GetPersister<GlobalDocPersister>;
+  trackUpload: () => void;
+  untrackUpload: () => void;
+  // TODO: Maybe merge doc and file persisters.
+  // localFilePersister?: LocalFilePersister;
+  // globalFilePersister?: GlobalFilePersister;
+  // TODO: Maybe these should be part of cloud. `cloudPersister.start({ onIncomingCreate, onIncomingDelete })`
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
+  // TODO: Make isUploading part of the cloudPersister. `cloudPersister.start({ isUploading })`
 };
 export type DocStoreParams = {
   sessionDocPersister: SessionDocPersister;
   localJsonPersister: LocalJsonPersister;
   globalDocPersister: GlobalDocPersister;
-  localFilePersister: LocalFilePersister;
-  globalFilePersister: GlobalFilePersister;
+  trackUpload: () => void;
+  untrackUpload: () => void;
+  // localFilePersister: LocalFilePersister;
+  // globalFilePersister: GlobalFilePersister;
   onIncomingCreate: (docId: string) => void;
   onIncomingDelete: (docId: string) => void;
 };
 export function initDocStoreConfig(params: {
-  config: DocStoreConfig;
+  persistance: PersistanceConfig;
   stage: string | null;
   workspaceId: string | null;
   docType: string;
 }): DocStoreParams {
+  const persisterConfig = isValid(params.workspaceId)
+    ? {
+        stage: params.stage,
+        docType: params.docType,
+        workspaceId: params.workspaceId,
+      }
+    : undefined;
   return {
-    sessionDocPersister: isValid(params.workspaceId)
-      ? sessionDocPersister(params.config.sessionInterface)
+    sessionDocPersister: isValid(persisterConfig)
+      ? sessionDocPersister(params.persistance.sessionConfig)
       : fakeSessionDocPersister,
     localJsonPersister:
-      isValid(params.config.getLocalJsonPersister) &&
-      isValid(params.workspaceId)
-        ? params.config.getLocalJsonPersister({
-            stage: params.stage,
-            docType: params.docType,
-            workspaceId: params.workspaceId,
-          })
+      isValid(params.persistance.getDevicePersister) && isValid(persisterConfig)
+        ? params.persistance.getDevicePersister(persisterConfig)
         : fakeLocalJsonPersister,
     globalDocPersister:
-      isValid(params.config.getGlobalDocPersister) &&
-      isValid(params.workspaceId)
-        ? params.config.getGlobalDocPersister({
-            stage: params.stage,
-            docType: params.docType,
-            workspaceId: params.workspaceId,
-          })
+      isValid(params.persistance.getCloudPersister) && isValid(persisterConfig)
+        ? params.persistance.getCloudPersister(persisterConfig)
         : fakeGlobalDocPersister,
-    localFilePersister:
-      isValid(params.config.getLocalFilePersister) &&
-      isValid(params.workspaceId)
-        ? params.config.getLocalFilePersister({
-            stage: params.stage,
-            docType: params.docType,
-            workspaceId: params.workspaceId,
-          })
-        : fakeLocalFilePersister,
-    globalFilePersister:
-      isValid(params.config.getGlobalFilePersister) &&
-      isValid(params.workspaceId)
-        ? params.config.getGlobalFilePersister({
-            stage: params.stage,
-            docType: params.docType,
-            workspaceId: params.workspaceId,
-          })
-        : fakeGlobalFilePersister,
-    onIncomingCreate: params.config.onIncomingCreate ?? (() => {}),
-    onIncomingDelete: params.config.onIncomingDelete ?? (() => {}),
+    trackUpload: params.persistance.trackUpload,
+    untrackUpload: params.persistance.untrackUpload,
+    onIncomingCreate: params.persistance.onIncomingCreate ?? (() => {}),
+    onIncomingDelete: params.persistance.onIncomingDelete ?? (() => {}),
   };
 }
 export function createDocStore(config: DocStoreParams) {
@@ -279,9 +232,9 @@ export function createDocStore(config: DocStoreParams) {
   const pushGlobalChange = createPersistedFunction(
     localJsonPersister.jsonFile(`pushGlobalChange`),
     async (docChange: GlobalDocChange) => {
-      trackUpload();
+      config.trackUpload();
       await config.globalDocPersister?.updateDoc(docChange);
-      untrackUpload();
+      config.untrackUpload();
     },
   );
 

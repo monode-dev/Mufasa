@@ -1,19 +1,36 @@
-import { UploadEvents, DocStoreConfig } from "./DocStore.js";
+import { MosaApi } from "@monode/mosa";
+import { PersistanceConfig, LocalJsonPersister, GetPersister, GlobalDocPersister } from "./DocStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
-export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, DocStoreConfig as DocPersisters, DocStore, UpdateBatch, GlobalFilePersister, LocalFilePersister, DELETED_KEY, Persistance, } from "./DocStore.js";
+export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, PersistanceConfig as DocPersisters, DocStore, UpdateBatch, DELETED_KEY, Persistance, } from "./DocStore.js";
 export { UserInfo } from "./Auth.js";
 export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
-export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig>(mfsConfig: {
-    defaultDocConfig: DefaultDocConfig;
-    getStage?: () => string | null;
+/** Set up Mufasa for your app.
+ * ```ts
+ * import { initializeMufasa } from "mufasa";
+ * import { solidPersister } from "mufasa/solid-js";
+ * import { capacitorPersister } from "mufasa/capacitor";
+ * import { firebasePersister } from "mufasa/firebase";
+ *
+ * export const mfs = initializeMufasa({
+ *   sessionPersister: solidPersister,
+ *   devicePersister: capacitorPersister,
+ *   cloudPersister: firebasePersister,
+ * });
+ * ```
+ */
+export declare function initializeMufasa(mfsConfig: PersistanceConfig & {
+    stage?: string;
     getWorkspaceId?: () => string | null;
-    isUploading?: UploadEvents;
+    sessionPersister: MosaApi;
+    devicePersister?: GetPersister<LocalJsonPersister>;
+    cloudPersister?: GetPersister<GlobalDocPersister>;
 }): {
-    readonly MfsFile: (docType: string, customizations?: Omit<{
+    readonly isUploadingToCloud: boolean;
+    readonly File: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: Partial<DocStoreConfig> | undefined;
+        docStoreConfig?: Partial<PersistanceConfig> | undefined;
     }, "docType"> | undefined) => {
         new (): {
             readonly _fileStore: {
@@ -402,19 +419,18 @@ export declare function initializeMufasa<DefaultDocConfig extends DocStoreConfig
             readonly deleteDoc: () => void;
         }>;
         readonly docType: string;
-        getDocStoreConfig<This extends typeof import("./Doc.js").MfsDoc>(this: This): DocStoreConfig;
-        customize<This_1 extends typeof import("./Doc.js").MfsDoc>(this: This_1, customizations: {
+        getDocStoreConfig<This extends typeof import("./Doc.js").Doc>(this: This): PersistanceConfig;
+        customize<This_1 extends typeof import("./Doc.js").Doc>(this: This_1, customizations: {
             docType?: string | undefined;
-            docStoreConfig?: Partial<DocStoreConfig> | undefined;
+            docStoreConfig?: Partial<PersistanceConfig> | undefined;
         }): This_1;
-        getAllDocs<T extends typeof import("./Doc.js").MfsDoc>(this: T): InstanceType<T>[];
-        _fromId<T_1 extends typeof import("./Doc.js").MfsDoc>(this: T_1, docId: string): InstanceType<T_1>;
-        create<T_2 extends typeof import("./Doc.js").MfsDoc>(this: T_2, ...overrideProps: Parameters<(import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) extends infer T_3 ? T_3 extends (import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) ? T_3 extends true ? (prop?: ({ [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
+        getAllDocs<T extends typeof import("./Doc.js").Doc>(this: T): InstanceType<T>[];
+        _fromId<T_1 extends typeof import("./Doc.js").Doc>(this: T_1, docId: string): InstanceType<T_1>;
+        create<T_2 extends typeof import("./Doc.js").Doc>(this: T_2, ...overrideProps: Parameters<(import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) extends infer T_3 ? T_3 extends (import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) ? T_3 extends true ? (prop?: ({ [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_2>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_2>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_2>;
     };
     readonly MfsDoc: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: Partial<DocStoreConfig> | undefined;
-    }, "docType"> | undefined) => typeof import("./Doc.js").MfsDoc;
-    readonly defaultDocStoreConfig: DefaultDocConfig;
-    readonly getWorkspaceId: () => string | null;
+        docStoreConfig?: Partial<PersistanceConfig> | undefined;
+    }, "docType"> | undefined) => typeof import("./Doc.js").Doc;
+    readonly defaultPersistanceConfig: PersistanceConfig;
 };

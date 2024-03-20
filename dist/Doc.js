@@ -1,20 +1,27 @@
 import { Persistance, createDocStore, initDocStoreConfig, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
-let _getWorkspaceId;
-export const getWorkspaceId = () => _getWorkspaceId();
-let _getStage;
+let _getStage = () => `Dev`;
 export const getStage = () => _getStage();
-let defaultDocStoreConfig;
+let _getWorkspaceId = () => null;
+export const getWorkspaceId = () => _getWorkspaceId();
+let defaultPersistanceConfig;
+let _trackUpload = () => { };
+export const trackUpload = () => _trackUpload();
+let _untrackUpload = () => { };
+export const untrackUpload = () => _untrackUpload();
 export function initializeDocClass(config) {
-    _getStage = config.getStage;
+    defaultPersistanceConfig = config.defaultPersistanceConfig;
+    _getStage = () => config.stage;
     _getWorkspaceId = config.getWorkspaceId;
-    defaultDocStoreConfig = config.defaultDocStoreConfig;
+    _trackUpload = config.defaultPersistanceConfig.trackUpload;
+    _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
     return {
         MfsDoc(docType, customizations) {
-            return MfsDoc.customize({ docType, ...(customizations ?? {}) });
+            return Doc.customize({ docType, ...(customizations ?? {}) });
         },
-        defaultDocStoreConfig: config.defaultDocStoreConfig,
-        getWorkspaceId,
+        defaultPersistanceConfig: config.defaultPersistanceConfig,
+        // TODO: Get user from the cloud persister.
+        // get user() {},
     };
 }
 const _allDocInstances = new Map();
@@ -90,7 +97,7 @@ getDocId) {
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
 const docStores = new Map();
-export class MfsDoc {
+export class Doc {
     // private constructor() {}
     /*** NOTE: This can be overridden to manually specify a type name. */
     static get docType() {
@@ -100,7 +107,7 @@ export class MfsDoc {
         return this.constructor.docType;
     }
     static getDocStoreConfig() {
-        return defaultDocStoreConfig;
+        return defaultPersistanceConfig;
     }
     static get _docStore() {
         const stage = getStage();
@@ -110,7 +117,7 @@ export class MfsDoc {
         const workspaceStore = docStores.get(workspaceId);
         if (!workspaceStore.has(this.docType)) {
             workspaceStore.set(this.docType, createDocStore(initDocStoreConfig({
-                config: this.getDocStoreConfig(),
+                persistance: this.getDocStoreConfig(),
                 stage: stage,
                 workspaceId: workspaceId,
                 docType: this.docType,
@@ -137,7 +144,7 @@ export class MfsDoc {
             }
             static getDocStoreConfig() {
                 return {
-                    ...defaultDocStoreConfig,
+                    ...defaultPersistanceConfig,
                     ...customizations.docStoreConfig,
                 };
             }
@@ -182,8 +189,8 @@ persistance = Persistance.global) {
         ? firstParam
         : Array.isArray(firstParam)
             ? firstParam[0]
-            : firstParam instanceof MfsDoc
-                ? MfsDoc
+            : firstParam instanceof Doc
+                ? Doc
                 : typeof firstParam === `boolean`
                     ? Boolean
                     : typeof firstParam === `number`
@@ -200,7 +207,7 @@ persistance = Persistance.global) {
         return {
             [IsCustomProp]: true,
             isFullCustom: false,
-            getInitValue: () => initValue instanceof MfsDoc ? initValue.docId : initValue,
+            getInitValue: () => initValue instanceof Doc ? initValue.docId : initValue,
             getFallbackValue: () => null,
             fromPrim: (prim) => {
                 if (prim === null)
@@ -245,5 +252,5 @@ function isCustomProp(arg) {
     return arg?.[IsCustomProp] === true;
 }
 function isDocClass(possibleDocClass) {
-    return Object.prototype.isPrototypeOf.call(MfsDoc.prototype, possibleDocClass.prototype);
+    return Object.prototype.isPrototypeOf.call(Doc.prototype, possibleDocClass.prototype);
 }

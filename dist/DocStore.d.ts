@@ -37,6 +37,10 @@ export declare const fakeSessionDocPersister: SessionDocPersister;
  * This will delay the save until the end of the current thread. */
 export type LocalJsonPersister = {
     readonly jsonFile: (fileId: string) => LocalJsonFilePersister;
+    getWebPath: (fileId: string) => Promise<string | undefined>;
+    readFile: (fileId: string) => Promise<string | undefined>;
+    writeFile: (fileId: string, base64String: string) => Promise<void>;
+    deleteFile: (fileId: string) => Promise<void>;
 };
 export type LocalJsonFilePersister = {
     readonly start: <T extends Json>(initValue: T) => SavedJson<T>;
@@ -58,6 +62,9 @@ export type ToReadonlyJson<T extends Json> = T extends Json[] ? ReadonlyArray<To
 export type GlobalDocPersister = {
     start: (batchUpdate: (updates: UpdateBatch) => void, localMetaDataPersister: LocalJsonFilePersister) => void;
     updateDoc: (change: GlobalDocChange) => Promise<void>;
+    uploadFile: (fileId: string, base64String: string) => Promise<void>;
+    downloadFile: (fileId: string) => Promise<string | undefined>;
+    deleteFile: (fileId: string) => Promise<void>;
 };
 export declare const fakeGlobalDocPersister: GlobalDocPersister;
 export type GlobalDocChange = {
@@ -69,33 +76,18 @@ export type UploadEvents = {
     onStartUploadBatch?: () => void;
     onFinishUploadBatch?: () => void;
 };
-export declare const trackUpload: () => void, untrackUpload: () => void, setUpUploadEvents: (newUploadEvents: UploadEvents | undefined) => void;
-export type GlobalFilePersister = {
-    uploadFile: (fileId: string, base64String: string) => Promise<void>;
-    downloadFile: (fileId: string) => Promise<string | undefined>;
-    deleteFile: (fileId: string) => Promise<void>;
-};
-export declare const fakeGlobalFilePersister: GlobalFilePersister;
-export type LocalFilePersister = {
-    getWebPath: (fileId: string) => Promise<string | undefined>;
-    readFile: (fileId: string) => Promise<string | undefined>;
-    writeFile: (fileId: string, base64String: string) => Promise<void>;
-    deleteFile: (fileId: string) => Promise<void>;
-    localJsonPersister: LocalJsonPersister;
-};
-export declare const fakeLocalFilePersister: LocalFilePersister;
 export type DocStore = ReturnType<typeof createDocStore>;
-export type GetPersister<T> = (config: {
+export type GetPersister<T> = (options: {
     stage: string | null;
-    docType: string;
     workspaceId: string;
+    docType: string;
 }) => T;
-export type DocStoreConfig = {
-    sessionInterface: MosaApi;
-    getLocalJsonPersister?: GetPersister<LocalJsonPersister>;
-    getGlobalDocPersister?: GetPersister<GlobalDocPersister>;
-    getLocalFilePersister?: GetPersister<LocalFilePersister>;
-    getGlobalFilePersister?: GetPersister<GlobalFilePersister>;
+export type PersistanceConfig = {
+    sessionConfig: MosaApi;
+    getDevicePersister?: GetPersister<LocalJsonPersister>;
+    getCloudPersister?: GetPersister<GlobalDocPersister>;
+    trackUpload: () => void;
+    untrackUpload: () => void;
     onIncomingCreate?: (docId: string) => void;
     onIncomingDelete?: (docId: string) => void;
 };
@@ -103,13 +95,13 @@ export type DocStoreParams = {
     sessionDocPersister: SessionDocPersister;
     localJsonPersister: LocalJsonPersister;
     globalDocPersister: GlobalDocPersister;
-    localFilePersister: LocalFilePersister;
-    globalFilePersister: GlobalFilePersister;
+    trackUpload: () => void;
+    untrackUpload: () => void;
     onIncomingCreate: (docId: string) => void;
     onIncomingDelete: (docId: string) => void;
 };
 export declare function initDocStoreConfig(params: {
-    config: DocStoreConfig;
+    persistance: PersistanceConfig;
     stage: string | null;
     workspaceId: string | null;
     docType: string;

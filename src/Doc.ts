@@ -1,5 +1,5 @@
 import {
-  DocStoreConfig,
+  PersistanceConfig,
   DocStore,
   Persistance,
   PersistanceTaggedUpdateBatch,
@@ -17,36 +17,41 @@ import {
   isValid,
 } from "./Utils.js";
 
-let _getWorkspaceId: () => string | null;
-export const getWorkspaceId = () => _getWorkspaceId();
-let _getStage: () => string | null;
+let _getStage = () => `Dev`;
 export const getStage = () => _getStage();
-let defaultDocStoreConfig: DocStoreConfig;
-export type DocExports<T extends DocStoreConfig> = ReturnType<
-  typeof initializeDocClass<T>
->;
-export function initializeDocClass<T extends DocStoreConfig>(config: {
-  getStage: () => string | null;
+let _getWorkspaceId: () => string | null = () => null;
+export const getWorkspaceId = () => _getWorkspaceId();
+let defaultPersistanceConfig: PersistanceConfig;
+let _trackUpload: () => void = () => {};
+export const trackUpload = () => _trackUpload();
+let _untrackUpload: () => void = () => {};
+export const untrackUpload = () => _untrackUpload();
+export type DocExports = ReturnType<typeof initializeDocClass>;
+export function initializeDocClass(config: {
+  stage: string;
   getWorkspaceId: () => string | null;
-  defaultDocStoreConfig: T;
+  defaultPersistanceConfig: PersistanceConfig;
 }) {
-  _getStage = config.getStage;
+  defaultPersistanceConfig = config.defaultPersistanceConfig;
+  _getStage = () => config.stage;
   _getWorkspaceId = config.getWorkspaceId;
-  defaultDocStoreConfig = config.defaultDocStoreConfig;
+  _trackUpload = config.defaultPersistanceConfig.trackUpload;
+  _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
 
   return {
     MfsDoc(
       docType: string,
-      customizations?: Omit<Parameters<typeof MfsDoc.customize>[0], `docType`>,
+      customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>,
     ) {
-      return MfsDoc.customize({ docType, ...(customizations ?? {}) });
+      return Doc.customize({ docType, ...(customizations ?? {}) });
     },
-    defaultDocStoreConfig: config.defaultDocStoreConfig,
-    getWorkspaceId,
+    defaultPersistanceConfig: config.defaultPersistanceConfig,
+    // TODO: Get user from the cloud persister.
+    // get user() {},
   };
 }
-const _allDocInstances = new Map<string, MfsDoc>();
-function _initializeInst<T extends MfsDoc>(
+const _allDocInstances = new Map<string, Doc>();
+function _initializeInst<T extends Doc>(
   inst: T,
   overrideProps: { [key: string | number]: PrimVal },
   // We should try not making docId reactive, and then decide if that was the wrong idea.
@@ -129,7 +134,7 @@ function _initializeInst<T extends MfsDoc>(
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
 const docStores = new Map<string | null, Map<string, DocStore>>();
-export class MfsDoc {
+export class Doc {
   // private constructor() {}
 
   /*** NOTE: This can be overridden to manually specify a type name. */
@@ -137,12 +142,12 @@ export class MfsDoc {
     return this.name;
   }
   get docType() {
-    return (this.constructor as typeof MfsDoc).docType;
+    return (this.constructor as typeof Doc).docType;
   }
-  static getDocStoreConfig<This extends typeof MfsDoc>(
+  static getDocStoreConfig<This extends typeof Doc>(
     this: This,
-  ): DocStoreConfig {
-    return defaultDocStoreConfig;
+  ): PersistanceConfig {
+    return defaultPersistanceConfig;
   }
   static get _docStore() {
     const stage = getStage();
@@ -154,7 +159,7 @@ export class MfsDoc {
         this.docType,
         createDocStore(
           initDocStoreConfig({
-            config: this.getDocStoreConfig(),
+            persistance: this.getDocStoreConfig(),
             stage: stage,
             workspaceId: workspaceId,
             docType: this.docType,
@@ -175,14 +180,14 @@ export class MfsDoc {
     return workspaceStore.get(this.docType)!;
   }
   get _docStore() {
-    return (this.constructor as typeof MfsDoc)._docStore;
+    return (this.constructor as typeof Doc)._docStore;
   }
   // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
-  static customize<This extends typeof MfsDoc>(
+  static customize<This extends typeof Doc>(
     this: This,
     customizations: {
       docType?: string;
-      docStoreConfig?: Partial<DocStoreConfig>;
+      docStoreConfig?: Partial<PersistanceConfig>;
     },
   ): This {
     return class extends (this as any) {
@@ -190,11 +195,11 @@ export class MfsDoc {
         return customizations.docType ?? this.name;
       }
 
-      static getDocStoreConfig<This extends typeof MfsDoc>(
+      static getDocStoreConfig<This extends typeof Doc>(
         this: This,
-      ): DocStoreConfig {
+      ): PersistanceConfig {
         return {
-          ...defaultDocStoreConfig!,
+          ...defaultPersistanceConfig!,
           ...customizations.docStoreConfig,
         };
       }
@@ -208,11 +213,11 @@ export class MfsDoc {
     return this._docStore.isDocDeleted(this.docId);
   }
 
-  static getAllDocs<T extends typeof MfsDoc>(this: T): InstanceType<T>[] {
+  static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
     return this._docStore.getAllDocs().map(this._fromId.bind(this) as any);
   }
 
-  static _fromId<T extends typeof MfsDoc>(
+  static _fromId<T extends typeof Doc>(
     this: T,
     docId: string,
   ): InstanceType<T> {
@@ -225,7 +230,7 @@ export class MfsDoc {
     return _allDocInstances.get(docId) as InstanceType<T>;
   }
 
-  static create<T extends typeof MfsDoc>(
+  static create<T extends typeof Doc>(
     this: T,
     ...overrideProps: CreateParams<T>
   ): InstanceType<T> {
@@ -250,9 +255,7 @@ export class MfsDoc {
 
 // TODO: Add Local and Session flags.
 // TODO: Add initFrom flag to init from func.
-type CreateParams<T extends typeof MfsDoc> = CreateParamsFromInst<
-  InstanceType<T>
->;
+type CreateParams<T extends typeof Doc> = CreateParamsFromInst<InstanceType<T>>;
 type OptionalParameter<T, IsOptional extends boolean> = Parameters<
   IsOptional extends true ? (prop?: T) => void : (prop: T) => void
 >;
@@ -269,13 +272,13 @@ export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export type OptionalPropFlag = typeof OptionalPropFlag;
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 // TODO: Delete docs that depend on non-nullable docs.
-type PropClass = typeof Boolean | typeof Number | typeof String | typeof MfsDoc;
+type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc;
 type PropType<T extends PropClass = PropClass> = T | [T, null];
-type PropInst = boolean | number | string | MfsDoc | null;
+type PropInst = boolean | number | string | Doc | null;
 type PropValue<T extends PropType | PropInst = PropType | PropInst> =
   T extends any[]
     ? PropValue<T[number]>
-    : T extends typeof MfsDoc
+    : T extends typeof Doc
     ? InstanceType<T>
     : T extends typeof Boolean
     ? boolean
@@ -314,8 +317,8 @@ export function prop<
       ? firstParam
       : Array.isArray(firstParam)
       ? firstParam[0]
-      : firstParam instanceof MfsDoc
-      ? MfsDoc
+      : firstParam instanceof Doc
+      ? Doc
       : typeof firstParam === `boolean`
       ? Boolean
       : typeof firstParam === `number`
@@ -333,7 +336,7 @@ export function prop<
       [IsCustomProp]: true,
       isFullCustom: false,
       getInitValue: () =>
-        initValue instanceof MfsDoc ? initValue.docId : initValue,
+        initValue instanceof Doc ? initValue.docId : initValue,
       getFallbackValue: () => null,
       fromPrim: (prim) => {
         if (prim === null) return null;
@@ -378,7 +381,7 @@ export type IsCustomProp = typeof IsCustomProp;
 export const IsCustomProp = Symbol(`IsCustomProp`);
 export type CustomProp = {
   [IsCustomProp]: true;
-  otherDocsToStartSyncing: (typeof MfsDoc)[];
+  otherDocsToStartSyncing: (typeof Doc)[];
 } & (
   | {
       isFullCustom: false;
@@ -391,7 +394,7 @@ export type CustomProp = {
     }
   | {
       isFullCustom: true;
-      init: (inst: MfsDoc, key: string) => void;
+      init: (inst: Doc, key: string) => void;
     }
 );
 function isCustomProp(arg: any): arg is CustomProp {
@@ -399,9 +402,9 @@ function isCustomProp(arg: any): arg is CustomProp {
 }
 function isDocClass(possibleDocClass: {
   new (...args: any[]): any;
-}): possibleDocClass is typeof MfsDoc {
+}): possibleDocClass is typeof Doc {
   return Object.prototype.isPrototypeOf.call(
-    MfsDoc.prototype,
+    Doc.prototype,
     possibleDocClass.prototype,
   );
 }

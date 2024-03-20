@@ -4,7 +4,7 @@ import { doNow, isValid } from "../Utils.js";
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredential, signInWithEmailAndPassword, } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 // SECTION: Doc Persister
-export function firestoreDocPersister(collectionRef, ...queryConstraints) {
+export function firebasePersister(firestoreConfig, getStorageRef) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     const useServerTimestamp = serverTimestamp();
     return {
@@ -14,11 +14,11 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
             });
             metaData.loadedFromLocalStorage.then(() => {
                 const testDate = new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0));
-                onSnapshot(query(collectionRef, and(or(
+                onSnapshot(query(firestoreConfig.collectionRef, and(or(
                 // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
                 where(CHANGE_DATE_KEY, ">", testDate), where(CHANGE_DATE_KEY, "==", null)), 
                 // TODO: Maybe there is some way to avoid already deleted docs.
-                ...queryConstraints)), (snapshot) => {
+                ...firestoreConfig.queryConstraints)), (snapshot) => {
                     const updates = {};
                     let latestChangeDate = metaData.data.lastChangeDatePosix;
                     // console.log(snapshot.metadata.hasPendingWrites);
@@ -31,7 +31,7 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
                         // );
                         // Skip removed documents. Documents should never be deleted only flagged.
                         if (change.type === "removed") {
-                            console.warn(`The Firestore document "${collectionRef.path}/${change.doc.id}" was removed. Mufasa
+                            console.warn(`The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa
                 is not currently configured to handle documents being removed.`, change.doc.data());
                             return;
                         }
@@ -52,16 +52,11 @@ export function firestoreDocPersister(collectionRef, ...queryConstraints) {
             const setOrUpdateDoc = change.isBeingCreatedOrDeleted
                 ? setDoc
                 : updateDoc;
-            await setOrUpdateDoc(docRef(collectionRef, change.docId), {
+            await setOrUpdateDoc(docRef(firestoreConfig.collectionRef, change.docId), {
                 ...change.props,
                 [CHANGE_DATE_KEY]: useServerTimestamp,
             });
         },
-    };
-}
-// SECTION: File Persister
-export function firebaseFilePersister(getStorageRef) {
-    return {
         async uploadFile(fileId, base64String) {
             await uploadString(getStorageRef(fileId), base64String);
         },
@@ -77,6 +72,27 @@ export function firebaseFilePersister(getStorageRef) {
         },
     };
 }
+// SECTION: File Persister
+// export function firebaseFilePersister(
+//   getStorageRef: (fileId: string) => StorageReference,
+// ): GlobalFilePersister {
+//   return {
+//     async uploadFile(fileId, base64String) {
+//       await uploadString(getStorageRef(fileId), base64String);
+//     },
+//     async downloadFile(fileId) {
+//       const bytes = await getBytes(getStorageRef(fileId)).catch(
+//         () => undefined,
+//       );
+//       if (!isValid(bytes)) return undefined;
+//       const base64String = new TextDecoder("utf-8").decode(bytes);
+//       return base64String;
+//     },
+//     async deleteFile(fileId) {
+//       await deleteObject(getStorageRef(fileId));
+//     },
+//   };
+// }
 // SECTION: Auth
 export function firebaseAuthIntegration(config) {
     config.firebaseAuth.onAuthStateChanged((user) => {

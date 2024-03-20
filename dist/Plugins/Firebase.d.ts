@@ -1,12 +1,14 @@
 import { CollectionReference, QueryFilterConstraint, DocumentReference } from "firebase/firestore";
-import { GlobalDocPersister, GlobalFilePersister } from "../DocStore.js";
+import { GlobalDocPersister } from "../DocStore.js";
 import { StorageReference } from "firebase/storage";
 import { Auth } from "firebase/auth";
 import { UserInfo } from "../Auth.js";
 import { Functions } from "firebase/functions";
 import { WorkspaceIntegration } from "../Workspace.js";
-export declare function firestoreDocPersister(collectionRef: CollectionReference, ...queryConstraints: QueryFilterConstraint[]): GlobalDocPersister;
-export declare function firebaseFilePersister(getStorageRef: (fileId: string) => StorageReference): GlobalFilePersister;
+export declare function firebasePersister(firestoreConfig: {
+    collectionRef: CollectionReference;
+    queryConstraints: QueryFilterConstraint[];
+}, getStorageRef: (fileId: string) => StorageReference): GlobalDocPersister;
 export declare function firebaseAuthIntegration(config: {
     signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
     signOutFromPlatform: () => Promise<void>;

@@ -1,8 +1,8 @@
-import { MfsDoc } from "./Doc.js";
-import { DocStoreConfig } from "./DocStore.js";
-type GetListFromTableConfig<OtherInst extends MfsDoc, TableConfig> = undefined extends TableConfig ? List<OtherInst> : TableConfig extends DocStoreConfig ? List<OtherInst> : TableConfig extends keyof OtherInst ? OtherInst[TableConfig] extends MfsDoc ? ReadonlyList<OtherInst> : List<OtherInst> : List<OtherInst>;
-export declare function list<OtherClass extends typeof MfsDoc, TableConfig extends undefined | DocStoreConfig | (keyof InstanceType<OtherClass> & string)>(OtherClass: OtherClass, tableConfig?: TableConfig): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig>;
-export declare class List<T extends MfsDoc> {
+import { Doc } from "./Doc.js";
+import { PersistanceConfig } from "./DocStore.js";
+type GetListFromTableConfig<OtherInst extends Doc, TableConfig> = undefined extends TableConfig ? List<OtherInst> : TableConfig extends PersistanceConfig ? List<OtherInst> : TableConfig extends keyof OtherInst ? OtherInst[TableConfig] extends Doc ? ReadonlyList<OtherInst> : List<OtherInst> : List<OtherInst>;
+export declare function list<OtherClass extends typeof Doc, TableConfig extends undefined | PersistanceConfig | (keyof InstanceType<OtherClass> & string)>(OtherClass: OtherClass, tableConfig?: TableConfig): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig>;
+export declare class List<T extends Doc> {
     private readonly getArray;
     readonly add: (value: T) => void;
     readonly remove: (value: T) => void;
@@ -13,5 +13,5 @@ export declare class List<T extends MfsDoc> {
     get count(): number;
     constructor(getArray: () => T[], add: (value: T) => void, remove: (value: T) => void);
 }
-export type ReadonlyList<T extends MfsDoc> = Omit<List<T>, `add` | `remove`>;
+export type ReadonlyList<T extends Doc> = Omit<List<T>, `add` | `remove`>;
 export {};
