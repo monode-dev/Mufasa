@@ -1,21 +1,15 @@
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import {
-  GetPersister,
-  Json,
-  LocalJsonPersister,
-  PersisterSetup,
-  ToReadonlyJson,
-} from "../DocStore.js";
+import { Device } from "../DocStore.js";
 import { doNow } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 
 // SECTION: Doc Persister
-export function capacitorPersister() {
-  return (directoryPath: string): LocalJsonPersister => {
+export function capacitorPersister(): Device.Persister {
+  return (directoryPath: string) => {
     const getFilePath = (fileId: string) => `${directoryPath}/${fileId}`;
     return {
       jsonFile: (fileName: string) => ({
-        start<T extends Json>(initJson: T) {
+        start<T extends Device.Json>(initJson: T) {
           const filePath = `${directoryPath}/${fileName}`;
           const data = {
             value: JSON.parse(JSON.stringify(initJson)) as T,
@@ -54,7 +48,7 @@ export function capacitorPersister() {
               return loadedFromLocalStorage;
             },
             get data() {
-              return data.value as ToReadonlyJson<T>;
+              return data.value as Device.ToReadonlyJson<T>;
             },
             // This allows us to save after a write batch.
             async batchUpdate(

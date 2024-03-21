@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { doNow, isValid } from "./Utils.js";
+import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
-import { MosaApi } from "@monode/mosa";
-import { sessionDocPersister } from "./SessionDocPersister.js";
+import { sessionTablePersister } from "./SessionTablePersister.js";
+import type { MosaApi } from "@monode/mosa";
 
 export const DELETED_KEY = `mx_deleted`;
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
@@ -18,7 +18,7 @@ export type DocJson = {
 export type WritableUpdateBatch = {
   [docId: string]: DocJson;
 };
-export type UpdateBatch = ToReadonlyJson<WritableUpdateBatch>;
+export type UpdateBatch = Device.ToReadonlyJson<WritableUpdateBatch>;
 export type WritablePersistanceTaggedUpdateBatch = {
   [docId: string]: {
     [key: string]: {
@@ -28,106 +28,128 @@ export type WritablePersistanceTaggedUpdateBatch = {
   };
 };
 export type PersistanceTaggedUpdateBatch =
-  ToReadonlyJson<WritablePersistanceTaggedUpdateBatch>;
+  Device.ToReadonlyJson<WritablePersistanceTaggedUpdateBatch>;
 
 // SECTION: Session Doc Persister Types
-export type SessionDocPersister = {
-  batchUpdate(updates: UpdateBatch, newDocsAreOnlyVirtual: boolean): void;
-  getProp(
-    id: string,
-    key: string,
-    initValue: PrimVal | (() => PrimVal),
-  ): PrimVal;
-  peekProp(id: string, key: string): PrimVal | undefined;
-  getAllDocs(): string[];
-  docExists(docId: string): boolean;
-};
-export const fakeSessionDocPersister: SessionDocPersister = {
-  batchUpdate: () => {},
-  getProp: (_, __, v) => (typeof v === `function` ? v() : v),
-  peekProp: () => undefined,
-  getAllDocs: () => [],
-  docExists: () => false,
-};
+export namespace Session {
+  export type Persister = MosaApi;
+  export type TablePersister = {
+    batchUpdate(updates: UpdateBatch, newDocsAreOnlyVirtual: boolean): void;
+    getProp(
+      id: string,
+      key: string,
+      initValue: PrimVal | (() => PrimVal),
+    ): PrimVal;
+    peekProp(id: string, key: string): PrimVal | undefined;
+    getAllDocs(): string[];
+    docExists(docId: string): boolean;
+  };
+  export const mockTablePersister: Session.TablePersister = {
+    batchUpdate: () => {},
+    getProp: (_, __, v) => (typeof v === `function` ? v() : v),
+    peekProp: () => undefined,
+    getAllDocs: () => [],
+    docExists: () => false,
+  };
+}
 
 // SECTION: Local Doc Persister Types
-/** TODO: We can make this simpler by giving it the format
- * `{ persist: <T extends JsonObj>(fileId: string, initValue: T) => Promise<T> }`
- * We can still batch updates by using `new Promise(() => save())`
- * This will delay the save until the end of the current thread. */
-export type LocalJsonPersister = {
-  readonly jsonFile: (fileId: string) => LocalJsonFilePersister;
-  getWebPath: (fileId: string) => Promise<string | undefined>;
-  readFile: (fileId: string) => Promise<string | undefined>;
-  writeFile: (fileId: string, base64String: string) => Promise<void>;
-  deleteFile: (fileId: string) => Promise<void>;
-};
-export type LocalJsonFilePersister = {
-  readonly start: <T extends Json>(initValue: T) => SavedJson<T>;
-};
-const fakeLocalJsonPersister: LocalJsonPersister = {
-  jsonFile: () => ({
-    start: (initValue) => ({
-      loadedFromLocalStorage: Promise.resolve(),
-      data: initValue as ToReadonlyJson<typeof initValue>,
-      batchUpdate: async (doUpdate) => {
-        await doUpdate(initValue as any, () => {});
-      },
+export namespace Device {
+  export type Persister = (directoryPath: string) => Device.DirectoryPersister;
+  /** TODO: We can make this simpler by giving it the format
+   * `{ persist: <T extends JsonObj>(fileId: string, initValue: T) => Promise<T> }`
+   * We can still batch updates by using `new Promise(() => save())`
+   * This will delay the save until the end of the current thread. */
+  export type DirectoryPersister = {
+    readonly jsonFile: (fileId: string) => Device.JsonPersister;
+    getWebPath: (fileId: string) => Promise<string | undefined>;
+    readFile: (fileId: string) => Promise<string | undefined>;
+    writeFile: (fileId: string, base64String: string) => Promise<void>;
+    deleteFile: (fileId: string) => Promise<void>;
+  };
+  export type JsonPersister = {
+    readonly start: <T extends Json>(initValue: T) => Device.SavedJson<T>;
+  };
+  export const mockDirectoryPersister: Device.DirectoryPersister = {
+    jsonFile: () => ({
+      start: (initValue) => ({
+        loadedFromLocalStorage: Promise.resolve(),
+        data: initValue as Device.ToReadonlyJson<typeof initValue>,
+        batchUpdate: async (doUpdate) => {
+          await doUpdate(initValue as any, () => {});
+        },
+      }),
     }),
-  }),
-  getWebPath: async () => undefined,
-  readFile: async () => undefined,
-  writeFile: async () => {},
-  deleteFile: async () => {},
-};
-export type SavedJson<T extends Json> = {
-  readonly loadedFromLocalStorage: Promise<void>;
-  readonly data: ToReadonlyJson<T>;
-  readonly batchUpdate: (
-    doUpdate: (
-      json: { value: T },
-      doNotSave: () => void,
-    ) => Promise<unknown> | unknown,
-  ) => Promise<void>;
-};
-export type Json = string | number | boolean | null | Json[] | JsonObj;
-export type JsonObj = { [key: string]: Json };
-export type ToReadonlyJson<T extends Json> = T extends Json[]
-  ? ReadonlyArray<ToReadonlyJson<T[number]>>
-  : T extends JsonObj
-  ? { readonly [K in keyof T]: ToReadonlyJson<T[K]> }
-  : T;
+    getWebPath: async () => undefined,
+    readFile: async () => undefined,
+    writeFile: async () => {},
+    deleteFile: async () => {},
+  };
+  export type SavedJson<T extends Json> = {
+    readonly loadedFromLocalStorage: Promise<void>;
+    readonly data: Device.ToReadonlyJson<T>;
+    readonly batchUpdate: (
+      doUpdate: (
+        json: { value: T },
+        doNotSave: () => void,
+      ) => Promise<unknown> | unknown,
+    ) => Promise<void>;
+  };
+  export type Json = string | number | boolean | null | Json[] | JsonObj;
+  export type JsonObj = { [key: string]: Json };
+  export type ToReadonlyJson<T extends Json> = T extends Json[]
+    ? ReadonlyArray<Device.ToReadonlyJson<T[number]>>
+    : T extends JsonObj
+    ? { readonly [K in keyof T]: Device.ToReadonlyJson<T[K]> }
+    : T;
+}
 
 // SECTION: Global Doc Persister Types
 // TODO: Maybe persisters should probably follow the format: { start: (...props) => { onLoaded, data, batchUpdate} }
-export type GlobalDocPersister = {
-  start: (
-    batchUpdate: (updates: UpdateBatch) => void,
-    localMetaDataPersister: LocalJsonFilePersister,
-  ) => void;
-  updateDoc: (change: GlobalDocChange) => Promise<void>;
-  uploadFile: (fileId: string, base64String: string) => Promise<void>;
-  downloadFile: (fileId: string) => Promise<string | undefined>;
-  deleteFile: (fileId: string) => Promise<void>;
-  // dispose: () => void;
-  // TODO: Maybe this should require a local persister of some sort so that we can complete unfinished uploads.
-};
-export const fakeGlobalDocPersister: GlobalDocPersister = {
-  start: () => {},
-  updateDoc: async () => {},
-  uploadFile: async () => {},
-  downloadFile: async () => undefined,
-  deleteFile: async () => {},
-};
-export type GlobalDocChange = {
-  docId: string;
-  props: DocJson;
-  isBeingCreatedOrDeleted: boolean;
-};
-export type UploadEvents = {
-  onStartUploadBatch?: () => void;
-  onFinishUploadBatch?: () => void;
-};
+export namespace Cloud {
+  export type Persister<T extends {}> = (config: {
+    stage: string;
+    setWorkspaceId: (workspaceId: string) => void;
+    sessionPersister: Session.Persister;
+    directoryPersister?: Device.DirectoryPersister;
+  }) => {
+    getWorkspacePersister: GetWorkspacePersister;
+    exports: T;
+  };
+  export type GetWorkspacePersister = (options: {
+    stage: string | null;
+    workspaceId: string;
+    docType: string;
+    // version: number;
+  }) => Cloud.WorkspacePersister;
+  export type WorkspacePersister = {
+    start: (
+      batchUpdate: (updates: UpdateBatch) => void,
+      localMetaDataPersister: Device.JsonPersister,
+    ) => void;
+    updateDoc: (change: Cloud.DocChange) => Promise<void>;
+    uploadFile: (fileId: string, base64String: string) => Promise<void>;
+    downloadFile: (fileId: string) => Promise<string | undefined>;
+    deleteFile: (fileId: string) => Promise<void>;
+    // dispose: () => void;
+  };
+  export const mockWorkspacePersister: Cloud.WorkspacePersister = {
+    start: () => {},
+    updateDoc: async () => {},
+    uploadFile: async () => {},
+    downloadFile: async () => undefined,
+    deleteFile: async () => {},
+  };
+  export type DocChange = {
+    docId: string;
+    props: DocJson;
+    isBeingCreatedOrDeleted: boolean;
+  };
+  export type UploadEvents = {
+    onStartUploadBatch?: () => void;
+    onFinishUploadBatch?: () => void;
+  };
+}
 
 // TODO: Support type unions.
 // TODO: Figure out how to ignore changes incoming server changes that have been overridden by more recent local changes.
@@ -138,20 +160,19 @@ export type PersisterSetup = {
   docType: string;
   // version: number;
 };
-export type GetPersister<T> = (options: PersisterSetup) => T;
 export type PersistanceConfig = {
-  sessionConfig: MosaApi;
-  getDevicePersister?: (directoryPath: string) => LocalJsonPersister;
-  getCloudPersister?: GetPersister<GlobalDocPersister>;
+  sessionPersister: Session.Persister;
+  devicePersister?: Device.Persister;
+  getWorkspacePersister?: Cloud.GetWorkspacePersister;
   trackUpload: () => void;
   untrackUpload: () => void;
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
 };
 export type DocStoreParams = {
-  sessionDocPersister: SessionDocPersister;
-  localJsonPersister: LocalJsonPersister;
-  globalDocPersister: GlobalDocPersister;
+  sessionTablePersister: Session.TablePersister;
+  deviceDirectoryPersister: Device.DirectoryPersister;
+  cloudWorkspacePersister: Cloud.WorkspacePersister;
   trackUpload: () => void;
   untrackUpload: () => void;
   onIncomingCreate: (docId: string) => void;
@@ -163,28 +184,25 @@ export function initDocStoreConfig(params: {
   workspaceId: string | null;
   docType: string;
 }): DocStoreParams {
-  const persisterConfig = isValid(params.workspaceId)
-    ? {
-        stage: params.stage,
-        docType: params.docType,
-        workspaceId: params.workspaceId,
-      }
-    : undefined;
-  const directoryPath = isValid(persisterConfig)
-    ? `${persisterConfig.workspaceId}/${persisterConfig.docType}`
-    : undefined;
   return {
-    sessionDocPersister: isValid(persisterConfig)
-      ? sessionDocPersister(params.persistance.sessionConfig)
-      : fakeSessionDocPersister,
-    localJsonPersister:
-      isValid(params.persistance.getDevicePersister) && isValid(directoryPath)
-        ? params.persistance.getDevicePersister(directoryPath)
-        : fakeLocalJsonPersister,
-    globalDocPersister:
-      isValid(params.persistance.getCloudPersister) && isValid(persisterConfig)
-        ? params.persistance.getCloudPersister(persisterConfig)
-        : fakeGlobalDocPersister,
+    sessionTablePersister: isValid(params.workspaceId)
+      ? sessionTablePersister(params.persistance.sessionPersister)
+      : Session.mockTablePersister,
+    deviceDirectoryPersister:
+      isValid(params.persistance.devicePersister) && isValid(params.workspaceId)
+        ? params.persistance.devicePersister(
+            `${params.workspaceId}/${params.docType}`,
+          )
+        : Device.mockDirectoryPersister,
+    cloudWorkspacePersister:
+      isValid(params.persistance.getWorkspacePersister) &&
+      isValid(params.workspaceId)
+        ? params.persistance.getWorkspacePersister({
+            stage: params.stage,
+            docType: params.docType,
+            workspaceId: params.workspaceId,
+          })
+        : Cloud.mockWorkspacePersister,
     trackUpload: params.persistance.trackUpload,
     untrackUpload: params.persistance.untrackUpload,
     onIncomingCreate: params.persistance.onIncomingCreate ?? (() => {}),
@@ -200,7 +218,7 @@ export function createDocStore(config: DocStoreParams) {
   //   onIncomingDelete: _config.onIncomingDelete,
   // };
   const localJsonPersister =
-    config.localJsonPersister ?? fakeLocalJsonPersister;
+    config.deviceDirectoryPersister ?? Device.mockDirectoryPersister;
   /** NOTE: Rather than break this up into sub systems we keep it all here so
    * that there is no need to join stuff on save, and when loading we only need
    * to read one file. */
@@ -212,7 +230,7 @@ export function createDocStore(config: DocStoreParams) {
 
   // Pick up any changes that still need pushed.
   localDocs.loadedFromLocalStorage.then(() => {
-    config.sessionDocPersister.batchUpdate(
+    config.sessionTablePersister.batchUpdate(
       Object.entries(localDocs.data.docs)
         .filter((_, v) => isValid(v))
         .reduce(
@@ -228,9 +246,9 @@ export function createDocStore(config: DocStoreParams) {
 
   const pushGlobalChange = createPersistedFunction(
     localJsonPersister.jsonFile(`pushGlobalChange`),
-    async (docChange: GlobalDocChange) => {
+    async (docChange: Cloud.DocChange) => {
       config.trackUpload();
-      await config.globalDocPersister?.updateDoc(docChange);
+      await config.cloudWorkspacePersister?.updateDoc(docChange);
       config.untrackUpload();
     },
   );
@@ -250,7 +268,8 @@ export function createDocStore(config: DocStoreParams) {
     Object.entries(params.updates).forEach(([docId, props]) => {
       Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
         if (maxPersistance >= Persistance.session) {
-          if (config.sessionDocPersister.peekProp(docId, key) === value) return;
+          if (config.sessionTablePersister.peekProp(docId, key) === value)
+            return;
           if (!isValid(sessionUpdates[docId])) sessionUpdates[docId] = {};
           sessionUpdates[docId][key] = value;
         }
@@ -265,7 +284,8 @@ export function createDocStore(config: DocStoreParams) {
       });
       const hasGlobalProps = isValid(globalUpdates[docId]);
       if (hasGlobalProps) {
-        const docExistsInSession = config.sessionDocPersister.docExists(docId);
+        const docExistsInSession =
+          config.sessionTablePersister.docExists(docId);
         const isBeingDeleted = props[DELETED_KEY]?.value === true;
         if (isBeingDeleted) {
           globalDeletes.add(docId);
@@ -277,7 +297,7 @@ export function createDocStore(config: DocStoreParams) {
     });
 
     // Changes are pushed to session store, but never come from there.
-    config.sessionDocPersister.batchUpdate(
+    config.sessionTablePersister.batchUpdate(
       sessionUpdates,
       params.newDocsAreOnlyVirtual,
     );
@@ -317,8 +337,8 @@ export function createDocStore(config: DocStoreParams) {
 
   // Watch cloud.
   localDocs.loadedFromLocalStorage.then(() => {
-    if (!config.globalDocPersister) return;
-    config.globalDocPersister.start((updates) => {
+    if (!config.cloudWorkspacePersister) return;
+    config.cloudWorkspacePersister.start((updates) => {
       batchUpdate({
         sourceStoreType: Persistance.global,
         newDocsAreOnlyVirtual: false,
@@ -392,8 +412,8 @@ export function createDocStore(config: DocStoreParams) {
       return this.getProp(docId, DELETED_KEY, false) as boolean;
     },
 
-    getProp: config.sessionDocPersister.getProp,
+    getProp: config.sessionTablePersister.getProp,
 
-    getAllDocs: config.sessionDocPersister.getAllDocs,
+    getAllDocs: config.sessionTablePersister.getAllDocs,
   } as const;
 }

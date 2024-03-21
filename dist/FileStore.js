@@ -30,11 +30,11 @@ function getFileStore(params) {
     return workspaceFileStores.get(params.docType);
 }
 function _createFileStore(config) {
-    const pullCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pullCreate`), async (fileId) => {
-        const fileData = await config.globalDocPersister.downloadFile(fileId);
+    const pullCreate = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pullCreate`), async (fileId) => {
+        const fileData = await config.cloudWorkspacePersister.downloadFile(fileId);
         if (!isValid(fileData))
             return null;
-        await config.localJsonPersister.writeFile(fileId, fileData);
+        await config.deviceDirectoryPersister.writeFile(fileId, fileData);
         docStore.batchUpdate({
             [fileId]: {
                 fileIsDownloaded: {
@@ -45,8 +45,8 @@ function _createFileStore(config) {
         }, { overwriteGlobally: false });
         return fileId;
     });
-    const pullDelete = createPersistedFunction(config.localJsonPersister.jsonFile(`pullDelete`), async (fileId) => {
-        await config.localJsonPersister.deleteFile(fileId);
+    const pullDelete = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pullDelete`), async (fileId) => {
+        await config.deviceDirectoryPersister.deleteFile(fileId);
     });
     const docStore = createDocStore({
         ...config,
@@ -59,14 +59,14 @@ function _createFileStore(config) {
             config.onIncomingDelete?.(docId);
         },
     });
-    const pushCreate = createPersistedFunction(config.localJsonPersister.jsonFile(`pushCreate`), async (fileId) => {
+    const pushCreate = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pushCreate`), async (fileId) => {
         trackUpload();
         if (!isValid(fileId))
             return;
-        const fileData = await config.localJsonPersister.readFile(fileId);
+        const fileData = await config.deviceDirectoryPersister.readFile(fileId);
         if (!isValid(fileData))
             return;
-        config.globalDocPersister.uploadFile(fileId, fileData);
+        config.cloudWorkspacePersister.uploadFile(fileId, fileData);
         // Manually persist globally to signify that the file is uploaded.
         docStore.batchUpdate({
             [fileId]: {
@@ -82,7 +82,7 @@ function _createFileStore(config) {
         docStore: docStore,
         async pushCreate(params) {
             const docId = params.manualDocId ?? uuidv4();
-            await config.localJsonPersister.writeFile(docId, params.base64String);
+            await config.deviceDirectoryPersister.writeFile(docId, params.base64String);
             docStore.createDoc({
                 fileIsDownloaded: {
                     value: true,
@@ -93,17 +93,17 @@ function _createFileStore(config) {
             return docId;
         },
         pullCreate,
-        pushDelete: createPersistedFunction(config.localJsonPersister.jsonFile(`pushDelete`), async (fileId) => {
+        pushDelete: createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pushDelete`), async (fileId) => {
             trackUpload();
-            await config.localJsonPersister.deleteFile(fileId);
+            await config.deviceDirectoryPersister.deleteFile(fileId);
             untrackUpload();
             return fileId;
         }).addStep(async (fileId) => {
-            await config.globalDocPersister.deleteFile(fileId);
+            await config.cloudWorkspacePersister.deleteFile(fileId);
         }),
         pullDelete,
         async readFile(fileId) {
-            return await config.localJsonPersister.readFile(fileId);
+            return await config.deviceDirectoryPersister.readFile(fileId);
         },
     };
 }

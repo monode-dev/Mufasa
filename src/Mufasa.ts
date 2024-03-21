@@ -1,21 +1,14 @@
-import { MosaApi } from "@monode/mosa";
 import { initializeDocClass } from "./Doc.js";
-import {
-  LocalJsonPersister,
-  GetPersister,
-  GlobalDocPersister,
-} from "./DocStore.js";
+import { Session, Device, Cloud } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./FileStore.js";
 import { doNow } from "./Utils.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export {
-  GlobalDocPersister,
-  LocalJsonFilePersister,
-  LocalJsonPersister,
-  SessionDocPersister,
-  GlobalDocChange,
+  Cloud,
+  Device,
+  Session,
   DocJson,
   PersistanceConfig,
   DocStore,
@@ -41,13 +34,14 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export function initializeMufasa(mfsConfig: {
+export function initializeMufasa<T extends {}>(mfsConfig: {
   stage?: string;
   getWorkspaceId?: () => string | null;
-  sessionPersister: MosaApi;
-  devicePersister?: (directoryPath: string) => LocalJsonPersister;
-  cloudPersister?: GetPersister<GlobalDocPersister>;
+  sessionPersister: Session.Persister;
+  devicePersister?: Device.Persister;
+  cloudPersister?: Cloud.Persister<T>;
 }) {
+  const workspaceId = mfsConfig.sessionPersister.useProp<null | string>(null);
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
     const uploadCount = mfsConfig.sessionPersister.useProp(0);
     return {
@@ -62,21 +56,33 @@ export function initializeMufasa(mfsConfig: {
       ),
     };
   });
+  const cloudPersistance = mfsConfig.cloudPersister?.({
+    stage: mfsConfig.stage ?? `Dev`,
+    sessionPersister: mfsConfig.sessionPersister,
+    setWorkspaceId: (id) => {
+      workspaceId.value = id;
+    },
+    directoryPersister: mfsConfig.devicePersister?.(`UserMetadata`),
+  });
   return {
     ...initializeDocClass({
       stage: mfsConfig.stage ?? `Dev`,
       getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => null),
       defaultPersistanceConfig: {
-        sessionConfig: mfsConfig.sessionPersister,
-        getDevicePersister: mfsConfig.devicePersister,
-        getCloudPersister: mfsConfig.cloudPersister,
+        sessionPersister: mfsConfig.sessionPersister,
+        devicePersister: mfsConfig.devicePersister,
+        getWorkspacePersister: cloudPersistance?.getWorkspacePersister,
         trackUpload,
         untrackUpload,
       },
     }),
+    ...cloudPersistance,
     ...initializeSyncedFileClass(),
     get isUploadingToCloud() {
       return isUploadingToCloud.value;
+    },
+    get workspaceId() {
+      return workspaceId.value;
     },
   } as const;
 }

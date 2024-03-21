@@ -1,4 +1,4 @@
-import { DELETED_KEY, PrimVal, SessionDocPersister } from "./DocStore.js";
+import { DELETED_KEY, PrimVal, Session } from "./DocStore.js";
 import { isValid } from "./Utils.js";
 import type { MosaApi, Prop } from "@monode/mosa";
 
@@ -7,7 +7,9 @@ const IS_VIRTUAL = Symbol("IS_VIRTUAL");
 /** This is a virtual store, meaning if you ask for data that doesn't
  * exist we will create the data and return it. This allows the store
  * to work even when data is delayed. */
-export function sessionDocPersister(mosaApi: MosaApi): SessionDocPersister {
+export function sessionTablePersister(
+  mosaApi: MosaApi,
+): Session.TablePersister {
   const rootProp = <T>(initialValue: T) =>
     mosaApi.useRoot(() => mosaApi.useProp(initialValue));
   // TODO: We might be able to track signal disposal and discard currently unused signals.

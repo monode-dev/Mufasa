@@ -1,14 +1,14 @@
-import { Json, LocalJsonFilePersister } from "./DocStore.js";
+import { Device } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 
-type AddStep<PrevIn extends Json[], PrevOut> = {
+type AddStep<PrevIn extends Device.Json[], PrevOut> = {
   addStep: <NewOut>(
     func: (args: PrevOut) => Promise<NewOut>,
   ) => ((...args: PrevIn) => Promise<NewOut>) & AddStep<PrevIn, NewOut>;
 };
 
-export function createPersistedFunction<Params extends Json[], Return>(
-  localJsonFilePersister: LocalJsonFilePersister,
+export function createPersistedFunction<Params extends Device.Json[], Return>(
+  localJsonFilePersister: Device.JsonPersister,
   func: (...args: Params) => Promise<Return>,
 ): ((...args: Params) => Promise<Return>) & AddStep<Params, Return> {
   const steps: Function[] = [func];
@@ -16,7 +16,7 @@ export function createPersistedFunction<Params extends Json[], Return>(
     activeFunctions: {} as {
       [instanceId: string]: {
         step: number;
-        args: Json[];
+        args: Device.Json[];
       };
     },
   });

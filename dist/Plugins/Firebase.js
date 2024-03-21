@@ -1,10 +1,32 @@
-import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, } from "firebase/firestore";
-import { uploadString, deleteObject, getBytes, } from "firebase/storage";
+import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
+import { Device } from "../DocStore.js";
+import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredential, signInWithEmailAndPassword, } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
-// SECTION: Doc Persister
-export function firebasePersister(firestoreConfig, getStorageRef) {
+export function firebasePersister(firebaseConfig) {
+    return ((config) => {
+        return {
+            exports: {
+                ...initializeUser({
+                    firestore: firebaseConfig.firestore,
+                    firebaseFunctions: firebaseConfig.firebaseFunctions,
+                    stage: config.stage,
+                    sessionPersister: config.sessionPersister,
+                    directoryPersister: config.directoryPersister ?? Device.mockDirectoryPersister,
+                    authConfig: firebaseConfig.authConfig,
+                }),
+            },
+            getWorkspacePersister: (setup) => workspacePersister({
+                collectionRef: collection(firebaseConfig.firestore, `${setup.stage}-Workspaces`, setup.workspaceId, setup.docType),
+                queryConstraints: [],
+            }, (fileId) => storageRef(firebaseConfig.firebaseStorage, 
+            // TODO: Include DocType in the path.
+            `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`)),
+        };
+    });
+}
+function workspacePersister(firestoreConfig, getStorageRef) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     const useServerTimestamp = serverTimestamp();
     return {
@@ -72,28 +94,6 @@ export function firebasePersister(firestoreConfig, getStorageRef) {
         },
     };
 }
-// SECTION: File Persister
-// export function firebaseFilePersister(
-//   getStorageRef: (fileId: string) => StorageReference,
-// ): GlobalFilePersister {
-//   return {
-//     async uploadFile(fileId, base64String) {
-//       await uploadString(getStorageRef(fileId), base64String);
-//     },
-//     async downloadFile(fileId) {
-//       const bytes = await getBytes(getStorageRef(fileId)).catch(
-//         () => undefined,
-//       );
-//       if (!isValid(bytes)) return undefined;
-//       const base64String = new TextDecoder("utf-8").decode(bytes);
-//       return base64String;
-//     },
-//     async deleteFile(fileId) {
-//       await deleteObject(getStorageRef(fileId));
-//     },
-//   };
-// }
-// SECTION: Auth
 export function firebaseAuthIntegration(config) {
     config.firebaseAuth.onAuthStateChanged((user) => {
         config.onAuthStateChanged(user !== null ? { uid: user.uid, email: user.email } : null);
@@ -176,4 +176,205 @@ export function firebaseWorkspace(config) {
         //   ).data;
         // },
     };
+}
+function initializeUser(config) {
+    const { useProp, useFormula, doNow, exists, onDispose } = config.sessionPersister;
+    function createWorkspaceInterface(userId, workspaceIntegration, onDispose) {
+        const isCreatingWorkspace = useProp(false);
+        const isJoiningWorkspace = useProp(false);
+        const isLeavingWorkspace = useProp(false);
+        const PendingAsJson = null;
+        const NoneAsJson = 0;
+        const userMetadata = doNow(() => {
+            const userMetadata = useProp(PendingAsJson);
+            const savedMetadata = config.directoryPersister
+                .jsonFile(`${userId}.json`)
+                .start(PendingAsJson);
+            savedMetadata.loadedFromLocalStorage.then(() => {
+                userMetadata.value = savedMetadata.data;
+            });
+            const disposeOnSnapshot = workspaceIntegration.onUserMetadata((newMetadata) => {
+                savedMetadata.batchUpdate((data) => {
+                    const newMetadataValue = exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
+                        ? {
+                            workspaceId: newMetadata.workspaceId,
+                            role: newMetadata.role,
+                        }
+                        : NoneAsJson;
+                    data.value = newMetadataValue;
+                    userMetadata.value = newMetadataValue;
+                });
+            });
+            onDispose(disposeOnSnapshot);
+            return userMetadata;
+        });
+        const WorkspaceStates = {
+            pending: {
+                isPending: true,
+            },
+            none: {
+                isNone: true,
+                async createWorkspace() {
+                    isCreatingWorkspace.value = true;
+                    await workspaceIntegration.createWorkspace({
+                        stage: config.stage,
+                    });
+                    isCreatingWorkspace.value = false;
+                },
+                async joinWorkspace(props) {
+                    isJoiningWorkspace.value = true;
+                    await workspaceIntegration.joinWorkspace({
+                        inviteCode: props.inviteCode,
+                        stage: config.stage,
+                    });
+                    isJoiningWorkspace.value = false;
+                },
+            },
+            creating: {
+                isCreating: true,
+            },
+            joining: {
+                isJoining: true,
+            },
+            createJoinedInst(userMetadata) {
+                return {
+                    haveJoined: true,
+                    id: userMetadata.workspaceId,
+                    role: userMetadata.role,
+                    async createWorkspaceInvite() {
+                        if (userMetadata.role !== `owner`) {
+                            console.error(`Attempted to create a workspace invite without permission.`);
+                            return;
+                        }
+                        if (userMetadata.workspaceId === null) {
+                            console.error(`Attempted to create a workspace invite without a workspace.`);
+                            return;
+                        }
+                        const validForDays = 14;
+                        const inviteCode = doc(collection(config.firestore, `${config.stage}-WorkspaceInvites`)).id;
+                        await workspaceIntegration.createWorkspaceInterface({
+                            inviteCode,
+                            workspaceId: userMetadata.workspaceId,
+                            validForDays,
+                        });
+                        return { inviteCode, validForDays };
+                    },
+                    async leaveWorkspace() {
+                        isLeavingWorkspace.value = true;
+                        await workspaceIntegration.leaveWorkspace({
+                            stage: config.stage,
+                        });
+                        isLeavingWorkspace.value = false;
+                    },
+                    // async deleteWorkspace() {
+                    //   isLeavingWorkspace.value = true;
+                    //   await workspaceIntegration.deleteWorkspace();
+                    //   isLeavingWorkspace.value = false;
+                    // },
+                };
+            },
+            leaving: {
+                isLeaving: true,
+            },
+            // deleting: {
+            //   isDeleting: true,
+            // },
+        };
+        return useFormula(() => {
+            console.log(`userMetadata.value`, userMetadata.value);
+            return userMetadata.value === PendingAsJson
+                ? WorkspaceStates.pending
+                : userMetadata.value === NoneAsJson
+                    ? isCreatingWorkspace.value
+                        ? WorkspaceStates.creating
+                        : isJoiningWorkspace.value
+                            ? WorkspaceStates.joining
+                            : WorkspaceStates.none
+                    : isLeavingWorkspace.value
+                        ? WorkspaceStates.leaving
+                        : WorkspaceStates.createJoinedInst(userMetadata.value);
+        });
+    }
+    // SECTION: User
+    return doNow(() => {
+        const userInfo = useProp(undefined);
+        const firebaseAuth = firebaseAuthIntegration(config.authConfig);
+        const isSigningIn = useProp(false);
+        const isSigningOut = useProp(false);
+        // TODO: Force these to be single threaded.
+        async function signUpWithEmail(email, password) {
+            isSigningIn.value = true;
+            await firebaseAuth.signUpWithEmail(email, password);
+            isSigningIn.value = false;
+        }
+        async function signInWithEmail(email, password) {
+            isSigningIn.value = true;
+            await firebaseAuth.signInWithEmail(email, password);
+            isSigningIn.value = false;
+        }
+        async function signInWithGoogle() {
+            isSigningIn.value = true;
+            await firebaseAuth.signInWithGoogle();
+            isSigningIn.value = false;
+        }
+        async function signOut() {
+            isSigningOut.value = true;
+            await firebaseAuth.signOut();
+            isSigningOut.value = false;
+        }
+        const UserStates = {
+            pending: {
+                isPending: true,
+            },
+            signedOut: {
+                isSignedOut: true,
+                signUpWithEmail,
+                signInWithEmail,
+                signInWithGoogle,
+            },
+            signingIn: {
+                isSigningIn: true,
+            },
+            createAwaitingVerificationInst(userInfo) {
+                return {
+                    isAwaitingVerification: true,
+                    get email() {
+                        return userInfo.email ?? null;
+                    },
+                    signOut,
+                };
+            },
+            // TODO: Maybe swap out the whole object when the user changes.
+            createSignedInInst(userInfo, onDispose) {
+                const workspace = createWorkspaceInterface(userInfo.uid, firebaseWorkspace({
+                    firebaseFunctions: config.firebaseFunctions,
+                    userMetadataDoc: doc(collection(config.firestore, `${config.stage}-UserMetadata`), userInfo.uid),
+                    workspaceInvitesCollection: collection(config.firestore, `${config.stage}-WorkspaceInvites`),
+                }), onDispose);
+                return {
+                    uid: userInfo.uid,
+                    email: userInfo.email,
+                    isSignedIn: true,
+                    // TODO: Leaving a workspace is not updating this.
+                    // TODO: Maybe use a query to watch this value.
+                    get workspace() {
+                        return workspace.value;
+                    },
+                    signOut,
+                };
+            },
+            signingOut: {
+                isSigningOut: true,
+            },
+        };
+        return useFormula(() => userInfo.value === undefined
+            ? UserStates.pending
+            : userInfo.value === null
+                ? isSigningIn.value
+                    ? UserStates.signingIn
+                    : UserStates.signedOut
+                : isSigningOut.value
+                    ? UserStates.signingOut
+                    : UserStates.createSignedInInst(userInfo.value, onDispose));
+    });
 }

@@ -1,63 +1,71 @@
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
-import { sessionDocPersister } from "./SessionDocPersister.js";
+import { sessionTablePersister } from "./SessionTablePersister.js";
 export const DELETED_KEY = `mx_deleted`;
 export const Persistance = {
     session: 0,
     local: 1,
     global: 2,
 };
-export const fakeSessionDocPersister = {
-    batchUpdate: () => { },
-    getProp: (_, __, v) => (typeof v === `function` ? v() : v),
-    peekProp: () => undefined,
-    getAllDocs: () => [],
-    docExists: () => false,
-};
-const fakeLocalJsonPersister = {
-    jsonFile: () => ({
-        start: (initValue) => ({
-            loadedFromLocalStorage: Promise.resolve(),
-            data: initValue,
-            batchUpdate: async (doUpdate) => {
-                await doUpdate(initValue, () => { });
-            },
+// SECTION: Session Doc Persister Types
+export var Session;
+(function (Session) {
+    Session.mockTablePersister = {
+        batchUpdate: () => { },
+        getProp: (_, __, v) => (typeof v === `function` ? v() : v),
+        peekProp: () => undefined,
+        getAllDocs: () => [],
+        docExists: () => false,
+    };
+})(Session || (Session = {}));
+// SECTION: Local Doc Persister Types
+export var Device;
+(function (Device) {
+    Device.mockDirectoryPersister = {
+        jsonFile: () => ({
+            start: (initValue) => ({
+                loadedFromLocalStorage: Promise.resolve(),
+                data: initValue,
+                batchUpdate: async (doUpdate) => {
+                    await doUpdate(initValue, () => { });
+                },
+            }),
         }),
-    }),
-    getWebPath: async () => undefined,
-    readFile: async () => undefined,
-    writeFile: async () => { },
-    deleteFile: async () => { },
-};
-export const fakeGlobalDocPersister = {
-    start: () => { },
-    updateDoc: async () => { },
-    uploadFile: async () => { },
-    downloadFile: async () => undefined,
-    deleteFile: async () => { },
-};
+        getWebPath: async () => undefined,
+        readFile: async () => undefined,
+        writeFile: async () => { },
+        deleteFile: async () => { },
+    };
+})(Device || (Device = {}));
+// SECTION: Global Doc Persister Types
+// TODO: Maybe persisters should probably follow the format: { start: (...props) => { onLoaded, data, batchUpdate} }
+export var Cloud;
+(function (Cloud) {
+    Cloud.mockWorkspacePersister = {
+        start: () => { },
+        updateDoc: async () => { },
+        uploadFile: async () => { },
+        downloadFile: async () => undefined,
+        deleteFile: async () => { },
+    };
+})(Cloud || (Cloud = {}));
 export function initDocStoreConfig(params) {
-    const persisterConfig = isValid(params.workspaceId)
-        ? {
-            stage: params.stage,
-            docType: params.docType,
-            workspaceId: params.workspaceId,
-        }
-        : undefined;
-    const directoryPath = isValid(persisterConfig)
-        ? `${persisterConfig.workspaceId}/${persisterConfig.docType}`
-        : undefined;
     return {
-        sessionDocPersister: isValid(persisterConfig)
-            ? sessionDocPersister(params.persistance.sessionConfig)
-            : fakeSessionDocPersister,
-        localJsonPersister: isValid(params.persistance.getDevicePersister) && isValid(directoryPath)
-            ? params.persistance.getDevicePersister(directoryPath)
-            : fakeLocalJsonPersister,
-        globalDocPersister: isValid(params.persistance.getCloudPersister) && isValid(persisterConfig)
-            ? params.persistance.getCloudPersister(persisterConfig)
-            : fakeGlobalDocPersister,
+        sessionTablePersister: isValid(params.workspaceId)
+            ? sessionTablePersister(params.persistance.sessionPersister)
+            : Session.mockTablePersister,
+        deviceDirectoryPersister: isValid(params.persistance.devicePersister) && isValid(params.workspaceId)
+            ? params.persistance.devicePersister(`${params.workspaceId}/${params.docType}`)
+            : Device.mockDirectoryPersister,
+        cloudWorkspacePersister: isValid(params.persistance.getWorkspacePersister) &&
+            isValid(params.workspaceId)
+            ? params.persistance.getWorkspacePersister({
+                stage: params.stage,
+                docType: params.docType,
+                workspaceId: params.workspaceId,
+            })
+            : Cloud.mockWorkspacePersister,
         trackUpload: params.persistance.trackUpload,
         untrackUpload: params.persistance.untrackUpload,
         onIncomingCreate: params.persistance.onIncomingCreate ?? (() => { }),
@@ -72,7 +80,7 @@ export function createDocStore(config) {
     //   onIncomingCreate: _config.onIncomingCreate,
     //   onIncomingDelete: _config.onIncomingDelete,
     // };
-    const localJsonPersister = config.localJsonPersister ?? fakeLocalJsonPersister;
+    const localJsonPersister = config.deviceDirectoryPersister ?? Device.mockDirectoryPersister;
     /** NOTE: Rather than break this up into sub systems we keep it all here so
      * that there is no need to join stuff on save, and when loading we only need
      * to read one file. */
@@ -81,7 +89,7 @@ export function createDocStore(config) {
     });
     // Pick up any changes that still need pushed.
     localDocs.loadedFromLocalStorage.then(() => {
-        config.sessionDocPersister.batchUpdate(Object.entries(localDocs.data.docs)
+        config.sessionTablePersister.batchUpdate(Object.entries(localDocs.data.docs)
             .filter((_, v) => isValid(v))
             .reduce((result, [id, props]) => ({
             ...result,
@@ -90,7 +98,7 @@ export function createDocStore(config) {
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
         config.trackUpload();
-        await config.globalDocPersister?.updateDoc(docChange);
+        await config.cloudWorkspacePersister?.updateDoc(docChange);
         config.untrackUpload();
     });
     //
@@ -103,7 +111,7 @@ export function createDocStore(config) {
         Object.entries(params.updates).forEach(([docId, props]) => {
             Object.entries(props).forEach(([key, { value, maxPersistance }]) => {
                 if (maxPersistance >= Persistance.session) {
-                    if (config.sessionDocPersister.peekProp(docId, key) === value)
+                    if (config.sessionTablePersister.peekProp(docId, key) === value)
                         return;
                     if (!isValid(sessionUpdates[docId]))
                         sessionUpdates[docId] = {};
@@ -122,7 +130,7 @@ export function createDocStore(config) {
             });
             const hasGlobalProps = isValid(globalUpdates[docId]);
             if (hasGlobalProps) {
-                const docExistsInSession = config.sessionDocPersister.docExists(docId);
+                const docExistsInSession = config.sessionTablePersister.docExists(docId);
                 const isBeingDeleted = props[DELETED_KEY]?.value === true;
                 if (isBeingDeleted) {
                     globalDeletes.add(docId);
@@ -134,7 +142,7 @@ export function createDocStore(config) {
             }
         });
         // Changes are pushed to session store, but never come from there.
-        config.sessionDocPersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
+        config.sessionTablePersister.batchUpdate(sessionUpdates, params.newDocsAreOnlyVirtual);
         localDocs.loadedFromLocalStorage.then(() => {
             if (params.sourceStoreType !== Persistance.local) {
                 localDocs.batchUpdate((data) => {
@@ -167,9 +175,9 @@ export function createDocStore(config) {
     }
     // Watch cloud.
     localDocs.loadedFromLocalStorage.then(() => {
-        if (!config.globalDocPersister)
+        if (!config.cloudWorkspacePersister)
             return;
-        config.globalDocPersister.start((updates) => {
+        config.cloudWorkspacePersister.start((updates) => {
             batchUpdate({
                 sourceStoreType: Persistance.global,
                 newDocsAreOnlyVirtual: false,
@@ -225,7 +233,7 @@ export function createDocStore(config) {
         isDocDeleted(docId) {
             return this.getProp(docId, DELETED_KEY, false);
         },
-        getProp: config.sessionDocPersister.getProp,
-        getAllDocs: config.sessionDocPersister.getAllDocs,
+        getProp: config.sessionTablePersister.getProp,
+        getAllDocs: config.sessionTablePersister.getAllDocs,
     };
 }

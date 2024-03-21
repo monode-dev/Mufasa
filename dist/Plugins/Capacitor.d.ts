@@ -1,2 +1,2 @@
-import { LocalJsonPersister } from "../DocStore.js";
-export declare function capacitorPersister(): (directoryPath: string) => LocalJsonPersister;
+import { Device } from "../DocStore.js";
+export declare function capacitorPersister(): Device.Persister;
