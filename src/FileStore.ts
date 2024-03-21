@@ -11,8 +11,6 @@ import {
 import {
   PersistanceConfig,
   DocStoreParams,
-  GetPersister,
-  LocalJsonPersister,
   Persistance,
   createDocStore,
   initDocStoreConfig,

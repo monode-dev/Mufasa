@@ -2,7 +2,7 @@ import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { doNow } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 // SECTION: Doc Persister
-export function capacitorJsonPersister(directoryPath) {
+export function capacitorPersister(directoryPath) {
     const getFilePath = (fileId) => `${directoryPath}/${fileId}`;
     return {
         jsonFile: (fileName) => ({

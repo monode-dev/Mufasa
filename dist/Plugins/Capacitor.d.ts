@@ -1,2 +1,2 @@
 import { LocalJsonPersister } from "../DocStore.js";
-export declare function capacitorJsonPersister(directoryPath: string): LocalJsonPersister;
+export declare function capacitorPersister(directoryPath: string): LocalJsonPersister;

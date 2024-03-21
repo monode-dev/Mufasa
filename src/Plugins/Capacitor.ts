@@ -4,7 +4,7 @@ import { doNow } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 
 // SECTION: Doc Persister
-export function capacitorJsonPersister(
+export function capacitorPersister(
   directoryPath: string,
 ): LocalJsonPersister {
   const getFilePath = (fileId: string) => `${directoryPath}/${fileId}`;
