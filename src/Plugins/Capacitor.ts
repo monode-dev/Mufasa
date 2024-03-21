@@ -10,78 +10,80 @@ import { doNow } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 
 // SECTION: Doc Persister
-export function capacitorPersister(directoryPath: string): LocalJsonPersister {
-  const getFilePath = (fileId: string) => `${directoryPath}/${fileId}`;
-  return {
-    jsonFile: (fileName: string) => ({
-      start<T extends Json>(initJson: T) {
-        const filePath = `${directoryPath}/${fileName}`;
-        const data = {
-          value: JSON.parse(JSON.stringify(initJson)) as T,
-        };
+export function capacitorPersister() {
+  return (directoryPath: string): LocalJsonPersister => {
+    const getFilePath = (fileId: string) => `${directoryPath}/${fileId}`;
+    return {
+      jsonFile: (fileName: string) => ({
+        start<T extends Json>(initJson: T) {
+          const filePath = `${directoryPath}/${fileName}`;
+          const data = {
+            value: JSON.parse(JSON.stringify(initJson)) as T,
+          };
 
-        // Load json from storage.
-        const loadedFromLocalStorage = doNow(async () => {
-          const fileString = await readFile(filePath);
-          if (!fileString) return;
-          data.value = JSON.parse(fileString);
-        });
-
-        // Save doc store to device.
-        const requestSave = doNow(() => {
-          let saveIndex = 0;
-          let lastSaveIndex = saveIndex;
-          doNow(async () => {
-            await loadedFromLocalStorage;
-            /* Using a loop enables multi-threaded saving preventing concurrent
-             * writes to disk. I'm not sure if this is necessary. */
-            while (true) {
-              const saveIndexAtStart = saveIndex;
-              if (lastSaveIndex !== saveIndexAtStart) {
-                lastSaveIndex = saveIndexAtStart;
-                await writeStringFile(filePath, JSON.stringify(data.value));
-              }
-              await new Promise((resolve) => setTimeout(resolve, 10));
-            }
+          // Load json from storage.
+          const loadedFromLocalStorage = doNow(async () => {
+            const fileString = await readFile(filePath);
+            if (!fileString) return;
+            data.value = JSON.parse(fileString);
           });
-          return () => (saveIndex += 1);
-        });
 
-        // Give limited access to the json.
-        return {
-          get loadedFromLocalStorage() {
-            return loadedFromLocalStorage;
-          },
-          get data() {
-            return data.value as ToReadonlyJson<T>;
-          },
-          // This allows us to save after a write batch.
-          async batchUpdate(
-            doUpdate: (
-              json: { value: T },
-              doNotSave: () => void,
-            ) => Promise<unknown> | unknown,
-          ) {
-            let shouldSave = true;
-            await doUpdate(data, () => (shouldSave = false));
-            if (shouldSave) requestSave();
-          },
-        };
-      },
-    }),
-    getWebPath: (fileId) =>
-      Filesystem.getUri({
-        path: getFilePath(fileId),
-        directory: Directory.Data,
-      })
-        .then(({ uri }) => Capacitor.convertFileSrc(uri))
-        .catch(() => undefined),
-    // TODO: We need to use strings for this.
-    readFile: (fileId) => readFile(getFilePath(fileId)),
-    writeFile: (fileId, base64String) =>
-      writeStringFile(getFilePath(fileId), base64String),
-    deleteFile: (fileId) => deleteFile(getFilePath(fileId)),
-    // localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
+          // Save doc store to device.
+          const requestSave = doNow(() => {
+            let saveIndex = 0;
+            let lastSaveIndex = saveIndex;
+            doNow(async () => {
+              await loadedFromLocalStorage;
+              /* Using a loop enables multi-threaded saving preventing concurrent
+               * writes to disk. I'm not sure if this is necessary. */
+              while (true) {
+                const saveIndexAtStart = saveIndex;
+                if (lastSaveIndex !== saveIndexAtStart) {
+                  lastSaveIndex = saveIndexAtStart;
+                  await writeStringFile(filePath, JSON.stringify(data.value));
+                }
+                await new Promise((resolve) => setTimeout(resolve, 10));
+              }
+            });
+            return () => (saveIndex += 1);
+          });
+
+          // Give limited access to the json.
+          return {
+            get loadedFromLocalStorage() {
+              return loadedFromLocalStorage;
+            },
+            get data() {
+              return data.value as ToReadonlyJson<T>;
+            },
+            // This allows us to save after a write batch.
+            async batchUpdate(
+              doUpdate: (
+                json: { value: T },
+                doNotSave: () => void,
+              ) => Promise<unknown> | unknown,
+            ) {
+              let shouldSave = true;
+              await doUpdate(data, () => (shouldSave = false));
+              if (shouldSave) requestSave();
+            },
+          };
+        },
+      }),
+      getWebPath: (fileId) =>
+        Filesystem.getUri({
+          path: getFilePath(fileId),
+          directory: Directory.Data,
+        })
+          .then(({ uri }) => Capacitor.convertFileSrc(uri))
+          .catch(() => undefined),
+      // TODO: We need to use strings for this.
+      readFile: (fileId) => readFile(getFilePath(fileId)),
+      writeFile: (fileId, base64String) =>
+        writeStringFile(getFilePath(fileId), base64String),
+      deleteFile: (fileId) => deleteFile(getFilePath(fileId)),
+      // localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
+    };
   };
 }
 
