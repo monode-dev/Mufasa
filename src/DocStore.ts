@@ -209,6 +209,7 @@ export function createDocStore(config: DocStoreParams) {
 
   // Pick up any changes that still need pushed.
   localDocs.loadedFromLocalStorage.then(() => {
+    console.log(localDocs.data);
     config.sessionDocPersister.batchUpdate(
       Object.entries(localDocs.data.docs)
         .filter((_, v) => isValid(v))
