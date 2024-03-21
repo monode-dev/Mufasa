@@ -93,6 +93,8 @@ export type PersistanceConfig = {
     onIncomingDelete?: (docId: string) => void;
 };
 export type DocStoreParams = {
+    workspaceId: string | null;
+    docType: string;
     sessionDocPersister: SessionDocPersister;
     localJsonPersister: LocalJsonPersister;
     globalDocPersister: GlobalDocPersister;

@@ -1,9 +1,9 @@
 import { MosaApi } from "@monode/mosa";
-import { PersistanceConfig, LocalJsonPersister, GetPersister, GlobalDocPersister } from "./DocStore.js";
+import { LocalJsonPersister, GetPersister, GlobalDocPersister } from "./DocStore.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
-export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, PersistanceConfig as DocPersisters, DocStore, UpdateBatch, DELETED_KEY, Persistance, } from "./DocStore.js";
+export { GlobalDocPersister, LocalJsonFilePersister, LocalJsonPersister, SessionDocPersister, GlobalDocChange, DocJson, PersistanceConfig, DocStore, UpdateBatch, DELETED_KEY, Persistance, } from "./DocStore.js";
 export { UserInfo } from "./Auth.js";
 export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
 /** Set up Mufasa for your app.
@@ -30,7 +30,7 @@ export declare function initializeMufasa(mfsConfig: {
     readonly isUploadingToCloud: boolean;
     readonly File: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: Partial<PersistanceConfig> | undefined;
+        docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;
     }, "docType"> | undefined) => {
         new (): {
             readonly _fileStore: {
@@ -419,10 +419,10 @@ export declare function initializeMufasa(mfsConfig: {
             readonly deleteDoc: () => void;
         }>;
         readonly docType: string;
-        getDocStoreConfig<This extends typeof import("./Doc.js").Doc>(this: This): PersistanceConfig;
+        getDocStoreConfig<This extends typeof import("./Doc.js").Doc>(this: This): import("./DocStore.js").PersistanceConfig;
         customize<This_1 extends typeof import("./Doc.js").Doc>(this: This_1, customizations: {
             docType?: string | undefined;
-            docStoreConfig?: Partial<PersistanceConfig> | undefined;
+            docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;
         }): This_1;
         getAllDocs<T extends typeof import("./Doc.js").Doc>(this: T): InstanceType<T>[];
         _fromId<T_1 extends typeof import("./Doc.js").Doc>(this: T_1, docId: string): InstanceType<T_1>;
@@ -430,7 +430,7 @@ export declare function initializeMufasa(mfsConfig: {
     };
     readonly Doc: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
-        docStoreConfig?: Partial<PersistanceConfig> | undefined;
+        docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;
     }, "docType"> | undefined) => typeof import("./Doc.js").Doc;
-    readonly defaultPersistanceConfig: PersistanceConfig;
+    readonly defaultPersistanceConfig: import("./DocStore.js").PersistanceConfig;
 };

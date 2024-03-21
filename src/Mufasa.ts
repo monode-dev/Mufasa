@@ -1,7 +1,6 @@
 import { MosaApi } from "@monode/mosa";
 import { initializeDocClass } from "./Doc.js";
 import {
-  PersistanceConfig,
   LocalJsonPersister,
   GetPersister,
   GlobalDocPersister,
@@ -18,7 +17,7 @@ export {
   SessionDocPersister,
   GlobalDocChange,
   DocJson,
-  PersistanceConfig as DocPersisters,
+  PersistanceConfig,
   DocStore,
   UpdateBatch,
   DELETED_KEY,

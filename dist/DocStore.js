@@ -46,6 +46,8 @@ export function initDocStoreConfig(params) {
         }
         : undefined;
     return {
+        workspaceId: params.workspaceId,
+        docType: params.docType,
         sessionDocPersister: isValid(persisterConfig)
             ? sessionDocPersister(params.persistance.sessionConfig)
             : fakeSessionDocPersister,
@@ -78,7 +80,7 @@ export function createDocStore(config) {
     });
     // Pick up any changes that still need pushed.
     localDocs.loadedFromLocalStorage.then(() => {
-        console.log(localDocs.data);
+        console.log(`${config.workspaceId} ${config.docType}: ${JSON.stringify(localDocs.data, null, 2)}`);
         config.sessionDocPersister.batchUpdate(Object.entries(localDocs.data.docs)
             .filter((_, v) => isValid(v))
             .reduce((result, [id, props]) => ({
