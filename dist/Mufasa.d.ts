@@ -20,7 +20,7 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export declare function initializeMufasa(mfsConfig: PersistanceConfig & {
+export declare function initializeMufasa(mfsConfig: {
     stage?: string;
     getWorkspaceId?: () => string | null;
     sessionPersister: MosaApi;

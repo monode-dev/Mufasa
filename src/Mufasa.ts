@@ -42,15 +42,13 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export function initializeMufasa(
-  mfsConfig: PersistanceConfig & {
-    stage?: string;
-    getWorkspaceId?: () => string | null;
-    sessionPersister: MosaApi;
-    devicePersister?: GetPersister<LocalJsonPersister>;
-    cloudPersister?: GetPersister<GlobalDocPersister>;
-  },
-) {
+export function initializeMufasa(mfsConfig: {
+  stage?: string;
+  getWorkspaceId?: () => string | null;
+  sessionPersister: MosaApi;
+  devicePersister?: GetPersister<LocalJsonPersister>;
+  cloudPersister?: GetPersister<GlobalDocPersister>;
+}) {
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
     const uploadCount = mfsConfig.sessionPersister.useProp(0);
     return {
