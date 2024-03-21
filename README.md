@@ -1,4 +1,4 @@
-# Mufasa
+# Mufasa (Monode's Fullstack Store)
 
 An easy way to connect your database to your UI. (AKA a strongly typed, local-first ORM)
 
@@ -6,9 +6,9 @@ Features:
 
 - Fully Reactive
 - Supports both documents and files
-- Changes can be made offline and will be synced later
+- Changes made offline will be synced later
 - Provides good defaults but is highly customizable
-- Should work with any front-end, back-end, or platform (only tested with Solid JS, Firebase, and Capacitor JS)
+- Should work with any front-end, back-end, or platform (only tested with Solid JS, Firebase, and Capacitor JS so far)
 
 ## Quick Start
 
@@ -20,25 +20,15 @@ Import and initialize Mufasa anywhere in your app.
 
 ```ts
 import { initializeMufasa } from "mufasa";
-import { solidSessionInterface } from "mufasa/solid-js";
-import { capacitorJsonPersister } from "mufasa/capacitor";
-import { firestoreDocPersister } from "mufasa/firebase";
+import { solidPersister } from "mufasa/solid-js";
+import { capacitorPersister } from "mufasa/capacitor";
+import { firebasePersister } from "mufasa/firebase";
 
-// Export "MfsDoc" so it can be used in other files too.
-export const { MfsDoc } = initializeMufasa({
-  getDefaultPersistersFromDocType: (docType) => {
-    const stagedName = `${import.meta.env.PROD ? `Prod` : `Dev`}_${docType}`;
-    return {
-      // Connect to front-end
-      sessionInterface: solidSessionInterface,
-      // Connect to local file system
-      localJsonPersister: capacitorJsonPersister(`${stagedName}.json`),
-      // Connect to database
-      globalDocPersister: firestoreDocPersister(
-        collection(firestore, stagedName),
-      ),
-    };
-  },
+export const mfs = initializeMufasa({
+  sessionPersister: solidPersister(),
+  // Device and cloud persisters are optional.
+  devicePersister: capacitorPersister(),
+  cloudPersister: firebasePersister(),
 });
 ```
 
@@ -49,7 +39,7 @@ Define your document types in any file.
 ```ts
 import { prop, list, formula } from "mufasa";
 
-export class Course extends MfsDoc(`Course`) {
+export class Course extends mfs.Doc(`Course`) {
   // Use `prop(TypeClass)` to specify a property that will be saved to the database
   name = prop(String);
 
@@ -66,7 +56,7 @@ export class Course extends MfsDoc(`Course`) {
   readonly students = list(Student);
 }
 
-export class Teacher extends MfsDoc(`Teacher`) {
+export class Teacher extends mfs.Doc(`Teacher`) {
   firstName = prop(String);
   lastName = prop(String);
   // Use formula to make reactive, read-only props
@@ -76,7 +66,7 @@ export class Teacher extends MfsDoc(`Teacher`) {
   readonly courses = list(Course, `teacher`);
 }
 
-export class Student extends MfsDoc(`Student`) {
+export class Student extends mfs.Doc(`Student`) {
   firstName = prop(String);
   lastName = prop(String);
   readonly fullName = formula(() => `${this.firstName} ${this.lastName}`);

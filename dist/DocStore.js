@@ -45,14 +45,15 @@ export function initDocStoreConfig(params) {
             workspaceId: params.workspaceId,
         }
         : undefined;
+    const directoryPath = isValid(persisterConfig)
+        ? `${persisterConfig.workspaceId}/${persisterConfig.docType}`
+        : undefined;
     return {
-        workspaceId: params.workspaceId,
-        docType: params.docType,
         sessionDocPersister: isValid(persisterConfig)
             ? sessionDocPersister(params.persistance.sessionConfig)
             : fakeSessionDocPersister,
-        localJsonPersister: isValid(params.persistance.getDevicePersister) && isValid(persisterConfig)
-            ? params.persistance.getDevicePersister(persisterConfig)
+        localJsonPersister: isValid(params.persistance.getDevicePersister) && isValid(directoryPath)
+            ? params.persistance.getDevicePersister(directoryPath)
             : fakeLocalJsonPersister,
         globalDocPersister: isValid(params.persistance.getCloudPersister) && isValid(persisterConfig)
             ? params.persistance.getCloudPersister(persisterConfig)
@@ -80,7 +81,6 @@ export function createDocStore(config) {
     });
     // Pick up any changes that still need pushed.
     localDocs.loadedFromLocalStorage.then(() => {
-        console.log(`${config.workspaceId} ${config.docType}: ${JSON.stringify(localDocs.data, null, 2)}`);
         config.sessionDocPersister.batchUpdate(Object.entries(localDocs.data.docs)
             .filter((_, v) => isValid(v))
             .reduce((result, [id, props]) => ({

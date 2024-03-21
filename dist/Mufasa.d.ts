@@ -24,7 +24,7 @@ export declare function initializeMufasa(mfsConfig: {
     stage?: string;
     getWorkspaceId?: () => string | null;
     sessionPersister: MosaApi;
-    devicePersister?: GetPersister<LocalJsonPersister>;
+    devicePersister?: (directoryPath: string) => LocalJsonPersister;
     cloudPersister?: GetPersister<GlobalDocPersister>;
 }): {
     readonly isUploadingToCloud: boolean;

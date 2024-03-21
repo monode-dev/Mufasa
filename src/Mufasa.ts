@@ -45,7 +45,7 @@ export function initializeMufasa(mfsConfig: {
   stage?: string;
   getWorkspaceId?: () => string | null;
   sessionPersister: MosaApi;
-  devicePersister?: GetPersister<LocalJsonPersister>;
+  devicePersister?: (directoryPath: string) => LocalJsonPersister;
   cloudPersister?: GetPersister<GlobalDocPersister>;
 }) {
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {

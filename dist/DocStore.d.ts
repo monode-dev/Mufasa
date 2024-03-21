@@ -85,7 +85,7 @@ export type PersisterSetup = {
 export type GetPersister<T> = (options: PersisterSetup) => T;
 export type PersistanceConfig = {
     sessionConfig: MosaApi;
-    getDevicePersister?: GetPersister<LocalJsonPersister>;
+    getDevicePersister?: (directoryPath: string) => LocalJsonPersister;
     getCloudPersister?: GetPersister<GlobalDocPersister>;
     trackUpload: () => void;
     untrackUpload: () => void;
@@ -93,8 +93,6 @@ export type PersistanceConfig = {
     onIncomingDelete?: (docId: string) => void;
 };
 export type DocStoreParams = {
-    workspaceId: string | null;
-    docType: string;
     sessionDocPersister: SessionDocPersister;
     localJsonPersister: LocalJsonPersister;
     globalDocPersister: GlobalDocPersister;

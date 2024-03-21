@@ -1,2 +1,4 @@
 import { mosaForSolid } from "@monode/mosa/solid-js";
-export const solidPersister = mosaForSolid;
+export function solidPersister() {
+    return mosaForSolid;
+}

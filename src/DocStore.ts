@@ -141,7 +141,7 @@ export type PersisterSetup = {
 export type GetPersister<T> = (options: PersisterSetup) => T;
 export type PersistanceConfig = {
   sessionConfig: MosaApi;
-  getDevicePersister?: GetPersister<LocalJsonPersister>;
+  getDevicePersister?: (directoryPath: string) => LocalJsonPersister;
   getCloudPersister?: GetPersister<GlobalDocPersister>;
   trackUpload: () => void;
   untrackUpload: () => void;
@@ -149,8 +149,6 @@ export type PersistanceConfig = {
   onIncomingDelete?: (docId: string) => void;
 };
 export type DocStoreParams = {
-  workspaceId: string | null;
-  docType: string;
   sessionDocPersister: SessionDocPersister;
   localJsonPersister: LocalJsonPersister;
   globalDocPersister: GlobalDocPersister;
@@ -172,15 +170,16 @@ export function initDocStoreConfig(params: {
         workspaceId: params.workspaceId,
       }
     : undefined;
+  const directoryPath = isValid(persisterConfig)
+    ? `${persisterConfig.workspaceId}/${persisterConfig.docType}`
+    : undefined;
   return {
-    workspaceId: params.workspaceId,
-    docType: params.docType,
     sessionDocPersister: isValid(persisterConfig)
       ? sessionDocPersister(params.persistance.sessionConfig)
       : fakeSessionDocPersister,
     localJsonPersister:
-      isValid(params.persistance.getDevicePersister) && isValid(persisterConfig)
-        ? params.persistance.getDevicePersister(persisterConfig)
+      isValid(params.persistance.getDevicePersister) && isValid(directoryPath)
+        ? params.persistance.getDevicePersister(directoryPath)
         : fakeLocalJsonPersister,
     globalDocPersister:
       isValid(params.persistance.getCloudPersister) && isValid(persisterConfig)
@@ -213,13 +212,6 @@ export function createDocStore(config: DocStoreParams) {
 
   // Pick up any changes that still need pushed.
   localDocs.loadedFromLocalStorage.then(() => {
-    console.log(
-      `${config.workspaceId} ${config.docType}: ${JSON.stringify(
-        localDocs.data,
-        null,
-        2,
-      )}`,
-    );
     config.sessionDocPersister.batchUpdate(
       Object.entries(localDocs.data.docs)
         .filter((_, v) => isValid(v))

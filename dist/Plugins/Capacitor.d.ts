@@ -1,2 +1,2 @@
-import { GetPersister, LocalJsonPersister, PersisterSetup } from "../DocStore.js";
-export declare function capacitorPersister(getDirectoryPath?: (setup: PersisterSetup) => string): GetPersister<LocalJsonPersister>;
+import { LocalJsonPersister } from "../DocStore.js";
+export declare function capacitorPersister(directoryPath: string): LocalJsonPersister;
