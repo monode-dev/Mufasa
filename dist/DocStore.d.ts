@@ -77,11 +77,12 @@ export type UploadEvents = {
     onFinishUploadBatch?: () => void;
 };
 export type DocStore = ReturnType<typeof createDocStore>;
-export type GetPersister<T> = (options: {
+export type PersisterSetup = {
     stage: string | null;
     workspaceId: string;
     docType: string;
-}) => T;
+};
+export type GetPersister<T> = (options: PersisterSetup) => T;
 export type PersistanceConfig = {
     sessionConfig: MosaApi;
     getDevicePersister?: GetPersister<LocalJsonPersister>;

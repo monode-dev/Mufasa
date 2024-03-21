@@ -132,25 +132,21 @@ export type UploadEvents = {
 // TODO: Support type unions.
 // TODO: Figure out how to ignore changes incoming server changes that have been overridden by more recent local changes.
 export type DocStore = ReturnType<typeof createDocStore>;
-export type GetPersister<T> = (options: {
+export type PersisterSetup = {
   stage: string | null;
   workspaceId: string;
   docType: string;
-  //version: number;
-}) => T;
+  // version: number;
+};
+export type GetPersister<T> = (options: PersisterSetup) => T;
 export type PersistanceConfig = {
   sessionConfig: MosaApi;
   getDevicePersister?: GetPersister<LocalJsonPersister>;
   getCloudPersister?: GetPersister<GlobalDocPersister>;
   trackUpload: () => void;
   untrackUpload: () => void;
-  // TODO: Maybe merge doc and file persisters.
-  // localFilePersister?: LocalFilePersister;
-  // globalFilePersister?: GlobalFilePersister;
-  // TODO: Maybe these should be part of cloud. `cloudPersister.start({ onIncomingCreate, onIncomingDelete })`
   onIncomingCreate?: (docId: string) => void;
   onIncomingDelete?: (docId: string) => void;
-  // TODO: Make isUploading part of the cloudPersister. `cloudPersister.start({ isUploading })`
 };
 export type DocStoreParams = {
   sessionDocPersister: SessionDocPersister;
@@ -158,8 +154,6 @@ export type DocStoreParams = {
   globalDocPersister: GlobalDocPersister;
   trackUpload: () => void;
   untrackUpload: () => void;
-  // localFilePersister: LocalFilePersister;
-  // globalFilePersister: GlobalFilePersister;
   onIncomingCreate: (docId: string) => void;
   onIncomingDelete: (docId: string) => void;
 };
