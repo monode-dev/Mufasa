@@ -44,7 +44,7 @@ export function capacitorPersister(
                 const saveIndexAtStart = saveIndex;
                 if (lastSaveIndex !== saveIndexAtStart) {
                   lastSaveIndex = saveIndexAtStart;
-                  await writeStringFile(filePath, JSON.stringify(data));
+                  await writeStringFile(filePath, JSON.stringify(data.value));
                 }
                 await new Promise((resolve) => setTimeout(resolve, 10));
               }
