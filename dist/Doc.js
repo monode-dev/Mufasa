@@ -16,7 +16,7 @@ export function initializeDocClass(config) {
     _trackUpload = config.defaultPersistanceConfig.trackUpload;
     _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
     return {
-        MfsDoc(docType, customizations) {
+        Doc(docType, customizations) {
             return Doc.customize({ docType, ...(customizations ?? {}) });
         },
         defaultPersistanceConfig: config.defaultPersistanceConfig,

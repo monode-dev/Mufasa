@@ -23,9 +23,7 @@ import { createPersistedFunction } from "./PersistedFunction.js";
 
 export function initializeSyncedFileClass() {
   return {
-    File(
-      ...params: Parameters<ReturnType<typeof initializeDocClass>[`MfsDoc`]>
-    ) {
+    File(...params: Parameters<ReturnType<typeof initializeDocClass>[`Doc`]>) {
       return File.customize({
         docType: params[0],
         ...(params[1] as PersistanceConfig),

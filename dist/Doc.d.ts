@@ -10,7 +10,7 @@ export declare function initializeDocClass(config: {
     getWorkspaceId: () => string | null;
     defaultPersistanceConfig: PersistanceConfig;
 }): {
-    MfsDoc(docType: string, customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>): typeof Doc;
+    Doc(docType: string, customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>): typeof Doc;
     defaultPersistanceConfig: PersistanceConfig;
 };
 export declare class Doc {

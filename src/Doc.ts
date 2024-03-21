@@ -39,7 +39,7 @@ export function initializeDocClass(config: {
   _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
 
   return {
-    MfsDoc(
+    Doc(
       docType: string,
       customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>,
     ) {
