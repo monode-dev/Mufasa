@@ -34,7 +34,7 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export function initializeMufasa<T extends {}>(mfsConfig: {
+export function initializeMufasa<T extends {} = {}>(mfsConfig: {
   stage?: string;
   // getWorkspaceId?: () => string | null;
   sessionPersister: Session.Persister;
@@ -76,7 +76,7 @@ export function initializeMufasa<T extends {}>(mfsConfig: {
         untrackUpload,
       },
     }),
-    ...cloudPersistance?.exports,
+    ...(cloudPersistance?.exports as T),
     ...initializeSyncedFileClass(),
     get isUploadingToCloud() {
       return isUploadingToCloud.value;
