@@ -36,7 +36,7 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  */
 export function initializeMufasa<T extends {}>(mfsConfig: {
   stage?: string;
-  getWorkspaceId?: () => string | null;
+  // getWorkspaceId?: () => string | null;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
   cloudPersister?: Cloud.Persister<T>;
@@ -67,7 +67,7 @@ export function initializeMufasa<T extends {}>(mfsConfig: {
   return {
     ...initializeDocClass({
       stage: mfsConfig.stage ?? `Dev`,
-      getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => null),
+      getWorkspaceId: () => workspaceId.value,
       defaultPersistanceConfig: {
         sessionPersister: mfsConfig.sessionPersister,
         devicePersister: mfsConfig.devicePersister,
@@ -76,7 +76,7 @@ export function initializeMufasa<T extends {}>(mfsConfig: {
         untrackUpload,
       },
     }),
-    ...cloudPersistance,
+    ...cloudPersistance?.exports,
     ...initializeSyncedFileClass(),
     get isUploadingToCloud() {
       return isUploadingToCloud.value;

@@ -6,16 +6,19 @@ import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredentia
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
     return ((config) => {
+        const user = initializeUser({
+            firestore: firebaseConfig.firestore,
+            firebaseFunctions: firebaseConfig.firebaseFunctions,
+            stage: config.stage,
+            sessionPersister: config.sessionPersister,
+            directoryPersister: config.directoryPersister ?? Device.mockDirectoryPersister,
+            authConfig: firebaseConfig.authConfig,
+        });
         return {
             exports: {
-                ...initializeUser({
-                    firestore: firebaseConfig.firestore,
-                    firebaseFunctions: firebaseConfig.firebaseFunctions,
-                    stage: config.stage,
-                    sessionPersister: config.sessionPersister,
-                    directoryPersister: config.directoryPersister ?? Device.mockDirectoryPersister,
-                    authConfig: firebaseConfig.authConfig,
-                }),
+                get user() {
+                    return user.value;
+                }
             },
             getWorkspacePersister: (setup) => workspacePersister({
                 collectionRef: collection(firebaseConfig.firestore, `${setup.stage}-Workspaces`, setup.workspaceId, setup.docType),

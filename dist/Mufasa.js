@@ -45,7 +45,7 @@ export function initializeMufasa(mfsConfig) {
     return {
         ...initializeDocClass({
             stage: mfsConfig.stage ?? `Dev`,
-            getWorkspaceId: mfsConfig.getWorkspaceId ?? (() => null),
+            getWorkspaceId: () => workspaceId.value,
             defaultPersistanceConfig: {
                 sessionPersister: mfsConfig.sessionPersister,
                 devicePersister: mfsConfig.devicePersister,
@@ -54,7 +54,7 @@ export function initializeMufasa(mfsConfig) {
                 untrackUpload,
             },
         }),
-        ...cloudPersistance,
+        ...cloudPersistance?.exports,
         ...initializeSyncedFileClass(),
         get isUploadingToCloud() {
             return isUploadingToCloud.value;
