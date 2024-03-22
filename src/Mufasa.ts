@@ -76,7 +76,7 @@ export function initializeMufasa<T extends {} = {}>(mfsConfig: {
         untrackUpload,
       },
     }),
-    ...(cloudPersistance?.exports as T),
+    exports: (cloudPersistance?.exports ?? {}) as T,
     ...initializeSyncedFileClass(),
     get isUploadingToCloud() {
       return isUploadingToCloud.value;
