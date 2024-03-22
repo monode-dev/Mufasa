@@ -205,7 +205,10 @@ function workspacePersister(
 // }
 
 // SECTION: Auth
-type AuthParams = Parameters<typeof firebaseAuthIntegration>[0];
+type AuthParams = Omit<
+  Parameters<typeof firebaseAuthIntegration>[0],
+  `onAuthStateChanged`
+>;
 export function firebaseAuthIntegration(config: {
   signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
   signOutFromPlatform: () => Promise<void>;
@@ -474,7 +477,12 @@ function initializeUser(config: {
   // SECTION: User
   return doNow(() => {
     const userInfo = useProp<undefined | null | UserInfo>(undefined);
-    const firebaseAuth = firebaseAuthIntegration(config.authConfig);
+    const firebaseAuth = firebaseAuthIntegration({
+      ...config.authConfig,
+      onAuthStateChanged: (user) => {
+        userInfo.value = user;
+      },
+    });
     const isSigningIn = useProp(false);
     const isSigningOut = useProp(false);
     // TODO: Force these to be single threaded.

@@ -298,7 +298,12 @@ function initializeUser(config) {
     // SECTION: User
     return doNow(() => {
         const userInfo = useProp(undefined);
-        const firebaseAuth = firebaseAuthIntegration(config.authConfig);
+        const firebaseAuth = firebaseAuthIntegration({
+            ...config.authConfig,
+            onAuthStateChanged: (user) => {
+                userInfo.value = user;
+            },
+        });
         const isSigningIn = useProp(false);
         const isSigningOut = useProp(false);
         // TODO: Force these to be single threaded.

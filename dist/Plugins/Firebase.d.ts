@@ -234,7 +234,7 @@ export declare function firebasePersister(firebaseConfig: {
         docType: string;
     }) => Cloud.WorkspacePersister;
 };
-type AuthParams = Parameters<typeof firebaseAuthIntegration>[0];
+type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthStateChanged`>;
 export declare function firebaseAuthIntegration(config: {
     signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
     signOutFromPlatform: () => Promise<void>;
