@@ -54,6 +54,7 @@ export function firebasePersister(firebaseConfig: {
       authConfig: firebaseConfig.authConfig,
     });
     return {
+      getWorkspaceId: () => user.value?.workspace?.id ?? null,
       exports: {
         get user() {
           return user.value;

@@ -13,7 +13,6 @@ export declare function firebasePersister(firebaseConfig: {
     authConfig: AuthParams;
 }): (config: {
     stage: string;
-    setWorkspaceId: (workspaceId: string) => void;
     sessionPersister: {
         readonly useRoot: <T>(func: () => T) => T;
         readonly useProp: <GetType, SetType = GetType>(initValue: GetType) => import("@monode/mosa").Prop<GetType, SetType>;
@@ -27,6 +26,7 @@ export declare function firebasePersister(firebaseConfig: {
     };
     directoryPersister?: Device.DirectoryPersister | undefined;
 }) => {
+    getWorkspaceId: () => string | null;
     exports: {
         readonly user: ({
             isPending: boolean;
@@ -103,9 +103,9 @@ export declare function firebasePersister(firebaseConfig: {
             readonly workspace: ({
                 readonly isPending: true;
             } & {
+                isNone?: undefined;
                 createWorkspace?: undefined;
                 joinWorkspace?: undefined;
-                isNone?: undefined;
             } & {
                 isCreating?: undefined;
             } & {
@@ -115,9 +115,9 @@ export declare function firebasePersister(firebaseConfig: {
             } & {
                 id?: undefined;
                 role?: undefined;
-                leaveWorkspace?: undefined;
                 haveJoined?: undefined;
                 createWorkspaceInvite?: undefined;
+                leaveWorkspace?: undefined;
             }) | ({
                 readonly isNone: true;
                 readonly createWorkspace: () => Promise<void>;
@@ -135,17 +135,17 @@ export declare function firebasePersister(firebaseConfig: {
             } & {
                 id?: undefined;
                 role?: undefined;
-                leaveWorkspace?: undefined;
                 haveJoined?: undefined;
                 createWorkspaceInvite?: undefined;
+                leaveWorkspace?: undefined;
             }) | ({
                 readonly isCreating: true;
             } & {
                 isPending?: undefined;
             } & {
+                isNone?: undefined;
                 createWorkspace?: undefined;
                 joinWorkspace?: undefined;
-                isNone?: undefined;
             } & {
                 isJoining?: undefined;
             } & {
@@ -153,17 +153,17 @@ export declare function firebasePersister(firebaseConfig: {
             } & {
                 id?: undefined;
                 role?: undefined;
-                leaveWorkspace?: undefined;
                 haveJoined?: undefined;
                 createWorkspaceInvite?: undefined;
+                leaveWorkspace?: undefined;
             }) | ({
                 readonly isJoining: true;
             } & {
                 isPending?: undefined;
             } & {
+                isNone?: undefined;
                 createWorkspace?: undefined;
                 joinWorkspace?: undefined;
-                isNone?: undefined;
             } & {
                 isCreating?: undefined;
             } & {
@@ -171,17 +171,17 @@ export declare function firebasePersister(firebaseConfig: {
             } & {
                 id?: undefined;
                 role?: undefined;
-                leaveWorkspace?: undefined;
                 haveJoined?: undefined;
                 createWorkspaceInvite?: undefined;
+                leaveWorkspace?: undefined;
             }) | ({
                 readonly isLeaving: true;
             } & {
                 isPending?: undefined;
             } & {
+                isNone?: undefined;
                 createWorkspace?: undefined;
                 joinWorkspace?: undefined;
-                isNone?: undefined;
             } & {
                 isCreating?: undefined;
             } & {
@@ -189,9 +189,9 @@ export declare function firebasePersister(firebaseConfig: {
             } & {
                 id?: undefined;
                 role?: undefined;
-                leaveWorkspace?: undefined;
                 haveJoined?: undefined;
                 createWorkspaceInvite?: undefined;
+                leaveWorkspace?: undefined;
             }) | ({
                 haveJoined: boolean;
                 id: string | null;
@@ -204,9 +204,9 @@ export declare function firebasePersister(firebaseConfig: {
             } & {
                 isPending?: undefined;
             } & {
+                isNone?: undefined;
                 createWorkspace?: undefined;
                 joinWorkspace?: undefined;
-                isNone?: undefined;
             } & {
                 isCreating?: undefined;
             } & {

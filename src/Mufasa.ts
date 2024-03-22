@@ -1,7 +1,7 @@
 import { initializeDocClass } from "./Doc.js";
 import { Session, Device, Cloud } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./FileStore.js";
-import { doNow } from "./Utils.js";
+import { doNow, isValid } from "./Utils.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
@@ -41,7 +41,6 @@ export function initializeMufasa<T extends {} = {}>(mfsConfig: {
   devicePersister?: Device.Persister;
   cloudPersister?: Cloud.Persister<T>;
 }) {
-  const workspaceId = mfsConfig.sessionPersister.useProp<null | string>(null);
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
     const uploadCount = mfsConfig.sessionPersister.useProp(0);
     return {
@@ -59,15 +58,16 @@ export function initializeMufasa<T extends {} = {}>(mfsConfig: {
   const cloudPersistance = mfsConfig.cloudPersister?.({
     stage: mfsConfig.stage ?? `Dev`,
     sessionPersister: mfsConfig.sessionPersister,
-    setWorkspaceId: (id) => {
-      workspaceId.value = id;
-    },
     directoryPersister: mfsConfig.devicePersister?.(`UserMetadata`),
   });
+  const getWorkspaceId = () =>
+    isValid(cloudPersistance)
+      ? cloudPersistance.getWorkspaceId()
+      : `default-workspace`;
   return {
     ...initializeDocClass({
       stage: mfsConfig.stage ?? `Dev`,
-      getWorkspaceId: () => workspaceId.value,
+      getWorkspaceId: getWorkspaceId,
       defaultPersistanceConfig: {
         sessionPersister: mfsConfig.sessionPersister,
         devicePersister: mfsConfig.devicePersister,
@@ -82,7 +82,7 @@ export function initializeMufasa<T extends {} = {}>(mfsConfig: {
       return isUploadingToCloud.value;
     },
     get workspaceId() {
-      return workspaceId.value;
+      return getWorkspaceId();
     },
   } as const;
 }

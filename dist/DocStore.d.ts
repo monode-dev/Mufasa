@@ -69,10 +69,10 @@ export declare namespace Device {
 export declare namespace Cloud {
     type Persister<T extends {}> = (config: {
         stage: string;
-        setWorkspaceId: (workspaceId: string) => void;
         sessionPersister: Session.Persister;
         directoryPersister?: Device.DirectoryPersister;
     }) => {
+        getWorkspaceId: () => string | null;
         getWorkspacePersister: GetWorkspacePersister;
         exports: T;
     };
