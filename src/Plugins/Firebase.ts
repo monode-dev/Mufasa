@@ -57,7 +57,7 @@ export function firebasePersister(firebaseConfig: {
       exports: {
         get user() {
           return user.value;
-        }
+        },
       },
       getWorkspacePersister: (setup) =>
         workspacePersister(
@@ -81,7 +81,7 @@ export function firebasePersister(firebaseConfig: {
   }) satisfies Cloud.Persister<any>;
 }
 
-function workspacePersister(
+export function workspacePersister(
   firestoreConfig: {
     collectionRef: CollectionReference;
     queryConstraints: QueryFilterConstraint[];

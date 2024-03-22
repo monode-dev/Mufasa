@@ -1,6 +1,6 @@
-import { CollectionReference, DocumentReference, Firestore } from "firebase/firestore";
+import { CollectionReference, QueryFilterConstraint, DocumentReference, Firestore } from "firebase/firestore";
 import { Cloud, Device } from "../DocStore.js";
-import { FirebaseStorage } from "firebase/storage";
+import { StorageReference, FirebaseStorage } from "firebase/storage";
 import { Auth } from "firebase/auth";
 import { UserInfo } from "../Auth.js";
 import { Functions } from "firebase/functions";
@@ -234,6 +234,10 @@ export declare function firebasePersister(firebaseConfig: {
         docType: string;
     }) => Cloud.WorkspacePersister;
 };
+export declare function workspacePersister(firestoreConfig: {
+    collectionRef: CollectionReference;
+    queryConstraints: QueryFilterConstraint[];
+}, getStorageRef: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
 type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthStateChanged`>;
 export declare function firebaseAuthIntegration(config: {
     signInToGoogleFromPlatform: () => Promise<string | undefined | null>;

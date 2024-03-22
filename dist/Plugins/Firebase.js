@@ -18,7 +18,7 @@ export function firebasePersister(firebaseConfig) {
             exports: {
                 get user() {
                     return user.value;
-                }
+                },
             },
             getWorkspacePersister: (setup) => workspacePersister({
                 collectionRef: collection(firebaseConfig.firestore, `${setup.stage}-Workspaces`, setup.workspaceId, setup.docType),
@@ -29,7 +29,7 @@ export function firebasePersister(firebaseConfig) {
         };
     });
 }
-function workspacePersister(firestoreConfig, getStorageRef) {
+export function workspacePersister(firestoreConfig, getStorageRef) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     const useServerTimestamp = serverTimestamp();
     return {
