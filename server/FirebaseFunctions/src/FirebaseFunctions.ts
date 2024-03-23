@@ -98,10 +98,13 @@ export function initializeMufasaFunctions({
       const user = await firestore
         .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
         .get();
-      const userIsAlreadyInOrg =
+      const userIsAlreadyInAWorkspace =
         user.exists && typeof user.data()?.workspaceId === `string`;
-      if (userIsAlreadyInOrg)
+      if (userIsAlreadyInAWorkspace) {
+        log("userIsAlreadyInAWorkspace", user.data());
+        log("userIsAlreadyInAWorkspace", request.data);
         throw new Error("Must leave workspace before you can join another.");
+      }
 
       // Validate invite
       const inviteDocRef = firestore.doc(
