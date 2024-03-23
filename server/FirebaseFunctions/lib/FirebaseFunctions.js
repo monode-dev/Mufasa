@@ -77,9 +77,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
                 .get();
             const userIsAlreadyInAWorkspace = user.exists && typeof ((_a = user.data()) === null || _a === void 0 ? void 0 : _a.workspaceId) === `string`;
             if (userIsAlreadyInAWorkspace) {
-                (0, logger_1.log)("userIsAlreadyInAWorkspace", user.data());
-                (0, logger_1.log)("userIsAlreadyInAWorkspace", request.data);
-                throw new Error("Must leave workspace before you can join another.");
+                throw new Error(`You must leave workspace before you can join another.: ${JSON.stringify(user.data(), null, 2)} - ${JSON.stringify(request.data, null, 2)}`);
             }
             // Validate invite
             const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${request.data.inviteCode.trim()}`);

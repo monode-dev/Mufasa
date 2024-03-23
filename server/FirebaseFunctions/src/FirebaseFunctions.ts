@@ -101,9 +101,13 @@ export function initializeMufasaFunctions({
       const userIsAlreadyInAWorkspace =
         user.exists && typeof user.data()?.workspaceId === `string`;
       if (userIsAlreadyInAWorkspace) {
-        log("userIsAlreadyInAWorkspace", user.data());
-        log("userIsAlreadyInAWorkspace", request.data);
-        throw new Error("Must leave workspace before you can join another.");
+        throw new Error(
+          `You must leave workspace before you can join another.: ${JSON.stringify(
+            user.data(),
+            null,
+            2,
+          )} - ${JSON.stringify(request.data, null, 2)}`,
+        );
       }
 
       // Validate invite
