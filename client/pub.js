@@ -49,7 +49,7 @@ try {
 
   // Commit the version change
   execSync(`git add .`);
-  execSync(`git commit -m "Publishing ${newVersion}"`);
+  execSync(`git commit -m "Publishing mufasa ${newVersion}"`);
   execSync(`git push`);
 } catch (err) {
   console.error("Error reading, updating, or publishing the package.", err);
