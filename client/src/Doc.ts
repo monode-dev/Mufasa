@@ -1,12 +1,9 @@
 import {
   PersistanceConfig,
-  DocStore,
   Persistance,
   PersistanceTaggedUpdateBatch,
   PrimVal,
   WritablePersistanceTaggedUpdateBatch,
-  createDocStore,
-  initDocStoreConfig,
 } from "./DocStore.js";
 import {
   Flagged,

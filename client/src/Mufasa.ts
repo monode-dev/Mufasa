@@ -1,6 +1,6 @@
 import { initializeDocClass } from "./Doc.js";
 import { Session, Device, Cloud } from "./DocStore.js";
-import { initializeSyncedFileClass } from "./FileStore.js";
+import { initializeSyncedFileClass } from "./File.js";
 import { doNow, isValid } from "./Utils.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
