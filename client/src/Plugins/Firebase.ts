@@ -183,6 +183,9 @@ export function workspacePersister(
     async deleteFile(fileId) {
       await deleteObject(getStorageRef(fileId));
     },
+    stopUploadsAndDownloads() {
+      // TODO: Implement
+    },
   };
 }
 

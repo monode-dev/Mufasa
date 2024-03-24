@@ -66,7 +66,9 @@ export function capacitorPersister() {
             readFile: (fileId) => readFile(getFilePath(fileId)),
             writeFile: (fileId, base64String) => writeStringFile(getFilePath(fileId), base64String),
             deleteFile: (fileId) => deleteFile(getFilePath(fileId)),
-            // localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
+            deleteAllData: async () => {
+                // TODO: Implement
+            },
         };
     };
 }

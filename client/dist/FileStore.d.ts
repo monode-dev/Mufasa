@@ -6,8 +6,8 @@ export declare function initializeSyncedFileClass(): {
         docStoreConfig?: Partial<PersistanceConfig> | undefined;
     }, "docType"> | undefined): typeof File;
 };
-export type FileStore = ReturnType<typeof _createFileStore>;
-declare function _createFileStore(config: DocStoreParams): {
+export type FileStore = ReturnType<typeof createFileStore>;
+export declare function createFileStore(config: DocStoreParams): {
     docStore: {
         readonly loadedFromLocalStorage: Promise<void>;
         readonly batchUpdate: (updates: {

@@ -46,6 +46,7 @@ export declare namespace Device {
         readFile: (fileId: string) => Promise<string | undefined>;
         writeFile: (fileId: string, base64String: string) => Promise<void>;
         deleteFile: (fileId: string) => Promise<void>;
+        deleteAllData: () => Promise<void>;
     };
     type JsonPersister = {
         readonly start: <T extends Json>(initValue: T) => Device.SavedJson<T>;
@@ -87,6 +88,7 @@ export declare namespace Cloud {
         uploadFile: (fileId: string, base64String: string) => Promise<void>;
         downloadFile: (fileId: string) => Promise<string | undefined>;
         deleteFile: (fileId: string) => Promise<void>;
+        stopUploadsAndDownloads: () => void;
     };
     const mockWorkspacePersister: Cloud.WorkspacePersister;
     type DocChange = {

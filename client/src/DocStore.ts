@@ -66,6 +66,7 @@ export namespace Device {
     readFile: (fileId: string) => Promise<string | undefined>;
     writeFile: (fileId: string, base64String: string) => Promise<void>;
     deleteFile: (fileId: string) => Promise<void>;
+    deleteAllData: () => Promise<void>;
   };
   export type JsonPersister = {
     readonly start: <T extends Json>(initValue: T) => Device.SavedJson<T>;
@@ -84,6 +85,7 @@ export namespace Device {
     readFile: async () => undefined,
     writeFile: async () => {},
     deleteFile: async () => {},
+    deleteAllData: async () => {},
   };
   export type SavedJson<T extends Json> = {
     readonly loadedFromLocalStorage: Promise<void>;
@@ -131,7 +133,7 @@ export namespace Cloud {
     uploadFile: (fileId: string, base64String: string) => Promise<void>;
     downloadFile: (fileId: string) => Promise<string | undefined>;
     deleteFile: (fileId: string) => Promise<void>;
-    // dispose: () => void;
+    stopUploadsAndDownloads: () => void;
   };
   export const mockWorkspacePersister: Cloud.WorkspacePersister = {
     start: () => {},
@@ -139,6 +141,7 @@ export namespace Cloud {
     uploadFile: async () => {},
     downloadFile: async () => undefined,
     deleteFile: async () => {},
+    stopUploadsAndDownloads: () => {},
   };
   export type DocChange = {
     docId: string;
@@ -184,7 +187,7 @@ export function initDocStoreConfig(params: {
   workspaceId: string | null;
   docType: string;
 }): DocStoreParams {
-  return {
+  const docStoreParams: DocStoreParams = {
     sessionTablePersister: isValid(params.workspaceId)
       ? sessionTablePersister(params.persistance.sessionPersister)
       : Session.mockTablePersister,
@@ -208,15 +211,16 @@ export function initDocStoreConfig(params: {
     onIncomingCreate: params.persistance.onIncomingCreate ?? (() => {}),
     onIncomingDelete: params.persistance.onIncomingDelete ?? (() => {}),
   };
+  // onWorkspaceDelete(params.workspaceId, () => {
+  //   docStoreParams.deviceDirectoryPersister.deleteAllData();
+  //   // TODO: Also prevent writes.
+  // });
+  // onWorkspaceDeactivation(params.workspaceId, () => {
+  //   docStoreParams.cloudWorkspacePersister.dispose();
+  // });
+  return docStoreParams;
 }
 export function createDocStore(config: DocStoreParams) {
-  // const config = {
-  //   sessionDocPersister: _config.getSessionDocPersister(_config),
-  //   localJsonPersister: _config.getLocalJsonPersister?.(_config),
-  //   globalDocPersister: _config.getGlobalDocPersister?.(_config),
-  //   onIncomingCreate: _config.onIncomingCreate,
-  //   onIncomingDelete: _config.onIncomingDelete,
-  // };
   const localJsonPersister =
     config.deviceDirectoryPersister ?? Device.mockDirectoryPersister;
   /** NOTE: Rather than break this up into sub systems we keep it all here so

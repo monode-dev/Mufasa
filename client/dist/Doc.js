@@ -1,5 +1,6 @@
-import { Persistance, createDocStore, initDocStoreConfig, } from "./DocStore.js";
+import { Persistance, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
+import { getDocStore } from "./Workspace.js";
 let _getStage = () => `Dev`;
 export const getStage = () => _getStage();
 let _getWorkspaceId = () => null;
@@ -96,7 +97,6 @@ getDocId) {
 }
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
-const docStores = new Map();
 export class Doc {
     // private constructor() {}
     /*** NOTE: This can be overridden to manually specify a type name. */
@@ -109,29 +109,23 @@ export class Doc {
     static getDocStoreConfig() {
         return defaultPersistanceConfig;
     }
+    static ensureSyncHasStarted() {
+        this._docStore;
+    }
     static get _docStore() {
-        const stage = getStage();
-        const workspaceId = getWorkspaceId();
-        if (!docStores.has(workspaceId))
-            docStores.set(workspaceId, new Map());
-        const workspaceStore = docStores.get(workspaceId);
-        if (!workspaceStore.has(this.docType)) {
-            workspaceStore.set(this.docType, createDocStore(initDocStoreConfig({
-                persistance: this.getDocStoreConfig(),
-                stage: stage,
-                workspaceId: workspaceId,
-                docType: this.docType,
-            })));
-            /** Docs don't start syncing until they are accessed the first time. So as soon as
-             * the first one is accessed we start syncing all the connected doc types too. */
-            const uninitializedInst = new this();
-            Object.values(uninitializedInst).forEach((prop) => {
-                if (isCustomProp(prop)) {
-                    prop.otherDocsToStartSyncing.forEach((docClass) => docClass._docStore);
-                }
-            });
-        }
-        return workspaceStore.get(this.docType);
+        return getDocStore({
+            stage: getStage(),
+            workspaceId: getWorkspaceId(),
+            docType: this.docType,
+            getStoreConfig: () => {
+                /** Docs don't start syncing until they are accessed the first time. So as soon as
+                 * the first one is accessed we start syncing all the connected doc types too. */
+                const customProps = Object.values(new this()).filter(isCustomProp);
+                const otherDocsToStartSyncing = new Set(customProps.flatMap((prop) => prop.otherDocsToStartSyncing));
+                otherDocsToStartSyncing.forEach((docClass) => docClass.ensureSyncHasStarted());
+                return this.getDocStoreConfig();
+            },
+        });
     }
     get _docStore() {
         return this.constructor._docStore;

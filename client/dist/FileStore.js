@@ -1,8 +1,9 @@
 import { prop, getWorkspaceId, Doc, getStage, trackUpload, untrackUpload, } from "./Doc.js";
-import { Persistance, createDocStore, initDocStoreConfig, } from "./DocStore.js";
+import { Persistance, createDocStore, } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
+import { getFileStore } from "./Workspace.js";
 export function initializeSyncedFileClass() {
     return {
         File(...params) {
@@ -13,23 +14,7 @@ export function initializeSyncedFileClass() {
         },
     };
 }
-const fileStores = new Map();
-function getFileStore(params) {
-    if (!fileStores.has(params.workspaceId)) {
-        fileStores.set(params.workspaceId, new Map());
-    }
-    const workspaceFileStores = fileStores.get(params.workspaceId);
-    if (!workspaceFileStores.has(params.docType)) {
-        workspaceFileStores.set(params.docType, _createFileStore(initDocStoreConfig({
-            stage: params.stage,
-            workspaceId: params.workspaceId,
-            docType: params.docType,
-            persistance: params.defaultConfig,
-        })));
-    }
-    return workspaceFileStores.get(params.docType);
-}
-function _createFileStore(config) {
+export function createFileStore(config) {
     const pullCreate = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pullCreate`), async (fileId) => {
         const fileData = await config.cloudWorkspacePersister.downloadFile(fileId);
         if (!isValid(fileData))
@@ -114,7 +99,7 @@ class File extends Doc {
             stage: getStage(),
             workspaceId: getWorkspaceId(),
             docType: this.docType,
-            defaultConfig: this.getDocStoreConfig(),
+            getStoreConfig: this.getDocStoreConfig,
         });
     }
     get _fileStore() {

@@ -96,6 +96,9 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
         async deleteFile(fileId) {
             await deleteObject(getStorageRef(fileId));
         },
+        stopUploadsAndDownloads() {
+            // TODO: Implement
+        },
     };
 }
 export function firebaseAuthIntegration(config) {

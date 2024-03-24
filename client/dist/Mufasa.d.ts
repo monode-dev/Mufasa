@@ -419,6 +419,7 @@ export declare function initializeMufasa<T extends {} = {}>(mfsConfig: {
         }>;
         readonly docType: string;
         getDocStoreConfig<This extends typeof import("./Doc.js").Doc>(this: This): import("./DocStore.js").PersistanceConfig;
+        ensureSyncHasStarted(): void;
         customize<This_1 extends typeof import("./Doc.js").Doc>(this: This_1, customizations: {
             docType?: string | undefined;
             docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;

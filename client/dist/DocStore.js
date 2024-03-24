@@ -36,6 +36,7 @@ export var Device;
         readFile: async () => undefined,
         writeFile: async () => { },
         deleteFile: async () => { },
+        deleteAllData: async () => { },
     };
 })(Device || (Device = {}));
 // SECTION: Global Doc Persister Types
@@ -48,10 +49,11 @@ export var Cloud;
         uploadFile: async () => { },
         downloadFile: async () => undefined,
         deleteFile: async () => { },
+        stopUploadsAndDownloads: () => { },
     };
 })(Cloud || (Cloud = {}));
 export function initDocStoreConfig(params) {
-    return {
+    const docStoreParams = {
         sessionTablePersister: isValid(params.workspaceId)
             ? sessionTablePersister(params.persistance.sessionPersister)
             : Session.mockTablePersister,
@@ -71,15 +73,16 @@ export function initDocStoreConfig(params) {
         onIncomingCreate: params.persistance.onIncomingCreate ?? (() => { }),
         onIncomingDelete: params.persistance.onIncomingDelete ?? (() => { }),
     };
+    // onWorkspaceDelete(params.workspaceId, () => {
+    //   docStoreParams.deviceDirectoryPersister.deleteAllData();
+    //   // TODO: Also prevent writes.
+    // });
+    // onWorkspaceDeactivation(params.workspaceId, () => {
+    //   docStoreParams.cloudWorkspacePersister.dispose();
+    // });
+    return docStoreParams;
 }
 export function createDocStore(config) {
-    // const config = {
-    //   sessionDocPersister: _config.getSessionDocPersister(_config),
-    //   localJsonPersister: _config.getLocalJsonPersister?.(_config),
-    //   globalDocPersister: _config.getGlobalDocPersister?.(_config),
-    //   onIncomingCreate: _config.onIncomingCreate,
-    //   onIncomingDelete: _config.onIncomingDelete,
-    // };
     const localJsonPersister = config.deviceDirectoryPersister ?? Device.mockDirectoryPersister;
     /** NOTE: Rather than break this up into sub systems we keep it all here so
      * that there is no need to join stuff on save, and when loading we only need

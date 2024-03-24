@@ -76,7 +76,9 @@ export function capacitorPersister(): Device.Persister {
       writeFile: (fileId, base64String) =>
         writeStringFile(getFilePath(fileId), base64String),
       deleteFile: (fileId) => deleteFile(getFilePath(fileId)),
-      // localJsonPersister: capacitorJsonPersister(`${directoryPath}.json`),
+      deleteAllData: async () => {
+        // TODO: Implement
+      },
     };
   };
 }

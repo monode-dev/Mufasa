@@ -18,6 +18,7 @@ export declare class Doc {
     static get docType(): string;
     get docType(): string;
     static getDocStoreConfig<This extends typeof Doc>(this: This): PersistanceConfig;
+    static ensureSyncHasStarted(): void;
     static get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
         readonly batchUpdate: (updates: {
