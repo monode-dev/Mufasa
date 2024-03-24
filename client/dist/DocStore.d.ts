@@ -1,4 +1,5 @@
 import type { MosaApi } from "@monode/mosa";
+import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
 export declare const DELETED_KEY = "mx_deleted";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
 export declare const Persistance: {
@@ -68,14 +69,9 @@ export declare namespace Device {
     } : T;
 }
 export declare namespace Cloud {
-    type Persister<T extends {}> = (config: {
-        stage: string;
-        sessionPersister: Session.Persister;
-        directoryPersister?: Device.DirectoryPersister;
-    }) => {
-        getWorkspaceId: () => string | null;
+    type Persister<T extends SignInFuncs> = {
+        getCloudAuth: GetCloudAuth<T>;
         getWorkspacePersister: GetWorkspacePersister;
-        exports: T;
     };
     type GetWorkspacePersister = (options: {
         stage: string | null;

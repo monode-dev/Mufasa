@@ -1,7 +1,13 @@
-import { DocStore, PersistanceConfig } from "./DocStore.js";
+import { Device, DocStore, PersistanceConfig, Session } from "./DocStore.js";
 import { FileStore } from "./FileStore.js";
+import { ReadonlyProp } from "@monode/mosa";
+export type UserInfo = {
+    uid: string;
+    email: string | null;
+};
 export type WorkspaceIntegration = {
     onUserMetadata: (handle: (metadata: UserMetadata | null) => void) => () => void;
+    generateInviteCode: () => Promise<string>;
     createWorkspace: (params: {
         stage: string;
     }) => Promise<void>;
@@ -22,6 +28,150 @@ export type UserMetadata = {
     workspaceId: string | null;
     role: `member` | `owner` | null;
 };
+export type GetCloudAuth<T extends SignInFuncs> = (config: {
+    onAuthStateChanged: (user: UserInfo | null) => void;
+}) => CloudAuth<T>;
+export type CloudAuth<T extends SignInFuncs> = {
+    signInFuncs: T;
+    signOut: () => Promise<void>;
+    workspaceIntegration: WorkspaceIntegration;
+};
+export type SignInFuncs = {
+    [key: string]: () => Promise<void>;
+};
+export declare function initializeAuth<T extends SignInFuncs>(config: {
+    stage: string;
+    sessionPersister: Session.Persister;
+    directoryPersister: Device.DirectoryPersister;
+    getCloudAuth: GetCloudAuth<T>;
+}): ReadonlyProp<({
+    isSignedOut: true;
+} & T) | {
+    isPending: boolean;
+} | {
+    isSigningIn: boolean;
+} | {
+    isSigningOut: boolean;
+} | {
+    uid: string;
+    email: string | null;
+    isSignedIn: boolean;
+    readonly workspace: ({
+        readonly isPending: true;
+    } & {
+        isNone?: undefined;
+        createWorkspace?: undefined;
+        joinWorkspace?: undefined;
+    } & {
+        isCreating?: undefined;
+    } & {
+        isJoining?: undefined;
+    } & {
+        isLeaving?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        haveJoined?: undefined;
+        createWorkspaceInvite?: undefined;
+        leaveWorkspace?: undefined;
+    }) | ({
+        readonly isNone: true;
+        readonly createWorkspace: () => Promise<void>;
+        readonly joinWorkspace: (props: {
+            inviteCode: string;
+        }) => Promise<void>;
+    } & {
+        isPending?: undefined;
+    } & {
+        isCreating?: undefined;
+    } & {
+        isJoining?: undefined;
+    } & {
+        isLeaving?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        haveJoined?: undefined;
+        createWorkspaceInvite?: undefined;
+        leaveWorkspace?: undefined;
+    }) | ({
+        readonly isCreating: true;
+    } & {
+        isPending?: undefined;
+    } & {
+        isNone?: undefined;
+        createWorkspace?: undefined;
+        joinWorkspace?: undefined;
+    } & {
+        isJoining?: undefined;
+    } & {
+        isLeaving?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        haveJoined?: undefined;
+        createWorkspaceInvite?: undefined;
+        leaveWorkspace?: undefined;
+    }) | ({
+        readonly isJoining: true;
+    } & {
+        isPending?: undefined;
+    } & {
+        isNone?: undefined;
+        createWorkspace?: undefined;
+        joinWorkspace?: undefined;
+    } & {
+        isCreating?: undefined;
+    } & {
+        isLeaving?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        haveJoined?: undefined;
+        createWorkspaceInvite?: undefined;
+        leaveWorkspace?: undefined;
+    }) | ({
+        readonly isLeaving: true;
+    } & {
+        isPending?: undefined;
+    } & {
+        isNone?: undefined;
+        createWorkspace?: undefined;
+        joinWorkspace?: undefined;
+    } & {
+        isCreating?: undefined;
+    } & {
+        isJoining?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        haveJoined?: undefined;
+        createWorkspaceInvite?: undefined;
+        leaveWorkspace?: undefined;
+    }) | ({
+        haveJoined: boolean;
+        id: string | null;
+        role: "member" | "owner" | null;
+        createWorkspaceInvite(): Promise<{
+            inviteCode: string;
+            validForDays: number;
+        } | undefined>;
+        leaveWorkspace(): Promise<void>;
+    } & {
+        isPending?: undefined;
+    } & {
+        isNone?: undefined;
+        createWorkspace?: undefined;
+        joinWorkspace?: undefined;
+    } & {
+        isCreating?: undefined;
+    } & {
+        isJoining?: undefined;
+    } & {
+        isLeaving?: undefined;
+    });
+    signOut: () => Promise<void>;
+}>;
 export declare function getDocStore(params: {
     stage: string;
     workspaceId: string | null;

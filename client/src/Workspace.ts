@@ -8,11 +8,18 @@ import {
   createDocStore,
 } from "./DocStore.js";
 import { FileStore, createFileStore } from "./FileStore.js";
+import { ReadonlyProp } from "@monode/mosa";
 
+// SECTION: Types
+export type UserInfo = {
+  uid: string;
+  email: string | null;
+};
 export type WorkspaceIntegration = {
   onUserMetadata: (
     handle: (metadata: UserMetadata | null) => void,
   ) => () => void;
+  generateInviteCode: () => Promise<string>;
   createWorkspace: (params: { stage: string }) => Promise<void>;
   createWorkspaceInterface: (params: {
     inviteCode: string;
@@ -31,6 +38,248 @@ export type UserMetadata = {
   role: `member` | `owner` | null;
 };
 
+// SECTION: Cloud Auth
+export type GetCloudAuth<T extends SignInFuncs> = (config: {
+  onAuthStateChanged: (user: UserInfo | null) => void;
+}) => CloudAuth<T>;
+export type CloudAuth<T extends SignInFuncs> = {
+  signInFuncs: T;
+  signOut: () => Promise<void>;
+  workspaceIntegration: WorkspaceIntegration;
+};
+export type SignInFuncs = {
+  [key: string]: () => Promise<void>;
+};
+export function initializeAuth<T extends SignInFuncs>(config: {
+  stage: string;
+  sessionPersister: Session.Persister;
+  directoryPersister: Device.DirectoryPersister;
+  getCloudAuth: GetCloudAuth<T>;
+}) {
+  const { useProp, useFormula, doNow, exists, onDispose } =
+    config.sessionPersister;
+  function createWorkspaceInterface(
+    userId: string,
+    workspaceIntegration: WorkspaceIntegration,
+    onDispose: (dispose: () => void) => void,
+  ) {
+    const isCreatingWorkspace = useProp(false);
+    const isJoiningWorkspace = useProp(false);
+    const isLeavingWorkspace = useProp(false);
+    // const isDeletingWorkspace = useProp(false);
+
+    type PendingAsJson = typeof PendingAsJson;
+    const PendingAsJson = null;
+    type NoneAsJson = typeof NoneAsJson;
+    const NoneAsJson = 0;
+    const userMetadata = doNow(() => {
+      type SavedUserMetadata = PendingAsJson | NoneAsJson | UserMetadata;
+      const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
+      const savedMetadata = config.directoryPersister
+        .jsonFile(`${userId}.json`)
+        .start(PendingAsJson as SavedUserMetadata);
+      savedMetadata.loadedFromLocalStorage.then(() => {
+        userMetadata.value = savedMetadata.data;
+      });
+      const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
+        (newMetadata) => {
+          savedMetadata.batchUpdate((data) => {
+            const newMetadataValue =
+              exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
+                ? {
+                    workspaceId: newMetadata.workspaceId,
+                    role: newMetadata.role,
+                  }
+                : NoneAsJson;
+            data.value = newMetadataValue;
+            userMetadata.value = newMetadataValue;
+          });
+        },
+      );
+      onDispose(disposeOnSnapshot);
+      return userMetadata as ReadonlyProp<SavedUserMetadata>;
+    });
+
+    const WorkspaceStates = {
+      pending: {
+        isPending: true,
+      },
+      none: {
+        isNone: true,
+        async createWorkspace() {
+          isCreatingWorkspace.value = true;
+          await workspaceIntegration.createWorkspace({
+            stage: config.stage,
+          });
+          isCreatingWorkspace.value = false;
+        },
+        async joinWorkspace(props: { inviteCode: string }) {
+          isJoiningWorkspace.value = true;
+          await workspaceIntegration.joinWorkspace({
+            inviteCode: props.inviteCode,
+            stage: config.stage,
+          });
+          isJoiningWorkspace.value = false;
+        },
+      },
+      creating: {
+        isCreating: true,
+      },
+      joining: {
+        isJoining: true,
+      },
+      createJoinedInst(userMetadata: UserMetadata) {
+        return {
+          haveJoined: true,
+          id: userMetadata.workspaceId,
+          role: userMetadata.role,
+          async createWorkspaceInvite() {
+            if (userMetadata.role !== `owner`) {
+              console.error(
+                `Attempted to create a workspace invite without permission.`,
+              );
+              return;
+            }
+            if (userMetadata.workspaceId === null) {
+              console.error(
+                `Attempted to create a workspace invite without a workspace.`,
+              );
+              return;
+            }
+            const validForDays = 14;
+            const inviteCode = await workspaceIntegration.generateInviteCode();
+            await workspaceIntegration.createWorkspaceInterface({
+              inviteCode,
+              workspaceId: userMetadata.workspaceId,
+              validForDays,
+            });
+            return { inviteCode, validForDays };
+          },
+          async leaveWorkspace() {
+            isLeavingWorkspace.value = true;
+            await workspaceIntegration.leaveWorkspace({
+              stage: config.stage,
+            });
+            isLeavingWorkspace.value = false;
+          },
+          // async deleteWorkspace() {
+          //   isLeavingWorkspace.value = true;
+          //   await workspaceIntegration.deleteWorkspace();
+          //   isLeavingWorkspace.value = false;
+          // },
+        };
+      },
+      leaving: {
+        isLeaving: true,
+      },
+      // deleting: {
+      //   isDeleting: true,
+      // },
+    } as const;
+
+    return useFormula(() => {
+      console.log(`userMetadata.value`, userMetadata.value);
+      return userMetadata.value === PendingAsJson
+        ? WorkspaceStates.pending
+        : userMetadata.value === NoneAsJson
+        ? isCreatingWorkspace.value
+          ? WorkspaceStates.creating
+          : isJoiningWorkspace.value
+          ? WorkspaceStates.joining
+          : WorkspaceStates.none
+        : isLeavingWorkspace.value
+        ? WorkspaceStates.leaving
+        : WorkspaceStates.createJoinedInst(userMetadata.value);
+    });
+  }
+
+  // SECTION: User
+  return doNow(() => {
+    const userInfo = useProp<undefined | null | UserInfo>(undefined);
+    const cloudAuth = config.getCloudAuth({
+      onAuthStateChanged: (user) => (userInfo.value = user),
+    });
+    const isSigningIn = useProp(false);
+    const isSigningOut = useProp(false);
+    async function signOut() {
+      isSigningOut.value = true;
+      await cloudAuth.signOut();
+      isSigningOut.value = false;
+    }
+    const UserStates = {
+      pending: {
+        isPending: true,
+      },
+      signedOut: doNow(() => {
+        const signedOut = { isSignedOut: true } as {
+          isSignedOut: true;
+        } & T;
+        // TODO: Force these to be single threaded.
+        Object.keys(cloudAuth.signInFuncs).forEach((key) => {
+          (signedOut as any)[key] = async () => {
+            isSigningIn.value = true;
+            await cloudAuth.signInFuncs[key]();
+            isSigningIn.value = false;
+          };
+        });
+        return signedOut;
+      }),
+      signingIn: {
+        isSigningIn: true,
+      },
+      createAwaitingVerificationInst(userInfo: UserInfo) {
+        return {
+          isAwaitingVerification: true,
+          get email() {
+            return userInfo.email ?? null;
+          },
+          signOut,
+        };
+      },
+      // TODO: Maybe swap out the whole object when the user changes.
+      createSignedInInst(
+        userInfo: UserInfo,
+        onDispose: (dispose: () => void) => void,
+      ) {
+        const workspace = createWorkspaceInterface(
+          userInfo.uid,
+          cloudAuth.workspaceIntegration,
+          onDispose,
+        );
+        return {
+          uid: userInfo.uid,
+          email: userInfo.email,
+          isSignedIn: true,
+          // TODO: Leaving a workspace is not updating this.
+          // TODO: Maybe use a query to watch this value.
+          get workspace() {
+            return workspace.value;
+          },
+          signOut,
+        };
+      },
+      signingOut: {
+        isSigningOut: true,
+      },
+    };
+
+    return useFormula(
+      () =>
+        userInfo.value === undefined
+          ? UserStates.pending
+          : userInfo.value === null
+          ? isSigningIn.value
+            ? UserStates.signingIn
+            : UserStates.signedOut
+          : isSigningOut.value
+          ? UserStates.signingOut
+          : UserStates.createSignedInInst(userInfo.value, onDispose),
+      // createAwaitingVerificationInst,
+    );
+  });
+}
+
+// SECTION: Workspace Instances
 const workspaceInsts = new Map<string | null, WorkspaceInst>();
 function getWorkspaceInst(params: {
   stage: string;

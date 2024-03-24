@@ -3,6 +3,7 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionTablePersister } from "./SessionTablePersister.js";
 import type { MosaApi } from "@monode/mosa";
+import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
 
 export const DELETED_KEY = `mx_deleted`;
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
@@ -109,14 +110,9 @@ export namespace Device {
 // SECTION: Global Doc Persister Types
 // TODO: Maybe persisters should probably follow the format: { start: (...props) => { onLoaded, data, batchUpdate} }
 export namespace Cloud {
-  export type Persister<T extends {}> = (config: {
-    stage: string;
-    sessionPersister: Session.Persister;
-    directoryPersister?: Device.DirectoryPersister;
-  }) => {
-    getWorkspaceId: () => string | null;
+  export type Persister<T extends SignInFuncs> = {
+    getCloudAuth: GetCloudAuth<T>;
     getWorkspacePersister: GetWorkspacePersister;
-    exports: T;
   };
   export type GetWorkspacePersister = (options: {
     stage: string | null;

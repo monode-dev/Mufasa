@@ -1,6 +1,8 @@
 import { initializeDocClass } from "./Doc.js";
+import { Device } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./File.js";
-import { doNow, isValid } from "./Utils.js";
+import { doNow } from "./Utils.js";
+import { initializeAuth } from "./Workspace.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
@@ -21,6 +23,7 @@ export { Cloud, Device, Session, DELETED_KEY, Persistance, } from "./DocStore.js
  * ```
  */
 export function initializeMufasa(mfsConfig) {
+    const stage = mfsConfig.stage ?? `Dev`;
     const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
         const uploadCount = mfsConfig.sessionPersister.useProp(0);
         return {
@@ -33,27 +36,31 @@ export function initializeMufasa(mfsConfig) {
             isUploadingToCloud: mfsConfig.sessionPersister.useFormula(() => uploadCount.value > 0),
         };
     });
-    const cloudPersistance = mfsConfig.cloudPersister?.({
-        stage: mfsConfig.stage ?? `Dev`,
+    const user = initializeAuth({
+        stage: stage,
         sessionPersister: mfsConfig.sessionPersister,
-        directoryPersister: mfsConfig.devicePersister?.(`UserMetadata`),
+        directoryPersister: mfsConfig.devicePersister?.(`Auth`) ?? Device.mockDirectoryPersister,
+        getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
     });
-    const getWorkspaceId = () => isValid(cloudPersistance)
-        ? cloudPersistance.getWorkspaceId()
-        : `default-workspace`;
+    // TODO: This should be inferred.
+    const getWorkspaceId = () => `workspace` in user.value && `id` in user.value.workspace
+        ? user.value.workspace.id ?? null
+        : null;
     return {
         ...initializeDocClass({
-            stage: mfsConfig.stage ?? `Dev`,
+            stage: stage,
             getWorkspaceId: getWorkspaceId,
             defaultPersistanceConfig: {
                 sessionPersister: mfsConfig.sessionPersister,
                 devicePersister: mfsConfig.devicePersister,
-                getWorkspacePersister: cloudPersistance?.getWorkspacePersister,
+                getWorkspacePersister: mfsConfig.cloudPersister.getWorkspacePersister,
                 trackUpload,
                 untrackUpload,
             },
         }),
-        exports: (cloudPersistance?.exports ?? {}),
+        get user() {
+            return user.value;
+        },
         ...initializeSyncedFileClass(),
         get isUploadingToCloud() {
             return isUploadingToCloud.value;
