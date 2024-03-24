@@ -31,52 +31,6 @@ export type UserMetadata = {
   role: `member` | `owner` | null;
 };
 
-export function initializeWorkspaceInstManager(config: {
-  sessionPersister: Session.Persister;
-  jsonFile: Device.JsonPersister;
-}) {
-  const instIdMap = config.jsonFile.start(
-    {} as {
-      [workspaceId: string]: string;
-    },
-  );
-  const docStores = new Map<string | null, Map<string, DocStore>>();
-  const fileStores = new Map<string | null, Map<string, FileStore>>();
-  return {
-    registerWorkspace(workspaceId: string): string {
-      const instId = uuidv4();
-      instIdMap.batchUpdate((data) => {
-        data.value[workspaceId] = instId;
-      });
-      docStores.set(instId, new Map());
-      fileStores.set(instId, new Map());
-      return instId;
-    },
-    getWorkspaceInstId(workspaceId: string | null): string | null {
-      if (workspaceId === null) return null;
-      return instIdMap.data[workspaceId] ?? null;
-    },
-    getDocStore(params: {
-      workspaceId: string | null;
-      docType: string;
-      createDocStore: () => DocStore;
-    }): DocStore | null {
-      const instId = this.getWorkspaceInstId(params.workspaceId);
-      if (instId === null) return null;
-      if (!docStores.get(instId)!.has(params.docType)) {
-        docStores.get(instId)!.set(params.docType, params.createDocStore());
-      }
-      return docStores.get(instId)!.get(params.docType)!;
-    },
-
-    ejectWorkspace(workspaceId: string) {
-      instIdMap.batchUpdate((data) => {
-        delete data.value[workspaceId];
-      });
-    },
-  };
-}
-
 const workspaceInsts = new Map<string | null, WorkspaceInst>();
 function getWorkspaceInst(params: {
   stage: string;
@@ -164,3 +118,49 @@ function createWorkspaceInst(workspaceConfig: {
     },
   };
 }
+
+// export function initializeWorkspaceInstManager(config: {
+//   sessionPersister: Session.Persister;
+//   jsonFile: Device.JsonPersister;
+// }) {
+//   const instIdMap = config.jsonFile.start(
+//     {} as {
+//       [workspaceId: string]: string;
+//     },
+//   );
+//   const docStores = new Map<string | null, Map<string, DocStore>>();
+//   const fileStores = new Map<string | null, Map<string, FileStore>>();
+//   return {
+//     registerWorkspace(workspaceId: string): string {
+//       const instId = uuidv4();
+//       instIdMap.batchUpdate((data) => {
+//         data.value[workspaceId] = instId;
+//       });
+//       docStores.set(instId, new Map());
+//       fileStores.set(instId, new Map());
+//       return instId;
+//     },
+//     getWorkspaceInstId(workspaceId: string | null): string | null {
+//       if (workspaceId === null) return null;
+//       return instIdMap.data[workspaceId] ?? null;
+//     },
+//     getDocStore(params: {
+//       workspaceId: string | null;
+//       docType: string;
+//       createDocStore: () => DocStore;
+//     }): DocStore | null {
+//       const instId = this.getWorkspaceInstId(params.workspaceId);
+//       if (instId === null) return null;
+//       if (!docStores.get(instId)!.has(params.docType)) {
+//         docStores.get(instId)!.set(params.docType, params.createDocStore());
+//       }
+//       return docStores.get(instId)!.get(params.docType)!;
+//     },
+
+//     ejectWorkspace(workspaceId: string) {
+//       instIdMap.batchUpdate((data) => {
+//         delete data.value[workspaceId];
+//       });
+//     },
+//   };
+// }
