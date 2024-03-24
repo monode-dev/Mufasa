@@ -92,22 +92,18 @@ export function getDocStore(params: {
   workspaceId: string | null;
   docType: string;
   getStoreConfig: () => PersistanceConfig;
+  onStoreInit?: (store: DocStore) => void;
 }): DocStore {
-  return getWorkspaceInst(params).getDocStore(
-    params.docType,
-    params.getStoreConfig,
-  );
+  return getWorkspaceInst(params).getDocStore(params);
 }
 export function getFileStore(params: {
   stage: string;
   workspaceId: string | null;
   docType: string;
   getStoreConfig: () => PersistanceConfig;
+  onStoreInit?: (store: FileStore) => void;
 }): FileStore {
-  return getWorkspaceInst(params).getFileStore(
-    params.docType,
-    params.getStoreConfig,
-  );
+  return getWorkspaceInst(params).getFileStore(params);
 }
 
 type WorkspaceInst = ReturnType<typeof createWorkspaceInst>;
@@ -124,43 +120,47 @@ function createWorkspaceInst(workspaceConfig: {
     get workspaceId() {
       return workspaceConfig.workspaceId;
     },
-    getDocStore(
-      docType: string,
-      getStoreConfig: () => PersistanceConfig,
-    ): DocStore {
-      if (!docStores.has(docType)) {
+    getDocStore(params: {
+      docType: string;
+      getStoreConfig: () => PersistanceConfig;
+      onStoreInit?: (store: DocStore) => void;
+    }): DocStore {
+      if (!docStores.has(params.docType)) {
         docStores.set(
-          docType,
+          params.docType,
           createDocStore(
             initDocStoreConfig({
-              persistance: getStoreConfig(),
               stage: workspaceConfig.stage,
               workspaceId: workspaceConfig.workspaceId,
-              docType: docType,
+              docType: params.docType,
+              persistance: params.getStoreConfig(),
             }),
           ),
         );
+        params.onStoreInit?.(docStores.get(params.docType)!);
       }
-      return docStores.get(docType)!;
+      return docStores.get(params.docType)!;
     },
-    getFileStore(
-      docType: string,
-      getStoreConfig: () => PersistanceConfig,
-    ): FileStore {
-      if (!fileStores.has(docType)) {
+    getFileStore(params: {
+      docType: string;
+      getStoreConfig: () => PersistanceConfig;
+      onStoreInit?: (store: FileStore) => void;
+    }): FileStore {
+      if (!fileStores.has(params.docType)) {
         fileStores.set(
-          docType,
+          params.docType,
           createFileStore(
             initDocStoreConfig({
               stage: workspaceConfig.stage,
               workspaceId: workspaceConfig.workspaceId,
-              docType: docType,
-              persistance: getStoreConfig(),
+              docType: params.docType,
+              persistance: params.getStoreConfig(),
             }),
           ),
         );
+        params.onStoreInit?.(fileStores.get(params.docType)!);
       }
-      return fileStores.get(docType)!;
+      return fileStores.get(params.docType)!;
     },
   };
 }

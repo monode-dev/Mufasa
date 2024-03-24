@@ -40,10 +40,12 @@ export declare function getDocStore(params: {
     workspaceId: string | null;
     docType: string;
     getStoreConfig: () => PersistanceConfig;
+    onStoreInit?: (store: DocStore) => void;
 }): DocStore;
 export declare function getFileStore(params: {
     stage: string;
     workspaceId: string | null;
     docType: string;
     getStoreConfig: () => PersistanceConfig;
+    onStoreInit?: (store: FileStore) => void;
 }): FileStore;

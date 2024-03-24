@@ -117,13 +117,13 @@ export class Doc {
             stage: getStage(),
             workspaceId: getWorkspaceId(),
             docType: this.docType,
-            getStoreConfig: () => {
-                /** Docs don't start syncing until they are accessed the first time. So as soon as
-                 * the first one is accessed we start syncing all the connected doc types too. */
+            getStoreConfig: () => this.getDocStoreConfig(),
+            /** Docs don't start syncing until they are accessed the first time. So as soon as
+             * the first one is accessed we start syncing all the connected doc types too. */
+            onStoreInit: () => {
                 const customProps = Object.values(new this()).filter(isCustomProp);
                 const otherDocsToStartSyncing = new Set(customProps.flatMap((prop) => prop.otherDocsToStartSyncing));
                 otherDocsToStartSyncing.forEach((docClass) => docClass.ensureSyncHasStarted());
-                return this.getDocStoreConfig();
             },
         });
     }
