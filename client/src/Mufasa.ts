@@ -39,14 +39,16 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
   cloudPersister: C;
-}): ReturnType<typeof _initializeMufasa<C>> {
-  return _initializeMufasa<C>(mfsConfig);
+}): ReturnType<
+  typeof _initializeMufasa<C extends Cloud.Persister<infer T> ? T : unknown>
+> {
+  return _initializeMufasa(mfsConfig);
 }
-export function _initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
+export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
   stage?: string;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
-  cloudPersister: C;
+  cloudPersister: Cloud.Persister<T>;
 }) {
   const stage = mfsConfig.stage ?? `Dev`;
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
@@ -87,7 +89,7 @@ export function _initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
         untrackUpload,
       },
     }),
-    get user(): C extends Cloud.Persister<infer A> ? A : never {
+    get user() {
       return user.value;
     },
     // get user(): ReturnType<
