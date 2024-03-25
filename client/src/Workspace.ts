@@ -41,11 +41,12 @@ export type UserMetadata = {
 // SECTION: Cloud Auth
 export type GetCloudAuth<T extends SignInFuncs> = (config: {
   onAuthStateChanged: (user: UserInfo | null) => void;
+  stage: string;
 }) => CloudAuth<T>;
 export type CloudAuth<T extends SignInFuncs> = {
   signInFuncs: T;
   signOut: () => Promise<void>;
-  workspaceIntegration: WorkspaceIntegration;
+  getWorkspaceIntegration: (uid: string) => WorkspaceIntegration;
 };
 export type SignInFuncs = {
   [key: string]: () => Promise<void>;
@@ -198,6 +199,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
     const userInfo = useProp<undefined | null | UserInfo>(undefined);
     const cloudAuth = config.getCloudAuth({
       onAuthStateChanged: (user) => (userInfo.value = user),
+      stage: config.stage,
     });
     const isSigningIn = useProp(false);
     const isSigningOut = useProp(false);
@@ -243,7 +245,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
       ) {
         const workspace = createWorkspaceInterface(
           userInfo.uid,
-          cloudAuth.workspaceIntegration,
+          cloudAuth.getWorkspaceIntegration(userInfo.uid),
           onDispose,
         );
         return {

@@ -36,16 +36,22 @@ import { UserInfo } from "../Auth.js";
 import { Functions, httpsCallable } from "firebase/functions";
 import { CloudAuth, UserMetadata, WorkspaceIntegration } from "../Workspace.js";
 
-export function firebasePersister(firebaseConfig: {
-  firestore: Firestore;
-  firebaseStorage: FirebaseStorage;
-  firebaseFunctions: Functions;
-  authConfig: AuthParams;
-}) {
+export function firebasePersister(
+  firebaseConfig: {
+    firestore: Firestore;
+    firebaseStorage: FirebaseStorage;
+    firebaseFunctions: Functions;
+  } & AuthParams,
+) {
   return {
-    getCloudAuth({ onAuthStateChanged }) {
+    getCloudAuth({ onAuthStateChanged, stage }) {
       return firebaseAuthIntegration({
-        ...firebaseConfig.authConfig,
+        ...firebaseConfig,
+        stage: stage,
+        workspaceInvitesCollection: collection(
+          firebaseConfig.firestore,
+          `${stage}-WorkspaceInvites`,
+        ),
         onAuthStateChanged,
       });
     },
@@ -180,7 +186,7 @@ export function workspacePersister(
 // SECTION: Auth
 type AuthParams = Omit<
   Parameters<typeof firebaseAuthIntegration>[0],
-  `onAuthStateChanged`
+  `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`
 >;
 export function firebaseAuthIntegration(config: {
   signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
@@ -188,8 +194,9 @@ export function firebaseAuthIntegration(config: {
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
   firebaseFunctions: Functions;
-  userMetadataDoc: DocumentReference;
   workspaceInvitesCollection: CollectionReference;
+  firestore: Firestore;
+  stage: string;
 }) {
   config.firebaseAuth.onAuthStateChanged((user) => {
     config.onAuthStateChanged(
@@ -240,7 +247,14 @@ export function firebaseAuthIntegration(config: {
         console.error("Error during Sign-Out:", error);
       }
     },
-    workspaceIntegration: firebaseWorkspace(config),
+    getWorkspaceIntegration: (uid: string) =>
+      firebaseWorkspace({
+        ...config,
+        userMetadataDoc: doc(
+          collection(config.firestore, `${config.stage}-UserMetadata`),
+          uid,
+        ),
+      }),
   } satisfies CloudAuth<any>;
 }
 

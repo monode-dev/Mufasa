@@ -123,6 +123,7 @@ export function initializeAuth(config) {
         const userInfo = useProp(undefined);
         const cloudAuth = config.getCloudAuth({
             onAuthStateChanged: (user) => (userInfo.value = user),
+            stage: config.stage,
         });
         const isSigningIn = useProp(false);
         const isSigningOut = useProp(false);
@@ -161,7 +162,7 @@ export function initializeAuth(config) {
             },
             // TODO: Maybe swap out the whole object when the user changes.
             createSignedInInst(userInfo, onDispose) {
-                const workspace = createWorkspaceInterface(userInfo.uid, cloudAuth.workspaceIntegration, onDispose);
+                const workspace = createWorkspaceInterface(userInfo.uid, cloudAuth.getWorkspaceIntegration(userInfo.uid), onDispose);
                 return {
                     uid: userInfo.uid,
                     email: userInfo.email,

@@ -30,11 +30,12 @@ export type UserMetadata = {
 };
 export type GetCloudAuth<T extends SignInFuncs> = (config: {
     onAuthStateChanged: (user: UserInfo | null) => void;
+    stage: string;
 }) => CloudAuth<T>;
 export type CloudAuth<T extends SignInFuncs> = {
     signInFuncs: T;
     signOut: () => Promise<void>;
-    workspaceIntegration: WorkspaceIntegration;
+    getWorkspaceIntegration: (uid: string) => WorkspaceIntegration;
 };
 export type SignInFuncs = {
     [key: string]: () => Promise<void>;

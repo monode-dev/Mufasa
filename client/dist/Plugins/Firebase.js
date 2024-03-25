@@ -5,9 +5,11 @@ import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredentia
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
     return {
-        getCloudAuth({ onAuthStateChanged }) {
+        getCloudAuth({ onAuthStateChanged, stage }) {
             return firebaseAuthIntegration({
-                ...firebaseConfig.authConfig,
+                ...firebaseConfig,
+                stage: stage,
+                workspaceInvitesCollection: collection(firebaseConfig.firestore, `${stage}-WorkspaceInvites`),
                 onAuthStateChanged,
             });
         },
@@ -138,7 +140,10 @@ export function firebaseAuthIntegration(config) {
                 console.error("Error during Sign-Out:", error);
             }
         },
-        workspaceIntegration: firebaseWorkspace(config),
+        getWorkspaceIntegration: (uid) => firebaseWorkspace({
+            ...config,
+            userMetadataDoc: doc(collection(config.firestore, `${config.stage}-UserMetadata`), uid),
+        }),
     };
 }
 // SECTION: Workspace
