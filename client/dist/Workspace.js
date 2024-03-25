@@ -60,9 +60,29 @@ export function initializeAuth(config) {
                 isJoining: true,
             },
             createJoinedInst(userMetadata) {
+                const otherMembers = doNow(() => {
+                    const otherMembers = useProp([]);
+                    let haveStartedWatching = false;
+                    return {
+                        get value() {
+                            if (!haveStartedWatching) {
+                                workspaceIntegration.watchMembers(userMetadata.workspaceId, (allMembers) => {
+                                    otherMembers.value = allMembers.filter((member) => {
+                                        return member.uid !== userId;
+                                    });
+                                });
+                                haveStartedWatching = true;
+                            }
+                            return otherMembers.value;
+                        },
+                    };
+                });
                 const result = {
                     haveJoined: true,
                     id: userMetadata.workspaceId,
+                    get otherMembers() {
+                        return otherMembers.value;
+                    },
                 };
                 const roleBasedProps = useFormula(() => userMetadata.role === `owner`
                     ? {

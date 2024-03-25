@@ -8,17 +8,34 @@ import {
   createDocStore,
 } from "./DocStore.js";
 import { FileStore, createFileStore } from "./FileStore.js";
-import { ReadonlyProp } from "@monode/mosa";
+import { Prop, ReadonlyProp } from "@monode/mosa";
+import { isValid } from "./Utils.js";
 
 // SECTION: Types
 export type UserInfo = {
   uid: string;
   email: string | null;
 };
+export type Member = {
+  uid: string;
+  email: string | null;
+  role: `member` | `owner`;
+};
+export type UserMetadata = {
+  workspaceId: string | null;
+  role: `member` | `owner` | null;
+};
+export type NonNullUserMetadata = {
+  [K in keyof UserMetadata]-?: NonNullable<UserMetadata[K]>;
+};
 export type WorkspaceIntegration = {
   onUserMetadata: (
     handle: (metadata: UserMetadata | null) => void,
   ) => () => void;
+  watchMembers: (
+    workspaceId: string,
+    handle: (members: Member[]) => void,
+  ) => void;
   generateInviteCode: () => Promise<string>;
   createWorkspace: (params: { stage: string }) => Promise<void>;
   createWorkspaceInterface: (params: {
@@ -32,10 +49,6 @@ export type WorkspaceIntegration = {
   }) => Promise<void>;
   leaveWorkspace: (params: { stage: string } | undefined) => Promise<void>;
   // deleteWorkspace: (params: { stage: string } | undefined) => Promise<void>;
-};
-export type UserMetadata = {
-  workspaceId: string | null;
-  role: `member` | `owner` | null;
 };
 
 // SECTION: Cloud Auth
@@ -74,7 +87,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
     type NoneAsJson = typeof NoneAsJson;
     const NoneAsJson = 0;
     const userMetadata = doNow(() => {
-      type SavedUserMetadata = PendingAsJson | NoneAsJson | UserMetadata;
+      type SavedUserMetadata = PendingAsJson | NoneAsJson | NonNullUserMetadata;
       const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
       const savedMetadata = config.directoryPersister
         .jsonFile(`${userId}.json`)
@@ -129,10 +142,33 @@ export function initializeAuth<T extends SignInFuncs>(config: {
       joining: {
         isJoining: true,
       },
-      createJoinedInst(userMetadata: UserMetadata) {
+      createJoinedInst(userMetadata: NonNullUserMetadata) {
+        const otherMembers = doNow(() => {
+          const otherMembers = useProp<Member[]>([]);
+          let haveStartedWatching = false;
+          return {
+            get value() {
+              if (!haveStartedWatching) {
+                workspaceIntegration.watchMembers(
+                  userMetadata.workspaceId,
+                  (allMembers) => {
+                    otherMembers.value = allMembers.filter((member) => {
+                      return member.uid !== userId;
+                    });
+                  },
+                );
+                haveStartedWatching = true;
+              }
+              return otherMembers.value;
+            },
+          };
+        });
         const result = {
           haveJoined: true,
           id: userMetadata.workspaceId,
+          get otherMembers() {
+            return otherMembers.value;
+          },
         };
         const roleBasedProps = useFormula(() =>
           userMetadata.role === `owner`

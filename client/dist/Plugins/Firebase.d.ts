@@ -1,17 +1,16 @@
-import { CollectionReference, QueryFilterConstraint, DocumentReference, Firestore } from "firebase/firestore";
+import { CollectionReference, QueryFilterConstraint, Firestore } from "firebase/firestore";
 import { Cloud } from "../DocStore.js";
 import { StorageReference, FirebaseStorage } from "firebase/storage";
 import { Auth } from "firebase/auth";
-import { UserInfo } from "../Auth.js";
 import { Functions } from "firebase/functions";
-import { WorkspaceIntegration } from "../Workspace.js";
+import { WorkspaceIntegration, UserInfo } from "../Workspace.js";
 export declare function firebasePersister(firebaseConfig: {
     firestore: Firestore;
     firebaseStorage: FirebaseStorage;
     firebaseFunctions: Functions;
 } & AuthParams): {
     getCloudAuth({ onAuthStateChanged, stage }: {
-        onAuthStateChanged: (user: import("../Workspace.js").UserInfo | null) => void;
+        onAuthStateChanged: (user: UserInfo | null) => void;
         stage: string;
     }): {
         signInFuncs: {
@@ -53,7 +52,8 @@ export declare function firebaseAuthIntegration(config: {
 };
 export declare function firebaseWorkspace(config: {
     firebaseFunctions: Functions;
-    userMetadataDoc: DocumentReference;
+    uid: string;
+    userMetadataCollection: CollectionReference;
     workspaceInvitesCollection: CollectionReference;
 }): WorkspaceIntegration;
 export {};

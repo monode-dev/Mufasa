@@ -3,8 +3,7 @@ export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
 export { Cloud, Device, Session, DocJson, PersistanceConfig, DocStore, UpdateBatch, DELETED_KEY, Persistance, } from "./DocStore.js";
-export { UserInfo } from "./Auth.js";
-export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
+export { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace.js";
 /** Set up Mufasa for your app.
  * ```ts
  * import { initializeMufasa } from "mufasa";
@@ -475,19 +474,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -505,19 +506,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -533,19 +536,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -561,19 +566,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -589,22 +596,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -628,9 +638,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -668,19 +679,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -698,19 +711,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -726,19 +741,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -754,19 +771,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -782,22 +801,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -821,9 +843,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -861,19 +884,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -891,19 +916,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -919,19 +946,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -947,19 +976,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -975,22 +1006,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -1014,9 +1048,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1054,19 +1089,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -1084,19 +1121,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -1112,19 +1151,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -1140,19 +1181,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -1168,22 +1211,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -1207,9 +1253,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1371,19 +1418,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -1401,19 +1450,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -1429,19 +1480,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -1457,19 +1510,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -1485,22 +1540,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -1524,9 +1582,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1574,19 +1633,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -1604,19 +1665,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -1632,19 +1695,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -1660,19 +1725,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -1688,22 +1755,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -1727,9 +1797,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1771,19 +1842,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -1801,19 +1874,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -1829,19 +1904,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -1857,19 +1934,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -1885,22 +1964,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -1924,9 +2006,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1968,19 +2051,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -1998,19 +2083,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -2026,19 +2113,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -2054,19 +2143,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -2082,22 +2173,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -2121,9 +2215,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -2165,19 +2260,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isNone: true;
             readonly createWorkspace: () => Promise<void>;
@@ -2195,19 +2292,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isCreating: true;
         } & {
@@ -2223,19 +2322,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isJoining: true;
         } & {
@@ -2251,19 +2352,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             readonly isLeaving: true;
         } & {
@@ -2279,22 +2382,25 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         } & {
             id?: undefined;
             role?: undefined;
-            leaveWorkspace?: undefined;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
             kickMember?: undefined;
+            leaveWorkspace?: undefined;
             haveJoined?: undefined;
+            otherMembers?: undefined;
         }) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
             role: "owner";
@@ -2318,9 +2424,10 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             isLeaving?: undefined;
         } & {}) | ({
             haveJoined: boolean;
-            id: string | null;
+            id: string;
+            readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member" | null;
+            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;

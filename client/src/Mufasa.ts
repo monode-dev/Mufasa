@@ -17,8 +17,7 @@ export {
   DELETED_KEY,
   Persistance,
 } from "./DocStore.js";
-export { UserInfo } from "./Auth.js";
-export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
+export { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace.js";
 
 // TODO: Implement database versioning.
 /** Set up Mufasa for your app.

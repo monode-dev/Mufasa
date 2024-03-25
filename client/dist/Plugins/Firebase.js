@@ -142,7 +142,8 @@ export function firebaseAuthIntegration(config) {
         },
         getWorkspaceIntegration: (uid) => firebaseWorkspace({
             ...config,
-            userMetadataDoc: doc(collection(config.firestore, `${config.stage}-UserMetadata`), uid),
+            uid: uid,
+            userMetadataCollection: collection(config.firestore, `${config.stage}-UserMetadata`),
         }),
     };
 }
@@ -153,10 +154,13 @@ export function firebaseWorkspace(config) {
             return doc(config.workspaceInvitesCollection).id;
         },
         onUserMetadata(handle) {
-            return onSnapshot(config.userMetadataDoc, (snapshot) => {
+            return onSnapshot(doc(config.userMetadataCollection, config.uid), (snapshot) => {
                 const metadata = snapshot.data();
                 handle(metadata ?? null);
             });
+        },
+        watchMembers(workspaceId, onMembers) {
+            return onSnapshot(query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)), (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data())));
         },
         async createWorkspace(params) {
             return (await httpsCallable(config.firebaseFunctions, "createWorkspace")(params)).data;

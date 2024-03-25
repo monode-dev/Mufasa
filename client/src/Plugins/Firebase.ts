@@ -32,9 +32,14 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { UserInfo } from "../Auth.js";
 import { Functions, httpsCallable } from "firebase/functions";
-import { CloudAuth, UserMetadata, WorkspaceIntegration } from "../Workspace.js";
+import {
+  CloudAuth,
+  UserMetadata,
+  WorkspaceIntegration,
+  UserInfo,
+  Member,
+} from "../Workspace.js";
 
 export function firebasePersister(
   firebaseConfig: {
@@ -250,9 +255,10 @@ export function firebaseAuthIntegration(config: {
     getWorkspaceIntegration: (uid: string) =>
       firebaseWorkspace({
         ...config,
-        userMetadataDoc: doc(
-          collection(config.firestore, `${config.stage}-UserMetadata`),
-          uid,
+        uid: uid,
+        userMetadataCollection: collection(
+          config.firestore,
+          `${config.stage}-UserMetadata`,
         ),
       }),
   } satisfies CloudAuth<any>;
@@ -261,7 +267,8 @@ export function firebaseAuthIntegration(config: {
 // SECTION: Workspace
 export function firebaseWorkspace(config: {
   firebaseFunctions: Functions;
-  userMetadataDoc: DocumentReference;
+  uid: string;
+  userMetadataCollection: CollectionReference;
   workspaceInvitesCollection: CollectionReference;
 }): WorkspaceIntegration {
   return {
@@ -269,10 +276,23 @@ export function firebaseWorkspace(config: {
       return doc(config.workspaceInvitesCollection).id;
     },
     onUserMetadata(handle: (metadata: UserMetadata | null) => void) {
-      return onSnapshot(config.userMetadataDoc, (snapshot) => {
-        const metadata = snapshot.data() as undefined | UserMetadata;
-        handle(metadata ?? null);
-      });
+      return onSnapshot(
+        doc(config.userMetadataCollection, config.uid),
+        (snapshot) => {
+          const metadata = snapshot.data() as undefined | UserMetadata;
+          handle(metadata ?? null);
+        },
+      );
+    },
+    watchMembers(workspaceId, onMembers) {
+      return onSnapshot(
+        query(
+          config.userMetadataCollection,
+          where("workspaceId", "==", workspaceId),
+        ),
+        (snapshot) =>
+          onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
+      );
     },
     async createWorkspace(params: { stage: string }) {
       return (

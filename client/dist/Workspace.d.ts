@@ -5,8 +5,21 @@ export type UserInfo = {
     uid: string;
     email: string | null;
 };
+export type Member = {
+    uid: string;
+    email: string | null;
+    role: `member` | `owner`;
+};
+export type UserMetadata = {
+    workspaceId: string | null;
+    role: `member` | `owner` | null;
+};
+export type NonNullUserMetadata = {
+    [K in keyof UserMetadata]-?: NonNullable<UserMetadata[K]>;
+};
 export type WorkspaceIntegration = {
     onUserMetadata: (handle: (metadata: UserMetadata | null) => void) => () => void;
+    watchMembers: (workspaceId: string, handle: (members: Member[]) => void) => void;
     generateInviteCode: () => Promise<string>;
     createWorkspace: (params: {
         stage: string;
@@ -23,10 +36,6 @@ export type WorkspaceIntegration = {
     leaveWorkspace: (params: {
         stage: string;
     } | undefined) => Promise<void>;
-};
-export type UserMetadata = {
-    workspaceId: string | null;
-    role: `member` | `owner` | null;
 };
 export type GetCloudAuth<T extends SignInFuncs> = (config: {
     onAuthStateChanged: (user: UserInfo | null) => void;
@@ -72,19 +81,21 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     }) | ({
         readonly isNone: true;
         readonly createWorkspace: () => Promise<void>;
@@ -102,19 +113,21 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     }) | ({
         readonly isCreating: true;
     } & {
@@ -130,19 +143,21 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     }) | ({
         readonly isJoining: true;
     } & {
@@ -158,19 +173,21 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     }) | ({
         readonly isLeaving: true;
     } & {
@@ -186,22 +203,25 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     } & {
         id?: undefined;
         role?: undefined;
-        leaveWorkspace?: undefined;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
+        leaveWorkspace?: undefined;
         haveJoined?: undefined;
+        otherMembers?: undefined;
     }) | ({
         haveJoined: boolean;
-        id: string | null;
+        id: string;
+        readonly otherMembers: Member[];
     } & {
         isOwner: boolean;
         role: "owner";
@@ -225,9 +245,10 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
         isLeaving?: undefined;
     } & {}) | ({
         haveJoined: boolean;
-        id: string | null;
+        id: string;
+        readonly otherMembers: Member[];
     } & {
-        role: "member" | null;
+        role: "member";
         leaveWorkspace(): Promise<void>;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
