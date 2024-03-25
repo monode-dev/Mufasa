@@ -34,11 +34,11 @@ export { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace.js";
  * });
  * ```
  */
-export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
+export function initializeMufasa<T extends SignInFuncs>(mfsConfig: {
   stage?: string;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
-  cloudPersister: C;
+  cloudPersister: Cloud.Persister<T>;
 }) {
   const stage = mfsConfig.stage ?? `Dev`;
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
@@ -79,6 +79,9 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
         untrackUpload,
       },
     }),
+    get user() {
+      return user.value;
+    },
     // get user(): ReturnType<
     //   typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
     // >[`value`] {

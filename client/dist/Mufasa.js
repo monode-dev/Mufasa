@@ -58,6 +58,9 @@ export function initializeMufasa(mfsConfig) {
                 untrackUpload,
             },
         }),
+        get user() {
+            return user.value;
+        },
         // get user(): ReturnType<
         //   typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
         // >[`value`] {
