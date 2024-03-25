@@ -39,6 +39,14 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
   cloudPersister: C;
+}): ReturnType<typeof _initializeMufasa<C>> {
+  return _initializeMufasa<C>(mfsConfig);
+}
+export function _initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
+  stage?: string;
+  sessionPersister: Session.Persister;
+  devicePersister?: Device.Persister;
+  cloudPersister: C;
 }) {
   const stage = mfsConfig.stage ?? `Dev`;
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {

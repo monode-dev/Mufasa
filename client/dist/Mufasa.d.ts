@@ -24,6 +24,12 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
     sessionPersister: Session.Persister;
     devicePersister?: Device.Persister;
     cloudPersister: C;
+}): ReturnType<typeof _initializeMufasa<C>>;
+export declare function _initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
+    stage?: string;
+    sessionPersister: Session.Persister;
+    devicePersister?: Device.Persister;
+    cloudPersister: C;
 }): {
     readonly isUploadingToCloud: boolean;
     readonly workspaceId: string | null;
