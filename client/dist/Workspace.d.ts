@@ -1,4 +1,4 @@
-import { Device, DocStore, PersistanceConfig, Session } from "./DocStore.js";
+import { Device, DocStore, PersistanceConfig, Session, Cloud } from "./DocStore.js";
 import { FileStore } from "./FileStore.js";
 import { ReadonlyProp } from "@monode/mosa";
 export type UserInfo = {
@@ -49,6 +49,7 @@ export type CloudAuth<T extends SignInFuncs> = {
 export type SignInFuncs = {
     [key: string]: () => Promise<void>;
 };
+export type User<T extends Cloud.Persister<any>> = ReturnType<typeof initializeAuth<ReturnType<T[`getCloudAuth`]>[`signInFuncs`]>>[`value`];
 export declare function initializeAuth<T extends SignInFuncs>(config: {
     stage: string;
     sessionPersister: Session.Persister;

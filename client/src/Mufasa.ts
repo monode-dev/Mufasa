@@ -2,7 +2,7 @@ import { initializeDocClass } from "./Doc.js";
 import { Session, Device, Cloud } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./File.js";
 import { doNow, isValid } from "./Utils.js";
-import { CloudAuth, SignInFuncs, initializeAuth } from "./Workspace.js";
+import { CloudAuth, SignInFuncs, User, initializeAuth } from "./Workspace.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
@@ -76,9 +76,7 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
         untrackUpload,
       },
     }),
-    get user(): ReturnType<
-      typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
-    >[`value`] {
+    get user(): User<C> {
       return user.value;
     },
     ...initializeSyncedFileClass(),
