@@ -79,11 +79,11 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
         untrackUpload,
       },
     }),
-    get user(): ReturnType<
-      typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
-    >[`value`] {
-      return user.value;
-    },
+    // get user(): ReturnType<
+    //   typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
+    // >[`value`] {
+    //   return user.value;
+    // },
     ...initializeSyncedFileClass(),
     get isUploadingToCloud() {
       return isUploadingToCloud.value;
