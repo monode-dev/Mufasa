@@ -467,171 +467,19 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -643,12 +491,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -665,178 +513,178 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }, T_4> extends infer T_14 ? T_14 extends Exclude<{
         uid: string;
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -848,12 +696,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -870,178 +718,178 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }, T_4> ? T_14 extends any ? { [K_8 in Exclude<keyof T_14, keyof T_4>]?: undefined; } : never : never : never) extends infer T_15 ? T_15 extends (Exclude<{
         uid: string;
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -1053,12 +901,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1075,178 +923,178 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }, T_4> extends infer T_16 ? T_16 extends Exclude<{
         uid: string;
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -1258,12 +1106,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1280,7 +1128,159 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }, T_4> ? T_16 extends any ? { [K_9 in Exclude<keyof T_16, keyof T_4>]?: undefined; } : never : never : never) ? T_15 extends any ? (x: T_15) => void : never : never : never) | ((Exclude<{
         isSignedOut: true;
@@ -1411,171 +1411,19 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -1587,12 +1435,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1609,7 +1457,159 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     } & (((x: {
         isPending?: undefined;
@@ -1626,171 +1626,19 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -1802,12 +1650,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -1824,7 +1672,159 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }> extends infer T_46 ? T_46 extends Exclude<{
         isSignedOut: true;
@@ -1835,171 +1835,19 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -2011,12 +1859,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -2033,7 +1881,159 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }> ? T_46 extends any ? { [K_18 in Exclude<keyof T_46, "email" | "uid" | "isSignedIn" | "workspace" | "signOut">]?: undefined; } : never : never : never) extends infer T_48 ? T_48 extends (Exclude<{
         isSignedOut: true;
@@ -2044,171 +2044,19 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -2220,12 +2068,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -2242,7 +2090,159 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }> extends infer T_50 ? T_50 extends Exclude<{
         isSignedOut: true;
@@ -2253,171 +2253,19 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         email: string | null;
         isSignedIn: boolean;
         readonly workspace: ({
-            readonly isPending: true;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isNone: true;
-            readonly createWorkspace: () => Promise<void>;
-            readonly joinWorkspace: (props: {
-                inviteCode: string;
-            }) => Promise<void>;
-        } & {
-            isPending?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isCreating: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isJoining: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isLeaving?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
-            readonly isLeaving: true;
-        } & {
-            isPending?: undefined;
-        } & {
-            isNone?: undefined;
-            createWorkspace?: undefined;
-            joinWorkspace?: undefined;
-        } & {
-            isCreating?: undefined;
-        } & {
-            isJoining?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        } & {
-            id?: undefined;
-            role?: undefined;
-            isOwner?: undefined;
-            createWorkspaceInvite?: undefined;
-            kickMember?: undefined;
-            leaveWorkspace?: undefined;
-            haveJoined?: undefined;
-            otherMembers?: undefined;
-        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
             isOwner: boolean;
-            role: "owner";
             createWorkspaceInvite(): Promise<{
                 inviteCode: string;
                 validForDays: number;
             } | undefined>;
             kickMember(): Promise<void>;
             leaveWorkspace?: undefined;
-        } & {} & {
+        } & {} & {} & {
             isPending?: undefined;
         } & {
             isNone?: undefined;
@@ -2429,12 +2277,12 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {}) | ({
+        }) | ({
             haveJoined: boolean;
-            id: string;
+            readonly id: string;
+            readonly role: NonNullable<"member" | "owner" | null>;
             readonly otherMembers: import("./Workspace.js").Member[];
         } & {
-            role: "member";
             leaveWorkspace(): Promise<void>;
             isOwner?: undefined;
             createWorkspaceInvite?: undefined;
@@ -2451,7 +2299,159 @@ export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
             isJoining?: undefined;
         } & {
             isLeaving?: undefined;
-        } & {});
+        } & {}) | ({
+            readonly isPending: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isNone: true;
+            readonly createWorkspace: () => Promise<void>;
+            readonly joinWorkspace: (props: {
+                inviteCode: string;
+            }) => Promise<void>;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isCreating: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isJoining?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isJoining: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isLeaving?: undefined;
+        }) | ({
+            readonly isLeaving: true;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            id?: undefined;
+            role?: undefined;
+            leaveWorkspace?: undefined;
+            isOwner?: undefined;
+            createWorkspaceInvite?: undefined;
+            kickMember?: undefined;
+            haveJoined?: undefined;
+            otherMembers?: undefined;
+        } & {
+            isPending?: undefined;
+        } & {
+            isNone?: undefined;
+            createWorkspace?: undefined;
+            joinWorkspace?: undefined;
+        } & {
+            isCreating?: undefined;
+        } & {
+            isJoining?: undefined;
+        });
         signOut: () => Promise<void>;
     }> ? T_50 extends any ? { [K_19 in Exclude<keyof T_50, "email" | "uid" | "isSignedIn" | "workspace" | "signOut">]?: undefined; } : never : never : never) ? T_48 extends any ? (x: T_48) => void : never : never : never) extends (x: infer I) => void ? I : never));
     readonly Doc: (docType: string, customizations?: Omit<{

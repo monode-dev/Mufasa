@@ -142,7 +142,8 @@ export function initializeAuth<T extends SignInFuncs>(config: {
       joining: {
         isJoining: true,
       },
-      createJoinedInst(userMetadata: NonNullUserMetadata) {
+      joined: doNow(() => {
+        const getUserMetadata = () => userMetadata.value as NonNullUserMetadata;
         const otherMembers = doNow(() => {
           const otherMembers = useProp<Member[]>([]);
           let haveStartedWatching = false;
@@ -150,7 +151,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
             get value() {
               if (!haveStartedWatching) {
                 workspaceIntegration.watchMembers(
-                  userMetadata.workspaceId,
+                  getUserMetadata().workspaceId,
                   (allMembers) => {
                     otherMembers.value = allMembers.filter((member) => {
                       return member.uid !== userId;
@@ -165,24 +166,28 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         });
         const result = {
           haveJoined: true,
-          id: userMetadata.workspaceId,
+          get id() {
+            return getUserMetadata().workspaceId;
+          },
+          get role() {
+            return getUserMetadata().role;
+          },
           get otherMembers() {
             return otherMembers.value;
           },
         };
         const roleBasedProps = useFormula(() =>
-          userMetadata.role === `owner`
+          getUserMetadata().role === `owner`
             ? {
                 isOwner: true,
-                role: userMetadata.role,
                 async createWorkspaceInvite() {
-                  if (userMetadata.role !== `owner`) {
+                  if (getUserMetadata().role !== `owner`) {
                     console.error(
                       `Attempted to create a workspace invite without permission.`,
                     );
                     return;
                   }
-                  if (userMetadata.workspaceId === null) {
+                  if (getUserMetadata().workspaceId === null) {
                     console.error(
                       `Attempted to create a workspace invite without a workspace.`,
                     );
@@ -193,7 +198,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
                     await workspaceIntegration.generateInviteCode();
                   await workspaceIntegration.createWorkspaceInterface({
                     inviteCode,
-                    workspaceId: userMetadata.workspaceId,
+                    workspaceId: getUserMetadata().workspaceId,
                     validForDays,
                   });
                   return { inviteCode, validForDays };
@@ -208,7 +213,6 @@ export function initializeAuth<T extends SignInFuncs>(config: {
                 // },
               }
             : {
-                role: userMetadata.role,
                 async leaveWorkspace() {
                   isLeavingWorkspace.value = true;
                   await workspaceIntegration.leaveWorkspace({
@@ -227,7 +231,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
           });
         });
         return result as typeof result & typeof roleBasedProps;
-      },
+      }),
       leaving: {
         isLeaving: true,
       },
@@ -236,20 +240,22 @@ export function initializeAuth<T extends SignInFuncs>(config: {
       // },
     } as const;
 
-    return useFormula(() => {
-      console.log(`userMetadata.value`, userMetadata.value);
-      return userMetadata.value === PendingAsJson
-        ? WorkspaceStates.pending
-        : userMetadata.value === NoneAsJson
-        ? isCreatingWorkspace.value
-          ? WorkspaceStates.creating
-          : isJoiningWorkspace.value
-          ? WorkspaceStates.joining
-          : WorkspaceStates.none
-        : isLeavingWorkspace.value
-        ? WorkspaceStates.leaving
-        : WorkspaceStates.createJoinedInst(userMetadata.value);
-    });
+    return useFormula<(typeof WorkspaceStates)[keyof typeof WorkspaceStates]>(
+      () => {
+        console.log(`userMetadata.value`, userMetadata.value);
+        return userMetadata.value === PendingAsJson
+          ? WorkspaceStates.pending
+          : userMetadata.value === NoneAsJson
+          ? isCreatingWorkspace.value
+            ? WorkspaceStates.creating
+            : isJoiningWorkspace.value
+            ? WorkspaceStates.joining
+            : WorkspaceStates.none
+          : isLeavingWorkspace.value
+          ? WorkspaceStates.leaving
+          : WorkspaceStates.joined;
+      },
+    );
   }
 
   // SECTION: User

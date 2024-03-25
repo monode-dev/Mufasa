@@ -59,14 +59,15 @@ export function initializeAuth(config) {
             joining: {
                 isJoining: true,
             },
-            createJoinedInst(userMetadata) {
+            joined: doNow(() => {
+                const getUserMetadata = () => userMetadata.value;
                 const otherMembers = doNow(() => {
                     const otherMembers = useProp([]);
                     let haveStartedWatching = false;
                     return {
                         get value() {
                             if (!haveStartedWatching) {
-                                workspaceIntegration.watchMembers(userMetadata.workspaceId, (allMembers) => {
+                                workspaceIntegration.watchMembers(getUserMetadata().workspaceId, (allMembers) => {
                                     otherMembers.value = allMembers.filter((member) => {
                                         return member.uid !== userId;
                                     });
@@ -79,21 +80,25 @@ export function initializeAuth(config) {
                 });
                 const result = {
                     haveJoined: true,
-                    id: userMetadata.workspaceId,
+                    get id() {
+                        return getUserMetadata().workspaceId;
+                    },
+                    get role() {
+                        return getUserMetadata().role;
+                    },
                     get otherMembers() {
                         return otherMembers.value;
                     },
                 };
-                const roleBasedProps = useFormula(() => userMetadata.role === `owner`
+                const roleBasedProps = useFormula(() => getUserMetadata().role === `owner`
                     ? {
                         isOwner: true,
-                        role: userMetadata.role,
                         async createWorkspaceInvite() {
-                            if (userMetadata.role !== `owner`) {
+                            if (getUserMetadata().role !== `owner`) {
                                 console.error(`Attempted to create a workspace invite without permission.`);
                                 return;
                             }
-                            if (userMetadata.workspaceId === null) {
+                            if (getUserMetadata().workspaceId === null) {
                                 console.error(`Attempted to create a workspace invite without a workspace.`);
                                 return;
                             }
@@ -101,7 +106,7 @@ export function initializeAuth(config) {
                             const inviteCode = await workspaceIntegration.generateInviteCode();
                             await workspaceIntegration.createWorkspaceInterface({
                                 inviteCode,
-                                workspaceId: userMetadata.workspaceId,
+                                workspaceId: getUserMetadata().workspaceId,
                                 validForDays,
                             });
                             return { inviteCode, validForDays };
@@ -116,7 +121,6 @@ export function initializeAuth(config) {
                         // },
                     }
                     : {
-                        role: userMetadata.role,
                         async leaveWorkspace() {
                             isLeavingWorkspace.value = true;
                             await workspaceIntegration.leaveWorkspace({
@@ -134,7 +138,7 @@ export function initializeAuth(config) {
                     });
                 });
                 return result;
-            },
+            }),
             leaving: {
                 isLeaving: true,
             },
@@ -154,7 +158,7 @@ export function initializeAuth(config) {
                             : WorkspaceStates.none
                     : isLeavingWorkspace.value
                         ? WorkspaceStates.leaving
-                        : WorkspaceStates.createJoinedInst(userMetadata.value);
+                        : WorkspaceStates.joined;
         });
     }
     // SECTION: User
