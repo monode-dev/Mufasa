@@ -24,7 +24,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
     sessionPersister: Session.Persister;
     devicePersister?: Device.Persister;
     cloudPersister: C;
-}): ReturnType<typeof _initializeMufasa<C extends Cloud.Persister<infer T> ? T : unknown>>;
+}): ReturnType<typeof _initializeMufasa<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>>;
 export declare function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
     stage?: string;
     sessionPersister: Session.Persister;

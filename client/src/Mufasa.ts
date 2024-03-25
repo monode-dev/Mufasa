@@ -40,7 +40,7 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   devicePersister?: Device.Persister;
   cloudPersister: C;
 }): ReturnType<
-  typeof _initializeMufasa<C extends Cloud.Persister<infer T> ? T : unknown>
+  typeof _initializeMufasa<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
 > {
   return _initializeMufasa(mfsConfig);
 }
