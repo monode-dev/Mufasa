@@ -34,10 +34,7 @@ export { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace.js";
  * });
  * ```
  */
-export function initializeMufasa<
-  C extends Cloud.Persister<T>,
-  T extends SignInFuncs,
->(mfsConfig: {
+export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   stage?: string;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
@@ -66,7 +63,7 @@ export function initializeMufasa<
     getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
   });
   // TODO: This should be inferred.
-  const getWorkspaceId = () =>
+  const getWorkspaceId = (): string | null =>
     `workspace` in user.value && `id` in user.value.workspace
       ? user.value.workspace.id ?? null
       : null;
@@ -82,7 +79,7 @@ export function initializeMufasa<
         untrackUpload,
       },
     }),
-    get user() {
+    get user(): C extends Cloud.Persister<infer A> ? A : never {
       return user.value;
     },
     // get user(): ReturnType<
