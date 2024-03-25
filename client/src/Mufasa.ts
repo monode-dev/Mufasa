@@ -89,7 +89,7 @@ export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         untrackUpload,
       },
     }),
-    get user(): any {
+    get user(): ReturnType<typeof initializeAuth<T>>[`value`] {
       return user.value;
     },
     // get user(): ReturnType<
