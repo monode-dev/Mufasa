@@ -35,10 +35,7 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export function initializeMufasa<
-  C extends Cloud.Persister<T>,
-  T extends SignInFuncs = {},
->(mfsConfig: {
+export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   stage?: string;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
@@ -83,7 +80,9 @@ export function initializeMufasa<
         untrackUpload,
       },
     }),
-    get user(): ReturnType<typeof initializeAuth<T>>[`value`] {
+    get user(): ReturnType<
+      typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
+    >[`value`] {
       return user.value;
     },
     ...initializeSyncedFileClass(),

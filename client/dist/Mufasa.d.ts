@@ -1,5 +1,4 @@
 import { Session, Device, Cloud } from "./DocStore.js";
-import { SignInFuncs } from "./Workspace.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
 export { isValid } from "./Utils.js";
@@ -20,14 +19,14 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends SignInFuncs = {}>(mfsConfig: {
+export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
     stage?: string;
     sessionPersister: Session.Persister;
     devicePersister?: Device.Persister;
     cloudPersister: C;
 }): {
     readonly isUploadingToCloud: boolean;
-    readonly workspaceId: string | null;
+    readonly workspaceId: any;
     readonly File: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
         docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;
@@ -431,9 +430,9 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
     };
     readonly user: ({
         isSignedOut: true;
-    } & T extends infer T_4 ? T_4 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_4 ? T_4 extends {
         isSignedOut: true;
-    } & T ? T_4 extends any ? T_4 extends null | undefined ? T_4 : T_4 & (((Exclude<{
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_4 extends any ? T_4 extends null | undefined ? T_4 : T_4 & (((Exclude<{
         isPending: boolean;
     }, T_4> extends infer T_5 ? T_5 extends Exclude<{
         isPending: boolean;
@@ -935,21 +934,21 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         signOut: () => Promise<void>;
     }, T_4> ? T_16 extends any ? { [K_9 in Exclude<keyof T_16, keyof T_4>]?: undefined; } : never : never : never) ? T_15 extends any ? (x: T_15) => void : never : never : never) | ((Exclude<{
         isSignedOut: true;
-    } & T extends infer T_17 ? T_17 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_17 ? T_17 extends {
         isSignedOut: true;
-    } & T ? T_17 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_17 : never : never, T_4> extends infer T_18 ? T_18 extends Exclude<{
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_17 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_17 : never : never, T_4> extends infer T_18 ? T_18 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_19 ? T_19 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_19 ? T_19 extends {
         isSignedOut: true;
-    } & T ? T_19 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_19 : never : never, T_4> ? T_18 extends any ? { [K_10 in Exclude<keyof T_18, keyof T_4>]?: undefined; } : never : never : never) extends infer T_20 ? T_20 extends (Exclude<{
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_19 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_19 : never : never, T_4> ? T_18 extends any ? { [K_10 in Exclude<keyof T_18, keyof T_4>]?: undefined; } : never : never : never) extends infer T_20 ? T_20 extends (Exclude<{
         isSignedOut: true;
-    } & T extends infer T_21 ? T_21 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_21 ? T_21 extends {
         isSignedOut: true;
-    } & T ? T_21 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_21 : never : never, T_4> extends infer T_22 ? T_22 extends Exclude<{
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_21 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_21 : never : never, T_4> extends infer T_22 ? T_22 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_23 ? T_23 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_23 ? T_23 extends {
         isSignedOut: true;
-    } & T ? T_23 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_23 : never : never, T_4> ? T_22 extends any ? { [K_11 in Exclude<keyof T_22, keyof T_4>]?: undefined; } : never : never : never) ? T_20 extends any ? (x: T_20) => void : never : never : never) extends (x: infer I) => void ? I : never) : never : never : never) | ({
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_23 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_23 : never : never, T_4> ? T_22 extends any ? { [K_11 in Exclude<keyof T_22, keyof T_4>]?: undefined; } : never : never : never) ? T_20 extends any ? (x: T_20) => void : never : never : never) extends (x: infer I) => void ? I : never) : never : never : never) | ({
         isPending: boolean;
     } & (((x: {
         isSigningIn?: undefined;
@@ -959,31 +958,31 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         email?: undefined;
         uid?: undefined;
         workspace?: undefined;
-        isSignedIn?: undefined;
         signOut?: undefined;
+        isSignedIn?: undefined;
     }) => void) | ((Exclude<{
         isSignedOut: true;
-    } & T extends infer T_24 ? T_24 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_24 ? T_24 extends {
         isSignedOut: true;
-    } & T ? T_24 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_24 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_24 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_24 : never : never, {
         isPending: boolean;
     }> extends infer T_25 ? T_25 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_26 ? T_26 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_26 ? T_26 extends {
         isSignedOut: true;
-    } & T ? T_26 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_26 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_26 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_26 : never : never, {
         isPending: boolean;
     }> ? T_25 extends any ? { [K_12 in Exclude<keyof T_25, "isPending">]?: undefined; } : never : never : never) extends infer T_27 ? T_27 extends (Exclude<{
         isSignedOut: true;
-    } & T extends infer T_28 ? T_28 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_28 ? T_28 extends {
         isSignedOut: true;
-    } & T ? T_28 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_28 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_28 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_28 : never : never, {
         isPending: boolean;
     }> extends infer T_29 ? T_29 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_30 ? T_30 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_30 ? T_30 extends {
         isSignedOut: true;
-    } & T ? T_30 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_30 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_30 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_30 : never : never, {
         isPending: boolean;
     }> ? T_29 extends any ? { [K_13 in Exclude<keyof T_29, "isPending">]?: undefined; } : never : never : never) ? T_27 extends any ? (x: T_27) => void : never : never : never) extends (x: infer I) => void ? I : never)) | ({
         isSigningIn: boolean;
@@ -995,31 +994,31 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         email?: undefined;
         uid?: undefined;
         workspace?: undefined;
-        isSignedIn?: undefined;
         signOut?: undefined;
+        isSignedIn?: undefined;
     }) => void) | ((Exclude<{
         isSignedOut: true;
-    } & T extends infer T_31 ? T_31 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_31 ? T_31 extends {
         isSignedOut: true;
-    } & T ? T_31 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_31 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_31 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_31 : never : never, {
         isSigningIn: boolean;
     }> extends infer T_32 ? T_32 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_33 ? T_33 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_33 ? T_33 extends {
         isSignedOut: true;
-    } & T ? T_33 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_33 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_33 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_33 : never : never, {
         isSigningIn: boolean;
     }> ? T_32 extends any ? { [K_14 in Exclude<keyof T_32, "isSigningIn">]?: undefined; } : never : never : never) extends infer T_34 ? T_34 extends (Exclude<{
         isSignedOut: true;
-    } & T extends infer T_35 ? T_35 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_35 ? T_35 extends {
         isSignedOut: true;
-    } & T ? T_35 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_35 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_35 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_35 : never : never, {
         isSigningIn: boolean;
     }> extends infer T_36 ? T_36 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_37 ? T_37 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_37 ? T_37 extends {
         isSignedOut: true;
-    } & T ? T_37 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_37 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_37 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_37 : never : never, {
         isSigningIn: boolean;
     }> ? T_36 extends any ? { [K_15 in Exclude<keyof T_36, "isSigningIn">]?: undefined; } : never : never : never) ? T_34 extends any ? (x: T_34) => void : never : never : never) extends (x: infer I) => void ? I : never)) | ({
         isSigningOut: boolean;
@@ -1031,31 +1030,31 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         email?: undefined;
         uid?: undefined;
         workspace?: undefined;
-        isSignedIn?: undefined;
         signOut?: undefined;
+        isSignedIn?: undefined;
     }) => void) | ((Exclude<{
         isSignedOut: true;
-    } & T extends infer T_38 ? T_38 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_38 ? T_38 extends {
         isSignedOut: true;
-    } & T ? T_38 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_38 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_38 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_38 : never : never, {
         isSigningOut: boolean;
     }> extends infer T_39 ? T_39 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_40 ? T_40 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_40 ? T_40 extends {
         isSignedOut: true;
-    } & T ? T_40 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_40 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_40 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_40 : never : never, {
         isSigningOut: boolean;
     }> ? T_39 extends any ? { [K_16 in Exclude<keyof T_39, "isSigningOut">]?: undefined; } : never : never : never) extends infer T_41 ? T_41 extends (Exclude<{
         isSignedOut: true;
-    } & T extends infer T_42 ? T_42 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_42 ? T_42 extends {
         isSignedOut: true;
-    } & T ? T_42 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_42 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_42 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_42 : never : never, {
         isSigningOut: boolean;
     }> extends infer T_43 ? T_43 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_44 ? T_44 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_44 ? T_44 extends {
         isSignedOut: true;
-    } & T ? T_44 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_44 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_44 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_44 : never : never, {
         isSigningOut: boolean;
     }> ? T_43 extends any ? { [K_17 in Exclude<keyof T_43, "isSigningOut">]?: undefined; } : never : never : never) ? T_41 extends any ? (x: T_41) => void : never : never : never) extends (x: infer I) => void ? I : never)) | ({
         uid: string;
@@ -1184,9 +1183,9 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         isSigningOut?: undefined;
     }) => void) | ((Exclude<{
         isSignedOut: true;
-    } & T extends infer T_45 ? T_45 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_45 ? T_45 extends {
         isSignedOut: true;
-    } & T ? T_45 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_45 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_45 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_45 : never : never, {
         uid: string;
         email: string | null;
         isSignedIn: boolean;
@@ -1307,9 +1306,9 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         signOut: () => Promise<void>;
     }> extends infer T_46 ? T_46 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_47 ? T_47 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_47 ? T_47 extends {
         isSignedOut: true;
-    } & T ? T_47 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_47 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_47 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_47 : never : never, {
         uid: string;
         email: string | null;
         isSignedIn: boolean;
@@ -1428,11 +1427,11 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
             isLeaving?: undefined;
         });
         signOut: () => Promise<void>;
-    }> ? T_46 extends any ? { [K_18 in Exclude<keyof T_46, "email" | "uid" | "workspace" | "isSignedIn" | "signOut">]?: undefined; } : never : never : never) extends infer T_48 ? T_48 extends (Exclude<{
+    }> ? T_46 extends any ? { [K_18 in Exclude<keyof T_46, "email" | "uid" | "workspace" | "signOut" | "isSignedIn">]?: undefined; } : never : never : never) extends infer T_48 ? T_48 extends (Exclude<{
         isSignedOut: true;
-    } & T extends infer T_49 ? T_49 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_49 ? T_49 extends {
         isSignedOut: true;
-    } & T ? T_49 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_49 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_49 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_49 : never : never, {
         uid: string;
         email: string | null;
         isSignedIn: boolean;
@@ -1553,9 +1552,9 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
         signOut: () => Promise<void>;
     }> extends infer T_50 ? T_50 extends Exclude<{
         isSignedOut: true;
-    } & T extends infer T_51 ? T_51 extends {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] extends infer T_51 ? T_51 extends {
         isSignedOut: true;
-    } & T ? T_51 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_51 : never : never, {
+    } & ReturnType<C["getCloudAuth"]>["signInFuncs"] ? T_51 extends string | number | boolean | symbol | Function | RegExp | Date | null | undefined ? never : T_51 : never : never, {
         uid: string;
         email: string | null;
         isSignedIn: boolean;
@@ -1674,7 +1673,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends
             isLeaving?: undefined;
         });
         signOut: () => Promise<void>;
-    }> ? T_50 extends any ? { [K_19 in Exclude<keyof T_50, "email" | "uid" | "workspace" | "isSignedIn" | "signOut">]?: undefined; } : never : never : never) ? T_48 extends any ? (x: T_48) => void : never : never : never) extends (x: infer I) => void ? I : never));
+    }> ? T_50 extends any ? { [K_19 in Exclude<keyof T_50, "email" | "uid" | "workspace" | "signOut" | "isSignedIn">]?: undefined; } : never : never : never) ? T_48 extends any ? (x: T_48) => void : never : never : never) extends (x: infer I) => void ? I : never));
     readonly Doc: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
         docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;
