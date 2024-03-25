@@ -39,16 +39,6 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
   cloudPersister: C;
-}): ReturnType<
-  typeof _initializeMufasa<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
-> {
-  return _initializeMufasa(mfsConfig);
-}
-export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
-  stage?: string;
-  sessionPersister: Session.Persister;
-  devicePersister?: Device.Persister;
-  cloudPersister: Cloud.Persister<T>;
 }) {
   const stage = mfsConfig.stage ?? `Dev`;
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
@@ -86,7 +76,9 @@ export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
         untrackUpload,
       },
     }),
-    get user(): ReturnType<typeof initializeAuth<T>>[`value`] {
+    get user(): ReturnType<
+      typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>
+    >[`value`] {
       return user.value as any;
     },
     // get user(): ReturnType<

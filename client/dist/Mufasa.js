@@ -23,9 +23,6 @@ export { Cloud, Device, Session, DELETED_KEY, Persistance, } from "./DocStore.js
  * ```
  */
 export function initializeMufasa(mfsConfig) {
-    return _initializeMufasa(mfsConfig);
-}
-export function _initializeMufasa(mfsConfig) {
     const stage = mfsConfig.stage ?? `Dev`;
     const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
         const uploadCount = mfsConfig.sessionPersister.useProp(0);
