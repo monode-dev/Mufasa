@@ -16,9 +16,9 @@ export { Cloud, Device, Session, DELETED_KEY, Persistance, } from "./DocStore.js
  * import { firebasePersister } from "mufasa/firebase";
  *
  * export const mfs = initializeMufasa({
- *   sessionPersister: solidPersister,
- *   devicePersister: capacitorPersister,
- *   cloudPersister: firebasePersister,
+ *   sessionPersister: solidPersister(),
+ *   devicePersister: capacitorPersister(),
+ *   cloudPersister: firebasePersister(...),
  * });
  * ```
  */

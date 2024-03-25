@@ -89,7 +89,13 @@ getDocId) {
                             });
                         },
                     }
-                    : {}),
+                    : isValid(propConfig.onSet)
+                        ? {
+                            set: function (value) {
+                                propConfig.onSet(value);
+                            },
+                        }
+                        : {}),
             });
         }
     });
@@ -230,13 +236,14 @@ persistance = Persistance.global) {
         };
     }
 }
-export function formula(compute) {
+export function formula(compute, set) {
     return {
         [IsCustomProp]: true,
         isFullCustom: false,
         getInitValue: () => undefined,
         getFallbackValue: () => compute,
         fromPrim: (prim) => prim,
+        onSet: set,
         persistance: Persistance.session,
         otherDocsToStartSyncing: [],
     };

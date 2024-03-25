@@ -29,9 +29,9 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * import { firebasePersister } from "mufasa/firebase";
  *
  * export const mfs = initializeMufasa({
- *   sessionPersister: solidPersister,
- *   devicePersister: capacitorPersister,
- *   cloudPersister: firebasePersister,
+ *   sessionPersister: solidPersister(),
+ *   devicePersister: capacitorPersister(),
+ *   cloudPersister: firebasePersister(...),
  * });
  * ```
  */
@@ -40,7 +40,6 @@ export function initializeMufasa<
   T extends SignInFuncs = {},
 >(mfsConfig: {
   stage?: string;
-  // getWorkspaceId?: () => string | null;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
   cloudPersister: C;
@@ -84,7 +83,7 @@ export function initializeMufasa<
         untrackUpload,
       },
     }),
-    get user() {
+    get user(): ReturnType<typeof initializeAuth<T>>[`value`] {
       return user.value;
     },
     ...initializeSyncedFileClass(),

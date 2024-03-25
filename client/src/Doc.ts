@@ -121,6 +121,12 @@ function _initializeInst<T extends Doc>(
                 );
               },
             }
+          : isValid(propConfig.onSet)
+          ? {
+              set: function (value) {
+                propConfig.onSet!(value);
+              },
+            }
           : {}),
       });
     }
@@ -355,13 +361,14 @@ export function prop<
     } satisfies CustomProp as any;
   }
 }
-export function formula<T>(compute: () => T): T {
+export function formula<T>(compute: () => T, set?: (newVal: T) => void): T {
   return {
     [IsCustomProp]: true,
     isFullCustom: false,
     getInitValue: () => undefined,
     getFallbackValue: () => compute,
     fromPrim: (prim) => prim,
+    onSet: set,
     persistance: Persistance.session,
     otherDocsToStartSyncing: [],
   } satisfies CustomProp as any;
@@ -372,15 +379,23 @@ export type CustomProp = {
   [IsCustomProp]: true;
   otherDocsToStartSyncing: (typeof Doc)[];
 } & (
-  | {
+  | ({
       isFullCustom: false;
       getInitValue: () => PrimVal | undefined;
       getFallbackValue: () => PrimVal | (() => any);
       fromPrim: (prim: PrimVal) => any;
-      toPrim?: (inst: any) => PrimVal;
       isNewList?: boolean;
       persistance: Persistance;
-    }
+    } & (
+      | {
+          toPrim?: (inst: any) => PrimVal;
+          onSet?: undefined;
+        }
+      | {
+          onSet?: (newVal: any) => void;
+          toPrim?: undefined;
+        }
+    ))
   | {
       isFullCustom: true;
       init: (inst: Doc, key: string) => void;
