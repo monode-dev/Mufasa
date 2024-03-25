@@ -60,40 +60,51 @@ export function initializeAuth(config) {
                 isJoining: true,
             },
             createJoinedInst(userMetadata) {
+                const roleBasedProps = useFormula(() => userMetadata.role === `owner`
+                    ? {
+                        isOwner: true,
+                        role: userMetadata.role,
+                        async createWorkspaceInvite() {
+                            if (userMetadata.role !== `owner`) {
+                                console.error(`Attempted to create a workspace invite without permission.`);
+                                return;
+                            }
+                            if (userMetadata.workspaceId === null) {
+                                console.error(`Attempted to create a workspace invite without a workspace.`);
+                                return;
+                            }
+                            const validForDays = 14;
+                            const inviteCode = await workspaceIntegration.generateInviteCode();
+                            await workspaceIntegration.createWorkspaceInterface({
+                                inviteCode,
+                                workspaceId: userMetadata.workspaceId,
+                                validForDays,
+                            });
+                            return { inviteCode, validForDays };
+                        },
+                        async kickMember() {
+                            console.error(`Not implemented`);
+                        },
+                        // async deleteWorkspace() {
+                        //   isLeavingWorkspace.value = true;
+                        //   await workspaceIntegration.deleteWorkspace();
+                        //   isLeavingWorkspace.value = false;
+                        // },
+                    }
+                    : {
+                        role: userMetadata.role,
+                        async leaveWorkspace() {
+                            isLeavingWorkspace.value = true;
+                            await workspaceIntegration.leaveWorkspace({
+                                stage: config.stage,
+                            });
+                            isLeavingWorkspace.value = false;
+                        },
+                    }).value;
                 return {
                     haveJoined: true,
                     id: userMetadata.workspaceId,
-                    role: userMetadata.role,
-                    async createWorkspaceInvite() {
-                        if (userMetadata.role !== `owner`) {
-                            console.error(`Attempted to create a workspace invite without permission.`);
-                            return;
-                        }
-                        if (userMetadata.workspaceId === null) {
-                            console.error(`Attempted to create a workspace invite without a workspace.`);
-                            return;
-                        }
-                        const validForDays = 14;
-                        const inviteCode = await workspaceIntegration.generateInviteCode();
-                        await workspaceIntegration.createWorkspaceInterface({
-                            inviteCode,
-                            workspaceId: userMetadata.workspaceId,
-                            validForDays,
-                        });
-                        return { inviteCode, validForDays };
-                    },
-                    async leaveWorkspace() {
-                        isLeavingWorkspace.value = true;
-                        await workspaceIntegration.leaveWorkspace({
-                            stage: config.stage,
-                        });
-                        isLeavingWorkspace.value = false;
-                    },
-                    // async deleteWorkspace() {
-                    //   isLeavingWorkspace.value = true;
-                    //   await workspaceIntegration.deleteWorkspace();
-                    //   isLeavingWorkspace.value = false;
-                    // },
+                    ...roleBasedProps,
                 };
             },
             leaving: {

@@ -72,9 +72,19 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        haveJoined?: undefined;
-        createWorkspaceInvite?: undefined;
         leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
     }) | ({
         readonly isNone: true;
         readonly createWorkspace: () => Promise<void>;
@@ -92,9 +102,19 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        haveJoined?: undefined;
-        createWorkspaceInvite?: undefined;
         leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
     }) | ({
         readonly isCreating: true;
     } & {
@@ -110,9 +130,19 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        haveJoined?: undefined;
-        createWorkspaceInvite?: undefined;
         leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
     }) | ({
         readonly isJoining: true;
     } & {
@@ -128,9 +158,19 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        haveJoined?: undefined;
-        createWorkspaceInvite?: undefined;
         leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
     }) | ({
         readonly isLeaving: true;
     } & {
@@ -146,18 +186,30 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         id?: undefined;
         role?: undefined;
-        haveJoined?: undefined;
-        createWorkspaceInvite?: undefined;
         leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
+    } & {
+        id?: undefined;
+        role?: undefined;
+        leaveWorkspace?: undefined;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined?: undefined;
     }) | ({
-        haveJoined: boolean;
-        id: string | null;
-        role: "member" | "owner" | null;
+        isOwner: boolean;
+        role: "owner";
         createWorkspaceInvite(): Promise<{
             inviteCode: string;
             validForDays: number;
         } | undefined>;
-        leaveWorkspace(): Promise<void>;
+        kickMember(): Promise<void>;
+        leaveWorkspace?: undefined;
+        haveJoined: boolean;
+        id: string | null;
     } & {
         isPending?: undefined;
     } & {
@@ -170,7 +222,27 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
         isJoining?: undefined;
     } & {
         isLeaving?: undefined;
-    });
+    } & {}) | ({
+        role: "member" | null;
+        leaveWorkspace(): Promise<void>;
+        isOwner?: undefined;
+        createWorkspaceInvite?: undefined;
+        kickMember?: undefined;
+        haveJoined: boolean;
+        id: string | null;
+    } & {
+        isPending?: undefined;
+    } & {
+        isNone?: undefined;
+        createWorkspace?: undefined;
+        joinWorkspace?: undefined;
+    } & {
+        isCreating?: undefined;
+    } & {
+        isJoining?: undefined;
+    } & {
+        isLeaving?: undefined;
+    } & {});
     signOut: () => Promise<void>;
 }>;
 export declare function getDocStore(params: {
