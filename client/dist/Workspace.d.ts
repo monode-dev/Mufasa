@@ -54,220 +54,84 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     sessionPersister: Session.Persister;
     directoryPersister: Device.DirectoryPersister;
     getCloudAuth: GetCloudAuth<T>;
-}): ReadonlyProp<({
-    isSignedOut: true;
-} & T) | {
-    isPending: boolean;
-} | {
-    isSigningIn: boolean;
-} | {
-    isSigningOut: boolean;
-} | {
+}): {
+    get value(): UserState<T>;
+};
+export type UserState<T extends SignInFuncs> = _Or<_UserStates<T>>;
+type _UserStates<T extends SignInFuncs> = {
+    pending: {
+        isPending: true;
+    };
+    signedOut: {
+        isSignedOut: true;
+    } & T;
+    signingIn: {
+        isSigningIn: true;
+    };
+    signedIn: {
+        uid: string;
+        email: string | null;
+        isSignedIn: true;
+        workspace: ReturnType<typeof createWorkspaceInterface>[`value`];
+        signOut: () => Promise<void>;
+    };
+    signingOut: {
+        isSigningOut: true;
+    };
+};
+type _Or<T extends {
+    [key: string]: {};
+}> = {
+    [K in keyof T]: T[K] & {
+        [K2 in Exclude<_AllKeys<T>, keyof T[K]>]?: undefined;
+    };
+}[keyof T];
+type _AllKeys<T extends {
+    [key: string]: {};
+}> = {
+    [K in keyof T]: keyof T[K];
+}[keyof T];
+declare function createWorkspaceInterface(config: {
     uid: string;
-    email: string | null;
-    isSignedIn: boolean;
-    readonly workspace: ({
-        haveJoined: boolean;
-        readonly id: string;
-        readonly role: NonNullable<"member" | "owner" | null>;
-        readonly otherMembers: Member[];
-    } & {
-        isOwner: boolean;
-        createWorkspaceInvite(): Promise<{
-            inviteCode: string;
-            validForDays: number;
-        } | undefined>;
-        kickMember(): Promise<void>;
-        leaveWorkspace?: undefined;
-    } & {} & {} & {
-        isPending?: undefined;
-    } & {
-        isNone?: undefined;
-        createWorkspace?: undefined;
-        joinWorkspace?: undefined;
-    } & {
-        isCreating?: undefined;
-    } & {
-        isJoining?: undefined;
-    } & {
-        isLeaving?: undefined;
-    }) | ({
-        haveJoined: boolean;
-        readonly id: string;
-        readonly role: NonNullable<"member" | "owner" | null>;
-        readonly otherMembers: Member[];
-    } & {
-        leaveWorkspace(): Promise<void>;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-    } & {} & {
-        isPending?: undefined;
-    } & {
-        isNone?: undefined;
-        createWorkspace?: undefined;
-        joinWorkspace?: undefined;
-    } & {
-        isCreating?: undefined;
-    } & {
-        isJoining?: undefined;
-    } & {
-        isLeaving?: undefined;
-    } & {}) | ({
-        readonly isPending: true;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        isNone?: undefined;
-        createWorkspace?: undefined;
-        joinWorkspace?: undefined;
-    } & {
-        isCreating?: undefined;
-    } & {
-        isJoining?: undefined;
-    } & {
-        isLeaving?: undefined;
-    }) | ({
-        readonly isNone: true;
-        readonly createWorkspace: () => Promise<void>;
-        readonly joinWorkspace: (props: {
-            inviteCode: string;
-        }) => Promise<void>;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        isPending?: undefined;
-    } & {
-        isCreating?: undefined;
-    } & {
-        isJoining?: undefined;
-    } & {
-        isLeaving?: undefined;
-    }) | ({
-        readonly isCreating: true;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        isPending?: undefined;
-    } & {
-        isNone?: undefined;
-        createWorkspace?: undefined;
-        joinWorkspace?: undefined;
-    } & {
-        isJoining?: undefined;
-    } & {
-        isLeaving?: undefined;
-    }) | ({
-        readonly isJoining: true;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        isPending?: undefined;
-    } & {
-        isNone?: undefined;
-        createWorkspace?: undefined;
-        joinWorkspace?: undefined;
-    } & {
-        isCreating?: undefined;
-    } & {
-        isLeaving?: undefined;
-    }) | ({
-        readonly isLeaving: true;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        id?: undefined;
-        role?: undefined;
-        leaveWorkspace?: undefined;
-        isOwner?: undefined;
-        createWorkspaceInvite?: undefined;
-        kickMember?: undefined;
-        haveJoined?: undefined;
-        otherMembers?: undefined;
-    } & {
-        isPending?: undefined;
-    } & {
-        isNone?: undefined;
-        createWorkspace?: undefined;
-        joinWorkspace?: undefined;
-    } & {
-        isCreating?: undefined;
-    } & {
-        isJoining?: undefined;
-    });
-    signOut: () => Promise<void>;
-}>;
+    workspaceIntegration: WorkspaceIntegration;
+    onDispose: (dispose: () => void) => void;
+    directoryPersister: Device.DirectoryPersister;
+    sessionPersister: Session.Persister;
+    stage: string;
+}): ReadonlyProp<{
+    readonly isPending: true;
+} | {
+    readonly isNone: true;
+    readonly createWorkspace: () => Promise<void>;
+    readonly joinWorkspace: (props: {
+        inviteCode: string;
+    }) => Promise<void>;
+} | {
+    readonly isCreating: true;
+} | {
+    readonly isJoining: true;
+} | {
+    readonly isLeaving: true;
+} | ({
+    haveJoined: boolean;
+    id: string;
+    readonly otherMembers: Member[];
+} & (({
+    isOwner: boolean;
+    role: "owner";
+    createWorkspaceInvite(): Promise<{
+        inviteCode: string;
+        validForDays: number;
+    } | undefined>;
+    kickMember(): Promise<void>;
+    leaveWorkspace?: undefined;
+} & {}) | ({
+    role: "member";
+    leaveWorkspace(): Promise<void>;
+    isOwner?: undefined;
+    createWorkspaceInvite?: undefined;
+    kickMember?: undefined;
+} & {})))>;
 export declare function getDocStore(params: {
     stage: string;
     workspaceId: string | null;
@@ -282,3 +146,4 @@ export declare function getFileStore(params: {
     getStoreConfig: () => PersistanceConfig;
     onStoreInit?: (store: FileStore) => void;
 }): FileStore;
+export {};

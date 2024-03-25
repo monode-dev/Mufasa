@@ -65,7 +65,7 @@ export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
       ),
     };
   });
-  const user = initializeAuth({
+  const user = initializeAuth<{}>({
     stage: stage,
     sessionPersister: mfsConfig.sessionPersister,
     directoryPersister:
@@ -73,10 +73,7 @@ export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
     getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
   });
   // TODO: This should be inferred.
-  const getWorkspaceId = (): string | null =>
-    `workspace` in user.value && `id` in user.value.workspace
-      ? user.value.workspace.id ?? null
-      : null;
+  const getWorkspaceId = (): string | null => user.value.workspace?.id ?? null;
   return {
     ...initializeDocClass({
       stage: stage,
@@ -90,7 +87,7 @@ export function _initializeMufasa<T extends SignInFuncs>(mfsConfig: {
       },
     }),
     get user(): ReturnType<typeof initializeAuth<T>>[`value`] {
-      return user.value;
+      return user.value as any;
     },
     // get user(): ReturnType<
     //   typeof initializeAuth<ReturnType<C[`getCloudAuth`]>[`signInFuncs`]>

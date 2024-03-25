@@ -69,194 +69,11 @@ export function initializeAuth<T extends SignInFuncs>(config: {
   sessionPersister: Session.Persister;
   directoryPersister: Device.DirectoryPersister;
   getCloudAuth: GetCloudAuth<T>;
-}) {
+}): {
+  get value(): UserState<T>;
+} {
   const { useProp, useFormula, doNow, exists, onDispose } =
     config.sessionPersister;
-  function createWorkspaceInterface(
-    userId: string,
-    workspaceIntegration: WorkspaceIntegration,
-    onDispose: (dispose: () => void) => void,
-  ) {
-    const isCreatingWorkspace = useProp(false);
-    const isJoiningWorkspace = useProp(false);
-    const isLeavingWorkspace = useProp(false);
-    // const isDeletingWorkspace = useProp(false);
-
-    type PendingAsJson = typeof PendingAsJson;
-    const PendingAsJson = null;
-    type NoneAsJson = typeof NoneAsJson;
-    const NoneAsJson = 0;
-    const userMetadata = doNow(() => {
-      type SavedUserMetadata = PendingAsJson | NoneAsJson | NonNullUserMetadata;
-      const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
-      const savedMetadata = config.directoryPersister
-        .jsonFile(`${userId}.json`)
-        .start(PendingAsJson as SavedUserMetadata);
-      savedMetadata.loadedFromLocalStorage.then(() => {
-        userMetadata.value = savedMetadata.data;
-      });
-      const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
-        (newMetadata) => {
-          savedMetadata.batchUpdate((data) => {
-            const newMetadataValue =
-              exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
-                ? {
-                    workspaceId: newMetadata.workspaceId,
-                    role: newMetadata.role,
-                  }
-                : NoneAsJson;
-            data.value = newMetadataValue;
-            userMetadata.value = newMetadataValue;
-          });
-        },
-      );
-      onDispose(disposeOnSnapshot);
-      return userMetadata as ReadonlyProp<SavedUserMetadata>;
-    });
-
-    const WorkspaceStates = {
-      pending: {
-        isPending: true,
-      },
-      none: {
-        isNone: true,
-        async createWorkspace() {
-          isCreatingWorkspace.value = true;
-          await workspaceIntegration.createWorkspace({
-            stage: config.stage,
-          });
-          isCreatingWorkspace.value = false;
-        },
-        async joinWorkspace(props: { inviteCode: string }) {
-          isJoiningWorkspace.value = true;
-          await workspaceIntegration.joinWorkspace({
-            inviteCode: props.inviteCode,
-            stage: config.stage,
-          });
-          isJoiningWorkspace.value = false;
-        },
-      },
-      creating: {
-        isCreating: true,
-      },
-      joining: {
-        isJoining: true,
-      },
-      joined: doNow(() => {
-        const getUserMetadata = () => userMetadata.value as NonNullUserMetadata;
-        const otherMembers = doNow(() => {
-          const otherMembers = useProp<Member[]>([]);
-          let haveStartedWatching = false;
-          return {
-            get value() {
-              if (!haveStartedWatching) {
-                workspaceIntegration.watchMembers(
-                  getUserMetadata().workspaceId,
-                  (allMembers) => {
-                    otherMembers.value = allMembers.filter((member) => {
-                      return member.uid !== userId;
-                    });
-                  },
-                );
-                haveStartedWatching = true;
-              }
-              return otherMembers.value;
-            },
-          };
-        });
-        const result = {
-          haveJoined: true,
-          get id() {
-            return getUserMetadata().workspaceId;
-          },
-          get role() {
-            return getUserMetadata().role;
-          },
-          get otherMembers() {
-            return otherMembers.value;
-          },
-        };
-        const roleBasedProps = useFormula(() =>
-          getUserMetadata().role === `owner`
-            ? {
-                isOwner: true,
-                async createWorkspaceInvite() {
-                  if (getUserMetadata().role !== `owner`) {
-                    console.error(
-                      `Attempted to create a workspace invite without permission.`,
-                    );
-                    return;
-                  }
-                  if (getUserMetadata().workspaceId === null) {
-                    console.error(
-                      `Attempted to create a workspace invite without a workspace.`,
-                    );
-                    return;
-                  }
-                  const validForDays = 14;
-                  const inviteCode =
-                    await workspaceIntegration.generateInviteCode();
-                  await workspaceIntegration.createWorkspaceInterface({
-                    inviteCode,
-                    workspaceId: getUserMetadata().workspaceId,
-                    validForDays,
-                  });
-                  return { inviteCode, validForDays };
-                },
-                async kickMember() {
-                  console.error(`Not implemented`);
-                },
-                // async deleteWorkspace() {
-                //   isLeavingWorkspace.value = true;
-                //   await workspaceIntegration.deleteWorkspace();
-                //   isLeavingWorkspace.value = false;
-                // },
-              }
-            : {
-                async leaveWorkspace() {
-                  isLeavingWorkspace.value = true;
-                  await workspaceIntegration.leaveWorkspace({
-                    stage: config.stage,
-                  });
-                  isLeavingWorkspace.value = false;
-                },
-              },
-        ).value;
-        Object.keys(roleBasedProps).forEach((key) => {
-          Object.defineProperty(result, key, {
-            get: () => roleBasedProps[key as keyof typeof roleBasedProps],
-            set: (newValue) => {
-              (roleBasedProps as any)[key] = newValue;
-            },
-          });
-        });
-        return result as typeof result & typeof roleBasedProps;
-      }),
-      leaving: {
-        isLeaving: true,
-      },
-      // deleting: {
-      //   isDeleting: true,
-      // },
-    } as const;
-
-    return useFormula<(typeof WorkspaceStates)[keyof typeof WorkspaceStates]>(
-      () => {
-        console.log(`userMetadata.value`, userMetadata.value);
-        return userMetadata.value === PendingAsJson
-          ? WorkspaceStates.pending
-          : userMetadata.value === NoneAsJson
-          ? isCreatingWorkspace.value
-            ? WorkspaceStates.creating
-            : isJoiningWorkspace.value
-            ? WorkspaceStates.joining
-            : WorkspaceStates.none
-          : isLeavingWorkspace.value
-          ? WorkspaceStates.leaving
-          : WorkspaceStates.joined;
-      },
-    );
-  }
 
   // SECTION: User
   return doNow(() => {
@@ -307,11 +124,14 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         userInfo: UserInfo,
         onDispose: (dispose: () => void) => void,
       ) {
-        const workspace = createWorkspaceInterface(
-          userInfo.uid,
-          cloudAuth.getWorkspaceIntegration(userInfo.uid),
+        const workspace = createWorkspaceInterface({
+          uid: userInfo.uid,
+          workspaceIntegration: cloudAuth.getWorkspaceIntegration(userInfo.uid),
           onDispose,
-        );
+          directoryPersister: config.directoryPersister,
+          sessionPersister: config.sessionPersister,
+          stage: config.stage,
+        });
         return {
           uid: userInfo.uid,
           email: userInfo.email,
@@ -341,7 +161,228 @@ export function initializeAuth<T extends SignInFuncs>(config: {
           ? UserStates.signingOut
           : UserStates.createSignedInInst(userInfo.value, onDispose),
       // createAwaitingVerificationInst,
+    ) as any;
+  });
+}
+export type UserState<T extends SignInFuncs> = _Or<_UserStates<T>>;
+type _UserStates<T extends SignInFuncs> = {
+  pending: {
+    isPending: true;
+  };
+  signedOut: {
+    isSignedOut: true;
+  } & T;
+  signingIn: {
+    isSigningIn: true;
+  };
+  signedIn: {
+    uid: string;
+    email: string | null;
+    isSignedIn: true;
+    workspace: ReturnType<typeof createWorkspaceInterface>[`value`];
+    signOut: () => Promise<void>;
+  };
+  signingOut: {
+    isSigningOut: true;
+  };
+};
+type _Or<T extends { [key: string]: {} }> = {
+  [K in keyof T]: T[K] & {
+    [K2 in Exclude<_AllKeys<T>, keyof T[K]>]?: undefined;
+  };
+}[keyof T];
+type _AllKeys<T extends { [key: string]: {} }> = {
+  [K in keyof T]: keyof T[K];
+}[keyof T];
+// type ksjdakf<T extends { [key: string]: {} }> = {
+//   [K in keyof T]: T[K] & {
+//     [K2 in Exclude<_AllKeys<T>, keyof T[K]>]?: undefined;
+//   };
+// };
+// type AJSKDFjsa = ksjdakf<_UserStates<{}>>[`signedIn`];
+
+function createWorkspaceInterface(config: {
+  uid: string;
+  workspaceIntegration: WorkspaceIntegration;
+  onDispose: (dispose: () => void) => void;
+  directoryPersister: Device.DirectoryPersister;
+  sessionPersister: Session.Persister;
+  stage: string;
+}) {
+  const { uid, workspaceIntegration, sessionPersister } = config;
+  const { useProp, useFormula, doNow, exists, onDispose } = sessionPersister;
+  const isCreatingWorkspace = useProp(false);
+  const isJoiningWorkspace = useProp(false);
+  const isLeavingWorkspace = useProp(false);
+  // const isDeletingWorkspace = useProp(false);
+
+  type PendingAsJson = typeof PendingAsJson;
+  const PendingAsJson = null;
+  type NoneAsJson = typeof NoneAsJson;
+  const NoneAsJson = 0;
+  const userMetadata = doNow(() => {
+    type SavedUserMetadata = PendingAsJson | NoneAsJson | NonNullUserMetadata;
+    const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
+    const savedMetadata = config.directoryPersister
+      .jsonFile(`${uid}.json`)
+      .start(PendingAsJson as SavedUserMetadata);
+    savedMetadata.loadedFromLocalStorage.then(() => {
+      userMetadata.value = savedMetadata.data;
+    });
+    const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
+      (newMetadata) => {
+        savedMetadata.batchUpdate((data) => {
+          const newMetadataValue =
+            exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
+              ? {
+                  workspaceId: newMetadata.workspaceId,
+                  role: newMetadata.role,
+                }
+              : NoneAsJson;
+          data.value = newMetadataValue;
+          userMetadata.value = newMetadataValue;
+        });
+      },
     );
+    onDispose(disposeOnSnapshot);
+    return userMetadata as ReadonlyProp<SavedUserMetadata>;
+  });
+
+  const WorkspaceStates = {
+    pending: {
+      isPending: true,
+    },
+    none: {
+      isNone: true,
+      async createWorkspace() {
+        isCreatingWorkspace.value = true;
+        await workspaceIntegration.createWorkspace({
+          stage: config.stage,
+        });
+        isCreatingWorkspace.value = false;
+      },
+      async joinWorkspace(props: { inviteCode: string }) {
+        isJoiningWorkspace.value = true;
+        await workspaceIntegration.joinWorkspace({
+          inviteCode: props.inviteCode,
+          stage: config.stage,
+        });
+        isJoiningWorkspace.value = false;
+      },
+    },
+    creating: {
+      isCreating: true,
+    },
+    joining: {
+      isJoining: true,
+    },
+    createJoinedInst(userMetadata: NonNullUserMetadata) {
+      const otherMembers = doNow(() => {
+        const otherMembers = useProp<Member[]>([]);
+        let haveStartedWatching = false;
+        return {
+          get value() {
+            if (!haveStartedWatching) {
+              workspaceIntegration.watchMembers(
+                userMetadata.workspaceId,
+                (allMembers) => {
+                  otherMembers.value = allMembers.filter((member) => {
+                    return member.uid !== uid;
+                  });
+                },
+              );
+              haveStartedWatching = true;
+            }
+            return otherMembers.value;
+          },
+        };
+      });
+      const result = {
+        haveJoined: true,
+        id: userMetadata.workspaceId,
+        get otherMembers() {
+          return otherMembers.value;
+        },
+      };
+      const roleBasedProps = useFormula(() =>
+        userMetadata.role === `owner`
+          ? {
+              isOwner: true,
+              role: userMetadata.role,
+              async createWorkspaceInvite() {
+                if (userMetadata.role !== `owner`) {
+                  console.error(
+                    `Attempted to create a workspace invite without permission.`,
+                  );
+                  return;
+                }
+                if (userMetadata.workspaceId === null) {
+                  console.error(
+                    `Attempted to create a workspace invite without a workspace.`,
+                  );
+                  return;
+                }
+                const validForDays = 14;
+                const inviteCode =
+                  await workspaceIntegration.generateInviteCode();
+                await workspaceIntegration.createWorkspaceInterface({
+                  inviteCode,
+                  workspaceId: userMetadata.workspaceId,
+                  validForDays,
+                });
+                return { inviteCode, validForDays };
+              },
+              async kickMember() {
+                console.error(`Not implemented`);
+              },
+              // async deleteWorkspace() {
+              //   isLeavingWorkspace.value = true;
+              //   await workspaceIntegration.deleteWorkspace();
+              //   isLeavingWorkspace.value = false;
+              // },
+            }
+          : {
+              role: userMetadata.role,
+              async leaveWorkspace() {
+                isLeavingWorkspace.value = true;
+                await workspaceIntegration.leaveWorkspace({
+                  stage: config.stage,
+                });
+                isLeavingWorkspace.value = false;
+              },
+            },
+      ).value;
+      Object.keys(roleBasedProps).forEach((key) => {
+        Object.defineProperty(result, key, {
+          get: () => roleBasedProps[key as keyof typeof roleBasedProps],
+          set: (newValue) => {
+            (roleBasedProps as any)[key] = newValue;
+          },
+        });
+      });
+      return result as typeof result & typeof roleBasedProps;
+    },
+    leaving: {
+      isLeaving: true,
+    },
+    // deleting: {
+    //   isDeleting: true,
+    // },
+  } as const;
+
+  return useFormula(() => {
+    console.log(`userMetadata.value`, userMetadata.value);
+    return userMetadata.value === PendingAsJson
+      ? WorkspaceStates.pending
+      : userMetadata.value === NoneAsJson
+      ? isCreatingWorkspace.value
+        ? WorkspaceStates.creating
+        : isJoiningWorkspace.value
+        ? WorkspaceStates.joining
+        : WorkspaceStates.none
+      : isLeavingWorkspace.value
+      ? WorkspaceStates.leaving
+      : WorkspaceStates.createJoinedInst(userMetadata.value);
   });
 }
 

@@ -46,9 +46,7 @@ export function _initializeMufasa(mfsConfig) {
         getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
     });
     // TODO: This should be inferred.
-    const getWorkspaceId = () => `workspace` in user.value && `id` in user.value.workspace
-        ? user.value.workspace.id ?? null
-        : null;
+    const getWorkspaceId = () => user.value.workspace?.id ?? null;
     return {
         ...initializeDocClass({
             stage: stage,
