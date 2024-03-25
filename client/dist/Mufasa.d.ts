@@ -20,11 +20,11 @@ export { WorkspaceIntegration, UserMetadata } from "./Workspace.js";
  * });
  * ```
  */
-export declare function initializeMufasa<T extends SignInFuncs = {}>(mfsConfig: {
+export declare function initializeMufasa<C extends Cloud.Persister<T>, T extends SignInFuncs = {}>(mfsConfig: {
     stage?: string;
     sessionPersister: Session.Persister;
     devicePersister?: Device.Persister;
-    cloudPersister: Cloud.Persister<T>;
+    cloudPersister: C;
 }): {
     readonly isUploadingToCloud: boolean;
     readonly workspaceId: string | null;
