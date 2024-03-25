@@ -48,9 +48,11 @@ try {
   console.log("Successfully published the package");
 
   // Commit the version change
-  execSync(`git add .`);
-  execSync(`git commit -m "Publishing @mufasa-orm/firebase-functions ${newVersion}"`);
-  execSync(`git push`);
+  execSync(`cd .. git add .`);
+  execSync(
+    `cd .. git commit -m "Publishing @mufasa-orm/firebase-functions ${newVersion}"`,
+  );
+  execSync(`cd .. git push`);
 } catch (err) {
   console.error("Error reading, updating, or publishing the package.", err);
   process.exit(1);
