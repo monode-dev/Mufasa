@@ -130,6 +130,10 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         isJoining: true,
       },
       createJoinedInst(userMetadata: UserMetadata) {
+        const result = {
+          haveJoined: true,
+          id: userMetadata.workspaceId,
+        };
         const roleBasedProps = useFormula(() =>
           userMetadata.role === `owner`
             ? {
@@ -178,11 +182,15 @@ export function initializeAuth<T extends SignInFuncs>(config: {
                 },
               },
         ).value;
-        return {
-          haveJoined: true,
-          id: userMetadata.workspaceId,
-          ...roleBasedProps,
-        };
+        Object.keys(roleBasedProps).forEach((key) => {
+          Object.defineProperty(result, key, {
+            get: () => roleBasedProps[key as keyof typeof roleBasedProps],
+            set: (newValue) => {
+              (roleBasedProps as any)[key] = newValue;
+            },
+          });
+        });
+        return result as typeof result & typeof roleBasedProps;
       },
       leaving: {
         isLeaving: true,

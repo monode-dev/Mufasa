@@ -200,6 +200,9 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
         kickMember?: undefined;
         haveJoined?: undefined;
     }) | ({
+        haveJoined: boolean;
+        id: string | null;
+    } & {
         isOwner: boolean;
         role: "owner";
         createWorkspaceInvite(): Promise<{
@@ -208,9 +211,7 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
         } | undefined>;
         kickMember(): Promise<void>;
         leaveWorkspace?: undefined;
-        haveJoined: boolean;
-        id: string | null;
-    } & {
+    } & {} & {
         isPending?: undefined;
     } & {
         isNone?: undefined;
@@ -223,14 +224,15 @@ export declare function initializeAuth<T extends SignInFuncs>(config: {
     } & {
         isLeaving?: undefined;
     } & {}) | ({
+        haveJoined: boolean;
+        id: string | null;
+    } & {
         role: "member" | null;
         leaveWorkspace(): Promise<void>;
         isOwner?: undefined;
         createWorkspaceInvite?: undefined;
         kickMember?: undefined;
-        haveJoined: boolean;
-        id: string | null;
-    } & {
+    } & {} & {
         isPending?: undefined;
     } & {
         isNone?: undefined;

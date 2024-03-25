@@ -60,6 +60,10 @@ export function initializeAuth(config) {
                 isJoining: true,
             },
             createJoinedInst(userMetadata) {
+                const result = {
+                    haveJoined: true,
+                    id: userMetadata.workspaceId,
+                };
                 const roleBasedProps = useFormula(() => userMetadata.role === `owner`
                     ? {
                         isOwner: true,
@@ -101,11 +105,15 @@ export function initializeAuth(config) {
                             isLeavingWorkspace.value = false;
                         },
                     }).value;
-                return {
-                    haveJoined: true,
-                    id: userMetadata.workspaceId,
-                    ...roleBasedProps,
-                };
+                Object.keys(roleBasedProps).forEach((key) => {
+                    Object.defineProperty(result, key, {
+                        get: () => roleBasedProps[key],
+                        set: (newValue) => {
+                            roleBasedProps[key] = newValue;
+                        },
+                    });
+                });
+                return result;
             },
             leaving: {
                 isLeaving: true,
