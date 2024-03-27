@@ -229,20 +229,17 @@ function createWorkspaceInterface(config) {
         //   isDeleting: true,
         // },
     };
-    return useFormula(() => {
-        console.log(`userMetadata.value`, userMetadata.value);
-        return userMetadata.value === PendingAsJson
-            ? WorkspaceStates.pending
-            : userMetadata.value === NoneAsJson
-                ? isCreatingWorkspace.value
-                    ? WorkspaceStates.creating
-                    : isJoiningWorkspace.value
-                        ? WorkspaceStates.joining
-                        : WorkspaceStates.none
-                : isLeavingWorkspace.value
-                    ? WorkspaceStates.leaving
-                    : WorkspaceStates.createJoinedInst(userMetadata.value);
-    });
+    return useFormula(() => userMetadata.value === PendingAsJson
+        ? WorkspaceStates.pending
+        : userMetadata.value === NoneAsJson
+            ? isCreatingWorkspace.value
+                ? WorkspaceStates.creating
+                : isJoiningWorkspace.value
+                    ? WorkspaceStates.joining
+                    : WorkspaceStates.none
+            : isLeavingWorkspace.value
+                ? WorkspaceStates.leaving
+                : WorkspaceStates.createJoinedInst(userMetadata.value));
 }
 // SECTION: Workspace Instances
 const workspaceInsts = new Map();
