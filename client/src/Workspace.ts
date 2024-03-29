@@ -87,9 +87,9 @@ export function initializeAuth<T extends SignInFuncs>(config: {
     const isSigningIn = useProp(false);
     const isSigningOut = useProp(false);
     async function signOut() {
-      isSigningOut.value = true;
+      // isSigningOut.value = true;
       await cloudAuth.signOut();
-      isSigningOut.value = false;
+      // isSigningOut.value = false;
     }
     const UserStates = {
       pending: {
