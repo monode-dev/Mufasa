@@ -25,13 +25,7 @@ import {
   FirebaseStorage,
 } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import {
-  Auth,
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  signInWithCredential,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { Auth, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { Functions, httpsCallable } from "firebase/functions";
 import {
   CloudAuth,
@@ -194,8 +188,11 @@ type AuthParams = Omit<
   `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`
 >;
 export function firebaseAuthIntegration(config: {
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
   signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
   signOutFromPlatform: () => Promise<void>;
+  signOutFromFirebase: () => Promise<void>;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
   firebaseFunctions: Functions;
@@ -213,18 +210,14 @@ export function firebaseAuthIntegration(config: {
     signInFuncs: {
       signUpWithEmail: async (email: string, password: string) => {
         try {
-          await createUserWithEmailAndPassword(
-            config.firebaseAuth,
-            email,
-            password,
-          );
+          await config.signUpWithEmail(email, password);
         } catch (error) {
           console.error("Error during email sign-up:", error);
         }
       },
       signInWithEmail: async (email: string, password: string) => {
         try {
-          signInWithEmailAndPassword(config.firebaseAuth, email, password);
+          config.signInWithEmail(email, password);
         } catch (error) {
           console.error("Error during email sign-in:", error);
         }
@@ -246,7 +239,7 @@ export function firebaseAuthIntegration(config: {
     async signOut() {
       try {
         // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-        await config.firebaseAuth.signOut();
+        await config.signOutFromFirebase();
         await config.signOutFromPlatform();
       } catch (error) {
         console.error("Error during Sign-Out:", error);

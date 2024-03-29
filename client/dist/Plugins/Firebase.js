@@ -1,7 +1,7 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithCredential, signInWithEmailAndPassword, } from "firebase/auth";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
     return {
@@ -100,7 +100,7 @@ export function firebaseAuthIntegration(config) {
         signInFuncs: {
             signUpWithEmail: async (email, password) => {
                 try {
-                    await createUserWithEmailAndPassword(config.firebaseAuth, email, password);
+                    await config.signUpWithEmail(email, password);
                 }
                 catch (error) {
                     console.error("Error during email sign-up:", error);
@@ -108,7 +108,7 @@ export function firebaseAuthIntegration(config) {
             },
             signInWithEmail: async (email, password) => {
                 try {
-                    signInWithEmailAndPassword(config.firebaseAuth, email, password);
+                    config.signInWithEmail(email, password);
                 }
                 catch (error) {
                     console.error("Error during email sign-in:", error);
@@ -133,7 +133,7 @@ export function firebaseAuthIntegration(config) {
         async signOut() {
             try {
                 // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-                await config.firebaseAuth.signOut();
+                await config.signOutFromFirebase();
                 await config.signOutFromPlatform();
             }
             catch (error) {

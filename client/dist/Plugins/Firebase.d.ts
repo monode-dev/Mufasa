@@ -33,8 +33,11 @@ export declare function workspacePersister(firestoreConfig: {
 }, getStorageRef: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
 type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`>;
 export declare function firebaseAuthIntegration(config: {
+    signUpWithEmail: (email: string, password: string) => Promise<void>;
+    signInWithEmail: (email: string, password: string) => Promise<void>;
     signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
     signOutFromPlatform: () => Promise<void>;
+    signOutFromFirebase: () => Promise<void>;
     firebaseAuth: Auth;
     onAuthStateChanged: (user: UserInfo | null) => void;
     firebaseFunctions: Functions;
