@@ -101,9 +101,9 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         } & T;
         // TODO: Force these to be single threaded.
         Object.keys(cloudAuth.signInFuncs).forEach((key) => {
-          (signedOut as any)[key] = async () => {
+          (signedOut as any)[key] = async (...args: any[]) => {
             isSigningIn.value = true;
-            await cloudAuth.signInFuncs[key]();
+            await cloudAuth.signInFuncs[key](...(args as []));
             isSigningIn.value = false;
           };
         });

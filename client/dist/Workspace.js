@@ -24,9 +24,9 @@ export function initializeAuth(config) {
                 const signedOut = { isSignedOut: true };
                 // TODO: Force these to be single threaded.
                 Object.keys(cloudAuth.signInFuncs).forEach((key) => {
-                    signedOut[key] = async () => {
+                    signedOut[key] = async (...args) => {
                         isSigningIn.value = true;
-                        await cloudAuth.signInFuncs[key]();
+                        await cloudAuth.signInFuncs[key](...args);
                         isSigningIn.value = false;
                     };
                 });
