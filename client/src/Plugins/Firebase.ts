@@ -224,9 +224,13 @@ export function firebaseAuthIntegration(config: {
       },
     },
     async signOut() {
-      // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-      await config.signOutFromFirebase();
-      await config.signOutFromPlatform();
+      try {
+        // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
+        await config.signOutFromFirebase();
+        await config.signOutFromPlatform();
+      } catch (error) {
+        console.error("Error during Sign-Out:", error);
+      }
     },
     getWorkspaceIntegration: (uid: string) =>
       firebaseWorkspace({

@@ -9,6 +9,7 @@ import {
 } from "./DocStore.js";
 import { FileStore, createFileStore } from "./FileStore.js";
 import { ReadonlyProp } from "@monode/mosa";
+import { isValid } from "./Utils.js";
 
 // SECTION: Types
 export type UserInfo = {
@@ -102,9 +103,15 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         // TODO: Force these to be single threaded.
         Object.keys(cloudAuth.signInFuncs).forEach((key) => {
           (signedOut as any)[key] = async (...args: any[]) => {
+            let error: any = null;
             isSigningIn.value = true;
-            await cloudAuth.signInFuncs[key](...(args as []));
+            try {
+              await cloudAuth.signInFuncs[key](...(args as []));
+            } catch (e) {
+              error = e;
+            }
             isSigningIn.value = false;
+            if (isValid(error)) throw error;
           };
         });
         return signedOut;

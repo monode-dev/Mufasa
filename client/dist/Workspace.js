@@ -1,5 +1,6 @@
 import { initDocStoreConfig, createDocStore, } from "./DocStore.js";
 import { createFileStore } from "./FileStore.js";
+import { isValid } from "./Utils.js";
 export function initializeAuth(config) {
     const { useProp, useFormula, doNow, exists, onDispose } = config.sessionPersister;
     // SECTION: User
@@ -25,9 +26,17 @@ export function initializeAuth(config) {
                 // TODO: Force these to be single threaded.
                 Object.keys(cloudAuth.signInFuncs).forEach((key) => {
                     signedOut[key] = async (...args) => {
+                        let error = null;
                         isSigningIn.value = true;
-                        await cloudAuth.signInFuncs[key](...args);
+                        try {
+                            await cloudAuth.signInFuncs[key](...args);
+                        }
+                        catch (e) {
+                            error = e;
+                        }
                         isSigningIn.value = false;
+                        if (isValid(error))
+                            throw error;
                     };
                 });
                 return signedOut;
