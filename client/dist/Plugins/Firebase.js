@@ -99,46 +99,25 @@ export function firebaseAuthIntegration(config) {
     return {
         signInFuncs: {
             signUpWithEmail: async (email, password) => {
-                try {
-                    await config.signUpWithEmail(email, password);
-                }
-                catch (error) {
-                    console.error("Error during email sign-up:", error);
-                }
+                await config.signUpWithEmail(email, password);
             },
             signInWithEmail: async (email, password) => {
-                try {
-                    config.signInWithEmail(email, password);
-                }
-                catch (error) {
-                    console.error("Error during email sign-in:", error);
-                }
+                await config.signInWithEmail(email, password);
             },
             async signInWithGoogle() {
                 await doNow(async () => {
-                    try {
-                        const idToken = await config.signInToGoogleFromPlatform();
-                        if (!isValid(idToken))
-                            return;
-                        const credential = GoogleAuthProvider.credential(idToken);
-                        await signInWithCredential(config.firebaseAuth, credential);
-                        // console.log("Google Sign-In Success:", credential);
-                    }
-                    catch (error) {
-                        console.error("Error during Google Sign-In:", error);
-                    }
+                    const idToken = await config.signInToGoogleFromPlatform();
+                    if (!isValid(idToken))
+                        return;
+                    const credential = GoogleAuthProvider.credential(idToken);
+                    await signInWithCredential(config.firebaseAuth, credential);
                 });
             },
         },
         async signOut() {
-            try {
-                // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-                await config.signOutFromFirebase();
-                await config.signOutFromPlatform();
-            }
-            catch (error) {
-                console.error("Error during Sign-Out:", error);
-            }
+            // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
+            await config.signOutFromFirebase();
+            await config.signOutFromPlatform();
         },
         getWorkspaceIntegration: (uid) => firebaseWorkspace({
             ...config,
