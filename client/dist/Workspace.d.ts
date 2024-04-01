@@ -1,6 +1,6 @@
 import { Device, DocStore, PersistanceConfig, Session, Cloud } from "./DocStore.js";
 import { FileStore } from "./FileStore.js";
-import { ReadonlyProp } from "@monode/mosa";
+import { ReadonlyProp } from "mosa-js";
 export type UserInfo = {
     uid: string;
     email: string | null;

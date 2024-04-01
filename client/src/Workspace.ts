@@ -8,7 +8,7 @@ import {
   Cloud,
 } from "./DocStore.js";
 import { FileStore, createFileStore } from "./FileStore.js";
-import { ReadonlyProp } from "@monode/mosa";
+import { ReadonlyProp } from "mosa-js";
 import { isValid } from "./Utils.js";
 
 // SECTION: Types

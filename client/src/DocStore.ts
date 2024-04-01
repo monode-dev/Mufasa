@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionTablePersister } from "./SessionTablePersister.js";
-import type { MosaApi } from "@monode/mosa";
+import type { MosaApi } from "mosa-js";
 import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
 
 export const DELETED_KEY = `mx_deleted`;

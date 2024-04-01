@@ -1,6 +1,6 @@
 import { DELETED_KEY, PrimVal, Session } from "./DocStore.js";
 import { isValid } from "./Utils.js";
-import type { MosaApi, Prop } from "@monode/mosa";
+import type { MosaApi, Prop } from "mosa-js";
 
 const IS_VIRTUAL = Symbol("IS_VIRTUAL");
 

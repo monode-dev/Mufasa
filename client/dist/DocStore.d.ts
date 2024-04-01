@@ -1,4 +1,4 @@
-import type { MosaApi } from "@monode/mosa";
+import type { MosaApi } from "mosa-js";
 import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
 export declare const DELETED_KEY = "mx_deleted";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
