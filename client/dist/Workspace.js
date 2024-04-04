@@ -118,6 +118,7 @@ function createWorkspaceInterface(config) {
                     ? {
                         workspaceId: newMetadata.workspaceId,
                         role: newMetadata.role,
+                        workspaceEntitlements: newMetadata.workspaceEntitlements ?? [],
                     }
                     : NoneAsJson;
                 data.value = newMetadataValue;
@@ -178,6 +179,9 @@ function createWorkspaceInterface(config) {
                 id: userMetadata.workspaceId,
                 get otherMembers() {
                     return otherMembers.value;
+                },
+                get workspaceEntitlements() {
+                    return userMetadata.workspaceEntitlements ?? [];
                 },
             };
             const roleBasedProps = useFormula(() => userMetadata.role === `owner`

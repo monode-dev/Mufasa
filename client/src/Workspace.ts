@@ -24,6 +24,7 @@ export type Member = {
 export type UserMetadata = {
   workspaceId: string | null;
   role: `member` | `owner` | null;
+  workspaceEntitlements: string[] | null;
 };
 export type NonNullUserMetadata = {
   [K in keyof UserMetadata]-?: NonNullable<UserMetadata[K]>;
@@ -230,13 +231,16 @@ function createWorkspaceInterface(config: {
   type NoneAsJson = typeof NoneAsJson;
   const NoneAsJson = 0;
   const userMetadata = doNow(() => {
-    type SavedUserMetadata = PendingAsJson | NoneAsJson | NonNullUserMetadata;
+    type SavedUserMetadata =
+      | PendingAsJson
+      | NoneAsJson
+      | Readonly<NonNullUserMetadata>;
     const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
     const savedMetadata = config.directoryPersister
       .jsonFile(`${uid}.json`)
       .start(PendingAsJson as SavedUserMetadata);
     savedMetadata.loadedFromLocalStorage.then(() => {
-      userMetadata.value = savedMetadata.data;
+      userMetadata.value = savedMetadata.data as any;
     });
     const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
       (newMetadata) => {
@@ -246,6 +250,8 @@ function createWorkspaceInterface(config: {
               ? {
                   workspaceId: newMetadata.workspaceId,
                   role: newMetadata.role,
+                  workspaceEntitlements:
+                    newMetadata.workspaceEntitlements ?? [],
                 }
               : NoneAsJson;
           data.value = newMetadataValue;
@@ -311,6 +317,9 @@ function createWorkspaceInterface(config: {
         id: userMetadata.workspaceId,
         get otherMembers() {
           return otherMembers.value;
+        },
+        get workspaceEntitlements() {
+          return userMetadata.workspaceEntitlements ?? [];
         },
       };
       const roleBasedProps = useFormula(() =>

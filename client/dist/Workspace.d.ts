@@ -13,6 +13,7 @@ export type Member = {
 export type UserMetadata = {
     workspaceId: string | null;
     role: `member` | `owner` | null;
+    workspaceEntitlements: string[] | null;
 };
 export type NonNullUserMetadata = {
     [K in keyof UserMetadata]-?: NonNullable<UserMetadata[K]>;
@@ -117,6 +118,7 @@ declare function createWorkspaceInterface(config: {
     haveJoined: boolean;
     id: string;
     readonly otherMembers: Member[];
+    readonly workspaceEntitlements: string[];
 } & (({
     isOwner: boolean;
     role: "owner";
