@@ -40,7 +40,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
     // SECTION: Functions
     return {
         createWorkspace: (0, https_1.onCall)(callableOptions, async (request) => {
-            var _a, _b, _c;
+            var _a, _b, _c, _d;
             // Validate user
             if (request.auth === undefined)
                 throw new Error("Unauthorized");
@@ -60,9 +60,12 @@ function initializeMufasaFunctions({ firestore, auth, }) {
                         `melchiahmauck@gmail.com`,
                     ].includes((_b = request.auth.token.email) === null || _b === void 0 ? void 0 : _b.trim().toLowerCase())
                     ? `axiom-hoist`
-                    : (0, uuid_1.v4)(),
+                    : request.auth.token.email !== undefined &&
+                        [`info@tke.us`].includes((_c = request.auth.token.email) === null || _c === void 0 ? void 0 : _c.trim().toLowerCase())
+                        ? `559957d2-2a30-45da-9cbe-77af979a8bc5`
+                        : (0, uuid_1.v4)(),
                 role: `owner`,
-                email: (_c = request.auth.token.email) !== null && _c !== void 0 ? _c : null,
+                email: (_d = request.auth.token.email) !== null && _d !== void 0 ? _d : null,
                 stage: request.data.stage,
             });
             return {};
