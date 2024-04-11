@@ -85,6 +85,11 @@ export function initializeMufasaFunctions({
             `melchiahmauck@gmail.com`,
           ].includes(request.auth.token.email?.trim().toLowerCase())
             ? `axiom-hoist`
+            : request.auth.token.email !== undefined &&
+              [`info@tke.us`].includes(
+                request.auth.token.email?.trim().toLowerCase(),
+              )
+            ? `559957d2-2a30-45da-9cbe-77af979a8bc5`
             : uuidv4(),
         role: `owner`,
         email: request.auth.token.email ?? null,
