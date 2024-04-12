@@ -16,9 +16,11 @@ export function firebasePersister(firebaseConfig) {
         getWorkspacePersister: (setup) => workspacePersister({
             collectionRef: collection(firebaseConfig.firestore, `${setup.stage}-Workspaces`, setup.workspaceId, setup.docType),
             queryConstraints: [],
-        }, (fileId) => storageRef(firebaseConfig.firebaseStorage, 
-        // TODO: Include DocType in the path.
-        `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`)),
+        }, isValid(firebaseConfig.firebaseStorage)
+            ? (fileId) => storageRef(firebaseConfig.firebaseStorage, 
+            // TODO: Include DocType in the path.
+            `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`)
+            : undefined),
     };
 }
 export function workspacePersister(firestoreConfig, getStorageRef) {
@@ -74,19 +76,23 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
                 [CHANGE_DATE_KEY]: useServerTimestamp,
             });
         },
-        async uploadFile(fileId, base64String) {
-            await uploadString(getStorageRef(fileId), base64String);
-        },
-        async downloadFile(fileId) {
-            const bytes = await getBytes(getStorageRef(fileId)).catch(() => undefined);
-            if (!isValid(bytes))
-                return undefined;
-            const base64String = new TextDecoder("utf-8").decode(bytes);
-            return base64String;
-        },
-        async deleteFile(fileId) {
-            await deleteObject(getStorageRef(fileId));
-        },
+        ...(isValid(getStorageRef)
+            ? {
+                async uploadFile(fileId, base64String) {
+                    await uploadString(getStorageRef(fileId), base64String);
+                },
+                async downloadFile(fileId) {
+                    const bytes = await getBytes(getStorageRef(fileId)).catch(() => undefined);
+                    if (!isValid(bytes))
+                        return undefined;
+                    const base64String = new TextDecoder("utf-8").decode(bytes);
+                    return base64String;
+                },
+                async deleteFile(fileId) {
+                    await deleteObject(getStorageRef(fileId));
+                },
+            }
+            : {}),
         stopUploadsAndDownloads() {
             // TODO: Implement
         },

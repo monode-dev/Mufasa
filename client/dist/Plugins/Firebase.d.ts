@@ -6,7 +6,7 @@ import { Functions } from "firebase/functions";
 import { WorkspaceIntegration, UserInfo } from "../Workspace.js";
 export declare function firebasePersister(firebaseConfig: {
     firestore: Firestore;
-    firebaseStorage: FirebaseStorage;
+    firebaseStorage?: FirebaseStorage;
     firebaseFunctions: Functions;
 } & AuthParams): {
     getCloudAuth({ onAuthStateChanged, stage }: {
@@ -30,7 +30,7 @@ export declare function firebasePersister(firebaseConfig: {
 export declare function workspacePersister(firestoreConfig: {
     collectionRef: CollectionReference;
     queryConstraints: QueryFilterConstraint[];
-}, getStorageRef: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
+}, getStorageRef?: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
 type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`>;
 export declare function firebaseAuthIntegration(config: {
     signUpWithEmail: (email: string, password: string) => Promise<void>;

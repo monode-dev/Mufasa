@@ -9,6 +9,7 @@ export function createFileStore(config: DocStoreParams) {
   const pullCreate = createPersistedFunction(
     config.deviceDirectoryPersister.jsonFile(`pullCreate`),
     async (fileId: string) => {
+      if (!isValid(config.cloudWorkspacePersister.downloadFile)) return null;
       const fileData = await config.cloudWorkspacePersister.downloadFile(
         fileId,
       );
@@ -52,7 +53,7 @@ export function createFileStore(config: DocStoreParams) {
       if (!isValid(fileId)) return;
       const fileData = await config.deviceDirectoryPersister.readFile(fileId);
       if (!isValid(fileData)) return;
-      config.cloudWorkspacePersister.uploadFile(fileId, fileData);
+      config.cloudWorkspacePersister.uploadFile?.(fileId, fileData);
       // Manually persist globally to signify that the file is uploaded.
       docStore.batchUpdate(
         {
@@ -98,7 +99,7 @@ export function createFileStore(config: DocStoreParams) {
         return fileId;
       },
     ).addStep(async (fileId) => {
-      await config.cloudWorkspacePersister.deleteFile(fileId);
+      await config.cloudWorkspacePersister.deleteFile?.(fileId);
     }),
     pullDelete,
     async readFile(fileId: string) {

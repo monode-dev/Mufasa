@@ -81,9 +81,9 @@ export declare namespace Cloud {
     type WorkspacePersister = {
         start: (batchUpdate: (updates: UpdateBatch) => void, localMetaDataPersister: Device.JsonPersister) => void;
         updateDoc: (change: Cloud.DocChange) => Promise<void>;
-        uploadFile: (fileId: string, base64String: string) => Promise<void>;
-        downloadFile: (fileId: string) => Promise<string | undefined>;
-        deleteFile: (fileId: string) => Promise<void>;
+        uploadFile?: (fileId: string, base64String: string) => Promise<void>;
+        downloadFile?: (fileId: string) => Promise<string | undefined>;
+        deleteFile?: (fileId: string) => Promise<void>;
         stopUploadsAndDownloads: () => void;
     };
     const mockWorkspacePersister: Cloud.WorkspacePersister;

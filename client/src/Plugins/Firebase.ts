@@ -38,7 +38,7 @@ import {
 export function firebasePersister(
   firebaseConfig: {
     firestore: Firestore;
-    firebaseStorage: FirebaseStorage;
+    firebaseStorage?: FirebaseStorage;
     firebaseFunctions: Functions;
   } & AuthParams,
 ) {
@@ -65,12 +65,14 @@ export function firebasePersister(
           ),
           queryConstraints: [],
         },
-        (fileId) =>
-          storageRef(
-            firebaseConfig.firebaseStorage,
-            // TODO: Include DocType in the path.
-            `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`,
-          ),
+        isValid(firebaseConfig.firebaseStorage)
+          ? (fileId) =>
+              storageRef(
+                firebaseConfig.firebaseStorage!,
+                // TODO: Include DocType in the path.
+                `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`,
+              )
+          : undefined,
       ),
   } satisfies Cloud.Persister<any>;
 }
@@ -80,7 +82,7 @@ export function workspacePersister(
     collectionRef: CollectionReference;
     queryConstraints: QueryFilterConstraint[];
   },
-  getStorageRef: (fileId: string) => StorageReference,
+  getStorageRef?: (fileId: string) => StorageReference,
 ): Cloud.WorkspacePersister {
   const CHANGE_DATE_KEY = `mx_changeDate`;
   const useServerTimestamp = serverTimestamp();
@@ -162,20 +164,24 @@ export function workspacePersister(
         },
       );
     },
-    async uploadFile(fileId, base64String) {
-      await uploadString(getStorageRef(fileId), base64String);
-    },
-    async downloadFile(fileId) {
-      const bytes = await getBytes(getStorageRef(fileId)).catch(
-        () => undefined,
-      );
-      if (!isValid(bytes)) return undefined;
-      const base64String = new TextDecoder("utf-8").decode(bytes);
-      return base64String;
-    },
-    async deleteFile(fileId) {
-      await deleteObject(getStorageRef(fileId));
-    },
+    ...(isValid(getStorageRef)
+      ? {
+          async uploadFile(fileId, base64String) {
+            await uploadString(getStorageRef(fileId), base64String);
+          },
+          async downloadFile(fileId) {
+            const bytes = await getBytes(getStorageRef(fileId)).catch(
+              () => undefined,
+            );
+            if (!isValid(bytes)) return undefined;
+            const base64String = new TextDecoder("utf-8").decode(bytes);
+            return base64String;
+          },
+          async deleteFile(fileId) {
+            await deleteObject(getStorageRef(fileId));
+          },
+        }
+      : {}),
     stopUploadsAndDownloads() {
       // TODO: Implement
     },
