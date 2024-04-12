@@ -10,7 +10,6 @@ import {
   and,
   QueryFilterConstraint,
   or,
-  DocumentReference,
   Firestore,
   collection,
   doc,
@@ -196,8 +195,8 @@ type AuthParams = Omit<
 export function firebaseAuthIntegration(config: {
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
-  signOutFromPlatform: () => Promise<void>;
+  signInToGoogleFromPlatform?: () => Promise<string | undefined | null>;
+  signOutFromPlatform?: () => Promise<void>;
   signOutFromFirebase: () => Promise<void>;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
@@ -221,19 +220,18 @@ export function firebaseAuthIntegration(config: {
         await config.signInWithEmail(email, password);
       },
       async signInWithGoogle() {
-        await doNow(async () => {
-          const idToken = await config.signInToGoogleFromPlatform();
-          if (!isValid(idToken)) return;
-          const credential = GoogleAuthProvider.credential(idToken);
-          await signInWithCredential(config.firebaseAuth, credential);
-        });
+        if (!isValid(config.signInToGoogleFromPlatform)) return;
+        const idToken = await config.signInToGoogleFromPlatform();
+        if (!isValid(idToken)) return;
+        const credential = GoogleAuthProvider.credential(idToken);
+        await signInWithCredential(config.firebaseAuth, credential);
       },
     },
     async signOut() {
       try {
         // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
         await config.signOutFromFirebase();
-        await config.signOutFromPlatform();
+        await config.signOutFromPlatform?.();
       } catch (error) {
         console.error("Error during Sign-Out:", error);
       }

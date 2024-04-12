@@ -1,6 +1,6 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
-import { doNow, isValid } from "../Utils.js";
+import { isValid } from "../Utils.js";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
@@ -111,20 +111,20 @@ export function firebaseAuthIntegration(config) {
                 await config.signInWithEmail(email, password);
             },
             async signInWithGoogle() {
-                await doNow(async () => {
-                    const idToken = await config.signInToGoogleFromPlatform();
-                    if (!isValid(idToken))
-                        return;
-                    const credential = GoogleAuthProvider.credential(idToken);
-                    await signInWithCredential(config.firebaseAuth, credential);
-                });
+                if (!isValid(config.signInToGoogleFromPlatform))
+                    return;
+                const idToken = await config.signInToGoogleFromPlatform();
+                if (!isValid(idToken))
+                    return;
+                const credential = GoogleAuthProvider.credential(idToken);
+                await signInWithCredential(config.firebaseAuth, credential);
             },
         },
         async signOut() {
             try {
                 // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
                 await config.signOutFromFirebase();
-                await config.signOutFromPlatform();
+                await config.signOutFromPlatform?.();
             }
             catch (error) {
                 console.error("Error during Sign-Out:", error);

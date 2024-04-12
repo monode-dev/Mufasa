@@ -35,8 +35,8 @@ type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthSta
 export declare function firebaseAuthIntegration(config: {
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
-    signInToGoogleFromPlatform: () => Promise<string | undefined | null>;
-    signOutFromPlatform: () => Promise<void>;
+    signInToGoogleFromPlatform?: () => Promise<string | undefined | null>;
+    signOutFromPlatform?: () => Promise<void>;
     signOutFromFirebase: () => Promise<void>;
     firebaseAuth: Auth;
     onAuthStateChanged: (user: UserInfo | null) => void;
