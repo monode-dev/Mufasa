@@ -48,7 +48,7 @@ export type CloudAuth<T extends SignInFuncs> = {
     getWorkspaceIntegration: (uid: string) => WorkspaceIntegration;
 };
 export type SignInFuncs = {
-    [key: string]: () => Promise<void>;
+    [key: string]: (...args: any) => Promise<void>;
 };
 export type User<T extends Cloud.Persister<any>> = ReturnType<typeof initializeAuth<ReturnType<T[`getCloudAuth`]>[`signInFuncs`]>>[`value`];
 export declare function initializeAuth<T extends SignInFuncs>(config: {

@@ -1,7 +1,7 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
 import { isValid } from "../Utils.js";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { signInWithCredential, } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
     return {
@@ -102,6 +102,15 @@ export function firebaseAuthIntegration(config) {
     config.firebaseAuth.onAuthStateChanged((user) => {
         config.onAuthStateChanged(user !== null ? { uid: user.uid, email: user.email } : null);
     });
+    const altSignInMethods = Object.fromEntries(Object.entries(config.providers).map(([providerName, value]) => [
+        `signInWith${providerName[0].toUpperCase()}${providerName.slice(1)}`,
+        async () => {
+            const credential = await value.signIn();
+            if (!isValid(credential))
+                return;
+            await signInWithCredential(config.firebaseAuth, credential);
+        },
+    ]));
     return {
         signInFuncs: {
             signUpWithEmail: async (email, password) => {
@@ -110,21 +119,26 @@ export function firebaseAuthIntegration(config) {
             signInWithEmail: async (email, password) => {
                 await config.signInWithEmail(email, password);
             },
-            async signInWithGoogle() {
-                if (!isValid(config.signInToGoogleFromPlatform))
-                    return;
-                const idToken = await config.signInToGoogleFromPlatform();
-                if (!isValid(idToken))
-                    return;
-                const credential = GoogleAuthProvider.credential(idToken);
-                await signInWithCredential(config.firebaseAuth, credential);
-            },
+            ...altSignInMethods,
+            // async signInWithGoogle() {
+            //   if (!isValid(config.signInToGoogleFromPlatform)) return;
+            //   const idToken = await config.signInToGoogleFromPlatform();
+            //   if (!isValid(idToken)) return;
+            //   const credential = GoogleAuthProvider.credential(idToken);
+            //   await signInWithCredential(config.firebaseAuth, credential);
+            // },
         },
         async signOut() {
             try {
                 // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
                 await config.signOutFromFirebase();
-                await config.signOutFromPlatform?.();
+                // Just try all the providers and make sure none of them are signed in.
+                for (const provider of Object.values(config.providers)) {
+                    try {
+                        await provider.signOut();
+                    }
+                    catch (error) { }
+                }
             }
             catch (error) {
                 console.error("Error during Sign-Out:", error);

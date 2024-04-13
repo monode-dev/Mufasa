@@ -24,7 +24,12 @@ import {
   FirebaseStorage,
 } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import { Auth, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import {
+  Auth,
+  GoogleAuthProvider,
+  OAuthCredential,
+  signInWithCredential,
+} from "firebase/auth";
 import { Functions, httpsCallable } from "firebase/functions";
 import {
   CloudAuth,
@@ -192,24 +197,47 @@ type AuthParams = Omit<
   Parameters<typeof firebaseAuthIntegration>[0],
   `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`
 >;
-export function firebaseAuthIntegration(config: {
+export function firebaseAuthIntegration<
+  T extends {
+    [key: string]: {
+      signIn: () => Promise<OAuthCredential | undefined>;
+      signOut: () => Promise<void>;
+    };
+  },
+>(config: {
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signInToGoogleFromPlatform?: () => Promise<string | undefined | null>;
-  signOutFromPlatform?: () => Promise<void>;
   signOutFromFirebase: () => Promise<void>;
+  providers: T;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
   firebaseFunctions: Functions;
   workspaceInvitesCollection: CollectionReference;
   firestore: Firestore;
   stage: string;
-}) {
+}): CloudAuth<
+  {
+    signUpWithEmail: (email: string, password: string) => Promise<void>;
+    signInWithEmail: (email: string, password: string) => Promise<void>;
+  } & {
+    [Key in keyof T & string as Capitalize<Key>]: () => Promise<void>;
+  }
+> {
   config.firebaseAuth.onAuthStateChanged((user) => {
     config.onAuthStateChanged(
       user !== null ? { uid: user.uid, email: user.email } : null,
     );
   });
+  const altSignInMethods = Object.fromEntries(
+    Object.entries(config.providers).map(([providerName, value]) => [
+      `signInWith${providerName[0].toUpperCase()}${providerName.slice(1)}`,
+      async () => {
+        const credential = await value.signIn();
+        if (!isValid(credential)) return;
+        await signInWithCredential(config.firebaseAuth, credential);
+      },
+    ]),
+  );
 
   return {
     signInFuncs: {
@@ -219,19 +247,25 @@ export function firebaseAuthIntegration(config: {
       signInWithEmail: async (email: string, password: string) => {
         await config.signInWithEmail(email, password);
       },
-      async signInWithGoogle() {
-        if (!isValid(config.signInToGoogleFromPlatform)) return;
-        const idToken = await config.signInToGoogleFromPlatform();
-        if (!isValid(idToken)) return;
-        const credential = GoogleAuthProvider.credential(idToken);
-        await signInWithCredential(config.firebaseAuth, credential);
-      },
+      ...(altSignInMethods as any),
+      // async signInWithGoogle() {
+      //   if (!isValid(config.signInToGoogleFromPlatform)) return;
+      //   const idToken = await config.signInToGoogleFromPlatform();
+      //   if (!isValid(idToken)) return;
+      //   const credential = GoogleAuthProvider.credential(idToken);
+      //   await signInWithCredential(config.firebaseAuth, credential);
+      // },
     },
     async signOut() {
       try {
         // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
         await config.signOutFromFirebase();
-        await config.signOutFromPlatform?.();
+        // Just try all the providers and make sure none of them are signed in.
+        for (const provider of Object.values(config.providers)) {
+          try {
+            await provider.signOut();
+          } catch (error) {}
+        }
       } catch (error) {
         console.error("Error during Sign-Out:", error);
       }

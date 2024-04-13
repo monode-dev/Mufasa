@@ -1,9 +1,9 @@
 import { CollectionReference, QueryFilterConstraint, Firestore } from "firebase/firestore";
 import { Cloud } from "../DocStore.js";
 import { StorageReference, FirebaseStorage } from "firebase/storage";
-import { Auth } from "firebase/auth";
+import { Auth, OAuthCredential } from "firebase/auth";
 import { Functions } from "firebase/functions";
-import { WorkspaceIntegration, UserInfo } from "../Workspace.js";
+import { CloudAuth, WorkspaceIntegration, UserInfo } from "../Workspace.js";
 export declare function firebasePersister(firebaseConfig: {
     firestore: Firestore;
     firebaseStorage?: FirebaseStorage;
@@ -12,15 +12,12 @@ export declare function firebasePersister(firebaseConfig: {
     getCloudAuth({ onAuthStateChanged, stage }: {
         onAuthStateChanged: (user: UserInfo | null) => void;
         stage: string;
-    }): {
-        signInFuncs: {
-            signUpWithEmail: (email: string, password: string) => Promise<void>;
-            signInWithEmail: (email: string, password: string) => Promise<void>;
-            signInWithGoogle(): Promise<void>;
-        };
-        signOut(): Promise<void>;
-        getWorkspaceIntegration: (uid: string) => WorkspaceIntegration;
-    };
+    }): CloudAuth<{
+        signUpWithEmail: (email: string, password: string) => Promise<void>;
+        signInWithEmail: (email: string, password: string) => Promise<void>;
+    } & {
+        [x: Capitalize<string>]: () => Promise<void>;
+    }>;
     getWorkspacePersister: (setup: {
         stage: string | null;
         workspaceId: string;
@@ -32,27 +29,28 @@ export declare function workspacePersister(firestoreConfig: {
     queryConstraints: QueryFilterConstraint[];
 }, getStorageRef?: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
 type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`>;
-export declare function firebaseAuthIntegration(config: {
+export declare function firebaseAuthIntegration<T extends {
+    [key: string]: {
+        signIn: () => Promise<OAuthCredential | undefined>;
+        signOut: () => Promise<void>;
+    };
+}>(config: {
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
-    signInToGoogleFromPlatform?: () => Promise<string | undefined | null>;
-    signOutFromPlatform?: () => Promise<void>;
     signOutFromFirebase: () => Promise<void>;
+    providers: T;
     firebaseAuth: Auth;
     onAuthStateChanged: (user: UserInfo | null) => void;
     firebaseFunctions: Functions;
     workspaceInvitesCollection: CollectionReference;
     firestore: Firestore;
     stage: string;
-}): {
-    signInFuncs: {
-        signUpWithEmail: (email: string, password: string) => Promise<void>;
-        signInWithEmail: (email: string, password: string) => Promise<void>;
-        signInWithGoogle(): Promise<void>;
-    };
-    signOut(): Promise<void>;
-    getWorkspaceIntegration: (uid: string) => WorkspaceIntegration;
-};
+}): CloudAuth<{
+    signUpWithEmail: (email: string, password: string) => Promise<void>;
+    signInWithEmail: (email: string, password: string) => Promise<void>;
+} & {
+    [Key in keyof T & string as Capitalize<Key>]: () => Promise<void>;
+}>;
 export declare function firebaseWorkspace(config: {
     firebaseFunctions: Functions;
     uid: string;
