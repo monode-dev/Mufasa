@@ -208,7 +208,7 @@ export function firebaseAuthIntegration<
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signOutFromFirebase: () => Promise<void>;
-  providers: T;
+  authProviders?: T;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
   firebaseFunctions: Functions;
@@ -231,7 +231,7 @@ export function firebaseAuthIntegration<
     );
   });
   const altSignInMethods = Object.fromEntries(
-    Object.entries(config.providers).map(([providerName, value]) => [
+    Object.entries(config.authProviders ?? {}).map(([providerName, value]) => [
       `signInWith${providerName[0].toUpperCase()}${providerName.slice(1)}`,
       async () => {
         const credential = await value.signIn();
@@ -263,7 +263,7 @@ export function firebaseAuthIntegration<
         // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
         await config.signOutFromFirebase();
         // Just try all the providers and make sure none of them are signed in.
-        for (const provider of Object.values(config.providers)) {
+        for (const provider of Object.values(config.authProviders ?? {})) {
           try {
             await provider.signOut();
           } catch (error) {}

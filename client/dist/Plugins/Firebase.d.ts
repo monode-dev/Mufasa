@@ -38,7 +38,7 @@ export declare function firebaseAuthIntegration<T extends {
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
     signOutFromFirebase: () => Promise<void>;
-    providers: T;
+    authProviders?: T;
     firebaseAuth: Auth;
     onAuthStateChanged: (user: UserInfo | null) => void;
     firebaseFunctions: Functions;
