@@ -39,12 +39,12 @@ import {
   Member,
 } from "../Workspace.js";
 
-export function firebasePersister(
+export function firebasePersister<T extends AuthProviders>(
   firebaseConfig: {
     firestore: Firestore;
     firebaseStorage?: FirebaseStorage;
     firebaseFunctions: Functions;
-  } & AuthParams,
+  } & AuthParams<T>,
 ) {
   return {
     getCloudAuth({ onAuthStateChanged, stage }) {
@@ -193,18 +193,17 @@ export function workspacePersister(
 }
 
 // SECTION: Auth
-type AuthParams = Omit<
-  Parameters<typeof firebaseAuthIntegration>[0],
+type AuthParams<T extends AuthProviders> = Omit<
+  Parameters<typeof firebaseAuthIntegration<T>>[0],
   `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`
 >;
-export function firebaseAuthIntegration<
-  T extends {
-    [key: string]: {
-      signIn: (...params: any) => Promise<OAuthCredential | undefined>;
-      signOut: () => Promise<void>;
-    };
-  },
->(config: {
+type AuthProviders = {
+  [key: string]: {
+    signIn: (...params: any) => Promise<OAuthCredential | undefined>;
+    signOut: () => Promise<void>;
+  };
+};
+export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signOutFromFirebase: () => Promise<void>;
