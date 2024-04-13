@@ -200,7 +200,7 @@ type AuthParams = Omit<
 export function firebaseAuthIntegration<
   T extends {
     [key: string]: {
-      signIn: () => Promise<OAuthCredential | undefined>;
+      signIn: (...params: any) => Promise<OAuthCredential | undefined>;
       signOut: () => Promise<void>;
     };
   },
@@ -220,7 +220,9 @@ export function firebaseAuthIntegration<
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
   } & {
-    [Key in keyof T & string as Capitalize<Key>]: () => Promise<void>;
+    [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (
+      ...params: Parameters<T[Key][`signIn`]>
+    ) => Promise<void>;
   }
 > {
   config.firebaseAuth.onAuthStateChanged((user) => {

@@ -16,7 +16,7 @@ export declare function firebasePersister(firebaseConfig: {
         signUpWithEmail: (email: string, password: string) => Promise<void>;
         signInWithEmail: (email: string, password: string) => Promise<void>;
     } & {
-        [x: Capitalize<string>]: () => Promise<void>;
+        [x: `signInWith${Capitalize<string>}`]: (...params: any) => Promise<void>;
     }>;
     getWorkspacePersister: (setup: {
         stage: string | null;
@@ -31,7 +31,7 @@ export declare function workspacePersister(firestoreConfig: {
 type AuthParams = Omit<Parameters<typeof firebaseAuthIntegration>[0], `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`>;
 export declare function firebaseAuthIntegration<T extends {
     [key: string]: {
-        signIn: () => Promise<OAuthCredential | undefined>;
+        signIn: (...params: any) => Promise<OAuthCredential | undefined>;
         signOut: () => Promise<void>;
     };
 }>(config: {
@@ -49,7 +49,7 @@ export declare function firebaseAuthIntegration<T extends {
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
 } & {
-    [Key in keyof T & string as Capitalize<Key>]: () => Promise<void>;
+    [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (...params: Parameters<T[Key][`signIn`]>) => Promise<void>;
 }>;
 export declare function firebaseWorkspace(config: {
     firebaseFunctions: Functions;
