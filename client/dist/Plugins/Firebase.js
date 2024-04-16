@@ -1,6 +1,6 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
-import { isValid } from "../Utils.js";
+import { doNow, isValid } from "../Utils.js";
 import { signInWithCredential, } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
@@ -99,8 +99,34 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
     };
 }
 export function firebaseAuthIntegration(config) {
+    let disposePrevEmailVerificationListener;
     config.firebaseAuth.onAuthStateChanged((user) => {
-        config.onAuthStateChanged(user !== null ? { uid: user.uid, email: user.email } : null);
+        disposePrevEmailVerificationListener?.();
+        config.onAuthStateChanged(user !== null
+            ? {
+                uid: user.uid,
+                email: user.email,
+                emailVerified: user.emailVerified,
+            }
+            : null);
+        if (isValid(user) && !user?.emailVerified) {
+            doNow(async () => {
+                let stopListeningForThisUser = false;
+                disposePrevEmailVerificationListener = () => (stopListeningForThisUser = true);
+                while (!stopListeningForThisUser) {
+                    if (user?.emailVerified) {
+                        config.onAuthStateChanged({
+                            uid: user.uid,
+                            email: user.email,
+                            emailVerified: user.emailVerified,
+                        });
+                        stopListeningForThisUser = true;
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 3000));
+                    await user?.reload();
+                }
+            });
+        }
     });
     const altSignInMethods = Object.fromEntries(Object.entries(config.authProviders ?? {}).map(([providerName, value]) => [
         `signInWith${providerName[0].toUpperCase()}${providerName.slice(1)}`,

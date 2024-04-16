@@ -4,6 +4,7 @@ import { ReadonlyProp } from "mosa-js";
 export type UserInfo = {
     uid: string;
     email: string | null;
+    emailVerified: boolean;
 };
 export type Member = {
     uid: string;

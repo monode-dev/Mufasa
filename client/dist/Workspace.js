@@ -5,10 +5,17 @@ export function initializeAuth(config) {
     const { useProp, useFormula, doNow, exists, onDispose } = config.sessionPersister;
     // SECTION: User
     return doNow(() => {
-        const userInfo = useProp(undefined);
-        const cloudAuth = config.getCloudAuth({
-            onAuthStateChanged: (user) => (userInfo.value = user),
-            stage: config.stage,
+        const { cloudAuth, uid, email, emailVerified } = doNow(() => {
+            const _userInfo = useProp(undefined);
+            return {
+                cloudAuth: config.getCloudAuth({
+                    onAuthStateChanged: (user) => (_userInfo.value = user),
+                    stage: config.stage,
+                }),
+                uid: useFormula(() => isValid(_userInfo.value) ? _userInfo.value.uid : _userInfo.value),
+                email: useFormula(() => _userInfo.value?.email ?? null),
+                emailVerified: useFormula(() => _userInfo.value?.emailVerified ?? false),
+            };
         });
         const isSigningIn = useProp(false);
         const isSigningOut = useProp(false);
@@ -22,7 +29,12 @@ export function initializeAuth(config) {
                 isPending: true,
             },
             signedOut: doNow(() => {
-                const signedOut = { isSignedOut: true };
+                const signedOut = {
+                    isSignedOut: true,
+                    get isSigningIn() {
+                        return isSigningIn.value;
+                    },
+                };
                 // TODO: Force these to be single threaded.
                 Object.keys(cloudAuth.signInFuncs).forEach((key) => {
                     signedOut[key] = async (...args) => {
@@ -41,18 +53,15 @@ export function initializeAuth(config) {
                 });
                 return signedOut;
             }),
-            signingIn: {
-                isSigningIn: true,
-            },
-            createAwaitingVerificationInst(userInfo) {
-                return {
-                    isAwaitingVerification: true,
-                    get email() {
-                        return userInfo.email ?? null;
-                    },
-                    signOut,
-                };
-            },
+            createSignedInButNotVerifiedInst: (userInfo) => ({
+                isSignedInButNotVerified: true,
+                get uid() {
+                    return userInfo.uid;
+                },
+                get email() {
+                    return userInfo.email;
+                },
+            }),
             // TODO: Maybe swap out the whole object when the user changes.
             createSignedInInst(userInfo, onDispose) {
                 const workspace = createWorkspaceInterface({
@@ -72,22 +81,28 @@ export function initializeAuth(config) {
                     get workspace() {
                         return workspace.value;
                     },
+                    get isSigningOut() {
+                        return isSigningOut.value;
+                    },
                     signOut,
                 };
             },
-            signingOut: {
-                isSigningOut: true,
-            },
         };
-        return useFormula(() => userInfo.value === undefined
+        return useFormula(() => uid.value === undefined
             ? UserStates.pending
-            : userInfo.value === null
-                ? isSigningIn.value
-                    ? UserStates.signingIn
-                    : UserStates.signedOut
-                : isSigningOut.value
-                    ? UserStates.signingOut
-                    : UserStates.createSignedInInst(userInfo.value, onDispose));
+            : uid.value === null
+                ? UserStates.signedOut
+                : emailVerified.value
+                    ? UserStates.createSignedInInst({
+                        uid: uid.value,
+                        email: email.value,
+                        emailVerified: emailVerified.value,
+                    }, onDispose)
+                    : UserStates.createSignedInButNotVerifiedInst({
+                        uid: uid.value,
+                        email: email.value,
+                        emailVerified: emailVerified.value,
+                    }));
     });
 }
 // type ksjdakf<T extends { [key: string]: {} }> = {

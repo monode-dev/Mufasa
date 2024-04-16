@@ -26,7 +26,6 @@ import {
 import { doNow, isValid } from "../Utils.js";
 import {
   Auth,
-  GoogleAuthProvider,
   OAuthCredential,
   signInWithCredential,
 } from "firebase/auth";
@@ -224,11 +223,39 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
     ) => Promise<void>;
   }
 > {
+  let disposePrevEmailVerificationListener: (() => void) | undefined;
   config.firebaseAuth.onAuthStateChanged((user) => {
+    disposePrevEmailVerificationListener?.();
     config.onAuthStateChanged(
-      user !== null ? { uid: user.uid, email: user.email } : null,
+      user !== null
+        ? {
+            uid: user.uid,
+            email: user.email,
+            emailVerified: user.emailVerified,
+          }
+        : null,
     );
+    if (isValid(user) && !user?.emailVerified) {
+      doNow(async () => {
+        let stopListeningForThisUser = false;
+        disposePrevEmailVerificationListener = () =>
+          (stopListeningForThisUser = true);
+        while (!stopListeningForThisUser) {
+          if (user?.emailVerified) {
+            config.onAuthStateChanged({
+              uid: user.uid,
+              email: user.email,
+              emailVerified: user.emailVerified,
+            });
+            stopListeningForThisUser = true;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          await user?.reload();
+        }
+      });
+    }
   });
+
   const altSignInMethods = Object.fromEntries(
     Object.entries(config.authProviders ?? {}).map(([providerName, value]) => [
       `signInWith${providerName[0].toUpperCase()}${providerName.slice(1)}`,
