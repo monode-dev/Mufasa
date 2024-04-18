@@ -1,7 +1,7 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import { signInWithCredential, } from "firebase/auth";
+import { signInWithCredential } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
     return {
@@ -123,6 +123,8 @@ export function firebaseAuthIntegration(config) {
                         stopListeningForThisUser = true;
                     }
                     await new Promise((resolve) => setTimeout(resolve, 3000));
+                    if (stopListeningForThisUser)
+                        return;
                     await user?.reload();
                 }
             });
@@ -163,7 +165,9 @@ export function firebaseAuthIntegration(config) {
                     try {
                         await provider.signOut();
                     }
-                    catch (error) { }
+                    catch (error) {
+                        console.error("Error during Sign-Out:", error);
+                    }
                 }
             }
             catch (error) {

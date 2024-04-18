@@ -24,11 +24,7 @@ import {
   FirebaseStorage,
 } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import {
-  Auth,
-  OAuthCredential,
-  signInWithCredential,
-} from "firebase/auth";
+import { Auth, OAuthCredential, signInWithCredential } from "firebase/auth";
 import { Functions, httpsCallable } from "firebase/functions";
 import {
   CloudAuth,
@@ -250,6 +246,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
             stopListeningForThisUser = true;
           }
           await new Promise((resolve) => setTimeout(resolve, 3000));
+          if (stopListeningForThisUser) return;
           await user?.reload();
         }
       });
@@ -292,7 +289,9 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
         for (const provider of Object.values(config.authProviders ?? {})) {
           try {
             await provider.signOut();
-          } catch (error) {}
+          } catch (error) {
+            console.error("Error during Sign-Out:", error);
+          }
         }
       } catch (error) {
         console.error("Error during Sign-Out:", error);
