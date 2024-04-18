@@ -101,6 +101,7 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
 export function firebaseAuthIntegration(config) {
     let disposePrevEmailVerificationListener;
     config.firebaseAuth.onAuthStateChanged((user) => {
+        console.log(`user:`, user);
         disposePrevEmailVerificationListener?.();
         config.onAuthStateChanged(user !== null
             ? {

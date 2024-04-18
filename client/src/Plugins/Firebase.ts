@@ -221,6 +221,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
 > {
   let disposePrevEmailVerificationListener: (() => void) | undefined;
   config.firebaseAuth.onAuthStateChanged((user) => {
+    console.log(`user:`, user);
     disposePrevEmailVerificationListener?.();
     config.onAuthStateChanged(
       user !== null
