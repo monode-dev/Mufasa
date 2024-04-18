@@ -136,7 +136,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         return signedOut;
       }),
       createSignedInButNotVerifiedInst: (userInfo: Readonly<UserInfo>) => ({
-        isSignedInButNotVerified: true,
+        isSignedInButNotVerified: true as const,
         get uid() {
           return userInfo.uid;
         },
