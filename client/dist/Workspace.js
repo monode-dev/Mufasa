@@ -61,6 +61,7 @@ export function initializeAuth(config) {
                 get email() {
                     return userInfo.email;
                 },
+                signOut,
             }),
             // TODO: Maybe swap out the whole object when the user changes.
             createSignedInInst(userInfo, onDispose) {

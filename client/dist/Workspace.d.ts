@@ -81,6 +81,7 @@ type _UserStates<T extends SignInFuncs> = {
         isSignedInButNotVerified: true;
         uid: string;
         email: string | null;
+        signOut: () => Promise<void>;
     };
 };
 type _Or<T extends {

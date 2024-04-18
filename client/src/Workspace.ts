@@ -143,6 +143,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         get email() {
           return userInfo.email;
         },
+        signOut,
       }),
       // TODO: Maybe swap out the whole object when the user changes.
       createSignedInInst(
@@ -217,6 +218,7 @@ type _UserStates<T extends SignInFuncs> = {
     isSignedInButNotVerified: true;
     uid: string;
     email: string | null;
+    signOut: () => Promise<void>;
   };
 };
 type _Or<T extends { [key: string]: {} }> = {
