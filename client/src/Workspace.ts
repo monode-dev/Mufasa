@@ -203,19 +203,20 @@ type _UserStates<T extends SignInFuncs> = {
   };
   signedOut: {
     isSignedOut: true;
+    isSigningIn: boolean;
   } & T;
-  signingIn: {
-    isSigningIn: true;
-  };
   signedIn: {
     uid: string;
     email: string | null;
     isSignedIn: true;
     workspace: ReturnType<typeof createWorkspaceInterface>[`value`];
     signOut: () => Promise<void>;
+    isSigningOut: boolean;
   };
-  signingOut: {
-    isSigningOut: true;
+  signedInButNotVerified: {
+    isSignedInButNotVerified: true;
+    uid: string;
+    email: string | null;
   };
 };
 type _Or<T extends { [key: string]: {} }> = {
