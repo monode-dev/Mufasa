@@ -248,6 +248,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
           }
           await new Promise((resolve) => setTimeout(resolve, 3000));
           if (stopListeningForThisUser) return;
+          console.log("Reloading user...");
           await user?.reload();
         }
       });
