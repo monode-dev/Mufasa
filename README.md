@@ -1,3 +1,3 @@
 # Mufasa (Monode's Fullstack Store)
 
-The mono-repo for Mufasa, a strongly typed, local-first ORM.
+An easy way to connect your database to your UI. (A local-first, class-based ORM) Very much a work in progress.
