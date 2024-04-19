@@ -44,7 +44,9 @@ try {
 
   // Publish to npm
   // Make sure you're already logged in to npm (npm login)
-  execSync("npm publish", { stdio: "inherit" });
+  const tag =
+    args.includes("-p") || args.includes("--prod") ? `` : `--tag alpha`;
+  execSync(`npm publish ${tag}`, { stdio: "inherit" });
   console.log("Successfully published the package");
 
   // Commit the version change

@@ -24,7 +24,12 @@ import {
   FirebaseStorage,
 } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import { Auth, OAuthCredential, signInWithCredential } from "firebase/auth";
+import {
+  Auth,
+  OAuthCredential,
+  signInWithCredential,
+  User as FirebaseUser,
+} from "firebase/auth";
 import { Functions, httpsCallable } from "firebase/functions";
 import {
   CloudAuth,
@@ -202,6 +207,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signOutFromFirebase: () => Promise<void>;
+  sendEmailVerification: (user: FirebaseUser) => Promise<void>;
   authProviders?: T;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
@@ -221,7 +227,6 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
 > {
   let disposePrevEmailVerificationListener: (() => void) | undefined;
   config.firebaseAuth.onAuthStateChanged((user) => {
-    console.log(`user:`, user);
     disposePrevEmailVerificationListener?.();
     config.onAuthStateChanged(
       user !== null
@@ -246,11 +251,9 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
             });
             stopListeningForThisUser = true;
           }
-          await new Promise((resolve) => setTimeout(resolve, 3000));
+          await new Promise((resolve) => setTimeout(resolve, 3 * 1000));
           if (stopListeningForThisUser) return;
-          console.log("Pre-reload user...");
           await user?.reload();
-          console.log("Post-reload user...");
         }
       });
     }

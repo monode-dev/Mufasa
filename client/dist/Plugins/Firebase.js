@@ -1,7 +1,7 @@
 import { onSnapshot, query, where, updateDoc, doc as docRef, setDoc, serverTimestamp, and, or, collection, doc, } from "firebase/firestore";
 import { uploadString, deleteObject, getBytes, ref as storageRef, } from "firebase/storage";
 import { doNow, isValid } from "../Utils.js";
-import { signInWithCredential } from "firebase/auth";
+import { signInWithCredential, } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
     return {
@@ -101,7 +101,6 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
 export function firebaseAuthIntegration(config) {
     let disposePrevEmailVerificationListener;
     config.firebaseAuth.onAuthStateChanged((user) => {
-        console.log(`user:`, user);
         disposePrevEmailVerificationListener?.();
         config.onAuthStateChanged(user !== null
             ? {
@@ -123,12 +122,10 @@ export function firebaseAuthIntegration(config) {
                         });
                         stopListeningForThisUser = true;
                     }
-                    await new Promise((resolve) => setTimeout(resolve, 3000));
+                    await new Promise((resolve) => setTimeout(resolve, 3 * 1000));
                     if (stopListeningForThisUser)
                         return;
-                    console.log("Pre-reload user...");
                     await user?.reload();
-                    console.log("Post-reload user...");
                 }
             });
         }
