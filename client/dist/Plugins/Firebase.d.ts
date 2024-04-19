@@ -1,7 +1,7 @@
 import { CollectionReference, QueryFilterConstraint, Firestore } from "firebase/firestore";
 import { Cloud } from "../DocStore.js";
 import { StorageReference, FirebaseStorage } from "firebase/storage";
-import { Auth, OAuthCredential, User as FirebaseUser } from "firebase/auth";
+import { Auth, OAuthCredential } from "firebase/auth";
 import { Functions } from "firebase/functions";
 import { CloudAuth, WorkspaceIntegration, UserInfo } from "../Workspace.js";
 export declare function firebasePersister<T extends AuthProviders>(firebaseConfig: {
@@ -37,7 +37,6 @@ export declare function firebaseAuthIntegration<T extends AuthProviders>(config:
     signUpWithEmail: (email: string, password: string) => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
     signOutFromFirebase: () => Promise<void>;
-    sendEmailVerification: (user: FirebaseUser) => Promise<void>;
     authProviders?: T;
     firebaseAuth: Auth;
     onAuthStateChanged: (user: UserInfo | null) => void;

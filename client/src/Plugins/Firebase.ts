@@ -207,7 +207,6 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signOutFromFirebase: () => Promise<void>;
-  sendEmailVerification: (user: FirebaseUser) => Promise<void>;
   authProviders?: T;
   firebaseAuth: Auth;
   onAuthStateChanged: (user: UserInfo | null) => void;
