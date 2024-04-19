@@ -1,6 +1,6 @@
 # Mufasa (Monode's Fullstack Store)
 
-An easy way to connect your database to your UI. (AKA a strongly typed, local-first ORM)
+An easy way to connect your database to your UI. (AKA a local-first, class-based ORM)
 
 Features:
 
