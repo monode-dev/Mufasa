@@ -351,6 +351,10 @@ export function firebaseWorkspace(config: {
       );
     },
     async createWorkspace(params: { stage: string }) {
+      console.log(config.uid);
+      console.log(
+        `region: ${config.firebaseFunctions.region}, name: ${config.firebaseFunctions.app.name}`,
+      );
       return (
         await httpsCallable<{ stage: string }, void>(
           config.firebaseFunctions,

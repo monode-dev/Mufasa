@@ -197,6 +197,8 @@ export function firebaseWorkspace(config) {
             return onSnapshot(query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)), (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data())));
         },
         async createWorkspace(params) {
+            console.log(config.uid);
+            console.log(`region: ${config.firebaseFunctions.region}, name: ${config.firebaseFunctions.app.name}`);
             return (await httpsCallable(config.firebaseFunctions, "createWorkspace")(params)).data;
         },
         async createWorkspaceInterface(params) {
