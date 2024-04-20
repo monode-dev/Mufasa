@@ -28,7 +28,7 @@ import {
   Auth,
   OAuthCredential,
   signInWithCredential,
-  User as FirebaseUser,
+  UserCredential,
 } from "firebase/auth";
 import { Functions, httpsCallable } from "firebase/functions";
 import {
@@ -204,8 +204,8 @@ type AuthProviders = {
   };
 };
 export function firebaseAuthIntegration<T extends AuthProviders>(config: {
-  signUpWithEmail: (email: string, password: string) => Promise<void>;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+  signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
   signOutFromFirebase: () => Promise<void>;
   authProviders?: T;
   firebaseAuth: Auth;
@@ -216,12 +216,18 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   stage: string;
 }): CloudAuth<
   {
-    signUpWithEmail: (email: string, password: string) => Promise<void>;
-    signInWithEmail: (email: string, password: string) => Promise<void>;
+    signUpWithEmail: (
+      email: string,
+      password: string,
+    ) => Promise<UserCredential>;
+    signInWithEmail: (
+      email: string,
+      password: string,
+    ) => Promise<UserCredential>;
   } & {
     [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (
       ...params: Parameters<T[Key][`signIn`]>
-    ) => Promise<void>;
+    ) => Promise<UserCredential>;
   }
 > {
   let disposePrevEmailVerificationListener: (() => void) | undefined;
@@ -264,7 +270,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
       async () => {
         const credential = await value.signIn();
         if (!isValid(credential)) return;
-        await signInWithCredential(config.firebaseAuth, credential);
+        return await signInWithCredential(config.firebaseAuth, credential);
       },
     ]),
   );
@@ -272,10 +278,10 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   return {
     signInFuncs: {
       signUpWithEmail: async (email: string, password: string) => {
-        await config.signUpWithEmail(email, password);
+        return await config.signUpWithEmail(email, password);
       },
       signInWithEmail: async (email: string, password: string) => {
-        await config.signInWithEmail(email, password);
+        return await config.signInWithEmail(email, password);
       },
       ...(altSignInMethods as any),
       // async signInWithGoogle() {

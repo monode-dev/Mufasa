@@ -136,16 +136,16 @@ export function firebaseAuthIntegration(config) {
             const credential = await value.signIn();
             if (!isValid(credential))
                 return;
-            await signInWithCredential(config.firebaseAuth, credential);
+            return await signInWithCredential(config.firebaseAuth, credential);
         },
     ]));
     return {
         signInFuncs: {
             signUpWithEmail: async (email, password) => {
-                await config.signUpWithEmail(email, password);
+                return await config.signUpWithEmail(email, password);
             },
             signInWithEmail: async (email, password) => {
-                await config.signInWithEmail(email, password);
+                return await config.signInWithEmail(email, password);
             },
             ...altSignInMethods,
             // async signInWithGoogle() {

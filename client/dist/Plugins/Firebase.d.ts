@@ -1,7 +1,7 @@
 import { CollectionReference, QueryFilterConstraint, Firestore } from "firebase/firestore";
 import { Cloud } from "../DocStore.js";
 import { StorageReference, FirebaseStorage } from "firebase/storage";
-import { Auth, OAuthCredential } from "firebase/auth";
+import { Auth, OAuthCredential, UserCredential } from "firebase/auth";
 import { Functions } from "firebase/functions";
 import { CloudAuth, WorkspaceIntegration, UserInfo } from "../Workspace.js";
 export declare function firebasePersister<T extends AuthProviders>(firebaseConfig: {
@@ -13,9 +13,9 @@ export declare function firebasePersister<T extends AuthProviders>(firebaseConfi
         onAuthStateChanged: (user: UserInfo | null) => void;
         stage: string;
     }): CloudAuth<{
-        signUpWithEmail: (email: string, password: string) => Promise<void>;
-        signInWithEmail: (email: string, password: string) => Promise<void>;
-    } & { [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (...params: Parameters<T[Key]["signIn"]>) => Promise<void>; }>;
+        signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+        signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
+    } & { [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (...params: Parameters<T[Key]["signIn"]>) => Promise<UserCredential>; }>;
     getWorkspacePersister: (setup: {
         stage: string | null;
         workspaceId: string;
@@ -34,8 +34,8 @@ type AuthProviders = {
     };
 };
 export declare function firebaseAuthIntegration<T extends AuthProviders>(config: {
-    signUpWithEmail: (email: string, password: string) => Promise<void>;
-    signInWithEmail: (email: string, password: string) => Promise<void>;
+    signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+    signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
     signOutFromFirebase: () => Promise<void>;
     authProviders?: T;
     firebaseAuth: Auth;
@@ -45,10 +45,10 @@ export declare function firebaseAuthIntegration<T extends AuthProviders>(config:
     firestore: Firestore;
     stage: string;
 }): CloudAuth<{
-    signUpWithEmail: (email: string, password: string) => Promise<void>;
-    signInWithEmail: (email: string, password: string) => Promise<void>;
+    signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+    signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
 } & {
-    [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (...params: Parameters<T[Key][`signIn`]>) => Promise<void>;
+    [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (...params: Parameters<T[Key][`signIn`]>) => Promise<UserCredential>;
 }>;
 export declare function firebaseWorkspace(config: {
     firebaseFunctions: Functions;

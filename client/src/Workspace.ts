@@ -64,7 +64,7 @@ export type CloudAuth<T extends SignInFuncs> = {
   getWorkspaceIntegration: (uid: string) => WorkspaceIntegration;
 };
 export type SignInFuncs = {
-  [key: string]: (...args: any) => Promise<void>;
+  [key: string]: (...args: any) => Promise<any>;
 };
 export type User<T extends Cloud.Persister<any>> = ReturnType<
   typeof initializeAuth<ReturnType<T[`getCloudAuth`]>[`signInFuncs`]>
@@ -124,13 +124,15 @@ export function initializeAuth<T extends SignInFuncs>(config: {
           (signedOut as any)[key] = async (...args: any[]) => {
             let error: any = null;
             isSigningIn.value = true;
+            let result: any = undefined;
             try {
-              await cloudAuth.signInFuncs[key](...(args as []));
+              result = await cloudAuth.signInFuncs[key](...(args as []));
             } catch (e) {
               error = e;
             }
             isSigningIn.value = false;
             if (isValid(error)) throw error;
+            return result;
           };
         });
         return signedOut;

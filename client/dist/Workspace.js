@@ -40,8 +40,9 @@ export function initializeAuth(config) {
                     signedOut[key] = async (...args) => {
                         let error = null;
                         isSigningIn.value = true;
+                        let result = undefined;
                         try {
-                            await cloudAuth.signInFuncs[key](...args);
+                            result = await cloudAuth.signInFuncs[key](...args);
                         }
                         catch (e) {
                             error = e;
@@ -49,6 +50,7 @@ export function initializeAuth(config) {
                         isSigningIn.value = false;
                         if (isValid(error))
                             throw error;
+                        return result;
                     };
                 });
                 return signedOut;
