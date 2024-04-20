@@ -198,7 +198,7 @@ export function firebaseWorkspace(config) {
         },
         async createWorkspace(params) {
             console.log(config.uid);
-            console.log(`region: ${config.firebaseFunctions.region}, name: ${config.firebaseFunctions.app.name}`);
+            console.log(`region: ${config.firebaseFunctions.region}, name: ${config.firebaseFunctions.app.options}, auth: ${config.firebaseAuth.currentUser?.email}`);
             return (await httpsCallable(config.firebaseFunctions, "createWorkspace")(params)).data;
         },
         async createWorkspaceInterface(params) {
