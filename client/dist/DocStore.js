@@ -28,7 +28,7 @@ export var Device;
                 loadedFromLocalStorage: Promise.resolve(),
                 data: initValue,
                 batchUpdate: async (doUpdate) => {
-                    await doUpdate(initValue, () => { });
+                    await doUpdate({ value: initValue }, () => { });
                 },
             }),
         }),

@@ -78,7 +78,7 @@ export namespace Device {
         loadedFromLocalStorage: Promise.resolve(),
         data: initValue as Device.ToReadonlyJson<typeof initValue>,
         batchUpdate: async (doUpdate) => {
-          await doUpdate(initValue as any, () => {});
+          await doUpdate({ value: initValue as any }, () => {});
         },
       }),
     }),
