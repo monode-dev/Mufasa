@@ -242,7 +242,7 @@ export function createDocStore(config) {
         getProp: config.sessionTablePersister.getProp,
         getAllDocs: config.sessionTablePersister.getAllDocs,
         getHaveCompletedFirstSync() {
-            haveCompletedFirstSync.value;
+            return haveCompletedFirstSync.value;
         },
     };
 }

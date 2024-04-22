@@ -41,7 +41,7 @@ export declare class Doc {
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
-        readonly getHaveCompletedFirstSync: () => void;
+        readonly getHaveCompletedFirstSync: () => boolean;
     };
     get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
@@ -65,7 +65,7 @@ export declare class Doc {
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
-        readonly getHaveCompletedFirstSync: () => void;
+        readonly getHaveCompletedFirstSync: () => boolean;
     };
     static customize<This extends typeof Doc>(this: This, customizations: {
         docType?: string;
@@ -74,6 +74,7 @@ export declare class Doc {
     get docId(): string;
     get isDeleted(): boolean;
     static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[];
+    static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean;
     static _fromId<T extends typeof Doc>(this: T, docId: string): InstanceType<T>;
     static create<T extends typeof Doc>(this: T, ...overrideProps: CreateParams<T>): InstanceType<T>;
     /** Override to run code just before an object is deleted. */

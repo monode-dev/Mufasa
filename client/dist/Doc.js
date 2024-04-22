@@ -160,6 +160,9 @@ export class Doc {
     static getAllDocs() {
         return this._docStore.getAllDocs().map(this._fromId.bind(this));
     }
+    static getHaveCompletedFirstSync() {
+        return this._docStore.getHaveCompletedFirstSync();
+    }
     static _fromId(docId) {
         if (!_allDocInstances.has(docId)) {
             _allDocInstances.set(docId, _initializeInst(new this(), {}, () => docId));

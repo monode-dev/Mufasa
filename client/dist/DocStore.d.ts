@@ -138,5 +138,5 @@ export declare function createDocStore(config: DocStoreParams): {
     readonly isDocDeleted: (docId: string) => boolean;
     readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
     readonly getAllDocs: () => string[];
-    readonly getHaveCompletedFirstSync: () => void;
+    readonly getHaveCompletedFirstSync: () => boolean;
 };

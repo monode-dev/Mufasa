@@ -32,7 +32,7 @@ declare class File extends Doc {
             readonly isDocDeleted: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
-            readonly getHaveCompletedFirstSync: () => void;
+            readonly getHaveCompletedFirstSync: () => boolean;
         };
         pushCreate(params: {
             base64String: string;
@@ -131,7 +131,7 @@ declare class File extends Doc {
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
         readonly getAllDocs: () => string[];
-        readonly getHaveCompletedFirstSync: () => void;
+        readonly getHaveCompletedFirstSync: () => boolean;
     };
     readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
     readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;

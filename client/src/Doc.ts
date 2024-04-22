@@ -211,6 +211,9 @@ export class Doc {
   static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
     return this._docStore.getAllDocs().map(this._fromId.bind(this) as any);
   }
+  static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
+    return this._docStore.getHaveCompletedFirstSync();
+  }
 
   static _fromId<T extends typeof Doc>(
     this: T,

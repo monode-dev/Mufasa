@@ -421,7 +421,7 @@ export function createDocStore(config: DocStoreParams) {
     getAllDocs: config.sessionTablePersister.getAllDocs,
 
     getHaveCompletedFirstSync() {
-      haveCompletedFirstSync.value;
+      return haveCompletedFirstSync.value;
     },
   } as const;
 }
