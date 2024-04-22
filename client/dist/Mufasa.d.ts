@@ -1,7 +1,7 @@
 import { Session, Device, Cloud } from "./DocStore.js";
 import { User } from "./Workspace.js";
 export { prop, formula } from "./Doc.js";
-export { list } from "./List.js";
+export { list, ReadonlyList } from "./List.js";
 export { isValid } from "./Utils.js";
 export { Cloud, Device, Session, DocJson, PersistanceConfig, DocStore, UpdateBatch, DELETED_KEY, Persistance, } from "./DocStore.js";
 export { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace.js";

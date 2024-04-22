@@ -1,10 +1,10 @@
 import { initializeDocClass } from "./Doc.js";
 import { Session, Device, Cloud } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./File.js";
-import { doNow, isValid } from "./Utils.js";
-import { CloudAuth, SignInFuncs, User, initializeAuth } from "./Workspace.js";
+import { doNow } from "./Utils.js";
+import { User, initializeAuth } from "./Workspace.js";
 export { prop, formula } from "./Doc.js";
-export { list } from "./List.js";
+export { list, ReadonlyList } from "./List.js";
 export { isValid } from "./Utils.js";
 export {
   Cloud,
