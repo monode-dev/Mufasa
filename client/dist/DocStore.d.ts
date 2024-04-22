@@ -1,4 +1,4 @@
-import type { MosaApi } from "mosa-js";
+import type { MosaApi, Prop } from "mosa-js";
 import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
 export declare const DELETED_KEY = "mx_deleted";
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
@@ -27,6 +27,7 @@ export type PersistanceTaggedUpdateBatch = Device.ToReadonlyJson<WritablePersist
 export declare namespace Session {
     type Persister = MosaApi;
     type TablePersister = {
+        staticProp<T>(initVal: T): Prop<T>;
         batchUpdate(updates: UpdateBatch, newDocsAreOnlyVirtual: boolean): void;
         getProp(id: string, key: string, initValue: PrimVal | (() => PrimVal)): PrimVal;
         peekProp(id: string, key: string): PrimVal | undefined;
@@ -137,4 +138,5 @@ export declare function createDocStore(config: DocStoreParams): {
     readonly isDocDeleted: (docId: string) => boolean;
     readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
     readonly getAllDocs: () => string[];
+    readonly getHaveCompletedFirstSync: () => void;
 };

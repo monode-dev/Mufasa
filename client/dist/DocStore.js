@@ -12,6 +12,7 @@ export const Persistance = {
 export var Session;
 (function (Session) {
     Session.mockTablePersister = {
+        staticProp: (initVal) => ({ value: initVal }),
         batchUpdate: () => { },
         getProp: (_, __, v) => (typeof v === `function` ? v() : v),
         peekProp: () => undefined,
@@ -177,6 +178,7 @@ export function createDocStore(config) {
         });
     }
     // Watch cloud.
+    const haveCompletedFirstSync = config.sessionTablePersister.staticProp(false);
     localDocs.loadedFromLocalStorage.then(() => {
         if (!config.cloudWorkspacePersister)
             return;
@@ -193,6 +195,7 @@ export function createDocStore(config) {
                 ])),
                 overwriteGlobally: false,
             });
+            haveCompletedFirstSync.value = true;
         }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
     });
     // This Interface should be all the Class API needs to interface with the store.
@@ -238,5 +241,8 @@ export function createDocStore(config) {
         },
         getProp: config.sessionTablePersister.getProp,
         getAllDocs: config.sessionTablePersister.getAllDocs,
+        getHaveCompletedFirstSync() {
+            haveCompletedFirstSync.value;
+        },
     };
 }

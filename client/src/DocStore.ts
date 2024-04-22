@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionTablePersister } from "./SessionTablePersister.js";
-import type { MosaApi } from "mosa-js";
+import type { MosaApi, Prop } from "mosa-js";
 import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
 
 export const DELETED_KEY = `mx_deleted`;
@@ -35,6 +35,7 @@ export type PersistanceTaggedUpdateBatch =
 export namespace Session {
   export type Persister = MosaApi;
   export type TablePersister = {
+    staticProp<T>(initVal: T): Prop<T>;
     batchUpdate(updates: UpdateBatch, newDocsAreOnlyVirtual: boolean): void;
     getProp(
       id: string,
@@ -46,6 +47,7 @@ export namespace Session {
     docExists(docId: string): boolean;
   };
   export const mockTablePersister: Session.TablePersister = {
+    staticProp: <T>(initVal: T) => ({ value: initVal } as any),
     batchUpdate: () => {},
     getProp: (_, __, v) => (typeof v === `function` ? v() : v),
     peekProp: () => undefined,
@@ -336,6 +338,7 @@ export function createDocStore(config: DocStoreParams) {
   }
 
   // Watch cloud.
+  const haveCompletedFirstSync = config.sessionTablePersister.staticProp(false);
   localDocs.loadedFromLocalStorage.then(() => {
     if (!config.cloudWorkspacePersister) return;
     config.cloudWorkspacePersister.start((updates) => {
@@ -355,6 +358,7 @@ export function createDocStore(config: DocStoreParams) {
         ),
         overwriteGlobally: false,
       });
+      haveCompletedFirstSync.value = true;
     }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
   });
 
@@ -415,5 +419,9 @@ export function createDocStore(config: DocStoreParams) {
     getProp: config.sessionTablePersister.getProp,
 
     getAllDocs: config.sessionTablePersister.getAllDocs,
+
+    getHaveCompletedFirstSync() {
+      haveCompletedFirstSync.value;
+    },
   } as const;
 }

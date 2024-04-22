@@ -55,6 +55,5 @@ export declare function firebaseWorkspace(config: {
     uid: string;
     userMetadataCollection: CollectionReference;
     workspaceInvitesCollection: CollectionReference;
-    firebaseAuth: Auth;
 }): WorkspaceIntegration;
 export {};

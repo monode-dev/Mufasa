@@ -326,7 +326,6 @@ export function firebaseWorkspace(config: {
   uid: string;
   userMetadataCollection: CollectionReference;
   workspaceInvitesCollection: CollectionReference;
-  firebaseAuth: Auth;
 }): WorkspaceIntegration {
   return {
     async generateInviteCode() {
@@ -352,10 +351,6 @@ export function firebaseWorkspace(config: {
       );
     },
     async createWorkspace(params: { stage: string }) {
-      console.log(config.uid);
-      console.log(
-        `region: ${config.firebaseFunctions.region}, name: ${config.firebaseFunctions.app.options}, auth: ${config.firebaseAuth.currentUser?.email}`,
-      );
       return (
         await httpsCallable<{ stage: string }, void>(
           config.firebaseFunctions,

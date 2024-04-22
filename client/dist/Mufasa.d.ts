@@ -55,6 +55,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                     readonly isDocDeleted: (docId: string) => boolean;
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
+                    readonly getHaveCompletedFirstSync: () => void;
                 };
                 pushCreate(params: {
                     base64String: string;
@@ -158,6 +159,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
+                readonly getHaveCompletedFirstSync: () => void;
             };
             readonly docId: string;
             readonly isDeleted: boolean;
@@ -186,6 +188,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
+                readonly getHaveCompletedFirstSync: () => void;
             };
             pushCreate(params: {
                 base64String: string;
@@ -284,6 +287,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             readonly isDocDeleted: (docId: string) => boolean;
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
+            readonly getHaveCompletedFirstSync: () => void;
         };
         createFromBase64String(base64String: string): Promise<{
             readonly _fileStore: {
@@ -309,6 +313,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                     readonly isDocDeleted: (docId: string) => boolean;
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
+                    readonly getHaveCompletedFirstSync: () => void;
                 };
                 pushCreate(params: {
                     base64String: string;
@@ -412,6 +417,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 readonly isDocDeleted: (docId: string) => boolean;
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
+                readonly getHaveCompletedFirstSync: () => void;
             };
             readonly docId: string;
             readonly isDeleted: boolean;

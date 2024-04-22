@@ -41,6 +41,7 @@ export declare class Doc {
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
+        readonly getHaveCompletedFirstSync: () => void;
     };
     get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
@@ -64,6 +65,7 @@ export declare class Doc {
         readonly isDocDeleted: (docId: string) => boolean;
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
+        readonly getHaveCompletedFirstSync: () => void;
     };
     static customize<This extends typeof Doc>(this: This, customizations: {
         docType?: string;

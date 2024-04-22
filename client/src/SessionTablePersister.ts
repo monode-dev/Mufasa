@@ -24,6 +24,8 @@ export function sessionTablePersister(
   };
 
   return {
+    staticProp: rootProp,
+
     batchUpdate(updates, newDocsAreOnlyVirtual) {
       // mosaApi.batch(() => {
       let haveAddedOrRemovedDocs = false;

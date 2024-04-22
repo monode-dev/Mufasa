@@ -10,6 +10,7 @@ export function sessionTablePersister(mosaApi) {
     const allDocIds = rootProp([]);
     const propSignals = {};
     return {
+        staticProp: rootProp,
         batchUpdate(updates, newDocsAreOnlyVirtual) {
             // mosaApi.batch(() => {
             let haveAddedOrRemovedDocs = false;
