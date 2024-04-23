@@ -119,7 +119,7 @@ export function initializeMufasaFunctions({
       );
       const inviteDoc = await inviteDocRef.get();
       if (!inviteDoc.exists)
-        throw new HttpsError(`invalid-argument`, "Invalid invite code.");
+        throw new HttpsError(`not-found`, "Invalid invite code.");
       const invite = inviteDoc.data() as any; //OrgInvite;
       if (
         Date.now() / 1000 - (invite.createdAt as Timestamp).seconds >

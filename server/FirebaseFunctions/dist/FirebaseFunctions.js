@@ -79,7 +79,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`);
             const inviteDoc = await inviteDocRef.get();
             if (!inviteDoc.exists)
-                throw new https_1.HttpsError(`invalid-argument`, "Invalid invite code.");
+                throw new https_1.HttpsError(`not-found`, "Invalid invite code.");
             const invite = inviteDoc.data(); //OrgInvite;
             if (Date.now() / 1000 - invite.createdAt.seconds >
                 invite.validForDays * 24 * 60 * 60) {
