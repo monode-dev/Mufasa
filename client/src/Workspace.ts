@@ -305,11 +305,17 @@ function createWorkspaceInterface(config: {
       },
       async joinWorkspace(props: { inviteCode: string }) {
         isJoiningWorkspace.value = true;
-        await workspaceIntegration.joinWorkspace({
-          inviteCode: props.inviteCode,
-          stage: config.stage,
-        });
+        let error: any = null;
+        try {
+          await workspaceIntegration.joinWorkspace({
+            inviteCode: props.inviteCode,
+            stage: config.stage,
+          });
+        } catch (e) {
+          error = e;
+        }
         isJoiningWorkspace.value = false;
+        if (error !== null) throw error;
       },
     },
     creating: {
