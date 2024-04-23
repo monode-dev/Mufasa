@@ -1,7 +1,11 @@
 // See a full list of supported triggers at https://firebase.google.com/docs/functions
 // Start writing functions: https://firebase.google.com/docs/functions/typescript
 // Writing Callable Functions: https://firebase.google.com/docs/functions/callable?gen=2nd
-import { onCall, CallableOptions } from "firebase-functions/v2/https";
+import {
+  onCall,
+  CallableOptions,
+  HttpsError,
+} from "firebase-functions/v2/https";
 import { Timestamp, FieldValue, Firestore } from "firebase-admin/firestore";
 import { Auth } from "firebase-admin/auth";
 import { v4 as uuidv4 } from "uuid";
@@ -63,34 +67,23 @@ export function initializeMufasaFunctions({
   return {
     createWorkspace: onCall(callableOptions, async (request) => {
       // Validate user
-      if (request.auth === undefined) throw new Error("Unauthorized");
+      if (request.auth === undefined)
+        throw new HttpsError(`permission-denied`, "Unauthorized");
       const user = await firestore
         .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
         .get();
       const userIsAlreadyInAWorkspace =
         user.exists && user.data()?.workspaceId !== null;
       if (userIsAlreadyInAWorkspace)
-        throw new Error(
+        throw new HttpsError(
+          `already-exists`,
           "Must leave your current workspace before you can start another.",
         );
 
       // Start Workspace
       await setUserWorkspace({
         uid: request.auth.uid,
-        workspaceId:
-          request.auth.token.email !== undefined &&
-          [
-            `peter@axiomhoist.com`,
-            `peterhotrum@axiomhoist.com`,
-            `melchiahmauck@gmail.com`,
-          ].includes(request.auth.token.email?.trim().toLowerCase())
-            ? `axiom-hoist`
-            : request.auth.token.email !== undefined &&
-              [`info@tke.us`].includes(
-                request.auth.token.email?.trim().toLowerCase(),
-              )
-            ? `559957d2-2a30-45da-9cbe-77af979a8bc5`
-            : uuidv4(),
+        workspaceId: uuidv4(),
         role: `owner`,
         email: request.auth.token.email ?? null,
         stage: request.data.stage,
@@ -99,14 +92,16 @@ export function initializeMufasaFunctions({
     }),
     joinWorkspace: onCall(callableOptions, async (request) => {
       // Validate user
-      if (request.auth === undefined) throw new Error("Unauthorized");
+      if (request.auth === undefined)
+        throw new HttpsError(`permission-denied`, "Unauthorized");
       const user = await firestore
         .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
         .get();
       const userIsAlreadyInAWorkspace =
         user.exists && typeof user.data()?.workspaceId === `string`;
       if (userIsAlreadyInAWorkspace) {
-        throw new Error(
+        throw new HttpsError(
+          `already-exists`,
           `You must leave workspace before you can join another.: ${JSON.stringify(
             user.data(),
             null,
@@ -122,14 +117,15 @@ export function initializeMufasaFunctions({
         )}-WorkspaceInvites/${request.data.inviteCode.trim()}`,
       );
       const inviteDoc = await inviteDocRef.get();
-      if (!inviteDoc.exists) throw new Error("Invalid invite code.");
+      if (!inviteDoc.exists)
+        throw new HttpsError(`invalid-argument`, "Invalid invite code.");
       const invite = inviteDoc.data() as any; //OrgInvite;
       if (
         Date.now() / 1000 - (invite.createdAt as Timestamp).seconds >
         invite.validForDays * 24 * 60 * 60
       ) {
         await inviteDocRef.delete();
-        throw new Error("Invite has expired.");
+        throw new HttpsError(`deadline-exceeded`, "Invite has expired.");
       }
       // Join workspace
       await setUserWorkspace({
@@ -144,7 +140,8 @@ export function initializeMufasaFunctions({
     }),
     leaveWorkspace: onCall(callableOptions, async (request) => {
       log("leaveWorkspace", request);
-      if (request.auth === undefined) throw new Error("Unauthorized");
+      if (request.auth === undefined)
+        throw new HttpsError(`permission-denied`, "Unauthorized");
       log("uid", request.auth.uid);
       await setUserWorkspace({
         uid: request.auth.uid,

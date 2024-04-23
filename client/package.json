@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "pub": "sucrase-node pub.js",
-    "pub:prod": "sucrase-node pub.js -p"
+    "pub:prod": "sucrase-node pub.js --prod"
   },
   "files": [
     "/dist"
