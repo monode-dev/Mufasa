@@ -61,7 +61,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             return {};
         }),
         joinWorkspace: (0, https_1.onCall)(callableOptions, async (request) => {
-            var _a, _b;
+            var _a, _b, _c;
             // Validate user
             if (request.auth === undefined)
                 throw new https_1.HttpsError(`permission-denied`, "Unauthorized");
@@ -73,7 +73,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
                 throw new https_1.HttpsError(`already-exists`, `You must leave workspace before you can join another.: ${JSON.stringify(user.data(), null, 2)} - ${JSON.stringify(request.data, null, 2)}`);
             }
             // Validate invite
-            const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${request.data.inviteCode.trim()}`);
+            const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${((_b = request.data.inviteCode) !== null && _b !== void 0 ? _b : ``).trim()}`);
             const inviteDoc = await inviteDocRef.get();
             if (!inviteDoc.exists)
                 throw new https_1.HttpsError(`invalid-argument`, "Invalid invite code.");
@@ -88,7 +88,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
                 uid: request.auth.uid,
                 workspaceId: invite.workspaceId,
                 role: `member`,
-                email: (_b = request.auth.token.email) !== null && _b !== void 0 ? _b : null,
+                email: (_c = request.auth.token.email) !== null && _c !== void 0 ? _c : null,
                 stage: request.data.stage,
             });
             await inviteDocRef.delete();

@@ -112,9 +112,9 @@ export function initializeMufasaFunctions({
 
       // Validate invite
       const inviteDocRef = firestore.doc(
-        `${getStage(
-          request.data.stage,
-        )}-WorkspaceInvites/${request.data.inviteCode.trim()}`,
+        `${getStage(request.data.stage)}-WorkspaceInvites/${(
+          request.data.inviteCode ?? ``
+        ).trim()}`,
       );
       const inviteDoc = await inviteDocRef.get();
       if (!inviteDoc.exists)
