@@ -154,10 +154,18 @@ function createWorkspaceInterface(config) {
             isNone: true,
             async createWorkspace() {
                 isCreatingWorkspace.value = true;
-                await workspaceIntegration.createWorkspace({
-                    stage: config.stage,
-                });
+                let error = null;
+                try {
+                    await workspaceIntegration.createWorkspace({
+                        stage: config.stage,
+                    });
+                }
+                catch (e) {
+                    error = e;
+                }
                 isCreatingWorkspace.value = false;
+                if (error !== null)
+                    throw error;
             },
             async joinWorkspace(props) {
                 isJoiningWorkspace.value = true;
