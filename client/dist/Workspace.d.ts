@@ -121,9 +121,7 @@ declare function createWorkspaceInterface(config: {
     haveJoined: boolean;
     id: string;
     readonly otherMembers: Member[];
-    readonly workspaceEntitlements: {
-        readonly value: string[];
-    };
+    readonly workspaceEntitlements: string[];
 } & (({
     isOwner: boolean;
     role: "owner";

@@ -377,7 +377,7 @@ function createWorkspaceInterface(config: {
           return otherMembers.value;
         },
         get workspaceEntitlements() {
-          return entitlements;
+          return entitlements.value;
         },
       };
       const roleBasedProps = useFormula(() =>
