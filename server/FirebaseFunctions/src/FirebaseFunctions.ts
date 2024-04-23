@@ -146,6 +146,7 @@ export function initializeMufasaFunctions({
         await inviteDocRef.delete();
         throw new HttpsError(`deadline-exceeded`, "Invite has expired.");
       }
+      // TODO: Ensure workspace exists maybe use `out-of-range` if it doesn't
       // Join workspace
       await setUserWorkspace({
         uid: request.auth.uid,
