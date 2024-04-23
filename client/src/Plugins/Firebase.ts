@@ -333,7 +333,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
           `${config.stage}-UserMetadata`,
         ),
         refreshCustomClaims: async () => {
-          await config.firebaseAuth.currentUser?.getIdTokenResult();
+          await config.firebaseAuth.currentUser?.getIdToken(true);
         },
       }),
   } satisfies CloudAuth<any>;

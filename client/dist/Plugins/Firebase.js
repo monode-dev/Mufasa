@@ -191,7 +191,7 @@ export function firebaseAuthIntegration(config) {
             uid: uid,
             userMetadataCollection: collection(config.firestore, `${config.stage}-UserMetadata`),
             refreshCustomClaims: async () => {
-                await config.firebaseAuth.currentUser?.getIdTokenResult();
+                await config.firebaseAuth.currentUser?.getIdToken(true);
             },
         }),
     };
