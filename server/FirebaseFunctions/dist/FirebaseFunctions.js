@@ -43,7 +43,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             var _a, _b;
             // Validate user
             if (request.auth === undefined)
-                throw new https_1.HttpsError(`permission-denied`, "Unauthorized");
+                throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
             const user = await firestore
                 .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
                 .get();
@@ -64,7 +64,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             var _a, _b, _c;
             // Validate user
             if (request.auth === undefined)
-                throw new https_1.HttpsError(`permission-denied`, "Unauthorized");
+                throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
             const user = await firestore
                 .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
                 .get();
@@ -101,7 +101,7 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             var _a;
             (0, logger_1.log)("leaveWorkspace", request);
             if (request.auth === undefined)
-                throw new https_1.HttpsError(`permission-denied`, "Unauthorized");
+                throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
             (0, logger_1.log)("uid", request.auth.uid);
             await setUserWorkspace({
                 uid: request.auth.uid,
