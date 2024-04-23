@@ -73,7 +73,10 @@ function initializeMufasaFunctions({ firestore, auth, }) {
                 throw new https_1.HttpsError(`already-exists`, `You must leave workspace before you can join another.: ${JSON.stringify(user.data(), null, 2)} - ${JSON.stringify(request.data, null, 2)}`);
             }
             // Validate invite
-            const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${((_b = request.data.inviteCode) !== null && _b !== void 0 ? _b : ``).trim()}`);
+            const inviteCode = ((_b = request.data.inviteCode) !== null && _b !== void 0 ? _b : ``).trim();
+            if (inviteCode === ``)
+                throw new https_1.HttpsError(`invalid-argument`, "Invite code is required.");
+            const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`);
             const inviteDoc = await inviteDocRef.get();
             if (!inviteDoc.exists)
                 throw new https_1.HttpsError(`invalid-argument`, "Invalid invite code.");

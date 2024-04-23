@@ -111,10 +111,11 @@ export function initializeMufasaFunctions({
       }
 
       // Validate invite
+      const inviteCode = (request.data.inviteCode ?? ``).trim();
+      if (inviteCode === ``)
+        throw new HttpsError(`invalid-argument`, "Invite code is required.");
       const inviteDocRef = firestore.doc(
-        `${getStage(request.data.stage)}-WorkspaceInvites/${(
-          request.data.inviteCode ?? ``
-        ).trim()}`,
+        `${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`,
       );
       const inviteDoc = await inviteDocRef.get();
       if (!inviteDoc.exists)
