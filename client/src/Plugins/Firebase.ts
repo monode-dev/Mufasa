@@ -316,6 +316,9 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
           config.firestore,
           `${config.stage}-UserMetadata`,
         ),
+        refreshCustomClaims: async () => {
+          await config.firebaseAuth.currentUser?.getIdTokenResult();
+        },
       }),
   } satisfies CloudAuth<any>;
 }
@@ -326,6 +329,7 @@ export function firebaseWorkspace(config: {
   uid: string;
   userMetadataCollection: CollectionReference;
   workspaceInvitesCollection: CollectionReference;
+  refreshCustomClaims: () => Promise<void>;
 }): WorkspaceIntegration {
   return {
     async generateInviteCode() {
@@ -350,14 +354,6 @@ export function firebaseWorkspace(config: {
           onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
       );
     },
-    async createWorkspace(params: { stage: string }) {
-      return (
-        await httpsCallable<{ stage: string }, void>(
-          config.firebaseFunctions,
-          "createWorkspace",
-        )(params)
-      ).data;
-    },
     async createWorkspaceInterface(params: {
       inviteCode: string;
       workspaceId: string;
@@ -372,21 +368,47 @@ export function firebaseWorkspace(config: {
         },
       );
     },
+    async createWorkspace(params: { stage: string }) {
+      const result = (
+        await httpsCallable<{ stage: string }, void>(
+          config.firebaseFunctions,
+          "createWorkspace",
+        )(params)
+      ).data;
+      try {
+        await config.refreshCustomClaims();
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+      }
+      return result;
+    },
     async joinWorkspace(params: { inviteCode: string; stage: string }) {
-      return (
+      const result = (
         await httpsCallable<{ inviteCode: string; stage: string }, void>(
           config.firebaseFunctions,
           "joinWorkspace",
         )(params)
       ).data;
+      try {
+        await config.refreshCustomClaims();
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+      }
+      return result;
     },
     async leaveWorkspace(params: { stage: string } | undefined) {
-      return (
+      const result = (
         await httpsCallable<{ stage: string } | undefined, void>(
           config.firebaseFunctions,
           "leaveWorkspace",
         )(params)
       ).data;
+      try {
+        await config.refreshCustomClaims();
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+      }
+      return result;
     },
     // async deleteWorkspace(params: { stage: string } | undefined) {
     //   return (
