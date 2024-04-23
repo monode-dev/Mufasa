@@ -1,6 +1,9 @@
 // See a full list of supported triggers at https://firebase.google.com/docs/functions
 // Start writing functions: https://firebase.google.com/docs/functions/typescript
 // Writing Callable Functions: https://firebase.google.com/docs/functions/callable?gen=2nd
+// Server sending errors: https://firebase.google.com/docs/functions/callable?gen=2nd#handle_errors
+// Error codes: https://github.com/grpc/grpc/blob/master/doc/statuscodes.md
+// Client catching errors: https://firebase.google.com/docs/functions/callable?gen=2nd#web-modular-api_5
 import {
   onCall,
   CallableOptions,
@@ -114,10 +117,25 @@ export function initializeMufasaFunctions({
       const inviteCode = (request.data.inviteCode ?? ``).trim();
       if (inviteCode === ``)
         throw new HttpsError(`invalid-argument`, "Invite code is required.");
-      const inviteDocRef = firestore.doc(
-        `${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`,
-      );
-      const inviteDoc = await inviteDocRef.get();
+      const inviteDocRef = (() => {
+        try {
+          return firestore.doc(
+            `${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`,
+          );
+        } catch (e) {
+          throw new HttpsError(
+            `invalid-argument`,
+            "That invite code looks wrong.",
+          );
+        }
+      })();
+      const inviteDoc = await (async () => {
+        try {
+          return await inviteDocRef.get();
+        } catch (e) {
+          throw new HttpsError(`not-found`, "Invalid invite code.");
+        }
+      })();
       if (!inviteDoc.exists)
         throw new HttpsError(`not-found`, "Invalid invite code.");
       const invite = inviteDoc.data() as any; //OrgInvite;

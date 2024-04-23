@@ -4,6 +4,9 @@ exports.initializeMufasaFunctions = void 0;
 // See a full list of supported triggers at https://firebase.google.com/docs/functions
 // Start writing functions: https://firebase.google.com/docs/functions/typescript
 // Writing Callable Functions: https://firebase.google.com/docs/functions/callable?gen=2nd
+// Server sending errors: https://firebase.google.com/docs/functions/callable?gen=2nd#handle_errors
+// Error codes: https://github.com/grpc/grpc/blob/master/doc/statuscodes.md
+// Client catching errors: https://firebase.google.com/docs/functions/callable?gen=2nd#web-modular-api_5
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
 const uuid_1 = require("uuid");
@@ -76,8 +79,22 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             const inviteCode = ((_b = request.data.inviteCode) !== null && _b !== void 0 ? _b : ``).trim();
             if (inviteCode === ``)
                 throw new https_1.HttpsError(`invalid-argument`, "Invite code is required.");
-            const inviteDocRef = firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`);
-            const inviteDoc = await inviteDocRef.get();
+            const inviteDocRef = (() => {
+                try {
+                    return firestore.doc(`${getStage(request.data.stage)}-WorkspaceInvites/${inviteCode}`);
+                }
+                catch (e) {
+                    throw new https_1.HttpsError(`invalid-argument`, "That invite code looks wrong.");
+                }
+            })();
+            const inviteDoc = await (async () => {
+                try {
+                    return await inviteDocRef.get();
+                }
+                catch (e) {
+                    throw new https_1.HttpsError(`not-found`, "Invalid invite code.");
+                }
+            })();
             if (!inviteDoc.exists)
                 throw new https_1.HttpsError(`not-found`, "Invalid invite code.");
             const invite = inviteDoc.data(); //OrgInvite;
