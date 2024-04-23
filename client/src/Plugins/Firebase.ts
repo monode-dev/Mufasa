@@ -332,6 +332,10 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
           config.firestore,
           `${config.stage}-UserMetadata`,
         ),
+        workspacesCollection: collection(
+          config.firestore,
+          `${config.stage}-Workspaces`,
+        ),
         refreshCustomClaims: async () => {
           await config.firebaseAuth.currentUser?.getIdToken(true);
         },
@@ -345,6 +349,7 @@ export function firebaseWorkspace(config: {
   uid: string;
   userMetadataCollection: CollectionReference;
   workspaceInvitesCollection: CollectionReference;
+  workspacesCollection: CollectionReference;
   refreshCustomClaims: () => Promise<void>;
 }): WorkspaceIntegration {
   return {
@@ -358,6 +363,12 @@ export function firebaseWorkspace(config: {
           const metadata = snapshot.data() as undefined | UserMetadata;
           handle(metadata ?? null);
         },
+      );
+    },
+    watchEntitlements(workspaceId, onEntitlements) {
+      return onSnapshot(
+        doc(config.workspacesCollection, workspaceId),
+        (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []),
       );
     },
     watchMembers(workspaceId, onMembers) {

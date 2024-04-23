@@ -136,7 +136,6 @@ function createWorkspaceInterface(config) {
                     ? {
                         workspaceId: newMetadata.workspaceId,
                         role: newMetadata.role,
-                        workspaceEntitlements: newMetadata.workspaceEntitlements ?? [],
                     }
                     : NoneAsJson;
                 data.value = newMetadataValue;
@@ -191,6 +190,21 @@ function createWorkspaceInterface(config) {
             isJoining: true,
         },
         createJoinedInst(userMetadata) {
+            const entitlements = doNow(() => {
+                const entitlements = useProp([]);
+                let haveStartedWatching = false;
+                return {
+                    get value() {
+                        if (!haveStartedWatching) {
+                            workspaceIntegration.watchEntitlements(userMetadata.workspaceId, (allEntitlements) => {
+                                entitlements.value = allEntitlements;
+                            });
+                            haveStartedWatching = true;
+                        }
+                        return entitlements.value;
+                    },
+                };
+            });
             const otherMembers = doNow(() => {
                 const otherMembers = useProp([]);
                 let haveStartedWatching = false;
@@ -215,7 +229,7 @@ function createWorkspaceInterface(config) {
                     return otherMembers.value;
                 },
                 get workspaceEntitlements() {
-                    return userMetadata.workspaceEntitlements ?? [];
+                    return entitlements;
                 },
             };
             const roleBasedProps = useFormula(() => userMetadata.role === `owner`

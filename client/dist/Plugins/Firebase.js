@@ -190,6 +190,7 @@ export function firebaseAuthIntegration(config) {
             ...config,
             uid: uid,
             userMetadataCollection: collection(config.firestore, `${config.stage}-UserMetadata`),
+            workspacesCollection: collection(config.firestore, `${config.stage}-Workspaces`),
             refreshCustomClaims: async () => {
                 await config.firebaseAuth.currentUser?.getIdToken(true);
             },
@@ -207,6 +208,9 @@ export function firebaseWorkspace(config) {
                 const metadata = snapshot.data();
                 handle(metadata ?? null);
             });
+        },
+        watchEntitlements(workspaceId, onEntitlements) {
+            return onSnapshot(doc(config.workspacesCollection, workspaceId), (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []));
         },
         watchMembers(workspaceId, onMembers) {
             return onSnapshot(query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)), (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data())));

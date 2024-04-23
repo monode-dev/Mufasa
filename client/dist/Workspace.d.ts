@@ -14,7 +14,6 @@ export type Member = {
 export type UserMetadata = {
     workspaceId: string | null;
     role: `member` | `owner` | null;
-    workspaceEntitlements: string[] | null;
 };
 export type NonNullUserMetadata = {
     [K in keyof UserMetadata]-?: NonNullable<UserMetadata[K]>;
@@ -22,6 +21,7 @@ export type NonNullUserMetadata = {
 export type WorkspaceIntegration = {
     onUserMetadata: (handle: (metadata: UserMetadata | null) => void) => () => void;
     watchMembers: (workspaceId: string, handle: (members: Member[]) => void) => void;
+    watchEntitlements: (workspaceId: string, handle: (entitlements: string[]) => void) => void;
     generateInviteCode: () => Promise<string>;
     createWorkspace: (params: {
         stage: string;
@@ -121,7 +121,9 @@ declare function createWorkspaceInterface(config: {
     haveJoined: boolean;
     id: string;
     readonly otherMembers: Member[];
-    readonly workspaceEntitlements: string[];
+    readonly workspaceEntitlements: {
+        readonly value: string[];
+    };
 } & (({
     isOwner: boolean;
     role: "owner";

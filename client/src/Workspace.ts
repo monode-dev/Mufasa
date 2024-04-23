@@ -25,7 +25,6 @@ export type Member = {
 export type UserMetadata = {
   workspaceId: string | null;
   role: `member` | `owner` | null;
-  workspaceEntitlements: string[] | null;
 };
 export type NonNullUserMetadata = {
   [K in keyof UserMetadata]-?: NonNullable<UserMetadata[K]>;
@@ -37,6 +36,10 @@ export type WorkspaceIntegration = {
   watchMembers: (
     workspaceId: string,
     handle: (members: Member[]) => void,
+  ) => void;
+  watchEntitlements: (
+    workspaceId: string,
+    handle: (entitlements: string[]) => void,
   ) => void;
   generateInviteCode: () => Promise<string>;
   createWorkspace: (params: { stage: string }) => Promise<void>;
@@ -277,8 +280,6 @@ function createWorkspaceInterface(config: {
               ? {
                   workspaceId: newMetadata.workspaceId,
                   role: newMetadata.role,
-                  workspaceEntitlements:
-                    newMetadata.workspaceEntitlements ?? [],
                 }
               : NoneAsJson;
           data.value = newMetadataValue;
@@ -331,6 +332,24 @@ function createWorkspaceInterface(config: {
       isJoining: true,
     },
     createJoinedInst(userMetadata: NonNullUserMetadata) {
+      const entitlements = doNow(() => {
+        const entitlements = useProp<string[]>([]);
+        let haveStartedWatching = false;
+        return {
+          get value() {
+            if (!haveStartedWatching) {
+              workspaceIntegration.watchEntitlements(
+                userMetadata.workspaceId,
+                (allEntitlements) => {
+                  entitlements.value = allEntitlements;
+                },
+              );
+              haveStartedWatching = true;
+            }
+            return entitlements.value;
+          },
+        };
+      });
       const otherMembers = doNow(() => {
         const otherMembers = useProp<Member[]>([]);
         let haveStartedWatching = false;
@@ -358,7 +377,7 @@ function createWorkspaceInterface(config: {
           return otherMembers.value;
         },
         get workspaceEntitlements() {
-          return userMetadata.workspaceEntitlements ?? [];
+          return entitlements;
         },
       };
       const roleBasedProps = useFormula(() =>
