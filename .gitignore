@@ -25,3 +25,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+/.vs
+/.vscode/settings.json
+/checks.json
