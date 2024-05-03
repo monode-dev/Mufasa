@@ -68,7 +68,7 @@ export function initializeStoreBank(bankConfig) {
                     ...params,
                 }));
             }
-            return managers[params.storeType].get(params.docType);
+            return managers[params.storeType].get(params.docType)?.value;
         },
     };
     function initializeStoreManager(params) {

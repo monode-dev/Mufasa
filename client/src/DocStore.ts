@@ -213,7 +213,7 @@ export function initializeStoreBank(bankConfig: {
           }) as any,
         );
       }
-      return managers[params.storeType].get(params.docType) as any;
+      return managers[params.storeType].get(params.docType)?.value as any;
     },
   };
   type StoreManager<T extends "doc" | "file"> = ReturnType<
