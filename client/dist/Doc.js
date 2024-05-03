@@ -153,6 +153,7 @@ export class Doc {
         return this._docStore.isDocDeleted(this.docId);
     }
     static getAllDocs() {
+        console.log(this._docStore);
         return this._docStore.getAllDocs().map(this._fromId.bind(this));
     }
     static getHaveCompletedFirstSync() {
