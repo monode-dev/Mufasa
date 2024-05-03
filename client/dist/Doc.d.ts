@@ -5,7 +5,6 @@ export declare const getStoreBank: () => {
         storeType: T;
         docType: string;
         getStoreConfig: () => PersistanceConfig;
-        /** Override to run code just before an object is deleted. */
         onStoreInit?: ((store: T extends "doc" ? {
             readonly loadedFromLocalStorage: Promise<void>;
             readonly batchUpdate: (updates: {
