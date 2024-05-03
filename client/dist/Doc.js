@@ -1,19 +1,15 @@
 import { Persistance, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
-import { getDocStore } from "./Workspace.js";
-let _getStage = () => `Dev`;
-export const getStage = () => _getStage();
-let _getWorkspaceId = () => null;
-export const getWorkspaceId = () => _getWorkspaceId();
 let defaultPersistanceConfig;
+let _getStoreBank = (() => { });
+export const getStoreBank = () => _getStoreBank();
 let _trackUpload = () => { };
 export const trackUpload = () => _trackUpload();
 let _untrackUpload = () => { };
 export const untrackUpload = () => _untrackUpload();
 export function initializeDocClass(config) {
     defaultPersistanceConfig = config.defaultPersistanceConfig;
-    _getStage = () => config.stage;
-    _getWorkspaceId = config.getWorkspaceId;
+    _getStoreBank = () => config.storeBank;
     _trackUpload = config.defaultPersistanceConfig.trackUpload;
     _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
     return {
@@ -119,9 +115,8 @@ export class Doc {
         this._docStore;
     }
     static get _docStore() {
-        return getDocStore({
-            stage: getStage(),
-            workspaceId: getWorkspaceId(),
+        return getStoreBank().getStore({
+            storeType: `doc`,
             docType: this.docType,
             getStoreConfig: () => this.getDocStoreConfig(),
             /** Docs don't start syncing until they are accessed the first time. So as soon as

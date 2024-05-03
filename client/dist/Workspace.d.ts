@@ -1,5 +1,4 @@
-import { Device, DocStore, PersistanceConfig, Session, Cloud } from "./DocStore.js";
-import { FileStore } from "./FileStore.js";
+import { Device, Session, Cloud } from "./DocStore.js";
 import { ReadonlyProp } from "mosa-js";
 export type UserInfo = {
     uid: string;
@@ -138,18 +137,4 @@ declare function createWorkspaceInterface(config: {
     createWorkspaceInvite?: undefined;
     kickMember?: undefined;
 } & {})))>;
-export declare function getDocStore(params: {
-    stage: string;
-    workspaceId: string | null;
-    docType: string;
-    getStoreConfig: () => PersistanceConfig;
-    onStoreInit?: (store: DocStore) => void;
-}): DocStore;
-export declare function getFileStore(params: {
-    stage: string;
-    workspaceId: string | null;
-    docType: string;
-    getStoreConfig: () => PersistanceConfig;
-    onStoreInit?: (store: FileStore) => void;
-}): FileStore;
 export {};

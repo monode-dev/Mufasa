@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils.js";
+import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionTablePersister } from "./SessionTablePersister.js";
-import type { MosaApi, Prop } from "mosa-js";
+import type { MosaApi, Prop, ReadonlyProp } from "mosa-js";
 import type { GetCloudAuth, SignInFuncs } from "./Workspace.js";
+import { FileStore, createFileStore } from "./FileStore.js";
 
 export const DELETED_KEY = `mx_deleted`;
 export type Persistance = (typeof Persistance)[keyof typeof Persistance];
@@ -179,44 +180,130 @@ export type DocStoreParams = {
   onIncomingCreate: (docId: string) => void;
   onIncomingDelete: (docId: string) => void;
 };
-export function initDocStoreConfig(params: {
-  persistance: PersistanceConfig;
-  stage: string | null;
-  workspaceId: string | null;
-  docType: string;
-}): DocStoreParams {
-  const docStoreParams: DocStoreParams = {
-    sessionTablePersister: isValid(params.workspaceId)
-      ? sessionTablePersister(params.persistance.sessionPersister)
-      : Session.mockTablePersister,
-    deviceDirectoryPersister:
-      isValid(params.persistance.devicePersister) && isValid(params.workspaceId)
-        ? params.persistance.devicePersister(
-            `${params.workspaceId}/${params.docType}`,
-          )
-        : Device.mockDirectoryPersister,
-    cloudWorkspacePersister:
-      isValid(params.persistance.getWorkspacePersister) &&
-      isValid(params.workspaceId)
-        ? params.persistance.getWorkspacePersister({
-            stage: params.stage,
-            docType: params.docType,
-            workspaceId: params.workspaceId,
-          })
-        : Cloud.mockWorkspacePersister,
-    trackUpload: params.persistance.trackUpload,
-    untrackUpload: params.persistance.untrackUpload,
-    onIncomingCreate: params.persistance.onIncomingCreate ?? (() => {}),
-    onIncomingDelete: params.persistance.onIncomingDelete ?? (() => {}),
+type WorkspaceSignature = {
+  userId: string;
+  workspaceId: string;
+};
+export type StoreBank = ReturnType<typeof initializeStoreBank>;
+export function initializeStoreBank(bankConfig: {
+  stage: string;
+  workspaceSignature: Prop<WorkspaceSignature | null>;
+}) {
+  type WorkspaceInstConfig = WorkspaceSignature & {
+    instId: string;
   };
-  // onWorkspaceDelete(params.workspaceId, () => {
-  //   docStoreParams.deviceDirectoryPersister.deleteAllData();
-  //   // TODO: Also prevent writes.
-  // });
-  // onWorkspaceDeactivation(params.workspaceId, () => {
-  //   docStoreParams.cloudWorkspacePersister.dispose();
-  // });
-  return docStoreParams;
+  const managers = {
+    doc: new Map<string, StoreManager<"doc">>(),
+    file: new Map<string, StoreManager<"file">>(),
+  };
+  return {
+    getStore<T extends "doc" | "file">(params: {
+      storeType: T;
+      docType: string;
+      getStoreConfig: () => PersistanceConfig;
+      onStoreInit?: (store: T extends "doc" ? DocStore : FileStore) => void;
+    }): T extends "doc" ? DocStore : FileStore {
+      if (!managers[params.storeType].has(params.docType)) {
+        managers[params.storeType].set(
+          params.docType,
+          initializeStoreManager({
+            stage: bankConfig.stage,
+            workspaceSignature: bankConfig.workspaceSignature,
+            ...params,
+          }) as any,
+        );
+      }
+      return managers[params.storeType].get(params.docType) as any;
+    },
+  };
+  type StoreManager<T extends "doc" | "file"> = ReturnType<
+    typeof initializeStoreManager<T>
+  >;
+  function initializeStoreManager<T extends "doc" | "file">(params: {
+    stage: string;
+    workspaceSignature: Prop<WorkspaceSignature | null>;
+    storeType: T;
+    docType: string;
+    getStoreConfig: () => PersistanceConfig;
+    onStoreInit?: (store: T extends "doc" ? DocStore : FileStore) => void;
+  }): ReadonlyProp<T extends "doc" ? DocStore : FileStore> {
+    // Set up config for this store.
+    const persistance = params.getStoreConfig();
+    const { useProp, useFormula, doWatch } = persistance.sessionPersister;
+    const createStore = (workspaceInstConfig: WorkspaceInstConfig | null) => {
+      const createSpecificStore =
+        params.storeType === "doc" ? createDocStore : createFileStore;
+      return createSpecificStore({
+        sessionTablePersister: isValid(workspaceInstConfig)
+          ? sessionTablePersister(persistance.sessionPersister)
+          : Session.mockTablePersister,
+        deviceDirectoryPersister:
+          isValid(persistance.devicePersister) && isValid(workspaceInstConfig)
+            ? persistance.devicePersister(
+                `${params.docType}/${workspaceInstConfig.instId}`,
+              )
+            : Device.mockDirectoryPersister,
+        cloudWorkspacePersister:
+          isValid(persistance.getWorkspacePersister) &&
+          isValid(workspaceInstConfig)
+            ? persistance.getWorkspacePersister({
+                stage: params.stage,
+                docType: params.docType,
+                workspaceId: workspaceInstConfig.workspaceId,
+              })
+            : Cloud.mockWorkspacePersister,
+        trackUpload: persistance.trackUpload,
+        untrackUpload: persistance.untrackUpload,
+        onIncomingCreate: persistance.onIncomingCreate ?? (() => {}),
+        onIncomingDelete: persistance.onIncomingDelete ?? (() => {}),
+      });
+    };
+
+    // Load the last workspace instance from disk.
+    const instConfig = useProp<WorkspaceInstConfig | null>(null);
+    const instConfigJson = persistance
+      .devicePersister?.(params.docType)
+      .jsonFile(`currentWorkspaceInstConfig.json`)
+      .start<WorkspaceInstConfig | null>(null);
+    instConfigJson?.loadedFromLocalStorage.then(() => {
+      instConfig.value = instConfigJson.data;
+    });
+
+    //
+    const store = useFormula(() => createStore(instConfig.value));
+    doWatch(
+      async () => {
+        const newInstConfig = params.workspaceSignature.value;
+        await instConfigJson?.loadedFromLocalStorage;
+        if (
+          newInstConfig?.userId === instConfig?.value?.userId &&
+          newInstConfig?.workspaceId === instConfig.value?.workspaceId
+        )
+          return;
+        // TODO: store.value.stop();
+        instConfig.value = isValid(newInstConfig)
+          ? {
+              userId: newInstConfig.userId,
+              workspaceId: newInstConfig.workspaceId,
+              instId: uuidv4(),
+            }
+          : null;
+        /* Wait to delete the old store until a new one is loaded, so
+         * that if the user logs right back in they don't have to
+         * re-download everything. */
+        if (newInstConfig !== null) {
+          instConfigJson?.batchUpdate((data) => {
+            data.value = instConfig.value;
+          });
+          // TODO: deleteStore(instConfigJson?.data);
+        }
+      },
+      {
+        on: [params.workspaceSignature],
+      },
+    );
+    return store as any;
+  }
 }
 export function createDocStore(config: DocStoreParams) {
   const localJsonPersister =

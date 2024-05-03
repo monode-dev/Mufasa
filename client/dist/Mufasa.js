@@ -1,7 +1,7 @@
 import { initializeDocClass } from "./Doc.js";
-import { Device } from "./DocStore.js";
+import { Device, initializeStoreBank } from "./DocStore.js";
 import { initializeSyncedFileClass } from "./File.js";
-import { doNow } from "./Utils.js";
+import { doNow, isValid } from "./Utils.js";
 import { initializeAuth } from "./Workspace.js";
 export { prop, formula } from "./Doc.js";
 export { list } from "./List.js";
@@ -42,12 +42,17 @@ export function initializeMufasa(mfsConfig) {
         directoryPersister: mfsConfig.devicePersister?.(`Auth`) ?? Device.mockDirectoryPersister,
         getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
     });
-    // TODO: This should be inferred.
-    const getWorkspaceId = () => user.value.workspace?.id ?? null;
     return {
         ...initializeDocClass({
-            stage: stage,
-            getWorkspaceId: getWorkspaceId,
+            storeBank: initializeStoreBank({
+                stage: stage,
+                workspaceSignature: mfsConfig.sessionPersister.useFormula(() => isValid(user.value.uid) && isValid(user.value.workspace?.id)
+                    ? {
+                        userId: user.value.uid,
+                        workspaceId: user.value.workspace.id,
+                    }
+                    : null),
+            }),
             defaultPersistanceConfig: {
                 sessionPersister: mfsConfig.sessionPersister,
                 devicePersister: mfsConfig.devicePersister,
@@ -62,9 +67,6 @@ export function initializeMufasa(mfsConfig) {
         ...initializeSyncedFileClass(),
         get isUploadingToCloud() {
             return isUploadingToCloud.value;
-        },
-        get workspaceId() {
-            return getWorkspaceId();
         },
     };
 }

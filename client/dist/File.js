@@ -1,7 +1,6 @@
-import { Doc, getStage, getWorkspaceId, prop } from "./Doc.js";
+import { Doc, prop, getStoreBank } from "./Doc.js";
 import { Persistance } from "./DocStore.js";
 import { isValid } from "./Utils.js";
-import { getFileStore } from "./Workspace.js";
 export function initializeSyncedFileClass() {
     return {
         File(...params) {
@@ -15,9 +14,8 @@ export function initializeSyncedFileClass() {
 // TODO: Maybe prevent this file from being directly created.
 class File extends Doc {
     static get _fileStore() {
-        return getFileStore({
-            stage: getStage(),
-            workspaceId: getWorkspaceId(),
+        return getStoreBank().getStore({
+            storeType: `file`,
             docType: this.docType,
             getStoreConfig: this.getDocStoreConfig,
         });

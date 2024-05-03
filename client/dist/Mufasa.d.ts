@@ -26,7 +26,6 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
     cloudPersister: C;
 }): {
     readonly isUploadingToCloud: boolean;
-    readonly workspaceId: string | null;
     readonly File: (docType: string, customizations?: Omit<{
         docType?: string | undefined;
         docStoreConfig?: Partial<import("./DocStore.js").PersistanceConfig> | undefined;

@@ -4,6 +4,7 @@ import {
   PersistanceTaggedUpdateBatch,
   PrimVal,
   WritablePersistanceTaggedUpdateBatch,
+  StoreBank,
 } from "./DocStore.js";
 import {
   Flagged,
@@ -13,26 +14,21 @@ import {
   doNow,
   isValid,
 } from "./Utils.js";
-import { getDocStore } from "./Workspace.js";
 
-let _getStage = () => `Dev`;
-export const getStage = () => _getStage();
-let _getWorkspaceId: () => string | null = () => null;
-export const getWorkspaceId = () => _getWorkspaceId();
 let defaultPersistanceConfig: PersistanceConfig;
+let _getStoreBank: () => StoreBank = (() => {}) as any;
+export const getStoreBank = () => _getStoreBank();
 let _trackUpload: () => void = () => {};
 export const trackUpload = () => _trackUpload();
 let _untrackUpload: () => void = () => {};
 export const untrackUpload = () => _untrackUpload();
 export type DocExports = ReturnType<typeof initializeDocClass>;
 export function initializeDocClass(config: {
-  stage: string;
-  getWorkspaceId: () => string | null;
+  storeBank: StoreBank;
   defaultPersistanceConfig: PersistanceConfig;
 }) {
   defaultPersistanceConfig = config.defaultPersistanceConfig;
-  _getStage = () => config.stage;
-  _getWorkspaceId = config.getWorkspaceId;
+  _getStoreBank = () => config.storeBank;
   _trackUpload = config.defaultPersistanceConfig.trackUpload;
   _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
 
@@ -156,9 +152,8 @@ export class Doc {
     this._docStore;
   }
   static get _docStore() {
-    return getDocStore({
-      stage: getStage(),
-      workspaceId: getWorkspaceId(),
+    return getStoreBank().getStore({
+      storeType: `doc`,
       docType: this.docType,
       getStoreConfig: () => this.getDocStoreConfig(),
       /** Docs don't start syncing until they are accessed the first time. So as soon as

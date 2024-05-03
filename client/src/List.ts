@@ -1,6 +1,5 @@
 import { CustomProp, Doc, IsCustomProp, prop } from "./Doc.js";
 import { PersistanceConfig } from "./DocStore.js";
-import { isValid } from "./Utils.js";
 
 const relTables = new Map<typeof Doc, Map<string, typeof Doc>>();
 
