@@ -137,7 +137,7 @@ export function DefineDocType(customizations: {
   persistance?: Partial<PersistanceConfig>;
   storeBank?: StoreBank;
 }) {
-  return class extends customizations.BaseClass {
+  return class NewClass extends customizations.BaseClass {
     static get RootDocClass() {
       return (
         customizations?.RootDocClass ?? customizations.BaseClass.RootDocClass
@@ -152,7 +152,7 @@ export function DefineDocType(customizations: {
       return customizations?.storeBank ?? customizations.BaseClass.storeBank;
     }
 
-    static getDocStoreConfig<This extends typeof _ProtoDoc>(
+    static getDocStoreConfig<This extends typeof NewClass>(
       this: This,
     ): PersistanceConfig {
       return {

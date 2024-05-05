@@ -96,7 +96,7 @@ getDocId) {
     return inst;
 }
 export function DefineDocType(customizations) {
-    return class extends customizations.BaseClass {
+    return class NewClass extends customizations.BaseClass {
         static get RootDocClass() {
             return (customizations?.RootDocClass ?? customizations.BaseClass.RootDocClass);
         }
