@@ -62,31 +62,37 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       mfsConfig.devicePersister?.(`Auth`) ?? Device.mockDirectoryPersister,
     getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
   });
+  const storeBank = initializeStoreBank({
+    stage: stage,
+    workspaceSignature: mfsConfig.sessionPersister.useFormula(() =>
+      isValid(user.value.uid) && isValid(user.value.workspace?.id)
+        ? {
+            userId: user.value.uid,
+            workspaceId: user.value.workspace.id,
+          }
+        : null,
+    ),
+  });
+  const docSetup = initializeDocClass({
+    storeBank: storeBank,
+    defaultPersistance: {
+      sessionPersister: mfsConfig.sessionPersister,
+      devicePersister: mfsConfig.devicePersister,
+      getWorkspacePersister: mfsConfig.cloudPersister.getWorkspacePersister,
+      trackUpload,
+      untrackUpload,
+    },
+  });
+  const fileSetup = initializeSyncedFileClass({
+    Doc: docSetup.DocClass,
+    storeBank: storeBank,
+  });
   return {
-    ...initializeDocClass({
-      storeBank: initializeStoreBank({
-        stage: stage,
-        workspaceSignature: mfsConfig.sessionPersister.useFormula(() =>
-          isValid(user.value.uid) && isValid(user.value.workspace?.id)
-            ? {
-                userId: user.value.uid,
-                workspaceId: user.value.workspace.id,
-              }
-            : null,
-        ),
-      }),
-      defaultPersistanceConfig: {
-        sessionPersister: mfsConfig.sessionPersister,
-        devicePersister: mfsConfig.devicePersister,
-        getWorkspacePersister: mfsConfig.cloudPersister.getWorkspacePersister,
-        trackUpload,
-        untrackUpload,
-      },
-    }),
+    Doc: docSetup.DefineDoc,
     get user(): User<C> {
       return user.value;
     },
-    ...initializeSyncedFileClass(),
+    File: fileSetup.DefineFile,
     get isUploadingToCloud() {
       return isUploadingToCloud.value;
     },

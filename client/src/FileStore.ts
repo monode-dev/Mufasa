@@ -1,4 +1,3 @@
-import { trackUpload, untrackUpload } from "./Doc.js";
 import { DocStoreParams, Persistance, createDocStore } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
@@ -49,7 +48,7 @@ export function createFileStore(config: DocStoreParams) {
   const pushCreate = createPersistedFunction(
     config.deviceDirectoryPersister.jsonFile(`pushCreate`),
     async (fileId: string) => {
-      trackUpload();
+      config.trackUpload();
       if (!isValid(fileId)) return;
       const fileData = await config.deviceDirectoryPersister.readFile(fileId);
       if (!isValid(fileData)) return;
@@ -66,7 +65,7 @@ export function createFileStore(config: DocStoreParams) {
         },
         { overwriteGlobally: true },
       );
-      untrackUpload();
+      config.untrackUpload();
     },
   );
   return {
@@ -93,9 +92,9 @@ export function createFileStore(config: DocStoreParams) {
     pushDelete: createPersistedFunction(
       config.deviceDirectoryPersister.jsonFile(`pushDelete`),
       async (fileId: string) => {
-        trackUpload();
+        config.trackUpload();
         await config.deviceDirectoryPersister.deleteFile(fileId);
-        untrackUpload();
+        config.untrackUpload();
         return fileId;
       },
     ).addStep(async (fileId) => {

@@ -1,4 +1,3 @@
-import { trackUpload, untrackUpload } from "./Doc.js";
 import { Persistance, createDocStore } from "./DocStore.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValid } from "./Utils.js";
@@ -36,7 +35,7 @@ export function createFileStore(config) {
         },
     });
     const pushCreate = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pushCreate`), async (fileId) => {
-        trackUpload();
+        config.trackUpload();
         if (!isValid(fileId))
             return;
         const fileData = await config.deviceDirectoryPersister.readFile(fileId);
@@ -52,7 +51,7 @@ export function createFileStore(config) {
                 },
             },
         }, { overwriteGlobally: true });
-        untrackUpload();
+        config.untrackUpload();
     });
     return {
         docStore: docStore,
@@ -70,9 +69,9 @@ export function createFileStore(config) {
         },
         pullCreate,
         pushDelete: createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pushDelete`), async (fileId) => {
-            trackUpload();
+            config.trackUpload();
             await config.deviceDirectoryPersister.deleteFile(fileId);
-            untrackUpload();
+            config.untrackUpload();
             return fileId;
         }).addStep(async (fileId) => {
             await config.cloudWorkspacePersister.deleteFile?.(fileId);

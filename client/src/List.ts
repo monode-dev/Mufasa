@@ -1,22 +1,29 @@
-import { CustomProp, Doc, IsCustomProp, prop } from "./Doc.js";
+import {
+  CustomProp,
+  DocClass,
+  DocInst,
+  IsCustomProp,
+  DefineDocType,
+  prop,
+} from "./Doc.js";
 import { PersistanceConfig } from "./DocStore.js";
 
-const relTables = new Map<typeof Doc, Map<string, typeof Doc>>();
+const relTables = new Map<DocClass, Map<string, DocClass>>();
 
 type GetListFromTableConfig<
-  OtherInst extends Doc,
+  OtherInst extends DocInst,
   TableConfig,
 > = undefined extends TableConfig
   ? List<OtherInst>
   : TableConfig extends PersistanceConfig
   ? List<OtherInst>
   : TableConfig extends keyof OtherInst
-  ? OtherInst[TableConfig] extends Doc
+  ? OtherInst[TableConfig] extends DocInst
     ? ReadonlyList<OtherInst>
     : List<OtherInst>
   : List<OtherInst>;
 export function list<
-  OtherClass extends typeof Doc,
+  OtherClass extends DocClass,
   TableConfig extends
     | undefined
     | PersistanceConfig
@@ -48,7 +55,7 @@ export function list<
           const listInst = new List(
             () =>
               OtherClass.getAllDocs().filter(
-                (other) => (other[otherProp] as Doc)?.docId === inst.docId,
+                (other) => (other[otherProp] as DocInst)?.docId === inst.docId,
               ),
             () => {},
             () => {},
@@ -75,11 +82,11 @@ export function list<
   }
 }
 function listProp(config: {
-  getPrimaryClass: (inst: Doc) => typeof Doc;
-  getSecondaryClass: (inst: Doc) => typeof Doc;
+  getPrimaryClass: (inst: DocInst) => DocClass;
+  getSecondaryClass: (inst: DocInst) => DocClass;
   gePrimaryProp: (thisProp: string) => string;
   docStoreConfig: PersistanceConfig | null;
-  otherDocsToStartSyncing: (typeof Doc)[];
+  otherDocsToStartSyncing: DocClass[];
 }) {
   return {
     [IsCustomProp]: true,
@@ -92,9 +99,10 @@ function listProp(config: {
       if (!relTablesForThisType.has(key)) {
         relTablesForThisType.set(
           key,
-          class extends Doc.customize({
+          class extends DefineDocType({
             docType: `${PrimaryClass.docType}_${key}`,
-            docStoreConfig: config.docStoreConfig ?? undefined,
+            BaseClass: PrimaryClass.RootDocClass,
+            persistance: config.docStoreConfig ?? undefined,
           }) {
             primary = prop(PrimaryClass);
             secondary = prop(SecondaryClass);
@@ -130,7 +138,7 @@ function listProp(config: {
     otherDocsToStartSyncing: config.otherDocsToStartSyncing,
   } satisfies CustomProp;
 }
-export class List<T extends Doc> {
+export class List<T extends DocInst> {
   [Symbol.iterator](): IterableIterator<T> {
     return this.getArray()[Symbol.iterator]();
   }
@@ -152,4 +160,4 @@ export class List<T extends Doc> {
     public readonly remove: (value: T) => void,
   ) {}
 }
-export type ReadonlyList<T extends Doc> = Omit<List<T>, `add` | `remove`>;
+export type ReadonlyList<T extends DocInst> = Omit<List<T>, `add` | `remove`>;

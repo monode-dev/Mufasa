@@ -15,37 +15,36 @@ import {
   isValid,
 } from "./Utils.js";
 
-let defaultPersistanceConfig: PersistanceConfig;
-let _getStoreBank: () => StoreBank = (() => {}) as any;
-export const getStoreBank = () => _getStoreBank();
-let _trackUpload: () => void = () => {};
-export const trackUpload = () => _trackUpload();
-let _untrackUpload: () => void = () => {};
-export const untrackUpload = () => _untrackUpload();
 export type DocExports = ReturnType<typeof initializeDocClass>;
+export type DocClass = DocExports["DocClass"];
+export type DocInst = InstanceType<DocClass>;
 export function initializeDocClass(config: {
   storeBank: StoreBank;
-  defaultPersistanceConfig: PersistanceConfig;
+  defaultPersistance: PersistanceConfig;
 }) {
-  defaultPersistanceConfig = config.defaultPersistanceConfig;
-  _getStoreBank = () => config.storeBank;
-  _trackUpload = config.defaultPersistanceConfig.trackUpload;
-  _untrackUpload = config.defaultPersistanceConfig.untrackUpload;
+  class RootDoc extends DefineDocType({
+    BaseClass: _ProtoDoc,
+    persistance: config.defaultPersistance,
+  }) {}
 
   return {
-    Doc(
+    DefineDoc(
       docType: string,
-      customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>,
+      customizations?: Omit<Parameters<typeof DefineDocType>[0], `docType`>,
     ) {
-      return Doc.customize({ docType, ...(customizations ?? {}) });
+      return DefineDocType({
+        BaseClass: RootDoc,
+        docType,
+        storeBank: config.storeBank,
+        ...customizations,
+      });
     },
-    defaultPersistanceConfig: config.defaultPersistanceConfig,
-    // TODO: Get user from the cloud persister.
-    // get user() {},
+    defaultPersistanceConfig: config.defaultPersistance,
+    DocClass: RootDoc,
   };
 }
-const _allDocInstances = new Map<string, Doc>();
-function _initializeInst<T extends Doc>(
+const _allDocInstances = new Map<string, DocInst>();
+function _initializeInst<T extends DocInst>(
   inst: T,
   overrideProps: { [key: string | number]: PrimVal },
   // We should try not making docId reactive, and then decide if that was the wrong idea.
@@ -131,28 +130,66 @@ function _initializeInst<T extends Doc>(
   return inst;
 }
 
+export function DefineDocType(customizations: {
+  BaseClass: typeof _ProtoDoc;
+  docType?: string;
+  RootDocClass?: typeof _ProtoDoc;
+  persistance?: Partial<PersistanceConfig>;
+  storeBank?: StoreBank;
+}) {
+  return class extends customizations.BaseClass {
+    static get RootDocClass() {
+      return (
+        customizations?.RootDocClass ?? customizations.BaseClass.RootDocClass
+      );
+    }
+
+    static get docType() {
+      return customizations?.docType ?? this.name;
+    }
+
+    static get storeBank() {
+      return customizations?.storeBank ?? customizations.BaseClass.storeBank;
+    }
+
+    static getDocStoreConfig<This extends typeof _ProtoDoc>(
+      this: This,
+    ): PersistanceConfig {
+      return {
+        ...customizations.BaseClass.getDocStoreConfig(),
+        ...customizations?.persistance,
+      };
+    }
+  };
+}
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
-export class Doc {
-  // private constructor() {}
+class _ProtoDoc {
+  static get RootDocClass() {
+    return _ProtoDoc;
+  }
 
   /*** NOTE: This can be overridden to manually specify a type name. */
   static get docType() {
     return this.name;
   }
   get docType() {
-    return (this.constructor as typeof Doc).docType;
+    return (this.constructor as typeof _ProtoDoc).docType;
   }
-  static getDocStoreConfig<This extends typeof Doc>(
+  static getDocStoreConfig<This extends typeof _ProtoDoc>(
     this: This,
   ): PersistanceConfig {
-    return defaultPersistanceConfig;
+    return {} as any;
   }
   static ensureSyncHasStarted() {
     this._docStore;
   }
+
+  static get storeBank(): StoreBank {
+    return {} as any;
+  }
   static get _docStore() {
-    return getStoreBank().getStore({
+    return this.storeBank.getStore({
       storeType: `doc`,
       docType: this.docType,
       getStoreConfig: () => this.getDocStoreConfig(),
@@ -170,31 +207,9 @@ export class Doc {
     });
   }
   get _docStore() {
-    return (this.constructor as typeof Doc)._docStore;
+    return (this.constructor as typeof _ProtoDoc)._docStore;
   }
-  // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
-  static customize<This extends typeof Doc>(
-    this: This,
-    customizations: {
-      docType?: string;
-      docStoreConfig?: Partial<PersistanceConfig>;
-    },
-  ): This {
-    return class extends (this as any) {
-      static get docType() {
-        return customizations.docType ?? this.name;
-      }
 
-      static getDocStoreConfig<This extends typeof Doc>(
-        this: This,
-      ): PersistanceConfig {
-        return {
-          ...defaultPersistanceConfig!,
-          ...customizations.docStoreConfig,
-        };
-      }
-    } as any;
-  }
   // TODO: Let this be defined as a hash of two keys for rel-tables.
   get docId() {
     return ``;
@@ -203,14 +218,16 @@ export class Doc {
     return this._docStore.isDocDeleted(this.docId);
   }
 
-  static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
+  static getAllDocs<T extends typeof _ProtoDoc>(this: T): InstanceType<T>[] {
     return this._docStore.getAllDocs().map(this._fromId.bind(this) as any);
   }
-  static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
+  static getHaveCompletedFirstSync<T extends typeof _ProtoDoc>(
+    this: T,
+  ): boolean {
     return this._docStore.getHaveCompletedFirstSync();
   }
 
-  static _fromId<T extends typeof Doc>(
+  static _fromId<T extends typeof _ProtoDoc>(
     this: T,
     docId: string,
   ): InstanceType<T> {
@@ -223,7 +240,7 @@ export class Doc {
     return _allDocInstances.get(docId) as InstanceType<T>;
   }
 
-  static create<T extends typeof Doc>(
+  static create<T extends typeof _ProtoDoc>(
     this: T,
     ...overrideProps: CreateParams<T>
   ): InstanceType<T> {
@@ -248,7 +265,7 @@ export class Doc {
 
 // TODO: Add Local and Session flags.
 // TODO: Add initFrom flag to init from func.
-type CreateParams<T extends typeof Doc> = CreateParamsFromInst<InstanceType<T>>;
+type CreateParams<T extends DocClass> = CreateParamsFromInst<InstanceType<T>>;
 type OptionalParameter<T, IsOptional extends boolean> = Parameters<
   IsOptional extends true ? (prop?: T) => void : (prop: T) => void
 >;
@@ -265,13 +282,13 @@ export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export type OptionalPropFlag = typeof OptionalPropFlag;
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 // TODO: Delete docs that depend on non-nullable docs.
-type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc;
+type PropClass = typeof Boolean | typeof Number | typeof String | DocClass;
 type PropType<T extends PropClass = PropClass> = T | [T, null];
-type PropInst = boolean | number | string | Doc | null;
+type PropInst = boolean | number | string | DocInst | null;
 type PropValue<T extends PropType | PropInst = PropType | PropInst> =
   T extends any[]
     ? PropValue<T[number]>
-    : T extends typeof Doc
+    : T extends DocClass
     ? InstanceType<T>
     : T extends typeof Boolean
     ? boolean
@@ -310,8 +327,8 @@ export function prop<
       ? firstParam
       : Array.isArray(firstParam)
       ? firstParam[0]
-      : firstParam instanceof Doc
-      ? Doc
+      : firstParam instanceof _ProtoDoc
+      ? _ProtoDoc
       : typeof firstParam === `boolean`
       ? Boolean
       : typeof firstParam === `number`
@@ -329,7 +346,7 @@ export function prop<
       [IsCustomProp]: true,
       isFullCustom: false,
       getInitValue: () =>
-        initValue instanceof Doc ? initValue.docId : initValue,
+        initValue instanceof _ProtoDoc ? initValue.docId : initValue,
       getFallbackValue: () => null,
       fromPrim: (prim) => {
         if (prim === null) return null;
@@ -358,6 +375,14 @@ export function prop<
       otherDocsToStartSyncing: [],
     } satisfies CustomProp as any;
   }
+  function isDocClass(possibleDocClass: {
+    new (...args: any[]): any;
+  }): possibleDocClass is DocClass {
+    return Object.prototype.isPrototypeOf.call(
+      _ProtoDoc.prototype,
+      possibleDocClass.prototype,
+    );
+  }
 }
 export function formula<T>(compute: () => T, set?: (newVal: T) => void): T {
   return {
@@ -375,7 +400,7 @@ export type IsCustomProp = typeof IsCustomProp;
 export const IsCustomProp = Symbol(`IsCustomProp`);
 export type CustomProp = {
   [IsCustomProp]: true;
-  otherDocsToStartSyncing: (typeof Doc)[];
+  otherDocsToStartSyncing: DocClass[];
 } & (
   | ({
       isFullCustom: false;
@@ -396,17 +421,9 @@ export type CustomProp = {
     ))
   | {
       isFullCustom: true;
-      init: (inst: Doc, key: string) => void;
+      init: (inst: DocInst, key: string) => void;
     }
 );
 function isCustomProp(arg: any): arg is CustomProp {
   return arg?.[IsCustomProp] === true;
-}
-function isDocClass(possibleDocClass: {
-  new (...args: any[]): any;
-}): possibleDocClass is typeof Doc {
-  return Object.prototype.isPrototypeOf.call(
-    Doc.prototype,
-    possibleDocClass.prototype,
-  );
 }
