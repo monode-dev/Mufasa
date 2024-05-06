@@ -97,6 +97,7 @@ export function initializeStoreBank(bankConfig) {
         const persistance = params.getStoreConfig();
         const { useProp, doWatch } = persistance.sessionPersister;
         const createStore = (workspaceInstConfig) => {
+            console.log(`workspaceInstConfig: ${JSON.stringify(workspaceInstConfig)}`);
             const createSpecificStore = params.storeType === "doc" ? createDocStore : createFileStore;
             return createSpecificStore({
                 sessionTablePersister: isValid(workspaceInstConfig)
