@@ -120,6 +120,7 @@ export function initializeStoreBank(bankConfig) {
             });
         };
         return doNow(() => {
+            let haveSetUpStore = false;
             const store = useRoot(() => useProp(createStore(null)));
             const instConfigJson = persistance
                 .devicePersister?.(params.docType)
@@ -130,7 +131,8 @@ export function initializeStoreBank(bankConfig) {
                 // Only do something if the workspace signature has changed.
                 const newInstSignature = params.workspaceSignature.value;
                 const oldInstConfig = instConfigJson.data;
-                if (newInstSignature?.userId === oldInstConfig?.userId &&
+                if (!haveSetUpStore &&
+                    newInstSignature?.userId === oldInstConfig?.userId &&
                     newInstSignature?.workspaceId === oldInstConfig?.workspaceId)
                     return;
                 const newInstConfig = isValid(newInstSignature)
@@ -142,6 +144,7 @@ export function initializeStoreBank(bankConfig) {
                 // Create a new store for the new inst.
                 const oldStore = store.value;
                 store.value = createStore(newInstConfig);
+                haveSetUpStore = true;
                 // Dispose of the old store.
                 if (isValid(oldInstConfig?.instId)) {
                     params.deleteStoreInst(oldInstConfig.instId, oldStore);

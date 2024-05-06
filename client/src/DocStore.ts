@@ -299,6 +299,7 @@ export function initializeStoreBank(bankConfig: {
     };
 
     return doNow(() => {
+      let haveSetUpStore = false;
       const store = useRoot(() => useProp(createStore(null)));
       const instConfigJson = persistance
         .devicePersister?.(params.docType)
@@ -312,6 +313,7 @@ export function initializeStoreBank(bankConfig: {
             const newInstSignature = params.workspaceSignature.value;
             const oldInstConfig = instConfigJson.data;
             if (
+              !haveSetUpStore &&
               newInstSignature?.userId === oldInstConfig?.userId &&
               newInstSignature?.workspaceId === oldInstConfig?.workspaceId
             )
@@ -327,6 +329,7 @@ export function initializeStoreBank(bankConfig: {
             // Create a new store for the new inst.
             const oldStore = store.value;
             store.value = createStore(newInstConfig);
+            haveSetUpStore = true;
 
             // Dispose of the old store.
             if (isValid(oldInstConfig?.instId)) {
