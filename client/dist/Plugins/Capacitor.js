@@ -107,10 +107,12 @@ export function capacitorPersister() {
                 }
             },
             deleteDirectory: async () => {
+                console.log(`Deleting directory: ${directoryPath}`);
                 const files = await Filesystem.readdir({
                     path: directoryPath,
                     directory: Directory.Data,
                 });
+                console.log(`Files in directory: ${files.files}`);
                 await Promise.all(files.files.map((file) => Filesystem.deleteFile({
                     path: `${directoryPath}/${file}`,
                     directory: Directory.Data,
@@ -119,6 +121,7 @@ export function capacitorPersister() {
                     path: directoryPath,
                     directory: Directory.Data,
                 });
+                console.log(`Deleted directory: ${directoryPath}`);
             },
         };
     };
