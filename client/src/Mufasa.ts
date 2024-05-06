@@ -66,16 +66,21 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   const storeBank = initializeStoreBank({
     stage: stage,
     devicePersister: mfsConfig.devicePersister,
-    workspaceSignature: mfsConfig.sessionPersister.useRoot(() =>
-      mfsConfig.sessionPersister.useFormula(() =>
-        isValid(user.value.uid) && isValid(user.value.workspace?.id)
-          ? {
-              userId: user.value.uid,
-              workspaceId: user.value.workspace.id,
-            }
-          : null,
-      ),
-    ),
+    workspaceSignature: doNow(async () => {
+      while (user.value.isPending || user.value.workspace?.isPending) {
+        await new Promise(() => setTimeout(() => {}, 10));
+      }
+      return mfsConfig.sessionPersister.useRoot(() =>
+        mfsConfig.sessionPersister.useFormula(() =>
+          isValid(user.value.uid) && isValid(user.value.workspace?.id)
+            ? {
+                userId: user.value.uid,
+                workspaceId: user.value.workspace.id,
+              }
+            : null,
+        ),
+      );
+    }),
   });
   const docSetup = initializeDocClass({
     storeBank: storeBank,

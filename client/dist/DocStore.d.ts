@@ -139,7 +139,7 @@ export type StoreBank = ReturnType<typeof initializeStoreBank>;
 export declare function initializeStoreBank(bankConfig: {
     stage: string;
     devicePersister?: Device.Persister;
-    workspaceSignature: Prop<WorkspaceSignature | null>;
+    workspaceSignature: Promise<Prop<WorkspaceSignature | null>>;
 }): {
     getStore<T extends "file" | "doc">(params: {
         storeType: T;

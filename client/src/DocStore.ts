@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { doNow, isValid } from "./Utils.js";
+import { PENDING, doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionTablePersister } from "./SessionTablePersister.js";
 import type { MosaApi, Prop, ReadonlyProp } from "mosa-js";
@@ -209,7 +209,7 @@ export type StoreBank = ReturnType<typeof initializeStoreBank>;
 export function initializeStoreBank(bankConfig: {
   stage: string;
   devicePersister?: Device.Persister;
-  workspaceSignature: Prop<WorkspaceSignature | null>;
+  workspaceSignature: Promise<Prop<WorkspaceSignature | null>>;
 }) {
   type WorkspaceInstConfig = WorkspaceSignature & {
     instId: string;
@@ -285,7 +285,7 @@ export function initializeStoreBank(bankConfig: {
   >;
   function initializeStoreManager<T extends "doc" | "file">(params: {
     stage: string;
-    workspaceSignature: Prop<WorkspaceSignature | null>;
+    workspaceSignature: Promise<Prop<WorkspaceSignature | null>>;
     storeType: T;
     docType: string;
     getStoreConfig: () => PersistanceConfig;
@@ -333,7 +333,6 @@ export function initializeStoreBank(bankConfig: {
     };
 
     return doNow(() => {
-      let haveSetUpStore = false;
       const store = useRoot(() => useProp(createStore(null)));
       const instConfigJson = persistance
         .devicePersister?.(params.docType)
@@ -341,6 +340,7 @@ export function initializeStoreBank(bankConfig: {
         .load<WorkspaceInstConfig | null>(null);
       // Load the last known workspace signature, and then watch for changes.
       doNow(async () => {
+        // Load the last known store signature
         await instConfigJson?.loadedFromLocalStorage;
         const currentInstConfig = useRoot(() =>
           isValid(instConfigJson)
@@ -350,10 +350,15 @@ export function initializeStoreBank(bankConfig: {
               )
             : useProp(null),
         );
+        store.value = createStore(currentInstConfig.value);
+
+        // Watch for changes in the signature
+        const incomingSignature = await params.workspaceSignature;
         doWatch(
           () => {
             // Only do something if the workspace signature has changed.
-            const newInstSignature = params.workspaceSignature.value;
+            const newInstSignature = incomingSignature.value;
+            const oldInstConfig = currentInstConfig.value;
             console.log(
               `${params.docType} - newInstSignature: ${JSON.stringify(
                 newInstSignature,
@@ -361,16 +366,6 @@ export function initializeStoreBank(bankConfig: {
                 2,
               )}`,
             );
-            const oldInstConfig = currentInstConfig.value;
-            if (
-              haveSetUpStore &&
-              newInstSignature?.userId === oldInstConfig?.userId &&
-              newInstSignature?.workspaceId === oldInstConfig?.workspaceId
-            )
-              return;
-            const newInstConfig = isValid(newInstSignature)
-              ? { ...newInstSignature, instId: uuidv4() }
-              : null;
             console.log(
               `${params.docType} - oldInstConfig: ${JSON.stringify(
                 oldInstConfig,
@@ -378,6 +373,14 @@ export function initializeStoreBank(bankConfig: {
                 2,
               )}`,
             );
+            if (
+              newInstSignature?.userId === oldInstConfig?.userId &&
+              newInstSignature?.workspaceId === oldInstConfig?.workspaceId
+            )
+              return;
+            const newInstConfig = isValid(newInstSignature)
+              ? { ...newInstSignature, instId: uuidv4() }
+              : null;
             console.log(
               `${params.docType} - newInstConfig: ${JSON.stringify(
                 newInstConfig,
@@ -392,7 +395,6 @@ export function initializeStoreBank(bankConfig: {
             // Create a new store for the new inst.
             const oldStore = store.value;
             store.value = createStore(newInstConfig);
-            haveSetUpStore = true;
 
             // Dispose of the old store.
             if (isValid(oldInstConfig?.instId)) {
@@ -404,7 +406,7 @@ export function initializeStoreBank(bankConfig: {
             }
           },
           {
-            on: [params.workspaceSignature],
+            on: [incomingSignature],
           },
         );
       });
