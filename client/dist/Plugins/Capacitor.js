@@ -8,7 +8,6 @@ export function capacitorPersister() {
     return (directoryPath) => {
         const getFilePath = (fileId) => `${directoryPath}/${fileId}`;
         const readFile = async (fileId) => {
-            console.log(`fileId: ${fileId}, shouldStop: ${shouldStop}`);
             if (shouldStop)
                 return undefined;
             liveOperationCount++;
@@ -57,7 +56,6 @@ export function capacitorPersister() {
                     const data = {
                         value: JSON.parse(JSON.stringify(initJson)),
                     };
-                    console.log(`fileName: ${fileName}`);
                     // Load json from storage.
                     const loadedFromLocalStorage = doNow(async () => {
                         const fileString = await readFile(fileName);

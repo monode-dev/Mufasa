@@ -69,7 +69,7 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
                                 isProcessingSnapshot = false;
                                 disposeSnapshot = undefined;
                                 setTimeout(runWatcher, 500);
-                                console.log(`Encountered error: ${error}`);
+                                console.warn(`Encountered error: ${error}`);
                             });
                         }
                     });

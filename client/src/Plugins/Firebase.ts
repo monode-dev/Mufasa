@@ -164,7 +164,7 @@ export function workspacePersister(
                   isProcessingSnapshot = false;
                   disposeSnapshot = undefined;
                   setTimeout(runWatcher, 500);
-                  console.log(`Encountered error: ${error}`);
+                  console.warn(`Encountered error: ${error}`);
                 },
               );
             }

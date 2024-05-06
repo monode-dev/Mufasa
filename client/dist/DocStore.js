@@ -138,7 +138,6 @@ export function initializeStoreBank(bankConfig) {
                 const newInstConfig = isValid(newInstSignature)
                     ? { ...newInstSignature, instId: uuidv4() }
                     : null;
-                console.log(`newInstConfig: ${JSON.stringify(newInstConfig)}`);
                 // Save the new workspace signature to disk
                 instConfigJson.batchUpdate((data) => (data.value = newInstConfig));
                 // Create a new store for the new inst.
@@ -164,11 +163,8 @@ export function createDocStore(config) {
     const localDocs = localJsonPersister.jsonFile(`localDocs`).load({
         docs: {},
     });
-    console.log(`localDocs.fileName: ${localDocs.fileName}`);
     // Pick up any changes that still need pushed.
     localDocs.loadedFromLocalStorage.then(() => {
-        console.log(`localDocs.then.fileName: ${localDocs.fileName}`);
-        console.log(`localDocs: ${JSON.stringify(localDocs.data.docs, null, 2)}`);
         config.sessionTablePersister.batchUpdate(Object.entries(localDocs.data.docs)
             .filter((_, v) => isValid(v))
             .reduce((result, [id, props]) => ({
