@@ -1,5 +1,5 @@
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import { doNow } from "../Utils.js";
+import { doNow, isValid } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 // SECTION: Doc Persister
 export function capacitorPersister() {
@@ -57,10 +57,11 @@ export function capacitorPersister() {
                     const data = {
                         value: JSON.parse(JSON.stringify(initJson)),
                     };
+                    console.log(`fileName: ${fileName}`);
                     // Load json from storage.
                     const loadedFromLocalStorage = doNow(async () => {
                         const fileString = await readFile(fileName);
-                        if (!fileString)
+                        if (!isValid(fileString))
                             return;
                         data.value = JSON.parse(fileString);
                     });
