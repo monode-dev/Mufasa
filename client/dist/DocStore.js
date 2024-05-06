@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { isValid } from "./Utils.js";
+import { doNow, isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 import { sessionTablePersister } from "./SessionTablePersister.js";
 import { createFileStore } from "./FileStore.js";
@@ -26,7 +26,7 @@ export var Device;
 (function (Device) {
     Device.mockDirectoryPersister = {
         jsonFile: () => ({
-            start: (initValue) => ({
+            load: (initValue) => ({
                 loadedFromLocalStorage: Promise.resolve(),
                 data: initValue,
                 batchUpdate: async (doUpdate) => {
@@ -39,6 +39,7 @@ export var Device;
         writeFile: async () => { },
         deleteFile: async () => { },
         deleteAllData: async () => { },
+        stop: () => { },
     };
 })(Device || (Device = {}));
 // SECTION: Global Doc Persister Types
@@ -46,12 +47,14 @@ export var Device;
 export var Cloud;
 (function (Cloud) {
     Cloud.mockWorkspacePersister = {
-        start: () => { },
+        setupWatcher: () => ({
+            start: () => { },
+            stop: async () => { },
+        }),
         updateDoc: async () => { },
         uploadFile: async () => { },
         downloadFile: async () => undefined,
         deleteFile: async () => { },
-        stopUploadsAndDownloads: () => { },
     };
 })(Cloud || (Cloud = {}));
 export function initializeStoreBank(bankConfig) {
@@ -59,12 +62,28 @@ export function initializeStoreBank(bankConfig) {
         doc: new Map(),
         file: new Map(),
     };
+    const deleteStoreInst = doNow(() => {
+        const storesBeingDeleted = new Map();
+        const deleteStoreInst = createPersistedFunction(bankConfig.directoryPersister.jsonFile(`deleteStoreInst`), async (instId) => {
+            // If the store is still being used, stop it so we can delete it.
+            if (storesBeingDeleted.has(instId)) {
+                await storesBeingDeleted.get(instId)?.stop();
+                storesBeingDeleted.delete(instId);
+            }
+            // TODO: Empty the directory.
+        });
+        return (instId, docStore) => {
+            storesBeingDeleted.set(instId, docStore);
+            deleteStoreInst(instId);
+        };
+    });
     return {
         getStore(params) {
             if (!managers[params.storeType].has(params.docType)) {
                 managers[params.storeType].set(params.docType, initializeStoreManager({
                     stage: bankConfig.stage,
                     workspaceSignature: bankConfig.workspaceSignature,
+                    deleteStoreInst,
                     ...params,
                 }));
             }
@@ -74,7 +93,7 @@ export function initializeStoreBank(bankConfig) {
     function initializeStoreManager(params) {
         // Set up config for this store.
         const persistance = params.getStoreConfig();
-        const { useProp, useFormula, doWatch } = persistance.sessionPersister;
+        const { useProp, doWatch } = persistance.sessionPersister;
         const createStore = (workspaceInstConfig) => {
             const createSpecificStore = params.storeType === "doc" ? createDocStore : createFileStore;
             return createSpecificStore({
@@ -98,44 +117,37 @@ export function initializeStoreBank(bankConfig) {
                 onIncomingDelete: persistance.onIncomingDelete ?? (() => { }),
             });
         };
-        // Load the last workspace instance from disk.
-        const instConfig = useProp(null);
-        const instConfigJson = persistance
-            .devicePersister?.(params.docType)
-            .jsonFile(`currentWorkspaceInstConfig.json`)
-            .start(null);
-        instConfigJson?.loadedFromLocalStorage.then(() => {
-            instConfig.value = instConfigJson.data;
-        });
-        //
-        const store = useFormula(() => createStore(instConfig.value));
-        doWatch(async () => {
-            const newInstConfig = params.workspaceSignature.value;
-            await instConfigJson?.loadedFromLocalStorage;
-            if (newInstConfig?.userId === instConfig?.value?.userId &&
-                newInstConfig?.workspaceId === instConfig.value?.workspaceId)
-                return;
-            // TODO: store.value.stop();
-            instConfig.value = isValid(newInstConfig)
-                ? {
-                    userId: newInstConfig.userId,
-                    workspaceId: newInstConfig.workspaceId,
-                    instId: uuidv4(),
+        return doNow(() => {
+            const store = useProp(createStore(null));
+            const instConfigJson = persistance
+                .devicePersister?.(params.docType)
+                .jsonFile(`currentWorkspaceInstConfig.json`)
+                .load(null);
+            // Load the last known workspace signature, and then watch for changes.
+            instConfigJson?.loadedFromLocalStorage.then(() => doWatch(() => {
+                // Only do something if the workspace signature has changed.
+                const newInstSignature = params.workspaceSignature.value;
+                const oldInstConfig = instConfigJson.data;
+                if (newInstSignature?.userId === oldInstConfig?.userId &&
+                    newInstSignature?.workspaceId === oldInstConfig?.workspaceId)
+                    return;
+                const newInstConfig = isValid(newInstSignature)
+                    ? { ...newInstSignature, instId: uuidv4() }
+                    : null;
+                // Save the new workspace signature to disk
+                instConfigJson.batchUpdate((data) => (data.value = newInstConfig));
+                // Create a new store for the new inst.
+                const oldStore = store.value;
+                store.value = createStore(newInstConfig);
+                // Dispose of the old store.
+                if (isValid(oldInstConfig?.instId)) {
+                    params.deleteStoreInst(oldInstConfig.instId, oldStore);
                 }
-                : null;
-            /* Wait to delete the old store until a new one is loaded, so
-             * that if the user logs right back in they don't have to
-             * re-download everything. */
-            if (newInstConfig !== null) {
-                instConfigJson?.batchUpdate((data) => {
-                    data.value = instConfig.value;
-                });
-                // TODO: deleteStore(instConfigJson?.data);
-            }
-        }, {
-            on: [params.workspaceSignature],
+            }, {
+                on: [params.workspaceSignature],
+            }));
+            return store;
         });
-        return store;
     }
 }
 export function createDocStore(config) {
@@ -143,7 +155,7 @@ export function createDocStore(config) {
     /** NOTE: Rather than break this up into sub systems we keep it all here so
      * that there is no need to join stuff on save, and when loading we only need
      * to read one file. */
-    const localDocs = localJsonPersister.jsonFile(`localDocs`).start({
+    const localDocs = localJsonPersister.jsonFile(`localDocs`).load({
         docs: {},
     });
     // Pick up any changes that still need pushed.
@@ -157,7 +169,7 @@ export function createDocStore(config) {
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
         config.trackUpload();
-        await config.cloudWorkspacePersister?.updateDoc(docChange);
+        await config.cloudWorkspacePersister.updateDoc(docChange);
         config.untrackUpload();
     });
     //
@@ -234,28 +246,34 @@ export function createDocStore(config) {
     }
     // Watch cloud.
     const haveCompletedFirstSync = config.sessionTablePersister.staticProp(false);
+    const cloudWatcher = config.cloudWorkspacePersister.setupWatcher((updates) => {
+        batchUpdate({
+            sourceStoreType: Persistance.global,
+            newDocsAreOnlyVirtual: false,
+            updates: Object.fromEntries(Object.entries(updates).map(([docId, props]) => [
+                docId,
+                Object.fromEntries(Object.entries(props).map(([key, value]) => [
+                    key,
+                    { value, maxPersistance: Persistance.global },
+                ])),
+            ])),
+            overwriteGlobally: false,
+        });
+        haveCompletedFirstSync.value = true;
+    }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
     localDocs.loadedFromLocalStorage.then(() => {
         if (!config.cloudWorkspacePersister)
             return;
-        config.cloudWorkspacePersister.start((updates) => {
-            batchUpdate({
-                sourceStoreType: Persistance.global,
-                newDocsAreOnlyVirtual: false,
-                updates: Object.fromEntries(Object.entries(updates).map(([docId, props]) => [
-                    docId,
-                    Object.fromEntries(Object.entries(props).map(([key, value]) => [
-                        key,
-                        { value, maxPersistance: Persistance.global },
-                    ])),
-                ])),
-                overwriteGlobally: false,
-            });
-            haveCompletedFirstSync.value = true;
-        }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
+        cloudWatcher.start();
     });
     // This Interface should be all the Class API needs to interface with the store.
     return {
         loadedFromLocalStorage: localDocs.loadedFromLocalStorage,
+        async stop() {
+            await pushGlobalChange.pauseAll();
+            await cloudWatcher.stop();
+            await config.deviceDirectoryPersister.stop();
+        },
         batchUpdate(updates, options) {
             batchUpdate({
                 sourceStoreType: Persistance.session,

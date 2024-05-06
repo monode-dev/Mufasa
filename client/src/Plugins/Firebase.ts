@@ -91,86 +91,96 @@ export function workspacePersister(
   const CHANGE_DATE_KEY = `mx_changeDate`;
   const useServerTimestamp = serverTimestamp();
   return {
-    start: async (batchUpdate, localJsonFilePersister) => {
-      const metaData = localJsonFilePersister.start({
+    setupWatcher: (batchUpdate, localJsonFilePersister) => {
+      const metaData = localJsonFilePersister.load({
         lastChangeDatePosix: 0,
       });
-      metaData.loadedFromLocalStorage.then(() => {
-        let needToStartANewSnapshot = true;
-        (async () => {
-          while (true) {
-            if (needToStartANewSnapshot) {
-              startSnapshot();
-              needToStartANewSnapshot = false;
-            }
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-        })();
-        function startSnapshot() {
-          onSnapshot(
-            query(
-              firestoreConfig.collectionRef,
-              and(
-                or(
-                  // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
-                  where(
-                    CHANGE_DATE_KEY,
-                    ">",
-                    new Date(
-                      Math.max(metaData.data.lastChangeDatePosix - 30000, 0),
+      let shouldStop = false;
+      let isProcessingSnapshot = false;
+      let disposeSnapshot: (() => void) | undefined = undefined;
+      return {
+        start: async () => {
+          metaData.loadedFromLocalStorage.then(() => {
+            runWatcher();
+            function runWatcher() {
+              if (shouldStop) return;
+              disposeSnapshot = onSnapshot(
+                query(
+                  firestoreConfig.collectionRef,
+                  and(
+                    or(
+                      // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
+                      where(
+                        CHANGE_DATE_KEY,
+                        ">",
+                        new Date(
+                          Math.max(
+                            metaData.data.lastChangeDatePosix - 30000,
+                            0,
+                          ),
+                        ),
+                      ),
+                      where(CHANGE_DATE_KEY, "==", null),
+                      // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
                     ),
+                    // TODO: Maybe there is some way to avoid already deleted docs.
+                    ...firestoreConfig.queryConstraints,
                   ),
-                  where(CHANGE_DATE_KEY, "==", null),
-                  // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
                 ),
-                // TODO: Maybe there is some way to avoid already deleted docs.
-                ...firestoreConfig.queryConstraints,
-              ),
-            ),
-            (snapshot) => {
-              const updates: {
-                [docId: string]: DocJson;
-              } = {};
-              let latestChangeDate = metaData.data.lastChangeDatePosix;
-              // console.log(snapshot.metadata.hasPendingWrites);
-              snapshot.docChanges().forEach((change) => {
-                // console.log(
-                //   "Firebase.firestoreDocPersister",
-                //   change.type,
-                //   change.doc.id,
-                //   change.doc.data(),
-                // );
-                // Skip removed documents. Documents should never be deleted only flagged.
-                if (change.type === "removed") {
-                  console.warn(
-                    `The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa
-                is not currently configured to handle documents being removed.`,
-                    change.doc.data(),
-                  );
-                  return;
-                }
+                (snapshot) => {
+                  isProcessingSnapshot = true;
+                  console.log("Processing snapshot");
+                  const updates: {
+                    [docId: string]: DocJson;
+                  } = {};
+                  let latestChangeDate = metaData.data.lastChangeDatePosix;
+                  snapshot.docChanges().forEach((change) => {
+                    // Skip removed documents. Documents should never be deleted only flagged.
+                    if (change.type === "removed") {
+                      console.warn(
+                        `The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa is not currently configured to handle documents being removed.`,
+                        change.doc.data(),
+                      );
+                      return;
+                    }
 
-                // Update doc store.
-                updates[change.doc.id] = change.doc.data() as DocJson;
-                latestChangeDate = Math.max(
-                  latestChangeDate,
-                  change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
-                );
-              });
-              batchUpdate(updates);
-              if (latestChangeDate > metaData.data.lastChangeDatePosix) {
-                metaData.batchUpdate(
-                  (data) => (data.value.lastChangeDatePosix = latestChangeDate),
-                );
-              }
-            },
-            (error) => {
-              console.log(`Encountered error: ${error}`);
-              needToStartANewSnapshot = true;
-            },
-          );
-        }
-      });
+                    // Update doc store.
+                    updates[change.doc.id] = change.doc.data() as DocJson;
+                    latestChangeDate = Math.max(
+                      latestChangeDate,
+                      change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
+                    );
+                  });
+                  batchUpdate(updates);
+                  if (latestChangeDate > metaData.data.lastChangeDatePosix) {
+                    metaData.batchUpdate(
+                      (data) =>
+                        (data.value.lastChangeDatePosix = latestChangeDate),
+                    );
+                  }
+                  isProcessingSnapshot = false;
+                },
+                (error) => {
+                  isProcessingSnapshot = false;
+                  disposeSnapshot = undefined;
+                  setTimeout(runWatcher, 500);
+                  console.log(`Encountered error: ${error}`);
+                },
+              );
+            }
+          });
+        },
+        async stop() {
+          shouldStop = true;
+          if (disposeSnapshot) {
+            disposeSnapshot();
+            disposeSnapshot = undefined;
+          }
+          while (isProcessingSnapshot) {
+            await new Promise((resolve) => setTimeout(resolve, 10));
+          }
+        },
+      };
     },
     updateDoc: async (change: Cloud.DocChange) => {
       const setOrUpdateDoc = change.isBeingCreatedOrDeleted
@@ -202,9 +212,6 @@ export function workspacePersister(
           },
         }
       : {}),
-    stopUploadsAndDownloads() {
-      // TODO: Implement
-    },
   };
 }
 

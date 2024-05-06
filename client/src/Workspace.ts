@@ -259,7 +259,7 @@ function createWorkspaceInterface(config: {
     const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
     const savedMetadata = config.directoryPersister
       .jsonFile(`${uid}.json`)
-      .start(PendingAsJson as SavedUserMetadata);
+      .load(PendingAsJson as SavedUserMetadata);
     savedMetadata.loadedFromLocalStorage.then(() => {
       userMetadata.value = savedMetadata.data as any;
     });

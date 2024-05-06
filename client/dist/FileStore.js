@@ -53,8 +53,25 @@ export function createFileStore(config) {
         }, { overwriteGlobally: true });
         config.untrackUpload();
     });
+    const pushDelete = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pushDelete`), async (fileId) => {
+        config.trackUpload();
+        await config.deviceDirectoryPersister.deleteFile(fileId);
+        config.untrackUpload();
+        return fileId;
+    }).addStep(async (fileId) => {
+        await config.cloudWorkspacePersister.deleteFile?.(fileId);
+    });
     return {
         docStore: docStore,
+        async stop() {
+            await Promise.all([
+                pullCreate.pauseAll(),
+                pullDelete.pauseAll(),
+                pushCreate.pauseAll(),
+                pushDelete.pauseAll(),
+            ]);
+            await docStore.stop();
+        },
         async pushCreate(params) {
             const docId = params.manualDocId ?? uuidv4();
             await config.deviceDirectoryPersister.writeFile(docId, params.base64String);
@@ -68,14 +85,7 @@ export function createFileStore(config) {
             return docId;
         },
         pullCreate,
-        pushDelete: createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pushDelete`), async (fileId) => {
-            config.trackUpload();
-            await config.deviceDirectoryPersister.deleteFile(fileId);
-            config.untrackUpload();
-            return fileId;
-        }).addStep(async (fileId) => {
-            await config.cloudWorkspacePersister.deleteFile?.(fileId);
-        }),
+        pushDelete,
         pullDelete,
         async readFile(fileId) {
             return await config.deviceDirectoryPersister.readFile(fileId);
