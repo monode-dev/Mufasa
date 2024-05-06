@@ -313,7 +313,7 @@ export function initializeStoreBank(bankConfig: {
             const newInstSignature = params.workspaceSignature.value;
             const oldInstConfig = instConfigJson.data;
             if (
-              !haveSetUpStore &&
+              haveSetUpStore &&
               newInstSignature?.userId === oldInstConfig?.userId &&
               newInstSignature?.workspaceId === oldInstConfig?.workspaceId
             )

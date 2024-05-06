@@ -131,7 +131,7 @@ export function initializeStoreBank(bankConfig) {
                 // Only do something if the workspace signature has changed.
                 const newInstSignature = params.workspaceSignature.value;
                 const oldInstConfig = instConfigJson.data;
-                if (!haveSetUpStore &&
+                if (haveSetUpStore &&
                     newInstSignature?.userId === oldInstConfig?.userId &&
                     newInstSignature?.workspaceId === oldInstConfig?.workspaceId)
                     return;
