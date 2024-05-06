@@ -268,7 +268,7 @@ export function initializeStoreBank(bankConfig: {
   }): ReadonlyProp<T extends "doc" ? DocStore : FileStore> {
     // Set up config for this store.
     const persistance = params.getStoreConfig();
-    const { useProp, doWatch } = persistance.sessionPersister;
+    const { useProp, doWatch, useRoot } = persistance.sessionPersister;
     const createStore = (workspaceInstConfig: WorkspaceInstConfig | null) => {
       const createSpecificStore =
         params.storeType === "doc" ? createDocStore : createFileStore;
@@ -299,7 +299,7 @@ export function initializeStoreBank(bankConfig: {
     };
 
     return doNow(() => {
-      const store = useProp(createStore(null));
+      const store = useRoot(() => useProp(createStore(null)));
       const instConfigJson = persistance
         .devicePersister?.(params.docType)
         .jsonFile(`currentWorkspaceInstConfig.json`)
@@ -311,10 +311,6 @@ export function initializeStoreBank(bankConfig: {
             // Only do something if the workspace signature has changed.
             const newInstSignature = params.workspaceSignature.value;
             const oldInstConfig = instConfigJson.data;
-            console.log(
-              `newInstSignature: ${JSON.stringify(newInstSignature)}`,
-            );
-            console.log(`oldInstConfig: ${JSON.stringify(oldInstConfig)}`);
             if (
               newInstSignature?.userId === oldInstConfig?.userId &&
               newInstSignature?.workspaceId === oldInstConfig?.workspaceId
@@ -323,6 +319,7 @@ export function initializeStoreBank(bankConfig: {
             const newInstConfig = isValid(newInstSignature)
               ? { ...newInstSignature, instId: uuidv4() }
               : null;
+            console.log(`newInstConfig: ${JSON.stringify(newInstConfig)}`);
 
             // Save the new workspace signature to disk
             instConfigJson.batchUpdate((data) => (data.value = newInstConfig));
