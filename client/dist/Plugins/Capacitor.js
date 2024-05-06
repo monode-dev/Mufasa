@@ -116,7 +116,7 @@ export function capacitorPersister() {
                     .map((file) => file.name)
                     .join(`, `)}`);
                 await Promise.all(files.files.map((file) => Filesystem.deleteFile({
-                    path: `${directoryPath}/${file}`,
+                    path: file.uri,
                     directory: Directory.Data,
                 })));
                 await Filesystem.rmdir({
