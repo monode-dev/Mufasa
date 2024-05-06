@@ -146,6 +146,7 @@ export function initializeStoreBank(bankConfig) {
             }, {
                 on: [params.workspaceSignature],
             }));
+            params.onStoreInit?.(store.value);
             return store;
         });
     }

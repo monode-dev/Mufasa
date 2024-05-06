@@ -332,6 +332,7 @@ export function initializeStoreBank(bankConfig: {
           },
         ),
       );
+      params.onStoreInit?.(store.value as any);
       return store;
     }) as any;
   }
