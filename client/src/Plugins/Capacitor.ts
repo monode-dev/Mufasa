@@ -126,10 +126,10 @@ export function capacitorPersister(): Device.Persister {
         await Promise.all(
           files.files.map((file) =>
             Filesystem.deleteFile({
-              path: file.uri,
+              path: `${directoryPath}/${file.name}`,
               directory: Directory.Data,
             }).catch((e) => {
-              console.warn(e);
+              console.warn;
             }),
           ),
         );
