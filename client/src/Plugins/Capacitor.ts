@@ -128,6 +128,8 @@ export function capacitorPersister(): Device.Persister {
             Filesystem.deleteFile({
               path: file.uri,
               directory: Directory.Data,
+            }).catch((e) => {
+              console.warn(e);
             }),
           ),
         );
