@@ -71,6 +71,7 @@ export namespace Device {
     writeFile: (fileId: string, base64String: string) => Promise<void>;
     deleteFile: (fileId: string) => Promise<void>;
     stop: () => void;
+    deleteDirectory: () => Promise<void>;
   };
   export type JsonPersister = {
     readonly load: <T extends Json>(initValue: T) => Device.SavedJson<T>;
@@ -90,8 +91,8 @@ export namespace Device {
     readFile: async () => undefined,
     writeFile: async () => {},
     deleteFile: async () => {},
-    // deleteAllData: async () => {},
     stop: () => {},
+    deleteDirectory: async () => {},
   };
   export type SavedJson<T extends Json> = {
     readonly loadedFromLocalStorage: Promise<void>;
@@ -198,10 +199,16 @@ type WorkspaceSignature = {
   userId: string;
   workspaceId: string;
 };
+export function getWorkspaceInstDirectory(props: {
+  docType: string;
+  workspaceInstId: string;
+}) {
+  return `${props.docType}/${props.workspaceInstId}`;
+}
 export type StoreBank = ReturnType<typeof initializeStoreBank>;
 export function initializeStoreBank(bankConfig: {
   stage: string;
-  directoryPersister: Device.DirectoryPersister;
+  devicePersister?: Device.Persister;
   workspaceSignature: Prop<WorkspaceSignature | null>;
 }) {
   type WorkspaceInstConfig = WorkspaceSignature & {
@@ -211,22 +218,42 @@ export function initializeStoreBank(bankConfig: {
     doc: new Map<string, StoreManager<"doc">>(),
     file: new Map<string, StoreManager<"file">>(),
   };
+  const bankDirectory =
+    bankConfig.devicePersister?.(`StoreBank`) ?? Device.mockDirectoryPersister;
   const deleteStoreInst = doNow(() => {
     const storesBeingDeleted = new Map<string, DocStore | FileStore>();
     const deleteStoreInst = createPersistedFunction(
-      bankConfig.directoryPersister.jsonFile(`deleteStoreInst`),
-      async (instId: string) => {
+      bankDirectory.jsonFile(`deleteStoreInst`),
+      async (params: { docType: string; instId: string }) => {
         // If the store is still being used, stop it so we can delete it.
-        if (storesBeingDeleted.has(instId)) {
-          await storesBeingDeleted.get(instId)?.stop();
-          storesBeingDeleted.delete(instId);
+        if (storesBeingDeleted.has(params.instId)) {
+          console.log(`Stopping store: ${params.instId}`);
+          await storesBeingDeleted.get(params.instId)?.stop();
+          console.log(`Stopped store: ${params.instId}`);
+          storesBeingDeleted.delete(params.instId);
         }
-        // TODO: Empty the directory.
+        // Delete the store from disk.
+        await bankConfig
+          .devicePersister?.(
+            getWorkspaceInstDirectory({
+              docType: params.docType,
+              workspaceInstId: params.instId,
+            }),
+          )
+          .deleteDirectory();
       },
     );
-    return (instId: string, docStore: DocStore | FileStore) => {
-      storesBeingDeleted.set(instId, docStore);
-      deleteStoreInst(instId);
+    return (params: {
+      docType: string;
+      instId: string;
+      store: DocStore | FileStore;
+    }) => {
+      console.log(`Deleting store: ${params.instId}`);
+      storesBeingDeleted.set(params.instId, params.store);
+      deleteStoreInst({
+        docType: params.docType,
+        instId: params.instId,
+      });
     };
   });
   return {
@@ -262,7 +289,11 @@ export function initializeStoreBank(bankConfig: {
     storeType: T;
     docType: string;
     getStoreConfig: () => PersistanceConfig;
-    deleteStoreInst: (instId: string, store: DocStore | FileStore) => void;
+    deleteStoreInst: (params: {
+      docType: string;
+      instId: string;
+      store: DocStore | FileStore;
+    }) => void;
     onStoreInit?: (store: T extends "doc" ? DocStore : FileStore) => void;
   }): ReadonlyProp<T extends "doc" ? DocStore : FileStore> {
     // Set up config for this store.
@@ -278,7 +309,10 @@ export function initializeStoreBank(bankConfig: {
         deviceDirectoryPersister:
           isValid(persistance.devicePersister) && isValid(workspaceInstConfig)
             ? persistance.devicePersister(
-                `${params.docType}/${workspaceInstConfig.instId}`,
+                getWorkspaceInstDirectory({
+                  docType: params.docType,
+                  workspaceInstId: workspaceInstConfig.instId,
+                }),
               )
             : Device.mockDirectoryPersister,
         cloudWorkspacePersister:
@@ -310,6 +344,9 @@ export function initializeStoreBank(bankConfig: {
           () => {
             // Only do something if the workspace signature has changed.
             const newInstSignature = params.workspaceSignature.value;
+            console.log(
+              `newInstSignature: ${JSON.stringify(newInstSignature, null, 2)}`,
+            );
             const oldInstConfig = instConfigJson.data;
             if (
               haveSetUpStore &&
@@ -331,7 +368,11 @@ export function initializeStoreBank(bankConfig: {
 
             // Dispose of the old store.
             if (isValid(oldInstConfig?.instId)) {
-              params.deleteStoreInst(oldInstConfig.instId, oldStore);
+              params.deleteStoreInst({
+                docType: params.docType,
+                instId: oldInstConfig.instId,
+                store: oldStore,
+              });
             }
           },
           {

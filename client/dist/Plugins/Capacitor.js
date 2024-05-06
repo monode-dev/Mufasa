@@ -105,6 +105,8 @@ export function capacitorPersister() {
                 while (liveOperationCount > 0) {
                     await new Promise((resolve) => setTimeout(resolve, 10));
                 }
+            },
+            deleteDirectory: async () => {
                 const files = await Filesystem.readdir({
                     path: directoryPath,
                     directory: Directory.Data,

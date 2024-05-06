@@ -45,13 +45,13 @@ export function initializeMufasa(mfsConfig) {
     });
     const storeBank = initializeStoreBank({
         stage: stage,
-        directoryPersister: mfsConfig.devicePersister?.(`StoreBank`) ?? Device.mockDirectoryPersister,
-        workspaceSignature: mfsConfig.sessionPersister.useFormula(() => isValid(user.value.uid) && isValid(user.value.workspace?.id)
+        devicePersister: mfsConfig.devicePersister,
+        workspaceSignature: mfsConfig.sessionPersister.useRoot(() => mfsConfig.sessionPersister.useFormula(() => isValid(user.value.uid) && isValid(user.value.workspace?.id)
             ? {
                 userId: user.value.uid,
                 workspaceId: user.value.workspace.id,
             }
-            : null),
+            : null)),
     });
     const docSetup = initializeDocClass({
         storeBank: storeBank,

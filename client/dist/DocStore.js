@@ -39,8 +39,8 @@ export var Device;
         readFile: async () => undefined,
         writeFile: async () => { },
         deleteFile: async () => { },
-        // deleteAllData: async () => {},
         stop: () => { },
+        deleteDirectory: async () => { },
     };
 })(Device || (Device = {}));
 // SECTION: Global Doc Persister Types
@@ -58,24 +58,40 @@ export var Cloud;
         deleteFile: async () => { },
     };
 })(Cloud || (Cloud = {}));
+export function getWorkspaceInstDirectory(props) {
+    return `${props.docType}/${props.workspaceInstId}`;
+}
 export function initializeStoreBank(bankConfig) {
     const managers = {
         doc: new Map(),
         file: new Map(),
     };
+    const bankDirectory = bankConfig.devicePersister?.(`StoreBank`) ?? Device.mockDirectoryPersister;
     const deleteStoreInst = doNow(() => {
         const storesBeingDeleted = new Map();
-        const deleteStoreInst = createPersistedFunction(bankConfig.directoryPersister.jsonFile(`deleteStoreInst`), async (instId) => {
+        const deleteStoreInst = createPersistedFunction(bankDirectory.jsonFile(`deleteStoreInst`), async (params) => {
             // If the store is still being used, stop it so we can delete it.
-            if (storesBeingDeleted.has(instId)) {
-                await storesBeingDeleted.get(instId)?.stop();
-                storesBeingDeleted.delete(instId);
+            if (storesBeingDeleted.has(params.instId)) {
+                console.log(`Stopping store: ${params.instId}`);
+                await storesBeingDeleted.get(params.instId)?.stop();
+                console.log(`Stopped store: ${params.instId}`);
+                storesBeingDeleted.delete(params.instId);
             }
-            // TODO: Empty the directory.
+            // Delete the store from disk.
+            await bankConfig
+                .devicePersister?.(getWorkspaceInstDirectory({
+                docType: params.docType,
+                workspaceInstId: params.instId,
+            }))
+                .deleteDirectory();
         });
-        return (instId, docStore) => {
-            storesBeingDeleted.set(instId, docStore);
-            deleteStoreInst(instId);
+        return (params) => {
+            console.log(`Deleting store: ${params.instId}`);
+            storesBeingDeleted.set(params.instId, params.store);
+            deleteStoreInst({
+                docType: params.docType,
+                instId: params.instId,
+            });
         };
     });
     return {
@@ -103,7 +119,10 @@ export function initializeStoreBank(bankConfig) {
                     ? sessionTablePersister(persistance.sessionPersister)
                     : Session.mockTablePersister,
                 deviceDirectoryPersister: isValid(persistance.devicePersister) && isValid(workspaceInstConfig)
-                    ? persistance.devicePersister(`${params.docType}/${workspaceInstConfig.instId}`)
+                    ? persistance.devicePersister(getWorkspaceInstDirectory({
+                        docType: params.docType,
+                        workspaceInstId: workspaceInstConfig.instId,
+                    }))
                     : Device.mockDirectoryPersister,
                 cloudWorkspacePersister: isValid(persistance.getWorkspacePersister) &&
                     isValid(workspaceInstConfig)
@@ -130,6 +149,7 @@ export function initializeStoreBank(bankConfig) {
             instConfigJson?.loadedFromLocalStorage.then(() => doWatch(() => {
                 // Only do something if the workspace signature has changed.
                 const newInstSignature = params.workspaceSignature.value;
+                console.log(`newInstSignature: ${JSON.stringify(newInstSignature, null, 2)}`);
                 const oldInstConfig = instConfigJson.data;
                 if (haveSetUpStore &&
                     newInstSignature?.userId === oldInstConfig?.userId &&
@@ -146,7 +166,11 @@ export function initializeStoreBank(bankConfig) {
                 haveSetUpStore = true;
                 // Dispose of the old store.
                 if (isValid(oldInstConfig?.instId)) {
-                    params.deleteStoreInst(oldInstConfig.instId, oldStore);
+                    params.deleteStoreInst({
+                        docType: params.docType,
+                        instId: oldInstConfig.instId,
+                        store: oldStore,
+                    });
                 }
             }, {
                 on: [params.workspaceSignature],

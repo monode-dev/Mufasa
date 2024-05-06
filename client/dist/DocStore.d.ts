@@ -50,6 +50,7 @@ export declare namespace Device {
         writeFile: (fileId: string, base64String: string) => Promise<void>;
         deleteFile: (fileId: string) => Promise<void>;
         stop: () => void;
+        deleteDirectory: () => Promise<void>;
     };
     type JsonPersister = {
         readonly load: <T extends Json>(initValue: T) => Device.SavedJson<T>;
@@ -130,10 +131,14 @@ type WorkspaceSignature = {
     userId: string;
     workspaceId: string;
 };
+export declare function getWorkspaceInstDirectory(props: {
+    docType: string;
+    workspaceInstId: string;
+}): string;
 export type StoreBank = ReturnType<typeof initializeStoreBank>;
 export declare function initializeStoreBank(bankConfig: {
     stage: string;
-    directoryPersister: Device.DirectoryPersister;
+    devicePersister?: Device.Persister;
     workspaceSignature: Prop<WorkspaceSignature | null>;
 }): {
     getStore<T extends "file" | "doc">(params: {
