@@ -120,7 +120,6 @@ export class Doc {
             /** Docs don't start syncing until they are accessed the first time. So as soon as
              * the first one is accessed we start syncing all the connected doc types too. */
             onStoreInit: () => {
-                console.log(`onStoreInit() called.`);
                 const customProps = Object.values(new this()).filter(isCustomProp);
                 const otherDocsToStartSyncing = new Set(customProps.flatMap((prop) => prop.otherDocsToStartSyncing));
                 otherDocsToStartSyncing.forEach((docClass) => docClass.ensureSyncHasStarted());

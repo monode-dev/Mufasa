@@ -245,6 +245,9 @@ export function initializeStoreBank(bankConfig: {
             ...params,
           }) as any,
         );
+        params.onStoreInit?.(
+          managers[params.storeType].get(params.docType)?.value as any,
+        );
       }
       return managers[params.storeType].get(params.docType)?.value as any;
     },
@@ -332,7 +335,6 @@ export function initializeStoreBank(bankConfig: {
           },
         ),
       );
-      params.onStoreInit?.(store.value as any);
       return store;
     }) as any;
   }

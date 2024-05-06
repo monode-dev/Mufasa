@@ -86,6 +86,7 @@ export function initializeStoreBank(bankConfig) {
                     deleteStoreInst,
                     ...params,
                 }));
+                params.onStoreInit?.(managers[params.storeType].get(params.docType)?.value);
             }
             return managers[params.storeType].get(params.docType)?.value;
         },
@@ -146,7 +147,6 @@ export function initializeStoreBank(bankConfig) {
             }, {
                 on: [params.workspaceSignature],
             }));
-            params.onStoreInit?.(store.value);
             return store;
         });
     }
