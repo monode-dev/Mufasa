@@ -1,4 +1,4 @@
-import { IsCustomProp, DefineDocType, prop, } from "./Doc.js";
+import { IsCustomProp, prop } from "./Doc.js";
 const relTables = new Map();
 export function list(OtherClass, tableConfig) {
     if (typeof tableConfig === `string`) {
@@ -54,10 +54,9 @@ function listProp(config) {
                 relTables.set(PrimaryClass, new Map());
             const relTablesForThisType = relTables.get(PrimaryClass);
             if (!relTablesForThisType.has(key)) {
-                relTablesForThisType.set(key, class extends DefineDocType({
+                relTablesForThisType.set(key, class extends PrimaryClass.RootClass.customize({
                     docType: `${PrimaryClass.docType}_${key}`,
-                    BaseClass: PrimaryClass.RootDocClass,
-                    persistance: config.docStoreConfig ?? undefined,
+                    docStoreConfig: config.docStoreConfig ?? undefined,
                 }) {
                     primary = prop(PrimaryClass);
                     secondary = prop(SecondaryClass);

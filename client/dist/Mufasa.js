@@ -62,16 +62,13 @@ export function initializeMufasa(mfsConfig) {
             untrackUpload,
         },
     });
-    const fileSetup = initializeSyncedFileClass({
-        Doc: docSetup.DocClass,
-        storeBank: storeBank,
-    });
+    const fileSetup = initializeSyncedFileClass();
     return {
-        Doc: docSetup.DefineDoc,
+        Doc: docSetup.Doc,
         get user() {
             return user.value;
         },
-        File: fileSetup.DefineFile,
+        File: fileSetup.File,
         get isUploadingToCloud() {
             return isUploadingToCloud.value;
         },

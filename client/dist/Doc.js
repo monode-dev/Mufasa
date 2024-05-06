@@ -1,22 +1,21 @@
 import { Persistance, } from "./DocStore.js";
 import { listObjEntries, doNow, isValid, } from "./Utils.js";
+let defaultPersistanceConfig;
+let _getStoreBank = (() => { });
+export const getStoreBank = () => _getStoreBank();
+let _trackUpload = () => { };
+export const trackUpload = () => _trackUpload();
+let _untrackUpload = () => { };
+export const untrackUpload = () => _untrackUpload();
 export function initializeDocClass(config) {
-    class RootDoc extends DefineDocType({
-        BaseClass: _ProtoDoc,
-        persistance: config.defaultPersistance,
-    }) {
-    }
+    defaultPersistanceConfig = config.defaultPersistance;
+    _getStoreBank = () => config.storeBank;
+    _trackUpload = config.defaultPersistance.trackUpload;
+    _untrackUpload = config.defaultPersistance.untrackUpload;
     return {
-        DefineDoc(docType, customizations) {
-            return DefineDocType({
-                BaseClass: RootDoc,
-                docType,
-                storeBank: config.storeBank,
-                ...customizations,
-            });
+        Doc(docType, customizations) {
+            return Doc.customize({ docType, ...(customizations ?? {}) });
         },
-        defaultPersistanceConfig: config.defaultPersistance,
-        DocClass: RootDoc,
     };
 }
 const _allDocInstances = new Map();
@@ -95,31 +94,11 @@ getDocId) {
     });
     return inst;
 }
-export function DefineDocType(customizations) {
-    return class NewClass extends customizations.BaseClass {
-        static get RootDocClass() {
-            return (customizations?.RootDocClass ?? customizations.BaseClass.RootDocClass);
-        }
-        static get docType() {
-            return customizations?.docType ?? this.name;
-        }
-        static get storeBank() {
-            return customizations?.storeBank ?? customizations.BaseClass.storeBank;
-        }
-        static getDocStoreConfig() {
-            return {
-                ...customizations.BaseClass.getDocStoreConfig(),
-                ...customizations?.persistance,
-            };
-        }
-    };
-}
 /* TODO: Maybe Require a special, non-exported symbol as the parameter of the constructor
  * so that no one outside of this file can create a new instance. */
-class _ProtoDoc {
-    static get RootDocClass() {
-        return _ProtoDoc;
-    }
+export class Doc {
+    // private constructor() {}
+    static RootClass = Doc;
     /*** NOTE: This can be overridden to manually specify a type name. */
     static get docType() {
         return this.name;
@@ -128,16 +107,13 @@ class _ProtoDoc {
         return this.constructor.docType;
     }
     static getDocStoreConfig() {
-        return {};
+        return defaultPersistanceConfig;
     }
     static ensureSyncHasStarted() {
         this._docStore;
     }
-    static get storeBank() {
-        return {};
-    }
     static get _docStore() {
-        return this.storeBank.getStore({
+        return getStoreBank().getStore({
             storeType: `doc`,
             docType: this.docType,
             getStoreConfig: () => this.getDocStoreConfig(),
@@ -152,6 +128,20 @@ class _ProtoDoc {
     }
     get _docStore() {
         return this.constructor._docStore;
+    }
+    // TODO: Rename this to "customize" or something like that so we can add more options to it like overriding docType.
+    static customize(customizations) {
+        return class extends this {
+            static get docType() {
+                return customizations.docType ?? this.name;
+            }
+            static getDocStoreConfig() {
+                return {
+                    ...defaultPersistanceConfig,
+                    ...customizations.docStoreConfig,
+                };
+            }
+        };
     }
     // TODO: Let this be defined as a hash of two keys for rel-tables.
     get docId() {
@@ -195,8 +185,8 @@ persistance = Persistance.global) {
         ? firstParam
         : Array.isArray(firstParam)
             ? firstParam[0]
-            : firstParam instanceof _ProtoDoc
-                ? _ProtoDoc
+            : firstParam instanceof Doc
+                ? Doc
                 : typeof firstParam === `boolean`
                     ? Boolean
                     : typeof firstParam === `number`
@@ -213,7 +203,7 @@ persistance = Persistance.global) {
         return {
             [IsCustomProp]: true,
             isFullCustom: false,
-            getInitValue: () => initValue instanceof _ProtoDoc ? initValue.docId : initValue,
+            getInitValue: () => initValue instanceof Doc ? initValue.docId : initValue,
             getFallbackValue: () => null,
             fromPrim: (prim) => {
                 if (prim === null)
@@ -241,9 +231,6 @@ persistance = Persistance.global) {
             otherDocsToStartSyncing: [],
         };
     }
-    function isDocClass(possibleDocClass) {
-        return Object.prototype.isPrototypeOf.call(_ProtoDoc.prototype, possibleDocClass.prototype);
-    }
 }
 export function formula(compute, set) {
     return {
@@ -260,4 +247,7 @@ export function formula(compute, set) {
 export const IsCustomProp = Symbol(`IsCustomProp`);
 function isCustomProp(arg) {
     return arg?.[IsCustomProp] === true;
+}
+function isDocClass(possibleDocClass) {
+    return Object.prototype.isPrototypeOf.call(Doc.prototype, possibleDocClass.prototype);
 }

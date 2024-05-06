@@ -1,11 +1,4 @@
-import {
-  CustomProp,
-  DocClass,
-  DocInst,
-  IsCustomProp,
-  DefineDocType,
-  prop,
-} from "./Doc.js";
+import { CustomProp, DocClass, DocInst, IsCustomProp, prop } from "./Doc.js";
 import { PersistanceConfig } from "./DocStore.js";
 
 const relTables = new Map<DocClass, Map<string, DocClass>>();
@@ -99,10 +92,9 @@ function listProp(config: {
       if (!relTablesForThisType.has(key)) {
         relTablesForThisType.set(
           key,
-          class extends DefineDocType({
+          class extends PrimaryClass.RootClass.customize({
             docType: `${PrimaryClass.docType}_${key}`,
-            BaseClass: PrimaryClass.RootDocClass,
-            persistance: config.docStoreConfig ?? undefined,
+            docStoreConfig: config.docStoreConfig ?? undefined,
           }) {
             primary = prop(PrimaryClass);
             secondary = prop(SecondaryClass);
