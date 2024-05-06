@@ -94,7 +94,7 @@ export function initializeStoreBank(bankConfig) {
     function initializeStoreManager(params) {
         // Set up config for this store.
         const persistance = params.getStoreConfig();
-        const { useProp, useRoot, doWatch } = persistance.sessionPersister;
+        const { useProp, doWatch } = persistance.sessionPersister;
         const createStore = (workspaceInstConfig) => {
             const createSpecificStore = params.storeType === "doc" ? createDocStore : createFileStore;
             return createSpecificStore({
@@ -119,7 +119,7 @@ export function initializeStoreBank(bankConfig) {
             });
         };
         return doNow(() => {
-            const store = useRoot(() => useProp(createStore(null)));
+            const store = useProp(createStore(null));
             const instConfigJson = persistance
                 .devicePersister?.(params.docType)
                 .jsonFile(`currentWorkspaceInstConfig.json`)

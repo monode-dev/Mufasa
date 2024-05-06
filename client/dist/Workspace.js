@@ -1,11 +1,10 @@
 import { isValid } from "./Utils.js";
 export function initializeAuth(config) {
-    const { useProp, useFormula, doNow, useRoot, onDispose } = config.sessionPersister;
-    const useRootProp = (initVal) => useRoot(() => useProp(initVal));
+    const { useProp, useFormula, doNow, onDispose } = config.sessionPersister;
     // SECTION: User
     return doNow(() => {
         const { cloudAuth, uid, email, emailVerified } = doNow(() => {
-            const _userInfo = useRootProp(undefined);
+            const _userInfo = useProp(undefined);
             return {
                 cloudAuth: config.getCloudAuth({
                     onAuthStateChanged: (user) => (_userInfo.value = user),
@@ -16,8 +15,8 @@ export function initializeAuth(config) {
                 emailVerified: useFormula(() => _userInfo.value?.emailVerified ?? false),
             };
         });
-        const isSigningIn = useRootProp(false);
-        const isSigningOut = useRootProp(false);
+        const isSigningIn = useProp(false);
+        const isSigningOut = useProp(false);
         async function signOut() {
             // isSigningOut.value = true;
             await cloudAuth.signOut();
@@ -115,15 +114,14 @@ export function initializeAuth(config) {
 // type AJSKDFjsa = ksjdakf<_UserStates<{}>>[`signedIn`];
 function createWorkspaceInterface(config) {
     const { uid, workspaceIntegration, sessionPersister } = config;
-    const { useProp, useRoot, useFormula, doNow, exists, onDispose } = sessionPersister;
-    const useRootProp = (initVal) => useRoot(() => useProp(initVal));
-    const isCreatingWorkspace = useRootProp(false);
-    const isJoiningWorkspace = useRootProp(false);
-    const isLeavingWorkspace = useRootProp(false);
+    const { useProp, useFormula, doNow, exists, onDispose } = sessionPersister;
+    const isCreatingWorkspace = useProp(false);
+    const isJoiningWorkspace = useProp(false);
+    const isLeavingWorkspace = useProp(false);
     const PendingAsJson = null;
     const NoneAsJson = 0;
     const userMetadata = doNow(() => {
-        const userMetadata = useRootProp(PendingAsJson);
+        const userMetadata = useProp(PendingAsJson);
         const savedMetadata = config.directoryPersister
             .jsonFile(`${uid}.json`)
             .load(PendingAsJson);
@@ -191,7 +189,7 @@ function createWorkspaceInterface(config) {
         },
         createJoinedInst(userMetadata) {
             const entitlements = doNow(() => {
-                const entitlements = useRootProp([]);
+                const entitlements = useProp([]);
                 let haveStartedWatching = false;
                 return {
                     get value() {
@@ -206,7 +204,7 @@ function createWorkspaceInterface(config) {
                 };
             });
             const otherMembers = doNow(() => {
-                const otherMembers = useRootProp([]);
+                const otherMembers = useProp([]);
                 let haveStartedWatching = false;
                 return {
                     get value() {
