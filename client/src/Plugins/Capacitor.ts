@@ -52,14 +52,13 @@ export function capacitorPersister(): Device.Persister {
     return {
       jsonFile: (fileName: string) => ({
         load<T extends Device.Json>(initJson: T) {
-          const filePath = `${directoryPath}/${fileName}`;
           const data = {
             value: JSON.parse(JSON.stringify(initJson)) as T,
           };
 
           // Load json from storage.
           const loadedFromLocalStorage = doNow(async () => {
-            const fileString = await readFile(filePath);
+            const fileString = await readFile(fileName);
             if (!fileString) return;
             data.value = JSON.parse(fileString);
           });
@@ -67,7 +66,7 @@ export function capacitorPersister(): Device.Persister {
           // Save doc store to device.
           const requestSave = async () => {
             await loadedFromLocalStorage;
-            await writeFile(filePath, JSON.stringify(data.value));
+            await writeFile(fileName, JSON.stringify(data.value));
           };
 
           // Give limited access to the json.

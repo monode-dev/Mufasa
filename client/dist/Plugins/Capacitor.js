@@ -53,13 +53,12 @@ export function capacitorPersister() {
         return {
             jsonFile: (fileName) => ({
                 load(initJson) {
-                    const filePath = `${directoryPath}/${fileName}`;
                     const data = {
                         value: JSON.parse(JSON.stringify(initJson)),
                     };
                     // Load json from storage.
                     const loadedFromLocalStorage = doNow(async () => {
-                        const fileString = await readFile(filePath);
+                        const fileString = await readFile(fileName);
                         if (!fileString)
                             return;
                         data.value = JSON.parse(fileString);
@@ -67,7 +66,7 @@ export function capacitorPersister() {
                     // Save doc store to device.
                     const requestSave = async () => {
                         await loadedFromLocalStorage;
-                        await writeFile(filePath, JSON.stringify(data.value));
+                        await writeFile(fileName, JSON.stringify(data.value));
                     };
                     // Give limited access to the json.
                     return {
