@@ -1,11 +1,11 @@
 import { isValid } from "./Utils.js";
 export function initializeAuth(config) {
-    const { useProp, useFormula, doNow, onDispose } = config.sessionPersister;
+    const { useProp, useFormula, doNow, onDispose, useRoot } = config.sessionPersister;
     // SECTION: User
     return doNow(() => {
         const { cloudAuth, uid, email, emailVerified } = doNow(() => {
             const _userInfo = useProp(undefined);
-            return {
+            return useRoot(() => ({
                 cloudAuth: config.getCloudAuth({
                     onAuthStateChanged: (user) => (_userInfo.value = user),
                     stage: config.stage,
@@ -13,10 +13,10 @@ export function initializeAuth(config) {
                 uid: useFormula(() => isValid(_userInfo.value) ? _userInfo.value.uid : _userInfo.value),
                 email: useFormula(() => _userInfo.value?.email ?? null),
                 emailVerified: useFormula(() => _userInfo.value?.emailVerified ?? false),
-            };
+            }));
         });
-        const isSigningIn = useProp(false);
-        const isSigningOut = useProp(false);
+        const isSigningIn = useRoot(() => useProp(false));
+        const isSigningOut = useRoot(() => useProp(false));
         async function signOut() {
             // isSigningOut.value = true;
             await cloudAuth.signOut();
@@ -89,7 +89,7 @@ export function initializeAuth(config) {
                 };
             },
         };
-        return useFormula(() => uid.value === undefined
+        return useRoot(() => useFormula(() => uid.value === undefined
             ? UserStates.pending
             : uid.value === null
                 ? UserStates.signedOut
@@ -103,7 +103,7 @@ export function initializeAuth(config) {
                         uid: uid.value,
                         email: email.value,
                         emailVerified: emailVerified.value,
-                    }));
+                    })));
     });
 }
 // type ksjdakf<T extends { [key: string]: {} }> = {

@@ -71,13 +71,14 @@ export function initializeAuth<T extends SignInFuncs>(config: {
 }): {
   get value(): UserState<T>;
 } {
-  const { useProp, useFormula, doNow, onDispose } = config.sessionPersister;
+  const { useProp, useFormula, doNow, onDispose, useRoot } =
+    config.sessionPersister;
 
   // SECTION: User
   return doNow(() => {
     const { cloudAuth, uid, email, emailVerified } = doNow(() => {
       const _userInfo = useProp<undefined | null | UserInfo>(undefined);
-      return {
+      return useRoot(() => ({
         cloudAuth: config.getCloudAuth({
           onAuthStateChanged: (user) => (_userInfo.value = user),
           stage: config.stage,
@@ -89,10 +90,10 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         emailVerified: useFormula(
           () => _userInfo.value?.emailVerified ?? false,
         ),
-      };
+      }));
     });
-    const isSigningIn = useProp(false);
-    const isSigningOut = useProp(false);
+    const isSigningIn = useRoot(() => useProp(false));
+    const isSigningOut = useRoot(() => useProp(false));
     async function signOut() {
       // isSigningOut.value = true;
       await cloudAuth.signOut();
@@ -170,25 +171,27 @@ export function initializeAuth<T extends SignInFuncs>(config: {
       },
     };
 
-    return useFormula(() =>
-      uid.value === undefined
-        ? UserStates.pending
-        : uid.value === null
-        ? UserStates.signedOut
-        : emailVerified.value
-        ? UserStates.createSignedInInst(
-            {
+    return useRoot(() =>
+      useFormula(() =>
+        uid.value === undefined
+          ? UserStates.pending
+          : uid.value === null
+          ? UserStates.signedOut
+          : emailVerified.value
+          ? UserStates.createSignedInInst(
+              {
+                uid: uid.value,
+                email: email.value,
+                emailVerified: emailVerified.value,
+              },
+              onDispose,
+            )
+          : UserStates.createSignedInButNotVerifiedInst({
               uid: uid.value,
               email: email.value,
               emailVerified: emailVerified.value,
-            },
-            onDispose,
-          )
-        : UserStates.createSignedInButNotVerifiedInst({
-            uid: uid.value,
-            email: email.value,
-            emailVerified: emailVerified.value,
-          }),
+            }),
+      ),
     ) as any;
   });
 }

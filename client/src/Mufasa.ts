@@ -42,7 +42,7 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
 }) {
   const stage = mfsConfig.stage ?? `Dev`;
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
-    const { useProp } = mfsConfig.sessionPersister;
+    const { useProp, useFormula, useRoot } = mfsConfig.sessionPersister;
     const uploadCount = useProp(0);
     return {
       trackUpload() {
@@ -51,8 +51,8 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       untrackUpload() {
         uploadCount.value--;
       },
-      isUploadingToCloud: mfsConfig.sessionPersister.useFormula(
-        () => uploadCount.value > 0,
+      isUploadingToCloud: useRoot(() =>
+        useFormula(() => uploadCount.value > 0),
       ),
     };
   });
