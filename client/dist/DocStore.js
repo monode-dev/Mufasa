@@ -154,7 +154,7 @@ export function initializeStoreBank(bankConfig) {
                 store.value = createStore(currentInstConfig.value);
                 // Watch for changes in the signature
                 const incomingSignature = await params.workspaceSignature;
-                doWatch(() => {
+                useRoot(() => doWatch(() => {
                     // Only do something if the workspace signature has changed.
                     const newInstSignature = incomingSignature.value;
                     const oldInstConfig = currentInstConfig.value;
@@ -182,7 +182,7 @@ export function initializeStoreBank(bankConfig) {
                     }
                 }, {
                     on: [incomingSignature],
-                });
+                }));
             });
             return store;
         });

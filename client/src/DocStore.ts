@@ -354,60 +354,62 @@ export function initializeStoreBank(bankConfig: {
 
         // Watch for changes in the signature
         const incomingSignature = await params.workspaceSignature;
-        doWatch(
-          () => {
-            // Only do something if the workspace signature has changed.
-            const newInstSignature = incomingSignature.value;
-            const oldInstConfig = currentInstConfig.value;
-            console.log(
-              `${params.docType} - newInstSignature: ${JSON.stringify(
-                newInstSignature,
-                null,
-                2,
-              )}`,
-            );
-            console.log(
-              `${params.docType} - oldInstConfig: ${JSON.stringify(
-                oldInstConfig,
-                null,
-                2,
-              )}`,
-            );
-            if (
-              newInstSignature?.userId === oldInstConfig?.userId &&
-              newInstSignature?.workspaceId === oldInstConfig?.workspaceId
-            )
-              return;
-            const newInstConfig = isValid(newInstSignature)
-              ? { ...newInstSignature, instId: uuidv4() }
-              : null;
-            console.log(
-              `${params.docType} - newInstConfig: ${JSON.stringify(
-                newInstConfig,
-                null,
-                2,
-              )}`,
-            );
+        useRoot(() =>
+          doWatch(
+            () => {
+              // Only do something if the workspace signature has changed.
+              const newInstSignature = incomingSignature.value;
+              const oldInstConfig = currentInstConfig.value;
+              console.log(
+                `${params.docType} - newInstSignature: ${JSON.stringify(
+                  newInstSignature,
+                  null,
+                  2,
+                )}`,
+              );
+              console.log(
+                `${params.docType} - oldInstConfig: ${JSON.stringify(
+                  oldInstConfig,
+                  null,
+                  2,
+                )}`,
+              );
+              if (
+                newInstSignature?.userId === oldInstConfig?.userId &&
+                newInstSignature?.workspaceId === oldInstConfig?.workspaceId
+              )
+                return;
+              const newInstConfig = isValid(newInstSignature)
+                ? { ...newInstSignature, instId: uuidv4() }
+                : null;
+              console.log(
+                `${params.docType} - newInstConfig: ${JSON.stringify(
+                  newInstConfig,
+                  null,
+                  2,
+                )}`,
+              );
 
-            // Save the new workspace signature to disk
-            currentInstConfig.value = newInstConfig;
+              // Save the new workspace signature to disk
+              currentInstConfig.value = newInstConfig;
 
-            // Create a new store for the new inst.
-            const oldStore = store.value;
-            store.value = createStore(newInstConfig);
+              // Create a new store for the new inst.
+              const oldStore = store.value;
+              store.value = createStore(newInstConfig);
 
-            // Dispose of the old store.
-            if (isValid(oldInstConfig?.instId)) {
-              params.deleteStoreInst({
-                docType: params.docType,
-                instId: oldInstConfig.instId,
-                store: oldStore,
-              });
-            }
-          },
-          {
-            on: [incomingSignature],
-          },
+              // Dispose of the old store.
+              if (isValid(oldInstConfig?.instId)) {
+                params.deleteStoreInst({
+                  docType: params.docType,
+                  instId: oldInstConfig.instId,
+                  store: oldStore,
+                });
+              }
+            },
+            {
+              on: [incomingSignature],
+            },
+          ),
         );
       });
       return store;
