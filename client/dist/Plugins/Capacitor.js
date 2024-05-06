@@ -8,6 +8,7 @@ export function capacitorPersister() {
     return (directoryPath) => {
         const getFilePath = (fileId) => `${directoryPath}/${fileId}`;
         const readFile = async (fileId) => {
+            console.log(`fileId: ${fileId}, shouldStop: ${shouldStop}`);
             if (shouldStop)
                 return undefined;
             liveOperationCount++;
