@@ -172,6 +172,7 @@ export function workspacePersister(
         },
         async stop() {
           shouldStop = true;
+          console.log(`Stopping Firebase Watcher`);
           if (disposeSnapshot) {
             disposeSnapshot();
             disposeSnapshot = undefined;
@@ -179,6 +180,7 @@ export function workspacePersister(
           while (isProcessingSnapshot) {
             await new Promise((resolve) => setTimeout(resolve, 10));
           }
+          console.log(`Stopped Firebase Watcher`);
         },
       };
     },
