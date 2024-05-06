@@ -68,7 +68,7 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
     devicePersister: mfsConfig.devicePersister,
     workspaceSignature: doNow(async () => {
       while (user.value.isPending || user.value.workspace?.isPending) {
-        await new Promise(() => setTimeout(() => {}, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
       console.log(
         `workspaceSignature`,
