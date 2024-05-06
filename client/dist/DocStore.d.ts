@@ -59,6 +59,7 @@ export declare namespace Device {
     type SavedJson<T extends Json> = {
         readonly loadedFromLocalStorage: Promise<void>;
         readonly data: Device.ToReadonlyJson<T>;
+        readonly fileName: string;
         readonly batchUpdate: (doUpdate: (json: {
             value: T;
         }, doNotSave: () => void) => Promise<unknown> | unknown) => Promise<void>;

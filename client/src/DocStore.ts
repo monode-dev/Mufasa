@@ -77,10 +77,11 @@ export namespace Device {
     readonly load: <T extends Json>(initValue: T) => Device.SavedJson<T>;
   };
   export const mockDirectoryPersister: Device.DirectoryPersister = {
-    jsonFile: () => ({
+    jsonFile: (fileName) => ({
       load: (initValue) => ({
         loadedFromLocalStorage: Promise.resolve(),
         data: initValue as Device.ToReadonlyJson<typeof initValue>,
+        fileName: `mock-${fileName}`,
         batchUpdate: async (doUpdate) => {
           await doUpdate({ value: initValue as any }, () => {});
         },
@@ -96,6 +97,7 @@ export namespace Device {
   export type SavedJson<T extends Json> = {
     readonly loadedFromLocalStorage: Promise<void>;
     readonly data: Device.ToReadonlyJson<T>;
+    readonly fileName: string;
     readonly batchUpdate: (
       doUpdate: (
         json: { value: T },

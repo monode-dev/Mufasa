@@ -25,10 +25,11 @@ export var Session;
 export var Device;
 (function (Device) {
     Device.mockDirectoryPersister = {
-        jsonFile: () => ({
+        jsonFile: (fileName) => ({
             load: (initValue) => ({
                 loadedFromLocalStorage: Promise.resolve(),
                 data: initValue,
+                fileName: `mock-${fileName}`,
                 batchUpdate: async (doUpdate) => {
                     await doUpdate({ value: initValue }, () => { });
                 },
