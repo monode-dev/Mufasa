@@ -111,9 +111,22 @@ export function capacitorPersister(): Device.Persister {
         while (liveOperationCount > 0) {
           await new Promise((resolve) => setTimeout(resolve, 10));
         }
-      },
-      deleteAllData: async () => {
-        // TODO: Implement
+        const files = await Filesystem.readdir({
+          path: directoryPath,
+          directory: Directory.Data,
+        });
+        await Promise.all(
+          files.files.map((file) =>
+            Filesystem.deleteFile({
+              path: `${directoryPath}/${file}`,
+              directory: Directory.Data,
+            }),
+          ),
+        );
+        await Filesystem.rmdir({
+          path: directoryPath,
+          directory: Directory.Data,
+        });
       },
     };
   };

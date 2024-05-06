@@ -70,7 +70,6 @@ export namespace Device {
     readFile: (fileId: string) => Promise<string | undefined>;
     writeFile: (fileId: string, base64String: string) => Promise<void>;
     deleteFile: (fileId: string) => Promise<void>;
-    deleteAllData: () => Promise<void>;
     stop: () => void;
   };
   export type JsonPersister = {
@@ -91,7 +90,7 @@ export namespace Device {
     readFile: async () => undefined,
     writeFile: async () => {},
     deleteFile: async () => {},
-    deleteAllData: async () => {},
+    // deleteAllData: async () => {},
     stop: () => {},
   };
   export type SavedJson<T extends Json> = {

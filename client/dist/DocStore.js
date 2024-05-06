@@ -39,7 +39,7 @@ export var Device;
         readFile: async () => undefined,
         writeFile: async () => { },
         deleteFile: async () => { },
-        deleteAllData: async () => { },
+        // deleteAllData: async () => {},
         stop: () => { },
     };
 })(Device || (Device = {}));
