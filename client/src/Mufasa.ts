@@ -42,7 +42,8 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
 }) {
   const stage = mfsConfig.stage ?? `Dev`;
   const { trackUpload, untrackUpload, isUploadingToCloud } = doNow(() => {
-    const uploadCount = mfsConfig.sessionPersister.useProp(0);
+    const { useProp, useRoot } = mfsConfig.sessionPersister;
+    const uploadCount = useRoot(() => useProp(0));
     return {
       trackUpload() {
         uploadCount.value++;

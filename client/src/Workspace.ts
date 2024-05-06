@@ -71,13 +71,14 @@ export function initializeAuth<T extends SignInFuncs>(config: {
 }): {
   get value(): UserState<T>;
 } {
-  const { useProp, useFormula, doNow, exists, onDispose } =
+  const { useProp, useFormula, doNow, useRoot, onDispose } =
     config.sessionPersister;
+  const useRootProp = <T>(initVal: T) => useRoot(() => useProp<T>(initVal));
 
   // SECTION: User
   return doNow(() => {
     const { cloudAuth, uid, email, emailVerified } = doNow(() => {
-      const _userInfo = useProp<undefined | null | UserInfo>(undefined);
+      const _userInfo = useRootProp<undefined | null | UserInfo>(undefined);
       return {
         cloudAuth: config.getCloudAuth({
           onAuthStateChanged: (user) => (_userInfo.value = user),
@@ -92,8 +93,8 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         ),
       };
     });
-    const isSigningIn = useProp(false);
-    const isSigningOut = useProp(false);
+    const isSigningIn = useRootProp(false);
+    const isSigningOut = useRootProp(false);
     async function signOut() {
       // isSigningOut.value = true;
       await cloudAuth.signOut();
@@ -241,11 +242,13 @@ function createWorkspaceInterface(config: {
   stage: string;
 }) {
   const { uid, workspaceIntegration, sessionPersister } = config;
-  const { useProp, useFormula, doNow, exists, onDispose } = sessionPersister;
-  const isCreatingWorkspace = useProp(false);
-  const isJoiningWorkspace = useProp(false);
-  const isLeavingWorkspace = useProp(false);
-  // const isDeletingWorkspace = useProp(false);
+  const { useProp, useRoot, useFormula, doNow, exists, onDispose } =
+    sessionPersister;
+  const useRootProp = <T>(initVal: T) => useRoot(() => useProp<T>(initVal));
+  const isCreatingWorkspace = useRootProp(false);
+  const isJoiningWorkspace = useRootProp(false);
+  const isLeavingWorkspace = useRootProp(false);
+  // const isDeletingWorkspace = useRootProp(false);
 
   type PendingAsJson = typeof PendingAsJson;
   const PendingAsJson = null;
@@ -256,7 +259,7 @@ function createWorkspaceInterface(config: {
       | PendingAsJson
       | NoneAsJson
       | Readonly<NonNullUserMetadata>;
-    const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
+    const userMetadata = useRootProp<SavedUserMetadata>(PendingAsJson);
     const savedMetadata = config.directoryPersister
       .jsonFile(`${uid}.json`)
       .load(PendingAsJson as SavedUserMetadata);
@@ -324,7 +327,7 @@ function createWorkspaceInterface(config: {
     },
     createJoinedInst(userMetadata: NonNullUserMetadata) {
       const entitlements = doNow(() => {
-        const entitlements = useProp<string[]>([]);
+        const entitlements = useRootProp<string[]>([]);
         let haveStartedWatching = false;
         return {
           get value() {
@@ -342,7 +345,7 @@ function createWorkspaceInterface(config: {
         };
       });
       const otherMembers = doNow(() => {
-        const otherMembers = useProp<Member[]>([]);
+        const otherMembers = useRootProp<Member[]>([]);
         let haveStartedWatching = false;
         return {
           get value() {
