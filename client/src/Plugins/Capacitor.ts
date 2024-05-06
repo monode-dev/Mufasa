@@ -79,6 +79,9 @@ export function capacitorPersister(): Device.Persister {
             get data() {
               return data.value as Device.ToReadonlyJson<T>;
             },
+            get fileName() {
+              return fileName;
+            },
             // This allows us to save after a write batch.
             async batchUpdate(
               doUpdate: (
@@ -86,6 +89,7 @@ export function capacitorPersister(): Device.Persister {
                 doNotSave: () => void,
               ) => Promise<unknown> | unknown,
             ) {
+              await loadedFromLocalStorage;
               let shouldSave = true;
               await doUpdate(data, () => (shouldSave = false));
               if (shouldSave) requestSave();

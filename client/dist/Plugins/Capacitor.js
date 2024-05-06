@@ -78,8 +78,12 @@ export function capacitorPersister() {
                         get data() {
                             return data.value;
                         },
+                        get fileName() {
+                            return fileName;
+                        },
                         // This allows us to save after a write batch.
                         async batchUpdate(doUpdate) {
+                            await loadedFromLocalStorage;
                             let shouldSave = true;
                             await doUpdate(data, () => (shouldSave = false));
                             if (shouldSave)

@@ -350,10 +350,12 @@ export function createDocStore(config: DocStoreParams) {
       [key: string]: DocJson | null;
     },
   });
+  console.log(`localDocs.fileName: ${(localDocs as any).fileName}`);
 
   // Pick up any changes that still need pushed.
   localDocs.loadedFromLocalStorage.then(() => {
-    console.log(JSON.stringify(localDocs.data.docs, null, 2));
+    console.log(`localDocs.then.fileName: ${(localDocs as any).fileName}`);
+    console.log(`localDocs: ${JSON.stringify(localDocs.data.docs, null, 2)}`);
     config.sessionTablePersister.batchUpdate(
       Object.entries(localDocs.data.docs)
         .filter((_, v) => isValid(v))
