@@ -50,6 +50,7 @@ export function initializeMufasa(mfsConfig) {
             while (user.value.isPending || user.value.workspace?.isPending) {
                 await new Promise(() => setTimeout(() => { }, 10));
             }
+            console.log(`workspaceSignature`, user.value.uid, user.value.workspace?.id);
             return mfsConfig.sessionPersister.useRoot(() => mfsConfig.sessionPersister.useFormula(() => isValid(user.value.uid) && isValid(user.value.workspace?.id)
                 ? {
                     userId: user.value.uid,
