@@ -97,7 +97,6 @@ export function initializeStoreBank(bankConfig) {
         const persistance = params.getStoreConfig();
         const { useProp, doWatch } = persistance.sessionPersister;
         const createStore = (workspaceInstConfig) => {
-            console.log(`workspaceInstConfig: ${JSON.stringify(workspaceInstConfig)}`);
             const createSpecificStore = params.storeType === "doc" ? createDocStore : createFileStore;
             return createSpecificStore({
                 sessionTablePersister: isValid(workspaceInstConfig)
@@ -131,6 +130,8 @@ export function initializeStoreBank(bankConfig) {
                 // Only do something if the workspace signature has changed.
                 const newInstSignature = params.workspaceSignature.value;
                 const oldInstConfig = instConfigJson.data;
+                console.log(`newInstSignature: ${JSON.stringify(newInstSignature)}`);
+                console.log(`oldInstConfig: ${JSON.stringify(oldInstConfig)}`);
                 if (newInstSignature?.userId === oldInstConfig?.userId &&
                     newInstSignature?.workspaceId === oldInstConfig?.workspaceId)
                     return;
