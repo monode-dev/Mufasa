@@ -227,9 +227,9 @@ export function initializeStoreBank(bankConfig: {
       async (params: { docType: string; instId: string }) => {
         // If the store is still being used, stop it so we can delete it.
         if (storesBeingDeleted.has(params.instId)) {
-          console.log(`Stopping store: ${params.instId}`);
+          console.log(`${params.docType} - Stopping store: ${params.instId}`);
           await storesBeingDeleted.get(params.instId)?.stop();
-          console.log(`Stopped store: ${params.instId}`);
+          console.log(`${params.docType} - Stopped store: ${params.instId}`);
           storesBeingDeleted.delete(params.instId);
         }
         // Delete the store from disk.
@@ -248,7 +248,7 @@ export function initializeStoreBank(bankConfig: {
       instId: string;
       store: DocStore | FileStore;
     }) => {
-      console.log(`Deleting store: ${params.instId}`);
+      console.log(`${params.docType} - Deleting store: ${params.instId}`);
       storesBeingDeleted.set(params.instId, params.store);
       deleteStoreInst({
         docType: params.docType,
@@ -298,7 +298,8 @@ export function initializeStoreBank(bankConfig: {
   }): ReadonlyProp<T extends "doc" ? DocStore : FileStore> {
     // Set up config for this store.
     const persistance = params.getStoreConfig();
-    const { useProp, doWatch, useRoot } = persistance.sessionPersister;
+    const { useProp, doWatch, useRoot, useFormula } =
+      persistance.sessionPersister;
     const createStore = (workspaceInstConfig: WorkspaceInstConfig | null) => {
       const createSpecificStore =
         params.storeType === "doc" ? createDocStore : createFileStore;
@@ -339,15 +340,28 @@ export function initializeStoreBank(bankConfig: {
         .jsonFile(`currentWorkspaceInstConfig.json`)
         .load<WorkspaceInstConfig | null>(null);
       // Load the last known workspace signature, and then watch for changes.
-      instConfigJson?.loadedFromLocalStorage.then(() =>
+      doNow(async () => {
+        await instConfigJson?.loadedFromLocalStorage;
+        const currentInstConfig = useRoot(() =>
+          isValid(instConfigJson)
+            ? useFormula(
+                () => instConfigJson!.data,
+                (v) => instConfigJson!.batchUpdate((data) => (data.value = v)),
+              )
+            : useProp(null),
+        );
         doWatch(
           () => {
             // Only do something if the workspace signature has changed.
             const newInstSignature = params.workspaceSignature.value;
             console.log(
-              `newInstSignature: ${JSON.stringify(newInstSignature, null, 2)}`,
+              `${params.docType} - newInstSignature: ${JSON.stringify(
+                newInstSignature,
+                null,
+                2,
+              )}`,
             );
-            const oldInstConfig = instConfigJson.data;
+            const oldInstConfig = currentInstConfig.value;
             if (
               haveSetUpStore &&
               newInstSignature?.userId === oldInstConfig?.userId &&
@@ -357,9 +371,23 @@ export function initializeStoreBank(bankConfig: {
             const newInstConfig = isValid(newInstSignature)
               ? { ...newInstSignature, instId: uuidv4() }
               : null;
+            console.log(
+              `${params.docType} - oldInstConfig: ${JSON.stringify(
+                oldInstConfig,
+                null,
+                2,
+              )}`,
+            );
+            console.log(
+              `${params.docType} - newInstConfig: ${JSON.stringify(
+                newInstConfig,
+                null,
+                2,
+              )}`,
+            );
 
             // Save the new workspace signature to disk
-            instConfigJson.batchUpdate((data) => (data.value = newInstConfig));
+            currentInstConfig.value = newInstConfig;
 
             // Create a new store for the new inst.
             const oldStore = store.value;
@@ -378,8 +406,8 @@ export function initializeStoreBank(bankConfig: {
           {
             on: [params.workspaceSignature],
           },
-        ),
-      );
+        );
+      });
       return store;
     }) as any;
   }
