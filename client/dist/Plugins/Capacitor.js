@@ -112,7 +112,9 @@ export function capacitorPersister() {
                     path: directoryPath,
                     directory: Directory.Data,
                 });
-                console.log(`Files in directory: ${files.files}`);
+                console.log(`Files in directory: ${files.files
+                    .map((file) => file.name)
+                    .join(`, `)}`);
                 await Promise.all(files.files.map((file) => Filesystem.deleteFile({
                     path: `${directoryPath}/${file}`,
                     directory: Directory.Data,
