@@ -110,17 +110,14 @@ declare function createWorkspaceInterface(config: {
     readonly joinWorkspace: (props: {
         inviteCode: string;
     }) => Promise<void>;
-} | {
-    readonly isCreating: true;
-} | {
-    readonly isJoining: true;
-} | {
-    readonly isLeaving: true;
+    readonly isCreating: boolean;
+    readonly isJoining: boolean;
 } | ({
     haveJoined: boolean;
     id: string;
     readonly otherMembers: Member[];
     readonly workspaceEntitlements: string[];
+    readonly isLeaving: boolean;
 } & (({
     isOwner: boolean;
     role: "owner";

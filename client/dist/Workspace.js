@@ -182,12 +182,12 @@ function createWorkspaceInterface(config) {
                 if (error !== null)
                     throw error;
             },
-        },
-        creating: {
-            isCreating: true,
-        },
-        joining: {
-            isJoining: true,
+            get isCreating() {
+                return isCreatingWorkspace.value;
+            },
+            get isJoining() {
+                return isJoiningWorkspace.value;
+            },
         },
         createJoinedInst(userMetadata) {
             const entitlements = doNow(() => {
@@ -230,6 +230,9 @@ function createWorkspaceInterface(config) {
                 },
                 get workspaceEntitlements() {
                     return entitlements.value;
+                },
+                get isLeaving() {
+                    return isLeavingWorkspace.value;
                 },
             };
             const roleBasedProps = useFormula(() => userMetadata.role === `owner`
@@ -283,9 +286,6 @@ function createWorkspaceInterface(config) {
             });
             return result;
         },
-        leaving: {
-            isLeaving: true,
-        },
         // deleting: {
         //   isDeleting: true,
         // },
@@ -293,12 +293,6 @@ function createWorkspaceInterface(config) {
     return useFormula(() => userMetadata.value === PendingAsJson
         ? WorkspaceStates.pending
         : userMetadata.value === NoneAsJson
-            ? isCreatingWorkspace.value
-                ? WorkspaceStates.creating
-                : isJoiningWorkspace.value
-                    ? WorkspaceStates.joining
-                    : WorkspaceStates.none
-            : isLeavingWorkspace.value
-                ? WorkspaceStates.leaving
-                : WorkspaceStates.createJoinedInst(userMetadata.value /**, onCleanup */));
+            ? WorkspaceStates.none
+            : WorkspaceStates.createJoinedInst(userMetadata.value /**, onCleanup */));
 }
