@@ -136,7 +136,7 @@ function createWorkspaceInterface(config) {
                         role: newMetadata.role,
                     }
                     : NoneAsJson;
-                console.log(`Workspace savedMetadata.fileName: ${savedMetadata.fileName}`);
+                console.log(`Workspace savedMetadata.fileName: ${savedMetadata.fileName}, newMetadataValue: ${newMetadataValue}`);
                 data.value = newMetadataValue;
                 userMetadata.value = newMetadataValue;
             });

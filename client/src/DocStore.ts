@@ -394,10 +394,19 @@ export function initializeStoreBank(bankConfig: {
               );
 
               // Save the new workspace signature to disk
-              currentInstConfig.value = newInstConfig;
-              console.log(
-                `${params.docType} - Set currentInstConfig ${currentInstConfig.value}`,
-              );
+              if (isValid(instConfigJson)) {
+                instConfigJson
+                  .batchUpdate((data) => {
+                    data.value = newInstConfig;
+                  })
+                  .then(() => {
+                    console.log(
+                      `${params.docType} - Set currentInstConfig ${currentInstConfig.value}`,
+                    );
+                  });
+              } else {
+                currentInstConfig.value = newInstConfig;
+              }
 
               // Create a new store for the new inst.
               const oldStore = store.value;
