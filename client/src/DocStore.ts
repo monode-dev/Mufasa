@@ -368,11 +368,12 @@ export function initializeStoreBank(bankConfig: {
               const newInstSignature = incomingSignature.value;
               const oldInstConfig = currentInstConfig.value;
               console.log(
-                `${params.docType} - newInstSignature: ${JSON.stringify(
-                  newInstSignature,
-                  null,
-                  2,
-                )}`,
+                `newInstSignature:`,
+                // `${params.docType} - newInstSignature: ${JSON.stringify(
+                //   newInstSignature,
+                //   null,
+                //   2,
+                // )}`,
               );
               console.log(
                 `${params.docType} - oldInstConfig: ${JSON.stringify(
