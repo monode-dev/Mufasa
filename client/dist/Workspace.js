@@ -7,7 +7,15 @@ export function initializeAuth(config) {
             const _userInfo = useProp(undefined);
             return useRoot(() => ({
                 cloudAuth: config.getCloudAuth({
-                    onAuthStateChanged: (user) => (_userInfo.value = user),
+                    onAuthStateChanged: (user) => {
+                        if (user === null && _userInfo.value === user)
+                            return;
+                        if (_userInfo.value?.uid === user?.uid &&
+                            _userInfo.value?.email === user?.email &&
+                            _userInfo.value?.emailVerified === user?.emailVerified)
+                            return;
+                        _userInfo.value = user;
+                    },
                     stage: config.stage,
                 }),
                 uid: useFormula(() => isValid(_userInfo.value) ? _userInfo.value.uid : _userInfo.value),
