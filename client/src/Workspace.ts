@@ -422,8 +422,11 @@ function createWorkspaceInterface(config: {
                 });
                 return { inviteCode, validForDays };
               },
-              async removeMember() {
-                console.error(`Not implemented`);
+              async removeMember(params: { uid: string }) {
+                return await workspaceIntegration.removeMember({
+                  stage: config.stage,
+                  uid: params.uid,
+                });
               },
               // async deleteWorkspace() {
               //   isLeavingWorkspace.value = true;
@@ -439,12 +442,6 @@ function createWorkspaceInterface(config: {
                   stage: config.stage,
                 });
                 isLeavingWorkspace.value = false;
-              },
-              async removeMember(params: { uid: string }) {
-                return await workspaceIntegration.removeMember({
-                  stage: config.stage,
-                  uid: params.uid,
-                });
               },
             },
       ).value;

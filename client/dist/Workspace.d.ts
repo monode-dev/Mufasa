@@ -129,15 +129,15 @@ declare function createWorkspaceInterface(config: {
         inviteCode: string;
         validForDays: number;
     } | undefined>;
-    removeMember(): Promise<void>;
+    removeMember(params: {
+        uid: string;
+    }): Promise<void>;
     leaveWorkspace?: undefined;
 } & {}) | ({
     role: "member";
     leaveWorkspace(): Promise<void>;
-    removeMember(params: {
-        uid: string;
-    }): Promise<void>;
     isOwner?: undefined;
     createWorkspaceInvite?: undefined;
+    removeMember?: undefined;
 } & {})))>;
 export {};

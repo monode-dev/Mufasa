@@ -36,6 +36,9 @@ function initCachedQuery(config: {
 
 // Data-plate
 class User extends Schema {
+  /* NOTE: This property is actually owned by the team. The user has no permission to
+   * change it. Or maybe it requires joint permission between the user and the team.
+   * I'm not sure yet. */
   readonly team = prop(Team, `owner`, { query: `` });
 }
 const user: { value: User } = mfs.initAuth(User);
