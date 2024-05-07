@@ -284,6 +284,12 @@ function createWorkspaceInterface(config) {
                         });
                         isLeavingWorkspace.value = false;
                     },
+                    async removeMember(params) {
+                        return await workspaceIntegration.removeMember({
+                            stage: config.stage,
+                            uid: params.uid,
+                        });
+                    },
                 }).value;
             Object.keys(roleBasedProps).forEach((key) => {
                 Object.defineProperty(result, key, {

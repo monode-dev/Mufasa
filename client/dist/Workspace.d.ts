@@ -37,6 +37,10 @@ export type WorkspaceIntegration = {
     leaveWorkspace: (params: {
         stage: string;
     } | undefined) => Promise<void>;
+    removeMember: (params: {
+        stage: string;
+        uid: string;
+    }) => Promise<void>;
 };
 export type GetCloudAuth<T extends SignInFuncs> = (config: {
     onAuthStateChanged: (user: UserInfo | null) => void;
@@ -130,8 +134,10 @@ declare function createWorkspaceInterface(config: {
 } & {}) | ({
     role: "member";
     leaveWorkspace(): Promise<void>;
+    removeMember(params: {
+        uid: string;
+    }): Promise<void>;
     isOwner?: undefined;
     createWorkspaceInvite?: undefined;
-    removeMember?: undefined;
 } & {})))>;
 export {};

@@ -264,6 +264,9 @@ export function firebaseWorkspace(config) {
             }
             return result;
         },
+        async removeMember(params) {
+            return (await httpsCallable(config.firebaseFunctions, "removeMember")(params)).data;
+        },
         // async deleteWorkspace(params: { stage: string } | undefined) {
         //   return (
         //     await httpsCallable<{ stage: string } | undefined, void>(

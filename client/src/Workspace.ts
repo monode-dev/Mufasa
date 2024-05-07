@@ -45,6 +45,7 @@ export type WorkspaceIntegration = {
     stage: string;
   }) => Promise<void>;
   leaveWorkspace: (params: { stage: string } | undefined) => Promise<void>;
+  removeMember: (params: { stage: string; uid: string }) => Promise<void>;
   // deleteWorkspace: (params: { stage: string } | undefined) => Promise<void>;
 };
 
@@ -438,6 +439,12 @@ function createWorkspaceInterface(config: {
                   stage: config.stage,
                 });
                 isLeavingWorkspace.value = false;
+              },
+              async removeMember(params: { uid: string }) {
+                return await workspaceIntegration.removeMember({
+                  stage: config.stage,
+                  uid: params.uid,
+                });
               },
             },
       ).value;
