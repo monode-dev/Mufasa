@@ -10,7 +10,8 @@ export function initializeAuth(config) {
                     onAuthStateChanged: (user) => {
                         if (user === null && _userInfo.value === user)
                             return;
-                        if (_userInfo.value?.uid === user?.uid &&
+                        if (_userInfo.value !== undefined &&
+                            _userInfo.value?.uid === user?.uid &&
                             _userInfo.value?.email === user?.email &&
                             _userInfo.value?.emailVerified === user?.emailVerified)
                             return;

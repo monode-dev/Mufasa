@@ -84,6 +84,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
           onAuthStateChanged: (user) => {
             if (user === null && _userInfo.value === user) return;
             if (
+              _userInfo.value !== undefined &&
               _userInfo.value?.uid === user?.uid &&
               _userInfo.value?.email === user?.email &&
               _userInfo.value?.emailVerified === user?.emailVerified
