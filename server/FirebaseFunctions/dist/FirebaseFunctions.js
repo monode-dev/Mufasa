@@ -129,6 +129,29 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             });
             return {};
         }),
+        removeMember: (0, https_1.onCall)(callableOptions, async (request) => {
+            var _a, _b, _c;
+            (0, logger_1.log)("removeMember", request);
+            if (request.auth === undefined)
+                throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
+            (0, logger_1.log)("uid", request.auth.uid);
+            if (request.auth.token.role !== `owner`)
+                throw new https_1.HttpsError(`permission-denied`, "Only the owner can remove members.");
+            if (typeof request.data.uid !== `string`)
+                throw new https_1.HttpsError(`invalid-argument`, "uid is required.");
+            const userDoc = await firestore.doc(`${getStage(request.data.stage)}-UserMetadata/${request.data.uid}`).get();
+            if (!userDoc.exists)
+                throw new https_1.HttpsError(`not-found`, "User not found.");
+            if (((_a = userDoc.data()) === null || _a === void 0 ? void 0 : _a.workspaceId) !== request.auth.token.workspaceId)
+                throw new https_1.HttpsError(`not-found`, "User not in workspace.");
+            await setUserWorkspace({
+                uid: request.data.uid,
+                workspaceId: null,
+                email: (_c = (_b = userDoc.data()) === null || _b === void 0 ? void 0 : _b.email) !== null && _c !== void 0 ? _c : null,
+                stage: request.data.stage,
+            });
+            return {};
+        }),
         // TODO: deleteWorkspace
     };
 }
