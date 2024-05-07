@@ -258,6 +258,7 @@ function createWorkspaceInterface(config: {
       | PendingAsJson
       | NoneAsJson
       | Readonly<NonNullUserMetadata>;
+    console.log(`Workspace - Setting up userMetadata for uid: ${uid}`);
     const userMetadata = useProp<SavedUserMetadata>(PendingAsJson);
     const savedMetadata = config.directoryPersister
       .jsonFile(`${uid}.json`)
@@ -276,7 +277,9 @@ function createWorkspaceInterface(config: {
                 }
               : NoneAsJson;
           console.log(
-            `Workspace savedMetadata.fileName: ${savedMetadata.fileName}, newMetadataValue: ${newMetadataValue}`,
+            `Workspace savedMetadata.fileName: ${
+              savedMetadata.fileName
+            }, newMetadataValue: ${JSON.stringify(newMetadataValue, null, 2)}`,
           );
           data.value = newMetadataValue;
           userMetadata.value = newMetadataValue;
