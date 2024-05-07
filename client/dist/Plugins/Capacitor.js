@@ -3,9 +3,9 @@ import { doNow, isValid } from "../Utils.js";
 import { Capacitor } from "@capacitor/core";
 // SECTION: Doc Persister
 export function capacitorPersister() {
-    let shouldStop = false;
-    let liveOperationCount = 0;
     return (directoryPath) => {
+        let shouldStop = false;
+        let liveOperationCount = 0;
         const getFilePath = (fileId) => `${directoryPath}/${fileId}`;
         const readFile = async (fileId) => {
             if (shouldStop)

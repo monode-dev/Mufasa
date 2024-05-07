@@ -125,13 +125,13 @@ declare function createWorkspaceInterface(config: {
         inviteCode: string;
         validForDays: number;
     } | undefined>;
-    kickMember(): Promise<void>;
+    removeMember(): Promise<void>;
     leaveWorkspace?: undefined;
 } & {}) | ({
     role: "member";
     leaveWorkspace(): Promise<void>;
     isOwner?: undefined;
     createWorkspaceInvite?: undefined;
-    kickMember?: undefined;
+    removeMember?: undefined;
 } & {})))>;
 export {};

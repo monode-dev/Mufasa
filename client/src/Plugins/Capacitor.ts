@@ -5,9 +5,9 @@ import { Capacitor } from "@capacitor/core";
 
 // SECTION: Doc Persister
 export function capacitorPersister(): Device.Persister {
-  let shouldStop = false;
-  let liveOperationCount = 0;
   return (directoryPath: string) => {
+    let shouldStop = false;
+    let liveOperationCount = 0;
     const getFilePath = (fileId: string) => `${directoryPath}/${fileId}`;
     const readFile = async (fileId: string) => {
       if (shouldStop) return undefined;

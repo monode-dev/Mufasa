@@ -266,7 +266,7 @@ function createWorkspaceInterface(config) {
                         });
                         return { inviteCode, validForDays };
                     },
-                    async kickMember() {
+                    async removeMember() {
                         console.error(`Not implemented`);
                     },
                     // async deleteWorkspace() {

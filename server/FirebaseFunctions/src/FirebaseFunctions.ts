@@ -171,6 +171,7 @@ export function initializeMufasaFunctions({
       });
       return {};
     }),
+    // TODO: removeMember
     // TODO: deleteWorkspace
   };
 }
