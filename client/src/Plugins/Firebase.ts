@@ -372,12 +372,18 @@ export function firebaseWorkspace(config: {
           const metadata = snapshot.data() as undefined | UserMetadata;
           handle(metadata ?? null);
         },
+        (error) => {
+          console.warn(error);
+        },
       );
     },
     watchEntitlements(workspaceId, onEntitlements) {
       return onSnapshot(
         doc(config.workspacesCollection, workspaceId),
         (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []),
+        (error) => {
+          console.warn(error);
+        },
       );
     },
     watchMembers(workspaceId, onMembers) {
@@ -388,6 +394,9 @@ export function firebaseWorkspace(config: {
         ),
         (snapshot) =>
           onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
+        (error) => {
+          console.warn(error);
+        },
       );
     },
     async createWorkspaceInterface(params: {

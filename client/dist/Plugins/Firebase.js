@@ -213,13 +213,19 @@ export function firebaseWorkspace(config) {
             return onSnapshot(doc(config.userMetadataCollection, config.uid), (snapshot) => {
                 const metadata = snapshot.data();
                 handle(metadata ?? null);
+            }, (error) => {
+                console.warn(error);
             });
         },
         watchEntitlements(workspaceId, onEntitlements) {
-            return onSnapshot(doc(config.workspacesCollection, workspaceId), (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []));
+            return onSnapshot(doc(config.workspacesCollection, workspaceId), (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []), (error) => {
+                console.warn(error);
+            });
         },
         watchMembers(workspaceId, onMembers) {
-            return onSnapshot(query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)), (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data())));
+            return onSnapshot(query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)), (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data())), (error) => {
+                console.warn(error);
+            });
         },
         async createWorkspaceInterface(params) {
             return await setDoc(docRef(config.workspaceInvitesCollection, params.inviteCode), {
