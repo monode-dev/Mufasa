@@ -104,24 +104,29 @@ export function capacitorPersister() {
             },
             deleteDirectory: async () => {
                 console.log(`Deleting directory: ${directoryPath}`);
-                const files = await Filesystem.readdir({
-                    path: directoryPath,
-                    directory: Directory.Data,
-                });
-                console.log(`Files in directory: ${files.files
-                    .map((file) => file.name)
-                    .join(`, `)}`);
-                await Promise.all(files.files.map((file) => Filesystem.deleteFile({
-                    path: `${directoryPath}/${file.name}`,
-                    directory: Directory.Data,
-                }).catch((e) => {
-                    console.warn;
-                })));
-                await Filesystem.rmdir({
-                    path: directoryPath,
-                    directory: Directory.Data,
-                });
-                console.log(`Deleted directory: ${directoryPath}`);
+                try {
+                    const files = await Filesystem.readdir({
+                        path: directoryPath,
+                        directory: Directory.Data,
+                    });
+                    console.log(`Files in directory: ${files.files
+                        .map((file) => file.name)
+                        .join(`, `)}`);
+                    await Promise.all(files.files.map((file) => Filesystem.deleteFile({
+                        path: `${directoryPath}/${file.name}`,
+                        directory: Directory.Data,
+                    }).catch((e) => {
+                        console.warn;
+                    })));
+                    await Filesystem.rmdir({
+                        path: directoryPath,
+                        directory: Directory.Data,
+                    });
+                    console.log(`Deleted directory: ${directoryPath}`);
+                }
+                catch (e) {
+                    console.warn(`Failed to delete directory: ${directoryPath}`);
+                }
             },
         };
     };
