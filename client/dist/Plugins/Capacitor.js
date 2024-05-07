@@ -63,11 +63,6 @@ export function capacitorPersister() {
                             return;
                         data.value = JSON.parse(fileString);
                     });
-                    // Save doc store to device.
-                    const requestSave = async () => {
-                        await loadedFromLocalStorage;
-                        await writeFile(fileName, JSON.stringify(data.value));
-                    };
                     // Give limited access to the json.
                     return {
                         get loadedFromLocalStorage() {
@@ -84,8 +79,9 @@ export function capacitorPersister() {
                             await loadedFromLocalStorage;
                             let shouldSave = true;
                             await doUpdate(data, () => (shouldSave = false));
-                            if (shouldSave)
-                                requestSave();
+                            if (shouldSave) {
+                                await writeFile(fileName, JSON.stringify(data.value));
+                            }
                         },
                     };
                 },

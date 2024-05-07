@@ -148,6 +148,7 @@ export function initializeStoreBank(bankConfig) {
             doNow(async () => {
                 // Load the last known store signature
                 await instConfigJson?.loadedFromLocalStorage;
+                console.log(`${params.docType} - instConfigJson.fileName: ${instConfigJson?.fileName}`);
                 const currentInstConfig = useRoot(() => isValid(instConfigJson)
                     ? useFormula(() => instConfigJson.data, (v) => instConfigJson.batchUpdate((data) => (data.value = v)))
                     : useProp(null));
@@ -169,6 +170,7 @@ export function initializeStoreBank(bankConfig) {
                     console.log(`${params.docType} - newInstConfig: ${JSON.stringify(newInstConfig, null, 2)}`);
                     // Save the new workspace signature to disk
                     currentInstConfig.value = newInstConfig;
+                    console.log(`${params.docType} - Set currentInstConfig ${currentInstConfig.value}`);
                     // Create a new store for the new inst.
                     const oldStore = store.value;
                     store.value = createStore(newInstConfig);
