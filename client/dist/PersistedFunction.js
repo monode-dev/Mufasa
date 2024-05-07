@@ -28,9 +28,10 @@ export function createPersistedFunction(localJsonFilePersister, func) {
                             args: [stepResult],
                         };
                     });
-                    doNextStep(instanceId);
+                    await doNextStep(instanceId);
                 }
                 else {
+                    console.log(`Finished ${savedJson.fileName} instance: ${instanceId}`);
                     savedJson.batchUpdate((data) => {
                         delete data.value.activeFunctions[instanceId];
                     });
