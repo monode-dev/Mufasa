@@ -150,7 +150,14 @@ export function initializeStoreBank(bankConfig) {
                 await instConfigJson?.loadedFromLocalStorage;
                 console.log(`${params.docType} - instConfigJson.fileName: ${instConfigJson?.fileName}`);
                 const currentInstConfig = useRoot(() => isValid(instConfigJson)
-                    ? useFormula(() => instConfigJson.data, (v) => instConfigJson.batchUpdate((data) => (data.value = v)))
+                    ? {
+                        get value() {
+                            return instConfigJson.data;
+                        },
+                        set value(v) {
+                            instConfigJson.batchUpdate((data) => (data.value = v));
+                        },
+                    }
                     : useProp(null));
                 store.value = createStore(currentInstConfig.value);
                 // Watch for changes in the signature

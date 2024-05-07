@@ -347,10 +347,14 @@ export function initializeStoreBank(bankConfig: {
         );
         const currentInstConfig = useRoot(() =>
           isValid(instConfigJson)
-            ? useFormula(
-                () => instConfigJson!.data,
-                (v) => instConfigJson!.batchUpdate((data) => (data.value = v)),
-              )
+            ? {
+                get value() {
+                  return instConfigJson!.data;
+                },
+                set value(v: WorkspaceInstConfig | null) {
+                  instConfigJson!.batchUpdate((data) => (data.value = v));
+                },
+              }
             : useProp(null),
         );
         store.value = createStore(currentInstConfig.value);

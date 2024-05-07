@@ -125,7 +125,7 @@ export function capacitorPersister() {
                     console.log(`Deleted directory: ${directoryPath}`);
                 }
                 catch (e) {
-                    console.warn(`Failed to delete directory: ${directoryPath}`);
+                    console.warn(e);
                 }
             },
         };
