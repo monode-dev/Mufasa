@@ -144,20 +144,28 @@ export function capacitorPersister(): Device.Persister {
           path: outputPath,
           recursive: true,
           directory: Directory.Data,
+        }).catch((e) => {
+          console.warn(e);
         });
-        const files = await Filesystem.readdir({
-          path: directoryPath,
-          directory: Directory.Data,
-        });
-        await Promise.all(
-          files.files.map((file) =>
-            Filesystem.copy({
-              from: `${directoryPath}/${file.name}`,
-              to: `${outputPath}/${file.name}`,
-              directory: Directory.Data,
-            }),
-          ),
-        );
+        try {
+          const files = await Filesystem.readdir({
+            path: directoryPath,
+            directory: Directory.Data,
+          });
+          await Promise.all(
+            files.files.map((file) =>
+              Filesystem.copy({
+                from: `${directoryPath}/${file.name}`,
+                to: `${outputPath}/${file.name}`,
+                directory: Directory.Data,
+              }).catch((e) => {
+                console.warn(e);
+              }),
+            ),
+          );
+        } catch (e) {
+          console.warn(e);
+        }
       },
     };
   };
