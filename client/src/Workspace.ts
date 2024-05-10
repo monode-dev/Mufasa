@@ -336,9 +336,6 @@ function createWorkspaceInterface(config: {
         isJoiningWorkspace.value = false;
         if (error !== null) throw error;
       },
-      async refreshToken() {
-        await workspaceIntegration.refreshToken();
-      },
       get isCreating() {
         return isCreatingWorkspace.value;
       },
@@ -396,6 +393,9 @@ function createWorkspaceInterface(config: {
         },
         get isLeaving() {
           return isLeavingWorkspace.value;
+        },
+        async refreshToken() {
+          await workspaceIntegration.refreshToken();
         },
       };
       const roleBasedProps = useFormula(() =>
