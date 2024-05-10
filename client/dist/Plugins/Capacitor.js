@@ -153,7 +153,7 @@ export function capacitorPersister() {
                             return false;
                         return true;
                     };
-                    await Promise.all(files.files.map((file) => shouldInclude(`${directoryPath}/${file.name}`)
+                    await Promise.all(files.files.map((file) => _shouldInclude(`${directoryPath}/${file.name}`)
                         ? Filesystem.copy({
                             from: `${directoryPath}/${file.name}`,
                             to: `${outputPath}/${file.name === `localDocs`

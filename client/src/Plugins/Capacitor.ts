@@ -163,7 +163,7 @@ export function capacitorPersister(): Device.Persister {
           };
           await Promise.all(
             files.files.map((file) =>
-              shouldInclude(`${directoryPath}/${file.name}`)
+              _shouldInclude(`${directoryPath}/${file.name}`)
                 ? Filesystem.copy({
                     from: `${directoryPath}/${file.name}`,
                     to: `${outputPath}/${
