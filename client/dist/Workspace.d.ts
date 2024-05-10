@@ -112,10 +112,10 @@ declare function createWorkspaceInterface(config: {
 } | {
     readonly isNone: true;
     readonly createWorkspace: () => Promise<void>;
-    readonly refreshToken: () => Promise<void>;
     readonly joinWorkspace: (props: {
         inviteCode: string;
     }) => Promise<void>;
+    readonly refreshToken: () => Promise<void>;
     readonly isCreating: boolean;
     readonly isJoining: boolean;
 } | ({

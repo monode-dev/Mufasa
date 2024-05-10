@@ -322,9 +322,6 @@ function createWorkspaceInterface(config: {
         isCreatingWorkspace.value = false;
         if (error !== null) throw error;
       },
-      async refreshToken() {
-        await workspaceIntegration.refreshToken();
-      },
       async joinWorkspace(props: { inviteCode: string }) {
         isJoiningWorkspace.value = true;
         let error: any = null;
@@ -338,6 +335,9 @@ function createWorkspaceInterface(config: {
         }
         isJoiningWorkspace.value = false;
         if (error !== null) throw error;
+      },
+      async refreshToken() {
+        await workspaceIntegration.refreshToken();
       },
       get isCreating() {
         return isCreatingWorkspace.value;

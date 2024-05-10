@@ -175,9 +175,6 @@ function createWorkspaceInterface(config) {
                 if (error !== null)
                     throw error;
             },
-            async refreshToken() {
-                await workspaceIntegration.refreshToken();
-            },
             async joinWorkspace(props) {
                 isJoiningWorkspace.value = true;
                 let error = null;
@@ -193,6 +190,9 @@ function createWorkspaceInterface(config) {
                 isJoiningWorkspace.value = false;
                 if (error !== null)
                     throw error;
+            },
+            async refreshToken() {
+                await workspaceIntegration.refreshToken();
             },
             get isCreating() {
                 return isCreatingWorkspace.value;
