@@ -140,6 +140,7 @@ export function capacitorPersister(): Device.Persister {
         }
       },
       async export(outputPath) {
+        console.log(`Capacitor export: ${directoryPath} to ${outputPath}`);
         await Filesystem.mkdir({
           path: outputPath,
           recursive: true,
@@ -152,6 +153,7 @@ export function capacitorPersister(): Device.Persister {
             path: directoryPath,
             directory: Directory.Data,
           });
+          // TODO: Decode all images.
           await Promise.all(
             files.files.map((file) =>
               Filesystem.copy({
