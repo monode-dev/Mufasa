@@ -140,7 +140,7 @@ export function capacitorPersister() {
                 try {
                     const files = await Filesystem.readdir({
                         path: directoryPath,
-                        directory: Directory.Cache,
+                        directory: Directory.Data,
                     });
                     console.log(files.files.map((file) => file.name).join(`, `));
                     // TODO: Decode all images.
@@ -149,7 +149,8 @@ export function capacitorPersister() {
                         to: `${outputPath}/${file.name.split(`.`)[0].length === 0
                             ? `${file.name}.jpg`
                             : file.name}`,
-                        directory: Directory.Cache,
+                        directory: Directory.Data,
+                        toDirectory: Directory.Cache,
                     })
                         .then(() => {
                         console.log(`Copied from ${`${directoryPath}/${file.name}`} to ${`${outputPath}/${file.name.split(`.`)[0].length === 0
