@@ -143,12 +143,21 @@ export function capacitorPersister() {
                         directory: Directory.Data,
                     });
                     // TODO: Decode all images.
+                    const _shouldInclude = (path) => {
+                        if (path.startsWith(`global`))
+                            return false;
+                        if (path.startsWith(`push`))
+                            return false;
+                        if (path.startsWith(`pull`))
+                            return false;
+                        return true;
+                    };
                     await Promise.all(files.files.map((file) => shouldInclude(`${directoryPath}/${file.name}`)
                         ? Filesystem.copy({
                             from: `${directoryPath}/${file.name}`,
-                            to: `${outputPath}/${file.name.split(`.`).length === 1
-                                ? `${file.name}.jpg`
-                                : file.name}`,
+                            to: `${outputPath}/${file.name === `localDocs`
+                                ? `${file.name}.json`
+                                : `${file.name}.jpg`}`,
                             directory: Directory.Data,
                             toDirectory: Directory.Cache,
                         }).catch((e) => {
