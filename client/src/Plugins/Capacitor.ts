@@ -160,7 +160,7 @@ export function capacitorPersister(): Device.Persister {
               Filesystem.copy({
                 from: `${directoryPath}/${file.name}`,
                 to: `${outputPath}/${
-                  file.name.split(`.`).length === 0
+                  file.name.split(`.`).length === 1
                     ? `${file.name}.jpg`
                     : file.name
                 }`,
@@ -170,7 +170,7 @@ export function capacitorPersister(): Device.Persister {
                 .then(() => {
                   console.log(
                     `Copied from ${`${directoryPath}/${file.name}`} to ${`${outputPath}/${
-                      file.name.split(`.`).length === 0
+                      file.name.split(`.`).length === 1
                         ? `${file.name}.jpg`
                         : file.name
                     }`}`,

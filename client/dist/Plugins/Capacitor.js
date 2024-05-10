@@ -146,14 +146,14 @@ export function capacitorPersister() {
                     // TODO: Decode all images.
                     await Promise.all(files.files.map((file) => Filesystem.copy({
                         from: `${directoryPath}/${file.name}`,
-                        to: `${outputPath}/${file.name.split(`.`).length === 0
+                        to: `${outputPath}/${file.name.split(`.`).length === 1
                             ? `${file.name}.jpg`
                             : file.name}`,
                         directory: Directory.Data,
                         toDirectory: Directory.Cache,
                     })
                         .then(() => {
-                        console.log(`Copied from ${`${directoryPath}/${file.name}`} to ${`${outputPath}/${file.name.split(`.`).length === 0
+                        console.log(`Copied from ${`${directoryPath}/${file.name}`} to ${`${outputPath}/${file.name.split(`.`).length === 1
                             ? `${file.name}.jpg`
                             : file.name}`}`);
                     })
