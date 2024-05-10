@@ -51,6 +51,7 @@ export declare namespace Device {
         deleteFile: (fileId: string) => Promise<void>;
         stop: () => void;
         deleteDirectory: () => Promise<void>;
+        export: (outputPath: string) => Promise<void>;
     };
     type JsonPersister = {
         readonly load: <T extends Json>(initValue: T) => Device.SavedJson<T>;
@@ -173,6 +174,7 @@ export declare function initializeStoreBank(bankConfig: {
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
             readonly getHaveCompletedFirstSync: () => boolean;
+            readonly export: (path: string) => Promise<void>;
         } : {
             docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
@@ -198,6 +200,7 @@ export declare function initializeStoreBank(bankConfig: {
                 readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
                 readonly getAllDocs: () => string[];
                 readonly getHaveCompletedFirstSync: () => boolean;
+                readonly export: (path: string) => Promise<void>;
             };
             stop(): Promise<void>;
             pushCreate(params: {
@@ -407,6 +410,7 @@ export declare function initializeStoreBank(bankConfig: {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
         readonly getHaveCompletedFirstSync: () => boolean;
+        readonly export: (path: string) => Promise<void>;
     } : {
         docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
@@ -432,6 +436,7 @@ export declare function initializeStoreBank(bankConfig: {
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
             readonly getHaveCompletedFirstSync: () => boolean;
+            readonly export: (path: string) => Promise<void>;
         };
         stop(): Promise<void>;
         pushCreate(params: {
@@ -630,5 +635,6 @@ export declare function createDocStore(config: DocStoreParams): {
     readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
     readonly getAllDocs: () => string[];
     readonly getHaveCompletedFirstSync: () => boolean;
+    readonly export: (path: string) => Promise<void>;
 };
 export {};

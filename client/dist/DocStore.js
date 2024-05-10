@@ -41,6 +41,7 @@ export var Device;
         deleteFile: async () => { },
         stop: () => { },
         deleteDirectory: async () => { },
+        export: async () => { },
     };
 })(Device || (Device = {}));
 // SECTION: Global Doc Persister Types
@@ -377,6 +378,9 @@ export function createDocStore(config) {
         getAllDocs: config.sessionTablePersister.getAllDocs,
         getHaveCompletedFirstSync() {
             return haveCompletedFirstSync.value;
+        },
+        async export(path) {
+            await config.deviceDirectoryPersister.export(path);
         },
     };
 }

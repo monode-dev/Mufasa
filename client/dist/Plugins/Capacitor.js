@@ -128,6 +128,22 @@ export function capacitorPersister() {
                     console.warn(e);
                 }
             },
+            async export(outputPath) {
+                await Filesystem.mkdir({
+                    path: outputPath,
+                    recursive: true,
+                    directory: Directory.Data,
+                });
+                const files = await Filesystem.readdir({
+                    path: directoryPath,
+                    directory: Directory.Data,
+                });
+                await Promise.all(files.files.map((file) => Filesystem.copy({
+                    from: `${directoryPath}/${file.name}`,
+                    to: `${outputPath}/${file.name}`,
+                    directory: Directory.Data,
+                })));
+            },
         };
     };
 }

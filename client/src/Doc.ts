@@ -234,6 +234,10 @@ export class Doc {
     ) as any;
   }
 
+  static async export(path: string) {
+    return await this._docStore.export(path);
+  }
+
   /** Override to run code just before an object is deleted. */
   onDelete() {}
 

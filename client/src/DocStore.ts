@@ -72,6 +72,7 @@ export namespace Device {
     deleteFile: (fileId: string) => Promise<void>;
     stop: () => void;
     deleteDirectory: () => Promise<void>;
+    export: (outputPath: string) => Promise<void>;
   };
   export type JsonPersister = {
     readonly load: <T extends Json>(initValue: T) => Device.SavedJson<T>;
@@ -93,6 +94,7 @@ export namespace Device {
     deleteFile: async () => {},
     stop: () => {},
     deleteDirectory: async () => {},
+    export: async () => {},
   };
   export type SavedJson<T extends Json> = {
     readonly loadedFromLocalStorage: Promise<void>;
@@ -656,6 +658,10 @@ export function createDocStore(config: DocStoreParams) {
 
     getHaveCompletedFirstSync() {
       return haveCompletedFirstSync.value;
+    },
+
+    async export(path: string) {
+      await config.deviceDirectoryPersister.export(path);
     },
   } as const;
 }

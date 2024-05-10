@@ -60,6 +60,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
                     readonly getHaveCompletedFirstSync: () => boolean;
+                    readonly export: (path: string) => Promise<void>;
                 };
                 stop(): Promise<void>;
                 pushCreate(params: {
@@ -274,6 +275,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
                 readonly getHaveCompletedFirstSync: () => boolean;
+                readonly export: (path: string) => Promise<void>;
             };
             readonly docId: string;
             readonly isDeleted: boolean;
@@ -304,6 +306,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
                 readonly getHaveCompletedFirstSync: () => boolean;
+                readonly export: (path: string) => Promise<void>;
             };
             stop(): Promise<void>;
             pushCreate(params: {
@@ -513,6 +516,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
             readonly getHaveCompletedFirstSync: () => boolean;
+            readonly export: (path: string) => Promise<void>;
         };
         createFromBase64String(base64String: string): Promise<{
             readonly _fileStore: {
@@ -540,6 +544,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                     readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                     readonly getAllDocs: () => string[];
                     readonly getHaveCompletedFirstSync: () => boolean;
+                    readonly export: (path: string) => Promise<void>;
                 };
                 stop(): Promise<void>;
                 pushCreate(params: {
@@ -754,6 +759,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
                 readonly getAllDocs: () => string[];
                 readonly getHaveCompletedFirstSync: () => boolean;
+                readonly export: (path: string) => Promise<void>;
             };
             readonly docId: string;
             readonly isDeleted: boolean;
@@ -771,6 +777,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
         getHaveCompletedFirstSync<T_1 extends typeof import("./Doc.js").Doc>(this: T_1): boolean;
         _fromId<T_2 extends typeof import("./Doc.js").Doc>(this: T_2, docId: string): InstanceType<T_2>;
         create<T_3 extends typeof import("./Doc.js").Doc>(this: T_3, ...overrideProps: Parameters<(import("./Utils.js").PickFlagged<InstanceType<T_3>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) extends infer T_4 ? T_4 extends (import("./Utils.js").PickFlagged<InstanceType<T_3>, typeof import("./Doc.js").RequiredPropFlag> extends never ? true : false) ? T_4 extends true ? (prop?: ({ [K in import("./Utils.js").PickFlagged<InstanceType<T_3>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_3>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_3>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_3>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) | undefined) => void : (prop: { [K in import("./Utils.js").PickFlagged<InstanceType<T_3>, typeof import("./Doc.js").RequiredPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_3>[K], typeof import("./Doc.js").RequiredPropFlag>; } & Partial<{ [K_1 in import("./Utils.js").PickFlagged<InstanceType<T_3>, typeof import("./Doc.js").OptionalPropFlag>]: import("./Utils.js").StripFlag<InstanceType<T_3>[K_1], typeof import("./Doc.js").OptionalPropFlag>; }>) => void : never : never>): InstanceType<T_3>;
+        export(path: string): Promise<void>;
     };
     readonly isUploadingToCloud: boolean;
     readonly isDownloadingFromCloud: "maybe" | "definitely";
