@@ -133,6 +133,7 @@ export function capacitorPersister(): Device.Persister {
           await Filesystem.rmdir({
             path: directoryPath,
             directory: Directory.Data,
+            // recursive: true,
           });
           console.log(`Deleted directory: ${directoryPath}`);
         } catch (e) {
@@ -140,7 +141,6 @@ export function capacitorPersister(): Device.Persister {
         }
       },
       async export(outputPath) {
-        console.log(`Capacitor export: ${directoryPath} to ${outputPath}`);
         await Filesystem.mkdir({
           path: outputPath,
           recursive: true,
@@ -166,19 +166,9 @@ export function capacitorPersister(): Device.Persister {
                 }`,
                 directory: Directory.Data,
                 toDirectory: Directory.Cache,
-              })
-                .then(() => {
-                  console.log(
-                    `Copied from ${`${directoryPath}/${file.name}`} to ${`${outputPath}/${
-                      file.name.split(`.`).length === 1
-                        ? `${file.name}.jpg`
-                        : file.name
-                    }`}`,
-                  );
-                })
-                .catch((e) => {
-                  console.warn(e);
-                }),
+              }).catch((e) => {
+                console.warn(e);
+              }),
             ),
           );
         } catch (e) {
