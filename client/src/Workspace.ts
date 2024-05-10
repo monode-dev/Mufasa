@@ -436,21 +436,21 @@ function createWorkspaceInterface(config: {
                 });
               },
               async deleteWorkspace() {
-                isLeavingWorkspace.value = true;
+                isDeletingWorkspace.value = true;
                 await workspaceIntegration.deleteWorkspace({
                   stage: config.stage,
                 });
-                isLeavingWorkspace.value = false;
+                isDeletingWorkspace.value = false;
               },
             }
           : {
               role: userMetadata.role,
               async leaveWorkspace() {
-                isDeletingWorkspace.value = true;
+                isLeavingWorkspace.value = true;
                 await workspaceIntegration.leaveWorkspace({
                   stage: config.stage,
                 });
-                isDeletingWorkspace.value = false;
+                isLeavingWorkspace.value = false;
               },
             },
       ).value;
