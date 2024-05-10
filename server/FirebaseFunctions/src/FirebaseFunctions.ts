@@ -215,6 +215,7 @@ export function initializeMufasaFunctions({
           "Only the owner can delete the workspace.",
         );
       log("deleting", request.auth.token.workspaceId);
+      // TODO: If there is a subscription, email the owner a link to cancel the subscription.
       // Get all members
       const members = await firestore
         .collection(`${getStage(request.data.stage)}-UserMetadata`)

@@ -29,7 +29,7 @@ export declare const getStoreBank: () => {
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
             readonly getHaveCompletedFirstSync: () => boolean;
-            readonly export: (path: string) => Promise<void>;
+            readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
         } : {
             docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
@@ -55,7 +55,7 @@ export declare const getStoreBank: () => {
                 readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
                 readonly getAllDocs: () => string[];
                 readonly getHaveCompletedFirstSync: () => boolean;
-                readonly export: (path: string) => Promise<void>;
+                readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
             };
             stop(): Promise<void>;
             pushCreate(params: {
@@ -265,7 +265,7 @@ export declare const getStoreBank: () => {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
         readonly getHaveCompletedFirstSync: () => boolean;
-        readonly export: (path: string) => Promise<void>;
+        readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
     } : {
         docStore: {
             readonly loadedFromLocalStorage: Promise<void>;
@@ -291,7 +291,7 @@ export declare const getStoreBank: () => {
             readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
             readonly getAllDocs: () => string[];
             readonly getHaveCompletedFirstSync: () => boolean;
-            readonly export: (path: string) => Promise<void>;
+            readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
         };
         stop(): Promise<void>;
         pushCreate(params: {
@@ -520,7 +520,7 @@ export declare class Doc {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
         readonly getHaveCompletedFirstSync: () => boolean;
-        readonly export: (path: string) => Promise<void>;
+        readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
     };
     get _docStore(): {
         readonly loadedFromLocalStorage: Promise<void>;
@@ -546,7 +546,7 @@ export declare class Doc {
         readonly getProp: (id: string, key: string, initValue: PrimVal | (() => PrimVal)) => PrimVal;
         readonly getAllDocs: () => string[];
         readonly getHaveCompletedFirstSync: () => boolean;
-        readonly export: (path: string) => Promise<void>;
+        readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
     };
     static customize<This extends typeof Doc>(this: This, customizations: {
         docType?: string;
@@ -558,7 +558,7 @@ export declare class Doc {
     static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean;
     static _fromId<T extends typeof Doc>(this: T, docId: string): InstanceType<T>;
     static create<T extends typeof Doc>(this: T, ...overrideProps: CreateParams<T>): InstanceType<T>;
-    static export(path: string): Promise<void>;
+    static export(path: string, shouldInclude?: (path: string) => boolean): Promise<void>;
     /** Override to run code just before an object is deleted. */
     onDelete(): void;
     /** Permanently deletes this object. */

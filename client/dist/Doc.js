@@ -165,8 +165,8 @@ export class Doc {
     static create(...overrideProps) {
         return _initializeInst(new this(), overrideProps[0] ?? {}, this._docStore.createDoc);
     }
-    static async export(path) {
-        return await this._docStore.export(path);
+    static async export(path, shouldInclude) {
+        return await this._docStore.export(path, shouldInclude);
     }
     /** Override to run code just before an object is deleted. */
     onDelete() { }

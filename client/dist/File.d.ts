@@ -34,7 +34,7 @@ declare class File extends Doc {
             readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
             readonly getAllDocs: () => string[];
             readonly getHaveCompletedFirstSync: () => boolean;
-            readonly export: (path: string) => Promise<void>;
+            readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
         };
         stop(): Promise<void>;
         pushCreate(params: {
@@ -244,7 +244,7 @@ declare class File extends Doc {
         readonly getProp: (id: string, key: string, initValue: import("./DocStore.js").PrimVal | (() => import("./DocStore.js").PrimVal)) => import("./DocStore.js").PrimVal;
         readonly getAllDocs: () => string[];
         readonly getHaveCompletedFirstSync: () => boolean;
-        readonly export: (path: string) => Promise<void>;
+        readonly export: (path: string, shouldInclude?: ((filePath: string) => boolean) | undefined) => Promise<void>;
     };
     readonly fileIsUploaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
     readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;

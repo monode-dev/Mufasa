@@ -140,7 +140,7 @@ export function capacitorPersister(): Device.Persister {
           console.warn(e);
         }
       },
-      async export(outputPath) {
+      async export(outputPath, shouldInclude) {
         await Filesystem.mkdir({
           path: outputPath,
           recursive: true,
@@ -156,18 +156,20 @@ export function capacitorPersister(): Device.Persister {
           // TODO: Decode all images.
           await Promise.all(
             files.files.map((file) =>
-              Filesystem.copy({
-                from: `${directoryPath}/${file.name}`,
-                to: `${outputPath}/${
-                  file.name.split(`.`).length === 1
-                    ? `${file.name}.jpg`
-                    : file.name
-                }`,
-                directory: Directory.Data,
-                toDirectory: Directory.Cache,
-              }).catch((e) => {
-                console.warn(e);
-              }),
+              shouldInclude(`${directoryPath}/${file.name}`)
+                ? Filesystem.copy({
+                    from: `${directoryPath}/${file.name}`,
+                    to: `${outputPath}/${
+                      file.name.split(`.`).length === 1
+                        ? `${file.name}.jpg`
+                        : file.name
+                    }`,
+                    directory: Directory.Data,
+                    toDirectory: Directory.Cache,
+                  }).catch((e) => {
+                    console.warn(e);
+                  })
+                : Promise.resolve(),
             ),
           );
         } catch (e) {

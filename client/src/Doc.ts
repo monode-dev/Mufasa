@@ -234,8 +234,8 @@ export class Doc {
     ) as any;
   }
 
-  static async export(path: string) {
-    return await this._docStore.export(path);
+  static async export(path: string, shouldInclude?: (path: string) => boolean) {
+    return await this._docStore.export(path, shouldInclude);
   }
 
   /** Override to run code just before an object is deleted. */

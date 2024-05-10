@@ -379,8 +379,8 @@ export function createDocStore(config) {
         getHaveCompletedFirstSync() {
             return haveCompletedFirstSync.value;
         },
-        async export(path) {
-            await config.deviceDirectoryPersister.export(path);
+        async export(path, shouldInclude) {
+            await config.deviceDirectoryPersister.export(path, shouldInclude ?? (() => true));
         },
     };
 }
