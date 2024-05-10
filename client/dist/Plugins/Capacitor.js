@@ -144,11 +144,12 @@ export function capacitorPersister() {
                     });
                     // TODO: Decode all images.
                     const _shouldInclude = (path) => {
-                        if (path.startsWith(`global`))
+                        const fileName = path.split(`/`).pop();
+                        if (fileName.startsWith(`global`))
                             return false;
-                        if (path.startsWith(`push`))
+                        if (fileName.startsWith(`push`))
                             return false;
-                        if (path.startsWith(`pull`))
+                        if (fileName.startsWith(`pull`))
                             return false;
                         return true;
                     };

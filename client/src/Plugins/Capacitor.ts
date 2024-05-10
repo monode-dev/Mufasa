@@ -155,9 +155,10 @@ export function capacitorPersister(): Device.Persister {
           });
           // TODO: Decode all images.
           const _shouldInclude = (path: string) => {
-            if (path.startsWith(`global`)) return false;
-            if (path.startsWith(`push`)) return false;
-            if (path.startsWith(`pull`)) return false;
+            const fileName = path.split(`/`).pop()!;
+            if (fileName.startsWith(`global`)) return false;
+            if (fileName.startsWith(`push`)) return false;
+            if (fileName.startsWith(`pull`)) return false;
             return true;
           };
           await Promise.all(
