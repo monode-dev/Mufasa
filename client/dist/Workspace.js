@@ -127,6 +127,7 @@ function createWorkspaceInterface(config) {
     const isCreatingWorkspace = useProp(false);
     const isJoiningWorkspace = useProp(false);
     const isLeavingWorkspace = useProp(false);
+    const isDeletingWorkspace = useProp(false);
     const PendingAsJson = null;
     const NoneAsJson = 0;
     const userMetadata = doNow(() => {
@@ -243,6 +244,9 @@ function createWorkspaceInterface(config) {
                 get isLeaving() {
                     return isLeavingWorkspace.value;
                 },
+                get isDeleting() {
+                    return isDeletingWorkspace.value;
+                },
                 async refreshToken() {
                     await workspaceIntegration.refreshToken();
                 },
@@ -286,11 +290,11 @@ function createWorkspaceInterface(config) {
                 : {
                     role: userMetadata.role,
                     async leaveWorkspace() {
-                        isLeavingWorkspace.value = true;
+                        isDeletingWorkspace.value = true;
                         await workspaceIntegration.leaveWorkspace({
                             stage: config.stage,
                         });
-                        isLeavingWorkspace.value = false;
+                        isDeletingWorkspace.value = false;
                     },
                 }).value;
             Object.keys(roleBasedProps).forEach((key) => {

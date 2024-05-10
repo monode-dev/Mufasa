@@ -126,6 +126,7 @@ declare function createWorkspaceInterface(config: {
     readonly otherMembers: Member[];
     readonly workspaceEntitlements: string[];
     readonly isLeaving: boolean;
+    readonly isDeleting: boolean;
     refreshToken(): Promise<void>;
 } & (({
     isOwner: boolean;
