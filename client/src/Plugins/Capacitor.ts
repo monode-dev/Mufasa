@@ -167,9 +167,17 @@ export function capacitorPersister(): Device.Persister {
                   data,
                   directory: Directory.Data,
                   encoding: Encoding.UTF8,
-                }).catch((e) => {
-                  console.warn(e);
-                });
+                })
+                  .then(() => {
+                    console.log(
+                      `Exported: ${
+                        file.name
+                      } to ${`${outputPath}/${file.name}`}`,
+                    );
+                  })
+                  .catch((e) => {
+                    console.warn(e);
+                  });
               }),
             ),
           );
