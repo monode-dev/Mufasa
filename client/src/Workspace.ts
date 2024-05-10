@@ -33,6 +33,7 @@ export type WorkspaceIntegration = {
     workspaceId: string,
     handle: (entitlements: string[]) => void,
   ) => void;
+  refreshToken: () => Promise<void>;
   generateInviteCode: () => Promise<string>;
   createWorkspace: (params: { stage: string }) => Promise<void>;
   createWorkspaceInterface: (params: {

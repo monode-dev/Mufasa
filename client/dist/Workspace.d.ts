@@ -21,6 +21,7 @@ export type WorkspaceIntegration = {
     onUserMetadata: (handle: (metadata: UserMetadata | null) => void) => () => void;
     watchMembers: (workspaceId: string, handle: (members: Member[]) => void) => void;
     watchEntitlements: (workspaceId: string, handle: (entitlements: string[]) => void) => void;
+    refreshToken: () => Promise<void>;
     generateInviteCode: () => Promise<string>;
     createWorkspace: (params: {
         stage: string;

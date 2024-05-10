@@ -244,6 +244,9 @@ export function firebaseWorkspace(config) {
             }
             return result;
         },
+        async refreshToken() {
+            await config.refreshCustomClaims();
+        },
         async joinWorkspace(params) {
             const result = (await httpsCallable(config.firebaseFunctions, "joinWorkspace")(params)).data;
             try {

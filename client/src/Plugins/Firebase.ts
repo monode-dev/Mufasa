@@ -427,6 +427,9 @@ export function firebaseWorkspace(config: {
       }
       return result;
     },
+    async refreshToken() {
+      await config.refreshCustomClaims();
+    },
     async joinWorkspace(params: { inviteCode: string; stage: string }) {
       const result = (
         await httpsCallable<{ inviteCode: string; stage: string }, void>(
