@@ -180,7 +180,7 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
                 });
             }));
             await firestore
-                .doc(`${getStage(request.data.stage)}-Workspace/${request.auth.token.workspaceId}`)
+                .doc(`${getStage(request.data.stage)}-Workspaces/${request.auth.token.workspaceId}`)
                 .delete();
             await storage.bucket().deleteFiles({
                 prefix: `/Prod-Workspace-Files/${request.auth.token.workspaceId}/`,

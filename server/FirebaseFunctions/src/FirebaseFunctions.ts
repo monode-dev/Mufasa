@@ -234,7 +234,7 @@ export function initializeMufasaFunctions({
       );
       await firestore
         .doc(
-          `${getStage(request.data.stage)}-Workspace/${
+          `${getStage(request.data.stage)}-Workspaces/${
             request.auth.token.workspaceId
           }`,
         )
