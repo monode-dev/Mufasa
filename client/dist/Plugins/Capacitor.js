@@ -144,12 +144,19 @@ export function capacitorPersister() {
                     });
                     console.log(files.files.map((file) => file.name).join(`, `));
                     // TODO: Decode all images.
-                    await Promise.all(files.files.map((file) => Filesystem.copy({
-                        from: `${directoryPath}/${file.name}`,
-                        to: `${outputPath}/${file.name}`,
+                    await Promise.all(files.files.map((file) => Filesystem.readFile({
+                        path: `${directoryPath}/${file.name}`,
                         directory: Directory.Data,
-                    }).catch((e) => {
-                        console.warn(e);
+                        encoding: Encoding.UTF8,
+                    }).then(({ data }) => {
+                        Filesystem.writeFile({
+                            path: `${outputPath}/${file.name}`,
+                            data,
+                            directory: Directory.Data,
+                            encoding: Encoding.UTF8,
+                        }).catch((e) => {
+                            console.warn(e);
+                        });
                     })));
                 }
                 catch (e) {
