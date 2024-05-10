@@ -153,7 +153,6 @@ export function capacitorPersister(): Device.Persister {
             path: directoryPath,
             directory: Directory.Data,
           });
-          console.log(files.files.map((file) => file.name).join(`, `));
           // TODO: Decode all images.
           await Promise.all(
             files.files.map((file) =>
