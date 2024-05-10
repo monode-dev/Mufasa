@@ -240,7 +240,7 @@ export function initializeMufasaFunctions({
         )
         .delete();
       await storage.bucket().deleteFiles({
-        prefix: `Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
+        prefix: `/Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
       });
       return {};
     }),

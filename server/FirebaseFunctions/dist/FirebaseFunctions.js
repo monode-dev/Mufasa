@@ -163,6 +163,7 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
             if (request.auth.token.role !== `owner`)
                 throw new https_1.HttpsError(`permission-denied`, "Only the owner can delete the workspace.");
             (0, logger_1.log)("deleting", request.auth.token.workspaceId);
+            // TODO: If there is a subscription, email the owner a link to cancel the subscription.
             // Get all members
             const members = await firestore
                 .collection(`${getStage(request.data.stage)}-UserMetadata`)
@@ -182,7 +183,7 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
                 .doc(`${getStage(request.data.stage)}-Workspace/${request.auth.token.workspaceId}`)
                 .delete();
             await storage.bucket().deleteFiles({
-                prefix: `Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
+                prefix: `/Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
             });
             return {};
         }),
