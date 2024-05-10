@@ -11,11 +11,12 @@ const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
 const uuid_1 = require("uuid");
 const logger_1 = require("firebase-functions/logger");
-function initializeMufasaFunctions({ firestore, auth, }) {
+function initializeMufasaFunctions({ firestore, auth, storage, }) {
     // SECTION: Utils
     const callableOptions = {
         cors: true,
         ingressSettings: "ALLOW_ALL",
+        timeoutSeconds: 20 * 60,
     };
     function getStage(stage) {
         return stage !== null && stage !== void 0 ? stage : `Dev`;
@@ -139,7 +140,9 @@ function initializeMufasaFunctions({ firestore, auth, }) {
                 throw new https_1.HttpsError(`permission-denied`, "Only the owner can remove members.");
             if (typeof request.data.uid !== `string`)
                 throw new https_1.HttpsError(`invalid-argument`, "uid is required.");
-            const userDoc = await firestore.doc(`${getStage(request.data.stage)}-UserMetadata/${request.data.uid}`).get();
+            const userDoc = await firestore
+                .doc(`${getStage(request.data.stage)}-UserMetadata/${request.data.uid}`)
+                .get();
             if (!userDoc.exists)
                 throw new https_1.HttpsError(`not-found`, "User not found.");
             if (((_a = userDoc.data()) === null || _a === void 0 ? void 0 : _a.workspaceId) !== request.auth.token.workspaceId)
@@ -152,7 +155,37 @@ function initializeMufasaFunctions({ firestore, auth, }) {
             });
             return {};
         }),
-        // TODO: deleteWorkspace
+        deleteWorkspace: (0, https_1.onCall)(callableOptions, async (request) => {
+            if (request.auth === undefined)
+                throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
+            if (request.auth.token.workspaceId === null)
+                throw new https_1.HttpsError(`not-found`, "You are not in a workspace to delete.");
+            if (request.auth.token.role !== `owner`)
+                throw new https_1.HttpsError(`permission-denied`, "Only the owner can delete the workspace.");
+            (0, logger_1.log)("deleting", request.auth.token.workspaceId);
+            // Get all members
+            const members = await firestore
+                .collection(`${getStage(request.data.stage)}-UserMetadata`)
+                .where("workspaceId", "==", request.auth.token.workspaceId)
+                .get();
+            // Remove all members
+            await Promise.all(members.docs.map(async (member) => {
+                var _a;
+                await setUserWorkspace({
+                    uid: member.id,
+                    workspaceId: null,
+                    email: (_a = member.data().email) !== null && _a !== void 0 ? _a : null,
+                    stage: request.data.stage,
+                });
+            }));
+            await firestore
+                .doc(`${getStage(request.data.stage)}-Workspace/${request.auth.token.workspaceId}`)
+                .delete();
+            await storage.bucket().deleteFiles({
+                prefix: `Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
+            });
+            return {};
+        }),
     };
 }
 exports.initializeMufasaFunctions = initializeMufasaFunctions;
