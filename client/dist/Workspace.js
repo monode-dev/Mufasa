@@ -275,11 +275,13 @@ function createWorkspaceInterface(config) {
                             uid: params.uid,
                         });
                     },
-                    // async deleteWorkspace() {
-                    //   isLeavingWorkspace.value = true;
-                    //   await workspaceIntegration.deleteWorkspace();
-                    //   isLeavingWorkspace.value = false;
-                    // },
+                    async deleteWorkspace() {
+                        isLeavingWorkspace.value = true;
+                        await workspaceIntegration.deleteWorkspace({
+                            stage: config.stage,
+                        });
+                        isLeavingWorkspace.value = false;
+                    },
                 }
                 : {
                     role: userMetadata.role,

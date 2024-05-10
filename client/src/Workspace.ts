@@ -45,9 +45,9 @@ export type WorkspaceIntegration = {
     inviteCode: string;
     stage: string;
   }) => Promise<void>;
-  leaveWorkspace: (params: { stage: string } | undefined) => Promise<void>;
+  leaveWorkspace: (params: { stage: string }) => Promise<void>;
   removeMember: (params: { stage: string; uid: string }) => Promise<void>;
-  // deleteWorkspace: (params: { stage: string } | undefined) => Promise<void>;
+  deleteWorkspace: (params: { stage: string }) => Promise<void>;
 };
 
 // SECTION: Cloud Auth
@@ -432,11 +432,13 @@ function createWorkspaceInterface(config: {
                   uid: params.uid,
                 });
               },
-              // async deleteWorkspace() {
-              //   isLeavingWorkspace.value = true;
-              //   await workspaceIntegration.deleteWorkspace();
-              //   isLeavingWorkspace.value = false;
-              // },
+              async deleteWorkspace() {
+                isLeavingWorkspace.value = true;
+                await workspaceIntegration.deleteWorkspace({
+                  stage: config.stage,
+                });
+                isLeavingWorkspace.value = false;
+              },
             }
           : {
               role: userMetadata.role,
