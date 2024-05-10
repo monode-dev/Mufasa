@@ -32,7 +32,7 @@ export function createPersistedFunction(localJsonFilePersister, func) {
                 }
                 else {
                     console.log(`Finished ${savedJson.fileName} instance: ${instanceId}`);
-                    savedJson.batchUpdate((data) => {
+                    await savedJson.batchUpdate((data) => {
                         delete data.value.activeFunctions[instanceId];
                     });
                 }
@@ -58,12 +58,15 @@ export function createPersistedFunction(localJsonFilePersister, func) {
         }
         Object.keys(savedJson.data.activeFunctions).forEach(doNextStep);
     }
-    return Object.assign(async (...args) => {
-        const instanceId = uuidv4();
-        savedJson.batchUpdate(async (data) => {
-            data.value.activeFunctions[instanceId] = { step: 0, args };
+    return Object.assign((...args) => {
+        doNow(async () => {
+            const instanceId = uuidv4();
+            await savedJson.batchUpdate(async (data) => {
+                data.value.activeFunctions[instanceId] = { step: 0, args };
+            });
+            await doNextStep(instanceId);
         });
-        return await doNextStep(instanceId);
+        return;
     }, {
         pauseAll,
         resumeAll: () => resumeAll({ force: true }),

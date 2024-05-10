@@ -8,6 +8,7 @@ export function createFileStore(config: DocStoreParams) {
   const pullCreate = createPersistedFunction(
     config.deviceDirectoryPersister.jsonFile(`pullCreate`),
     async (fileId: string) => {
+      config.trackDownload();
       if (!isValid(config.cloudWorkspacePersister.downloadFile)) return null;
       const fileData = await config.cloudWorkspacePersister.downloadFile(
         fileId,
@@ -25,13 +26,16 @@ export function createFileStore(config: DocStoreParams) {
         },
         { overwriteGlobally: false },
       );
+      config.untrackDownload();
       return fileId;
     },
   );
   const pullDelete = createPersistedFunction(
     config.deviceDirectoryPersister.jsonFile(`pullDelete`),
     async (fileId: string) => {
+      config.trackDownload();
       await config.deviceDirectoryPersister.deleteFile(fileId);
+      config.untrackDownload();
     },
   );
   const docStore = createDocStore({

@@ -5,7 +5,7 @@ import { doNow } from "./Utils.js";
 type AddStep<PrevIn extends Device.Json[], PrevOut> = {
   addStep: <NewOut>(func: (args: PrevOut) => Promise<NewOut>) => ((
     ...args: PrevIn
-  ) => Promise<NewOut>) & {
+  ) => void) & {
     pauseAll: () => Promise<void>;
     resumeAll: () => Promise<void>;
   } & AddStep<PrevIn, NewOut>;
@@ -52,7 +52,7 @@ export function createPersistedFunction<Params extends Device.Json[], Return>(
           await doNextStep(instanceId);
         } else {
           console.log(`Finished ${savedJson.fileName} instance: ${instanceId}`);
-          savedJson.batchUpdate((data) => {
+          await savedJson.batchUpdate((data) => {
             delete data.value.activeFunctions[instanceId];
           });
         }
@@ -75,12 +75,15 @@ export function createPersistedFunction<Params extends Device.Json[], Return>(
     Object.keys(savedJson.data.activeFunctions).forEach(doNextStep);
   }
   return Object.assign(
-    async (...args: Params) => {
-      const instanceId = uuidv4();
-      savedJson.batchUpdate(async (data) => {
-        data.value.activeFunctions[instanceId] = { step: 0, args };
+    (...args: Params) => {
+      doNow(async () => {
+        const instanceId = uuidv4();
+        await savedJson.batchUpdate(async (data) => {
+          data.value.activeFunctions[instanceId] = { step: 0, args };
+        });
+        await doNextStep(instanceId);
       });
-      return await doNextStep(instanceId);
+      return;
     },
     {
       pauseAll,

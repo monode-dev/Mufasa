@@ -1,6 +1,6 @@
 import { Device } from "./DocStore.js";
 type AddStep<PrevIn extends Device.Json[], PrevOut> = {
-    addStep: <NewOut>(func: (args: PrevOut) => Promise<NewOut>) => ((...args: PrevIn) => Promise<NewOut>) & {
+    addStep: <NewOut>(func: (args: PrevOut) => Promise<NewOut>) => ((...args: PrevIn) => void) & {
         pauseAll: () => Promise<void>;
         resumeAll: () => Promise<void>;
     } & AddStep<PrevIn, NewOut>;

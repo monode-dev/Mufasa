@@ -134,6 +134,8 @@ export function initializeStoreBank(bankConfig) {
                     : Cloud.mockWorkspacePersister,
                 trackUpload: persistance.trackUpload,
                 untrackUpload: persistance.untrackUpload,
+                trackDownload: persistance.trackDownload,
+                untrackDownload: persistance.untrackDownload,
                 onIncomingCreate: persistance.onIncomingCreate ?? (() => { }),
                 onIncomingDelete: persistance.onIncomingDelete ?? (() => { }),
             });
@@ -304,6 +306,7 @@ export function createDocStore(config) {
     // Watch cloud.
     const haveCompletedFirstSync = config.sessionTablePersister.staticProp(false);
     const cloudWatcher = config.cloudWorkspacePersister.setupWatcher((updates) => {
+        config.trackDownload();
         batchUpdate({
             sourceStoreType: Persistance.global,
             newDocsAreOnlyVirtual: false,
@@ -317,6 +320,7 @@ export function createDocStore(config) {
             overwriteGlobally: false,
         });
         haveCompletedFirstSync.value = true;
+        config.untrackDownload();
     }, localJsonPersister.jsonFile(`globalPersisterMetaData`));
     localDocs.loadedFromLocalStorage.then(() => {
         if (!config.cloudWorkspacePersister)

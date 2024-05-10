@@ -56,6 +56,23 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       ),
     };
   });
+  const { trackDownload, untrackDownload, isDownloadingFromCloud } = doNow(
+    () => {
+      const { useProp, useFormula, useRoot } = mfsConfig.sessionPersister;
+      const downloadCount = useProp(0);
+      return {
+        trackDownload() {
+          downloadCount.value++;
+        },
+        untrackDownload() {
+          downloadCount.value--;
+        },
+        isDownloadingFromCloud: useRoot(() =>
+          useFormula(() => (downloadCount.value > 0 ? `definitely` : `maybe`)),
+        ),
+      };
+    },
+  );
   const user = initializeAuth<{}>({
     stage: stage,
     sessionPersister: mfsConfig.sessionPersister,
@@ -90,6 +107,8 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       getWorkspacePersister: mfsConfig.cloudPersister.getWorkspacePersister,
       trackUpload,
       untrackUpload,
+      trackDownload,
+      untrackDownload,
     },
   });
   const fileSetup = initializeSyncedFileClass();
@@ -101,6 +120,9 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
     File: fileSetup.File,
     get isUploadingToCloud() {
       return isUploadingToCloud.value;
+    },
+    get isDownloadingFromCloud() {
+      return isDownloadingFromCloud.value;
     },
   } as const;
 }

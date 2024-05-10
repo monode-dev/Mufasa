@@ -4,6 +4,7 @@ import { isValid } from "./Utils.js";
 import { createPersistedFunction } from "./PersistedFunction.js";
 export function createFileStore(config) {
     const pullCreate = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pullCreate`), async (fileId) => {
+        config.trackDownload();
         if (!isValid(config.cloudWorkspacePersister.downloadFile))
             return null;
         const fileData = await config.cloudWorkspacePersister.downloadFile(fileId);
@@ -18,10 +19,13 @@ export function createFileStore(config) {
                 },
             },
         }, { overwriteGlobally: false });
+        config.untrackDownload();
         return fileId;
     });
     const pullDelete = createPersistedFunction(config.deviceDirectoryPersister.jsonFile(`pullDelete`), async (fileId) => {
+        config.trackDownload();
         await config.deviceDirectoryPersister.deleteFile(fileId);
+        config.untrackDownload();
     });
     const docStore = createDocStore({
         ...config,
