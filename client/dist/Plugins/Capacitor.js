@@ -133,34 +133,31 @@ export function capacitorPersister() {
                 await Filesystem.mkdir({
                     path: outputPath,
                     recursive: true,
-                    directory: Directory.Data,
+                    directory: Directory.Cache,
                 }).catch((e) => {
                     console.warn(e);
                 });
                 try {
                     const files = await Filesystem.readdir({
                         path: directoryPath,
-                        directory: Directory.Data,
+                        directory: Directory.Cache,
                     });
                     console.log(files.files.map((file) => file.name).join(`, `));
                     // TODO: Decode all images.
-                    await Promise.all(files.files.map((file) => Filesystem.readFile({
-                        path: `${directoryPath}/${file.name}`,
-                        directory: Directory.Data,
-                        encoding: Encoding.UTF8,
-                    }).then(({ data }) => {
-                        Filesystem.writeFile({
-                            path: `${outputPath}/${file.name}`,
-                            data,
-                            directory: Directory.Data,
-                            encoding: Encoding.UTF8,
-                        })
-                            .then(() => {
-                            console.log(`Exported: ${file.name} to ${`${outputPath}/${file.name}`}`);
-                        })
-                            .catch((e) => {
-                            console.warn(e);
-                        });
+                    await Promise.all(files.files.map((file) => Filesystem.copy({
+                        from: `${directoryPath}/${file.name}`,
+                        to: `${outputPath}/${file.name.split(`.`)[0].length === 0
+                            ? `${file.name}.jpg`
+                            : file.name}`,
+                        directory: Directory.Cache,
+                    })
+                        .then(() => {
+                        console.log(`Copied from ${`${directoryPath}/${file.name}`} to ${`${outputPath}/${file.name.split(`.`)[0].length === 0
+                            ? `${file.name}.jpg`
+                            : file.name}`}`);
+                    })
+                        .catch((e) => {
+                        console.warn(e);
                     })));
                 }
                 catch (e) {
