@@ -46,6 +46,15 @@ export function firebasePersister<T extends AuthProviders>(
     firebaseFunctions: Functions;
   } & AuthParams<T>,
 ) {
+  const refreshCustomClaims = doNow(() => {
+    let isRefreshing = false;
+    return async () => {
+      if (isRefreshing) return;
+      isRefreshing = true;
+      await firebaseConfig.firebaseAuth.currentUser?.getIdToken(true);
+      isRefreshing = false;
+    };
+  });
   return {
     getCloudAuth({ onAuthStateChanged, stage }) {
       return firebaseAuthIntegration({
@@ -56,6 +65,7 @@ export function firebasePersister<T extends AuthProviders>(
           `${stage}-WorkspaceInvites`,
         ),
         onAuthStateChanged,
+        refreshCustomClaims,
       });
     },
     getWorkspacePersister: (setup) =>
@@ -69,6 +79,7 @@ export function firebasePersister<T extends AuthProviders>(
           ),
           queryConstraints: [],
         },
+        refreshCustomClaims,
         isValid(firebaseConfig.firebaseStorage)
           ? (fileId) =>
               storageRef(
@@ -86,6 +97,7 @@ export function workspacePersister(
     collectionRef: CollectionReference;
     queryConstraints: QueryFilterConstraint[];
   },
+  refreshCustomClaims: () => Promise<void>,
   getStorageRef?: (fileId: string) => StorageReference,
 ): Cloud.WorkspacePersister {
   const CHANGE_DATE_KEY = `mx_changeDate`;
@@ -163,6 +175,10 @@ export function workspacePersister(
                 (error) => {
                   isProcessingSnapshot = false;
                   disposeSnapshot = undefined;
+
+                  if (error.code === "permission-denied") {
+                    refreshCustomClaims();
+                  }
                   setTimeout(runWatcher, 500);
                   console.warn(`Encountered error: ${error}`);
                 },
@@ -220,7 +236,11 @@ export function workspacePersister(
 // SECTION: Auth
 type AuthParams<T extends AuthProviders> = Omit<
   Parameters<typeof firebaseAuthIntegration<T>>[0],
-  `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`
+  | `onAuthStateChanged`
+  | `workspaceInvitesCollection`
+  | `stage`
+  | `firestore`
+  | `refreshCustomClaims`
 >;
 type AuthProviders = {
   [key: string]: {
@@ -234,6 +254,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   signOutFromFirebase: () => Promise<void>;
   authProviders?: T;
   firebaseAuth: Auth;
+  refreshCustomClaims: () => Promise<void>;
   onAuthStateChanged: (user: UserInfo | null) => void;
   firebaseFunctions: Functions;
   workspaceInvitesCollection: CollectionReference;
@@ -345,9 +366,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
           config.firestore,
           `${config.stage}-Workspaces`,
         ),
-        refreshCustomClaims: async () => {
-          await config.firebaseAuth.currentUser?.getIdToken(true);
-        },
+        refreshCustomClaims: config.refreshCustomClaims,
       }),
   } satisfies CloudAuth<any>;
 }
@@ -374,6 +393,9 @@ export function firebaseWorkspace(config: {
         },
         (error) => {
           console.warn(error);
+          if (error.code === "permission-denied") {
+            config.refreshCustomClaims();
+          }
         },
       );
     },
@@ -383,6 +405,9 @@ export function firebaseWorkspace(config: {
         (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []),
         (error) => {
           console.warn(error);
+          if (error.code === "permission-denied") {
+            config.refreshCustomClaims();
+          }
         },
       );
     },
@@ -396,6 +421,9 @@ export function firebaseWorkspace(config: {
           onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
         (error) => {
           console.warn(error);
+          if (error.code === "permission-denied") {
+            config.refreshCustomClaims();
+          }
         },
       );
     },

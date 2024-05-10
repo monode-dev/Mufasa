@@ -4,6 +4,16 @@ import { doNow, isValid } from "../Utils.js";
 import { signInWithCredential, } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 export function firebasePersister(firebaseConfig) {
+    const refreshCustomClaims = doNow(() => {
+        let isRefreshing = false;
+        return async () => {
+            if (isRefreshing)
+                return;
+            isRefreshing = true;
+            await firebaseConfig.firebaseAuth.currentUser?.getIdToken(true);
+            isRefreshing = false;
+        };
+    });
     return {
         getCloudAuth({ onAuthStateChanged, stage }) {
             return firebaseAuthIntegration({
@@ -11,19 +21,20 @@ export function firebasePersister(firebaseConfig) {
                 stage: stage,
                 workspaceInvitesCollection: collection(firebaseConfig.firestore, `${stage}-WorkspaceInvites`),
                 onAuthStateChanged,
+                refreshCustomClaims,
             });
         },
         getWorkspacePersister: (setup) => workspacePersister({
             collectionRef: collection(firebaseConfig.firestore, `${setup.stage}-Workspaces`, setup.workspaceId, setup.docType),
             queryConstraints: [],
-        }, isValid(firebaseConfig.firebaseStorage)
+        }, refreshCustomClaims, isValid(firebaseConfig.firebaseStorage)
             ? (fileId) => storageRef(firebaseConfig.firebaseStorage, 
             // TODO: Include DocType in the path.
             `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`)
             : undefined),
     };
 }
-export function workspacePersister(firestoreConfig, getStorageRef) {
+export function workspacePersister(firestoreConfig, refreshCustomClaims, getStorageRef) {
     const CHANGE_DATE_KEY = `mx_changeDate`;
     const useServerTimestamp = serverTimestamp();
     return {
@@ -68,6 +79,9 @@ export function workspacePersister(firestoreConfig, getStorageRef) {
                             }, (error) => {
                                 isProcessingSnapshot = false;
                                 disposeSnapshot = undefined;
+                                if (error.code === "permission-denied") {
+                                    refreshCustomClaims();
+                                }
                                 setTimeout(runWatcher, 500);
                                 console.warn(`Encountered error: ${error}`);
                             });
@@ -197,9 +211,7 @@ export function firebaseAuthIntegration(config) {
             uid: uid,
             userMetadataCollection: collection(config.firestore, `${config.stage}-UserMetadata`),
             workspacesCollection: collection(config.firestore, `${config.stage}-Workspaces`),
-            refreshCustomClaims: async () => {
-                await config.firebaseAuth.currentUser?.getIdToken(true);
-            },
+            refreshCustomClaims: config.refreshCustomClaims,
         }),
     };
 }
@@ -215,16 +227,25 @@ export function firebaseWorkspace(config) {
                 handle(metadata ?? null);
             }, (error) => {
                 console.warn(error);
+                if (error.code === "permission-denied") {
+                    config.refreshCustomClaims();
+                }
             });
         },
         watchEntitlements(workspaceId, onEntitlements) {
             return onSnapshot(doc(config.workspacesCollection, workspaceId), (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []), (error) => {
                 console.warn(error);
+                if (error.code === "permission-denied") {
+                    config.refreshCustomClaims();
+                }
             });
         },
         watchMembers(workspaceId, onMembers) {
             return onSnapshot(query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)), (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data())), (error) => {
                 console.warn(error);
+                if (error.code === "permission-denied") {
+                    config.refreshCustomClaims();
+                }
             });
         },
         async createWorkspaceInterface(params) {

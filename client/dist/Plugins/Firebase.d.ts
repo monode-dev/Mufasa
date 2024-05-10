@@ -25,8 +25,8 @@ export declare function firebasePersister<T extends AuthProviders>(firebaseConfi
 export declare function workspacePersister(firestoreConfig: {
     collectionRef: CollectionReference;
     queryConstraints: QueryFilterConstraint[];
-}, getStorageRef?: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
-type AuthParams<T extends AuthProviders> = Omit<Parameters<typeof firebaseAuthIntegration<T>>[0], `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore`>;
+}, refreshCustomClaims: () => Promise<void>, getStorageRef?: (fileId: string) => StorageReference): Cloud.WorkspacePersister;
+type AuthParams<T extends AuthProviders> = Omit<Parameters<typeof firebaseAuthIntegration<T>>[0], `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore` | `refreshCustomClaims`>;
 type AuthProviders = {
     [key: string]: {
         signIn: (...params: any) => Promise<OAuthCredential | undefined>;
@@ -39,6 +39,7 @@ export declare function firebaseAuthIntegration<T extends AuthProviders>(config:
     signOutFromFirebase: () => Promise<void>;
     authProviders?: T;
     firebaseAuth: Auth;
+    refreshCustomClaims: () => Promise<void>;
     onAuthStateChanged: (user: UserInfo | null) => void;
     firebaseFunctions: Functions;
     workspaceInvitesCollection: CollectionReference;
