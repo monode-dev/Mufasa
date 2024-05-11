@@ -242,6 +242,7 @@ export function initializeMufasaFunctions({
       await storage.bucket().deleteFiles({
         prefix: `/Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
       });
+      log(`Finished deleting workspace ${request.auth.token.workspaceId}`);
       return {};
     }),
   };
