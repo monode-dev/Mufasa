@@ -169,7 +169,7 @@ export function capacitorPersister(): Device.Persister {
                     directory: Directory.Data,
                     encoding: Encoding.UTF8,
                   })
-                    .then(async (result) =>
+                    .then((result) =>
                       Filesystem.writeFile(
                         file.name === `localDocs`
                           ? {

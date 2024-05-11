@@ -159,7 +159,7 @@ export function capacitorPersister() {
                             directory: Directory.Data,
                             encoding: Encoding.UTF8,
                         })
-                            .then(async (result) => Filesystem.writeFile(file.name === `localDocs`
+                            .then((result) => Filesystem.writeFile(file.name === `localDocs`
                             ? {
                                 data: result.data,
                                 path: `${outputPath}/${file.name}.json`,

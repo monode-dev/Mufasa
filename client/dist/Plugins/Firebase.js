@@ -188,32 +188,34 @@ export function firebaseAuthIntegration(config) {
             //   await signInWithCredential(config.firebaseAuth, credential);
             // },
         },
-        async signOut() {
-            try {
-                // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-                await config.signOutFromFirebase();
-                // Just try all the providers and make sure none of them are signed in.
-                for (const provider of Object.values(config.authProviders ?? {})) {
-                    try {
-                        await provider.signOut();
-                    }
-                    catch (error) {
-                        console.error("Error during Sign-Out:", error);
-                    }
-                }
-            }
-            catch (error) {
-                console.error("Error during Sign-Out:", error);
-            }
-        },
+        signOut: signOut,
         getWorkspaceIntegration: (uid) => firebaseWorkspace({
             ...config,
             uid: uid,
             userMetadataCollection: collection(config.firestore, `${config.stage}-UserMetadata`),
             workspacesCollection: collection(config.firestore, `${config.stage}-Workspaces`),
             refreshCustomClaims: config.refreshCustomClaims,
+            signOut: signOut,
         }),
     };
+    async function signOut() {
+        try {
+            // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
+            await config.signOutFromFirebase();
+            // Just try all the providers and make sure none of them are signed in.
+            for (const provider of Object.values(config.authProviders ?? {})) {
+                try {
+                    await provider.signOut();
+                }
+                catch (error) {
+                    console.error("Error during Sign-Out:", error);
+                }
+            }
+        }
+        catch (error) {
+            console.error("Error during Sign-Out:", error);
+        }
+    }
 }
 // SECTION: Workspace
 export function firebaseWorkspace(config) {
@@ -295,7 +297,13 @@ export function firebaseWorkspace(config) {
             return (await httpsCallable(config.firebaseFunctions, "deleteWorkspace")(params)).data;
         },
         async deleteAccount(params) {
-            return (await httpsCallable(config.firebaseFunctions, "deleteAccount")(params)).data;
+            await httpsCallable(config.firebaseFunctions, "deleteAccount")(params);
+            try {
+                await config.signOut();
+            }
+            catch (error) {
+                console.error("Error refreshing token:", error);
+            }
         },
     };
 }

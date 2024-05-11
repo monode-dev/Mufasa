@@ -338,22 +338,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
       //   await signInWithCredential(config.firebaseAuth, credential);
       // },
     },
-    async signOut() {
-      try {
-        // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
-        await config.signOutFromFirebase();
-        // Just try all the providers and make sure none of them are signed in.
-        for (const provider of Object.values(config.authProviders ?? {})) {
-          try {
-            await provider.signOut();
-          } catch (error) {
-            console.error("Error during Sign-Out:", error);
-          }
-        }
-      } catch (error) {
-        console.error("Error during Sign-Out:", error);
-      }
-    },
+    signOut: signOut,
     getWorkspaceIntegration: (uid: string) =>
       firebaseWorkspace({
         ...config,
@@ -367,8 +352,26 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
           `${config.stage}-Workspaces`,
         ),
         refreshCustomClaims: config.refreshCustomClaims,
+        signOut: signOut,
       }),
   } satisfies CloudAuth<any>;
+
+  async function signOut() {
+    try {
+      // We have to be carful how we call `firebaseAuth.signOut` because it depends on "this" and JavaScript tends to mess that up.
+      await config.signOutFromFirebase();
+      // Just try all the providers and make sure none of them are signed in.
+      for (const provider of Object.values(config.authProviders ?? {})) {
+        try {
+          await provider.signOut();
+        } catch (error) {
+          console.error("Error during Sign-Out:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error during Sign-Out:", error);
+    }
+  }
 }
 
 // SECTION: Workspace
@@ -379,6 +382,7 @@ export function firebaseWorkspace(config: {
   workspaceInvitesCollection: CollectionReference;
   workspacesCollection: CollectionReference;
   refreshCustomClaims: () => Promise<void>;
+  signOut: () => Promise<void>;
 }): WorkspaceIntegration {
   return {
     async generateInviteCode() {
@@ -503,12 +507,15 @@ export function firebaseWorkspace(config: {
       ).data;
     },
     async deleteAccount(params: { stage: string }) {
-      return (
-        await httpsCallable<{ stage: string }, void>(
-          config.firebaseFunctions,
-          "deleteAccount",
-        )(params)
-      ).data;
+      await httpsCallable<{ stage: string }, void>(
+        config.firebaseFunctions,
+        "deleteAccount",
+      )(params);
+      try {
+        await config.signOut();
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+      }
     },
   };
 }
