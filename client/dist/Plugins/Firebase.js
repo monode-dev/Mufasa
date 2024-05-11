@@ -58,7 +58,6 @@ export function workspacePersister(firestoreConfig, refreshCustomClaims, getStor
                             // TODO: Maybe there is some way to avoid already deleted docs.
                             ...firestoreConfig.queryConstraints)), (snapshot) => {
                                 isProcessingSnapshot = true;
-                                console.log("Processing snapshot");
                                 const updates = {};
                                 let latestChangeDate = metaData.data.lastChangeDatePosix;
                                 snapshot.docChanges().forEach((change) => {
@@ -90,7 +89,6 @@ export function workspacePersister(firestoreConfig, refreshCustomClaims, getStor
                 },
                 async stop() {
                     shouldStop = true;
-                    console.log(`Stopping Firebase Watcher`);
                     if (disposeSnapshot) {
                         disposeSnapshot();
                         disposeSnapshot = undefined;
@@ -98,7 +96,6 @@ export function workspacePersister(firestoreConfig, refreshCustomClaims, getStor
                     while (isProcessingSnapshot) {
                         await new Promise((resolve) => setTimeout(resolve, 10));
                     }
-                    console.log(`Stopped Firebase Watcher`);
                 },
             };
         },

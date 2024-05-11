@@ -51,7 +51,6 @@ export function createPersistedFunction<Params extends Device.Json[], Return>(
           });
           await doNextStep(instanceId);
         } else {
-          console.log(`Finished ${savedJson.fileName} instance: ${instanceId}`);
           await savedJson.batchUpdate((data) => {
             delete data.value.activeFunctions[instanceId];
           });
