@@ -154,14 +154,20 @@ export function capacitorPersister() {
                         return true;
                     };
                     await Promise.all(files.files.map((file) => _shouldInclude(`${directoryPath}/${file.name}`)
-                        ? Filesystem.copy({
-                            from: `${directoryPath}/${file.name}`,
-                            to: `${outputPath}/${file.name === `localDocs`
+                        ? Filesystem.readFile({
+                            path: `${directoryPath}/${file.name}`,
+                            directory: Directory.Data,
+                            encoding: Encoding.UTF8,
+                        })
+                            .then((result) => Filesystem.writeFile({
+                            data: result.data,
+                            path: `${outputPath}/${file.name === `localDocs`
                                 ? `${file.name}.json`
                                 : `${file.name}.jpg`}`,
-                            directory: Directory.Data,
-                            toDirectory: Directory.Cache,
-                        }).catch((e) => {
+                            encoding: file.name === `localDocs` ? Encoding.UTF8 : undefined,
+                            directory: Directory.Cache,
+                        }))
+                            .catch((e) => {
                             console.warn(e);
                         })
                         : Promise.resolve()));
