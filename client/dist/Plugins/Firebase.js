@@ -298,12 +298,7 @@ export function firebaseWorkspace(config) {
         },
         async deleteAccount(params) {
             await httpsCallable(config.firebaseFunctions, "deleteAccount")(params);
-            try {
-                await config.signOut();
-            }
-            catch (error) {
-                console.error("Error refreshing token:", error);
-            }
+            await config.signOut();
         },
     };
 }
