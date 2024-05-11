@@ -11,4 +11,5 @@ export declare function initializeMufasaFunctions({ firestore, auth, storage, }:
     leaveWorkspace: import("firebase-functions/v2/https").CallableFunction<any, Promise<{}>>;
     removeMember: import("firebase-functions/v2/https").CallableFunction<any, Promise<{}>>;
     deleteWorkspace: import("firebase-functions/v2/https").CallableFunction<any, Promise<{}>>;
+    deleteAccount: import("firebase-functions/v2/https").CallableFunction<any, Promise<void>>;
 };

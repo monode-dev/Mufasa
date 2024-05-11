@@ -214,36 +214,74 @@ export function initializeMufasaFunctions({
           `permission-denied`,
           "Only the owner can delete the workspace.",
         );
-      log("deleting", request.auth.token.workspaceId);
-      // TODO: If there is a subscription, email the owner a link to cancel the subscription.
-      // Get all members
-      const members = await firestore
-        .collection(`${getStage(request.data.stage)}-UserMetadata`)
-        .where("workspaceId", "==", request.auth.token.workspaceId)
-        .get();
-      // Remove all members
-      await Promise.all(
-        members.docs.map(async (member) => {
-          await setUserWorkspace({
-            uid: member.id,
-            workspaceId: null,
-            email: member.data().email ?? null,
-            stage: request.data.stage,
-          });
-        }),
-      );
-      await firestore
-        .doc(
-          `${getStage(request.data.stage)}-Workspaces/${
-            request.auth.token.workspaceId
-          }`,
-        )
-        .delete();
-      await storage.bucket().deleteFiles({
-        prefix: `/Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
+      await deleteWorkspace({
+        stage: request.data.stage,
+        workspaceId: request.auth.token.workspaceId,
+        storage,
+        firestore,
       });
-      log(`Finished deleting workspace ${request.auth.token.workspaceId}`);
       return {};
     }),
+    deleteAccount: onCall(callableOptions, async (request) => {
+      if (request.auth === undefined)
+        throw new HttpsError(`unauthenticated`, "Unauthorized");
+      const workspaceToDelete =
+        request.auth.token.workspaceId !== null &&
+        request.auth.token.role === `owner`
+          ? request.auth.token.workspaceId
+          : null;
+
+      // Delete user
+      await auth.deleteUser(request.auth.uid);
+      await firestore
+        .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
+        .delete()
+        .catch((e) => {
+          log(e);
+        });
+
+      // Delete workspace
+      if (workspaceToDelete !== null) {
+        await deleteWorkspace({
+          stage: request.data.stage,
+          workspaceId: workspaceToDelete,
+          storage,
+          firestore,
+        });
+      }
+    }),
   };
+
+  async function deleteWorkspace(props: {
+    stage: string;
+    workspaceId: string;
+    storage: Storage;
+    firestore: Firestore;
+  }) {
+    log("deleting", props.workspaceId);
+    // TODO: If there is a subscription, email the owner a link to cancel the subscription.
+    // Get all members
+    const members = await props.firestore
+      .collection(`${props.stage}-UserMetadata`)
+      .where("workspaceId", "==", props.workspaceId)
+      .get();
+    // Remove all members
+    await Promise.all(
+      members.docs.map(async (member) => {
+        await setUserWorkspace({
+          uid: member.id,
+          workspaceId: null,
+          email: member.data().email ?? null,
+          stage: props.stage,
+        });
+      }),
+    );
+    await firestore
+      .doc(`${getStage(props.stage)}-Workspaces/${props.workspaceId}`)
+      .delete();
+    await storage.bucket().deleteFiles({
+      prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+    });
+    log(`Finished deleting workspace ${props.workspaceId}`);
+  }
 }

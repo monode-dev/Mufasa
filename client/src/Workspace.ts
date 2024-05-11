@@ -48,6 +48,7 @@ export type WorkspaceIntegration = {
   leaveWorkspace: (params: { stage: string }) => Promise<void>;
   removeMember: (params: { stage: string; uid: string }) => Promise<void>;
   deleteWorkspace: (params: { stage: string }) => Promise<void>;
+  deleteAccount: (params: { stage: string }) => Promise<void>;
 };
 
 // SECTION: Cloud Auth
@@ -441,6 +442,11 @@ function createWorkspaceInterface(config: {
                   stage: config.stage,
                 });
                 isDeletingWorkspace.value = false;
+              },
+              async deleteAccount() {
+                await workspaceIntegration.deleteAccount({
+                  stage: config.stage,
+                });
               },
             }
           : {

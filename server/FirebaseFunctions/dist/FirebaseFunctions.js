@@ -162,33 +162,66 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
                 throw new https_1.HttpsError(`not-found`, "You are not in a workspace to delete.");
             if (request.auth.token.role !== `owner`)
                 throw new https_1.HttpsError(`permission-denied`, "Only the owner can delete the workspace.");
-            (0, logger_1.log)("deleting", request.auth.token.workspaceId);
-            // TODO: If there is a subscription, email the owner a link to cancel the subscription.
-            // Get all members
-            const members = await firestore
-                .collection(`${getStage(request.data.stage)}-UserMetadata`)
-                .where("workspaceId", "==", request.auth.token.workspaceId)
-                .get();
-            // Remove all members
-            await Promise.all(members.docs.map(async (member) => {
-                var _a;
-                await setUserWorkspace({
-                    uid: member.id,
-                    workspaceId: null,
-                    email: (_a = member.data().email) !== null && _a !== void 0 ? _a : null,
-                    stage: request.data.stage,
-                });
-            }));
-            await firestore
-                .doc(`${getStage(request.data.stage)}-Workspaces/${request.auth.token.workspaceId}`)
-                .delete();
-            await storage.bucket().deleteFiles({
-                prefix: `/Prod-Workspace-Files/${request.auth.token.workspaceId}/`,
+            await deleteWorkspace({
+                stage: request.data.stage,
+                workspaceId: request.auth.token.workspaceId,
+                storage,
+                firestore,
             });
-            (0, logger_1.log)(`Finished deleting workspace ${request.auth.token.workspaceId}`);
             return {};
         }),
+        deleteAccount: (0, https_1.onCall)(callableOptions, async (request) => {
+            if (request.auth === undefined)
+                throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
+            const workspaceToDelete = request.auth.token.workspaceId !== null &&
+                request.auth.token.role === `owner`
+                ? request.auth.token.workspaceId
+                : null;
+            // Delete user
+            await auth.deleteUser(request.auth.uid);
+            await firestore
+                .doc(`${getStage(request.data.stage)}-UserMetadata/${request.auth.uid}`)
+                .delete()
+                .catch((e) => {
+                (0, logger_1.log)(e);
+            });
+            // Delete workspace
+            if (workspaceToDelete !== null) {
+                await deleteWorkspace({
+                    stage: request.data.stage,
+                    workspaceId: workspaceToDelete,
+                    storage,
+                    firestore,
+                });
+            }
+        }),
     };
+    async function deleteWorkspace(props) {
+        (0, logger_1.log)("deleting", props.workspaceId);
+        // TODO: If there is a subscription, email the owner a link to cancel the subscription.
+        // Get all members
+        const members = await props.firestore
+            .collection(`${props.stage}-UserMetadata`)
+            .where("workspaceId", "==", props.workspaceId)
+            .get();
+        // Remove all members
+        await Promise.all(members.docs.map(async (member) => {
+            var _a;
+            await setUserWorkspace({
+                uid: member.id,
+                workspaceId: null,
+                email: (_a = member.data().email) !== null && _a !== void 0 ? _a : null,
+                stage: props.stage,
+            });
+        }));
+        await firestore
+            .doc(`${getStage(props.stage)}-Workspaces/${props.workspaceId}`)
+            .delete();
+        await storage.bucket().deleteFiles({
+            prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+        });
+        (0, logger_1.log)(`Finished deleting workspace ${props.workspaceId}`);
+    }
 }
 exports.initializeMufasaFunctions = initializeMufasaFunctions;
 //# sourceMappingURL=FirebaseFunctions.js.map

@@ -286,6 +286,11 @@ function createWorkspaceInterface(config) {
                         });
                         isDeletingWorkspace.value = false;
                     },
+                    async deleteAccount() {
+                        await workspaceIntegration.deleteAccount({
+                            stage: config.stage,
+                        });
+                    },
                 }
                 : {
                     role: userMetadata.role,

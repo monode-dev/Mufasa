@@ -294,5 +294,8 @@ export function firebaseWorkspace(config) {
         async deleteWorkspace(params) {
             return (await httpsCallable(config.firebaseFunctions, "deleteWorkspace")(params)).data;
         },
+        async deleteAccount(params) {
+            return (await httpsCallable(config.firebaseFunctions, "deleteAccount")(params)).data;
+        },
     };
 }

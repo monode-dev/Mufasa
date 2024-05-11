@@ -502,5 +502,13 @@ export function firebaseWorkspace(config: {
         )(params)
       ).data;
     },
+    async deleteAccount(params: { stage: string }) {
+      return (
+        await httpsCallable<{ stage: string }, void>(
+          config.firebaseFunctions,
+          "deleteAccount",
+        )(params)
+      ).data;
+    },
   };
 }
