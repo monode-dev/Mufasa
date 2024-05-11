@@ -218,7 +218,7 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
             .doc(`${getStage(props.stage)}-Workspaces/${props.workspaceId}`)
             .delete();
         const files = await storage.bucket().getFiles({
-            prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+            prefix: `Prod-Workspace-Files/${props.workspaceId}`,
         });
         files[0].forEach((file) => {
             (0, logger_1.log)(`deleting ${file.name}`);
@@ -226,7 +226,7 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
         await storage
             .bucket()
             .deleteFiles({
-            prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+            prefix: `Prod-Workspace-Files/${props.workspaceId}`,
         })
             .catch((e) => {
             (0, logger_1.log)(e);

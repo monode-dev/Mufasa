@@ -280,7 +280,7 @@ export function initializeMufasaFunctions({
       .doc(`${getStage(props.stage)}-Workspaces/${props.workspaceId}`)
       .delete();
     const files = await storage.bucket().getFiles({
-      prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+      prefix: `Prod-Workspace-Files/${props.workspaceId}`,
     });
     files[0].forEach((file) => {
       log(`deleting ${file.name}`);
@@ -288,7 +288,7 @@ export function initializeMufasaFunctions({
     await storage
       .bucket()
       .deleteFiles({
-        prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+        prefix: `Prod-Workspace-Files/${props.workspaceId}`,
       })
       .catch((e) => {
         log(e);
