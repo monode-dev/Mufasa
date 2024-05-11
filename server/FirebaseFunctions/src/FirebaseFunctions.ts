@@ -276,15 +276,27 @@ export function initializeMufasaFunctions({
         });
       }),
     );
+    const workspaceDocRef = props.firestore.doc(
+      `${props.stage}-Workspaces/${props.workspaceId}`,
+    );
+    // Delete all sub-collections
+    await workspaceDocRef.listCollections().then(async (collections) => {
+      collections.forEach(async (collection) => {
+        while (true) {
+          const snapshot = await collection.limit(500).get();
+          if (snapshot.size === 0) return;
+          const batch = firestore.batch();
+          snapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+        }
+      });
+    });
     await firestore
       .doc(`${getStage(props.stage)}-Workspaces/${props.workspaceId}`)
       .delete();
-    const files = await storage.bucket().getFiles({
-      prefix: `Prod-Workspace-Files/${props.workspaceId}`,
-    });
-    files[0].forEach((file) => {
-      log(`deleting ${file.name}`);
-    });
+    // Delete all files
     await storage
       .bucket()
       .deleteFiles({
