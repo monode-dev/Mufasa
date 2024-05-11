@@ -169,9 +169,13 @@ export function capacitorPersister(): Device.Persister {
                     directory: Directory.Data,
                     encoding: Encoding.UTF8,
                   })
-                    .then((result) =>
+                    .then(async (result) =>
                       Filesystem.writeFile({
-                        data: result.data,
+                        data:
+                          file.name === `localDocs`
+                            ? result.data
+                            : // Decode base64 to string.
+                              atob((result.data as string).split(`,`)[1]),
                         path: `${outputPath}/${
                           file.name === `localDocs`
                             ? `${file.name}.json`
