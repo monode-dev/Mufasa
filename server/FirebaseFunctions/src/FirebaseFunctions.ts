@@ -49,13 +49,11 @@ export function initializeMufasaFunctions({
         }
     ),
   ) {
-    log("setUserWorkspace", params);
     // We need to set CustomUserClaims first, and then let the user know they have new permission.
     await auth.setCustomUserClaims(params.uid, {
       workspaceId: params.workspaceId,
       role: params.role ?? null,
     });
-    log("updated custom claims");
     await firestore
       .doc(`${getStage(params.stage)}-UserMetadata/${params.uid}`)
       .set(
@@ -67,7 +65,6 @@ export function initializeMufasaFunctions({
           email: params.email,
         } /* satisfies UserMetadata */,
       );
-    log("updated firestore");
   }
 
   // SECTION: Functions
@@ -163,10 +160,8 @@ export function initializeMufasaFunctions({
       return {};
     }),
     leaveWorkspace: onCall(callableOptions, async (request) => {
-      log("leaveWorkspace", request);
       if (request.auth === undefined)
         throw new HttpsError(`unauthenticated`, "Unauthorized");
-      log("uid", request.auth.uid);
       await setUserWorkspace({
         uid: request.auth.uid,
         workspaceId: null,
@@ -176,10 +171,8 @@ export function initializeMufasaFunctions({
       return {};
     }),
     removeMember: onCall(callableOptions, async (request) => {
-      log("removeMember", request);
       if (request.auth === undefined)
         throw new HttpsError(`unauthenticated`, "Unauthorized");
-      log("uid", request.auth.uid);
       if (request.auth.token.role !== `owner`)
         throw new HttpsError(
           `permission-denied`,
@@ -305,6 +298,5 @@ export function initializeMufasaFunctions({
       .catch((e) => {
         log(e);
       });
-    log(`Finished deleting workspace ${props.workspaceId}`);
   }
 }

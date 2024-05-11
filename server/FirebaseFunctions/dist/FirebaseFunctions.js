@@ -23,13 +23,11 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
     }
     async function setUserWorkspace(params) {
         var _a, _b;
-        (0, logger_1.log)("setUserWorkspace", params);
         // We need to set CustomUserClaims first, and then let the user know they have new permission.
         await auth.setCustomUserClaims(params.uid, {
             workspaceId: params.workspaceId,
             role: (_a = params.role) !== null && _a !== void 0 ? _a : null,
         });
-        (0, logger_1.log)("updated custom claims");
         await firestore
             .doc(`${getStage(params.stage)}-UserMetadata/${params.uid}`)
             .set({
@@ -39,7 +37,6 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
             role: (_b = params.role) !== null && _b !== void 0 ? _b : null,
             email: params.email,
         } /* satisfies UserMetadata */);
-        (0, logger_1.log)("updated firestore");
     }
     // SECTION: Functions
     return {
@@ -118,10 +115,8 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
         }),
         leaveWorkspace: (0, https_1.onCall)(callableOptions, async (request) => {
             var _a;
-            (0, logger_1.log)("leaveWorkspace", request);
             if (request.auth === undefined)
                 throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
-            (0, logger_1.log)("uid", request.auth.uid);
             await setUserWorkspace({
                 uid: request.auth.uid,
                 workspaceId: null,
@@ -132,10 +127,8 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
         }),
         removeMember: (0, https_1.onCall)(callableOptions, async (request) => {
             var _a, _b, _c;
-            (0, logger_1.log)("removeMember", request);
             if (request.auth === undefined)
                 throw new https_1.HttpsError(`unauthenticated`, "Unauthorized");
-            (0, logger_1.log)("uid", request.auth.uid);
             if (request.auth.token.role !== `owner`)
                 throw new https_1.HttpsError(`permission-denied`, "Only the owner can remove members.");
             if (typeof request.data.uid !== `string`)
@@ -242,7 +235,6 @@ function initializeMufasaFunctions({ firestore, auth, storage, }) {
             .catch((e) => {
             (0, logger_1.log)(e);
         });
-        (0, logger_1.log)(`Finished deleting workspace ${props.workspaceId}`);
     }
 }
 exports.initializeMufasaFunctions = initializeMufasaFunctions;
