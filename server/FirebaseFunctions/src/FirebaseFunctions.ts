@@ -283,7 +283,7 @@ export function initializeMufasaFunctions({
     await workspaceDocRef.listCollections().then(async (collections) => {
       collections.forEach(async (collection) => {
         while (true) {
-          const snapshot = await collection.limit(500).get();
+          const snapshot = await collection.limit(100).get();
           if (snapshot.size === 0) return;
           const batch = firestore.batch();
           snapshot.docs.forEach((doc) => {
