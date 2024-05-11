@@ -279,9 +279,20 @@ export function initializeMufasaFunctions({
     await firestore
       .doc(`${getStage(props.stage)}-Workspaces/${props.workspaceId}`)
       .delete();
-    await storage.bucket().deleteFiles({
+    const files = await storage.bucket().getFiles({
       prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
     });
+    files[0].forEach((file) => {
+      log(`deleting ${file.name}`);
+    });
+    await storage
+      .bucket()
+      .deleteFiles({
+        prefix: `/Prod-Workspace-Files/${props.workspaceId}/`,
+      })
+      .catch((e) => {
+        log(e);
+      });
     log(`Finished deleting workspace ${props.workspaceId}`);
   }
 }
