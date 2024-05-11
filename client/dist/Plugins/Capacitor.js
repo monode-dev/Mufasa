@@ -159,19 +159,18 @@ export function capacitorPersister() {
                             directory: Directory.Data,
                             encoding: Encoding.UTF8,
                         })
-                            .then(async (result) => Filesystem.writeFile({
-                            data: file.name === `localDocs`
-                                ? result.data
-                                : // Decode base64 to string.
-                                    atob(result.data.split(`,`)[1]),
-                            path: `${outputPath}/${file.name === `localDocs`
-                                ? `${file.name}.json`
-                                : `${file.name}.jpg`}`,
-                            encoding: file.name === `localDocs`
-                                ? Encoding.UTF8
-                                : Encoding.UTF8,
-                            directory: Directory.Cache,
-                        }))
+                            .then(async (result) => Filesystem.writeFile(file.name === `localDocs`
+                            ? {
+                                data: result.data,
+                                path: `${outputPath}/${file.name}.json`,
+                                encoding: Encoding.UTF8,
+                                directory: Directory.Cache,
+                            }
+                            : {
+                                data: result.data,
+                                path: `${outputPath}/${file.name}.jpg`,
+                                directory: Directory.Cache,
+                            }))
                             .catch((e) => {
                             console.warn(e);
                         })
