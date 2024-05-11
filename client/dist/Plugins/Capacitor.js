@@ -164,7 +164,9 @@ export function capacitorPersister() {
                             path: `${outputPath}/${file.name === `localDocs`
                                 ? `${file.name}.json`
                                 : `${file.name}.jpg`}`,
-                            encoding: file.name === `localDocs` ? Encoding.UTF8 : undefined,
+                            encoding: file.name === `localDocs`
+                                ? Encoding.UTF8
+                                : Encoding.UTF8,
                             directory: Directory.Cache,
                         }))
                             .catch((e) => {

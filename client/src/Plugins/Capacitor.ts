@@ -178,7 +178,9 @@ export function capacitorPersister(): Device.Persister {
                             : `${file.name}.jpg`
                         }`,
                         encoding:
-                          file.name === `localDocs` ? Encoding.UTF8 : undefined,
+                          file.name === `localDocs`
+                            ? Encoding.UTF8
+                            : Encoding.UTF8,
                         directory: Directory.Cache,
                       }),
                     )
