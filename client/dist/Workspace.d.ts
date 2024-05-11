@@ -131,6 +131,7 @@ declare function createWorkspaceInterface(config: {
     readonly isLeaving: boolean;
     readonly isDeleting: boolean;
     refreshToken(): Promise<void>;
+    deleteAccount(): Promise<void>;
 } & (({
     isOwner: boolean;
     role: "owner";
@@ -142,7 +143,6 @@ declare function createWorkspaceInterface(config: {
         uid: string;
     }): Promise<void>;
     deleteWorkspace(): Promise<void>;
-    deleteAccount(): Promise<void>;
     leaveWorkspace?: undefined;
 } & {}) | ({
     role: "member";
@@ -151,6 +151,5 @@ declare function createWorkspaceInterface(config: {
     createWorkspaceInvite?: undefined;
     removeMember?: undefined;
     deleteWorkspace?: undefined;
-    deleteAccount?: undefined;
 } & {})))>;
 export {};

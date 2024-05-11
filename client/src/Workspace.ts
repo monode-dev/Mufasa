@@ -401,6 +401,11 @@ function createWorkspaceInterface(config: {
         async refreshToken() {
           await workspaceIntegration.refreshToken();
         },
+        async deleteAccount() {
+          await workspaceIntegration.deleteAccount({
+            stage: config.stage,
+          });
+        },
       };
       const roleBasedProps = useFormula(() =>
         userMetadata.role === `owner`
@@ -442,11 +447,6 @@ function createWorkspaceInterface(config: {
                   stage: config.stage,
                 });
                 isDeletingWorkspace.value = false;
-              },
-              async deleteAccount() {
-                await workspaceIntegration.deleteAccount({
-                  stage: config.stage,
-                });
               },
             }
           : {
