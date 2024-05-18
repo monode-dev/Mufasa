@@ -179,12 +179,12 @@ export function capacitorPersister(): Device.Persister {
                       ),
                     )
                     .catch(async (e) => {
-                      await Filesystem.writeFile({
-                        data: JSON.stringify(e, null, 2),
-                        path: `${outputPath}/${file.name}.txt`,
-                        encoding: Encoding.UTF8,
-                        directory: Directory.Cache,
-                      });
+                      // await Filesystem.writeFile({
+                      //   data: JSON.stringify(e, null, 2),
+                      //   path: `${outputPath}/${file.name}.txt`,
+                      //   encoding: Encoding.UTF8,
+                      //   directory: Directory.Cache,
+                      // });
                       console.warn(e);
                     })
                 : Promise.resolve(),
