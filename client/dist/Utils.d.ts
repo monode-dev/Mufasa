@@ -30,3 +30,10 @@ export type StripFlag<T, FlagSym extends symbol> = T extends Flagged<infer U, Fl
 export type Flag<FlagSym extends symbol> = {
     [K in FlagSym]: FlagSym;
 };
+declare const __brand: unique symbol;
+type Brand<B> = {
+    [__brand]: B;
+};
+/** From: https://egghead.io/blog/using-branded-types-in-typescript */
+export type Branded<T, B> = T & Brand<B>;
+export {};

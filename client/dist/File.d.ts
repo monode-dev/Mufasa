@@ -41,6 +41,7 @@ declare class File extends Doc {
             base64String: string;
             manualDocId?: string | undefined;
         }): Promise<string>;
+        reUpload(fileId: string): Promise<void>;
         pullCreate: ((fileId: string) => void) & {
             addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
                 pauseAll: () => Promise<void>;
@@ -252,5 +253,6 @@ declare class File extends Doc {
     getBase64String(): Promise<string>;
     static createFromBase64String(base64String: string): Promise<File>;
     onDelete(): void;
+    reUpload(): void;
 }
 export {};

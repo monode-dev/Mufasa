@@ -32,6 +32,7 @@ export declare function createFileStore(config: DocStoreParams): {
         base64String: string;
         manualDocId?: string;
     }): Promise<string>;
+    reUpload(fileId: string): Promise<void>;
     pullCreate: ((fileId: string) => void) & {
         addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
             pauseAll: () => Promise<void>;

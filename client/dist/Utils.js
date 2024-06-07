@@ -34,18 +34,3 @@ export function listObjValues(obj) {
 export function listObjEntries(obj) {
     return Object.entries(obj);
 }
-// export function makeFlagger() {
-//   const flagSym = Symbol();
-//   return {
-//     flag<T>(toFlag: T): Flagged<T, typeof flagSym> {
-//       (toFlag as any)[flagSym] = flagSym;
-//       return toFlag as any;
-//     },
-//     isFlagged<T>(
-//       toCheck: Flagged<T, typeof flagSym>,
-//     ): toCheck is Flagged<T, typeof flagSym> {
-//       return (toCheck as any)[flagSym] === flagSym;
-//     },
-//     flagSym,
-//   } as const;
-// }

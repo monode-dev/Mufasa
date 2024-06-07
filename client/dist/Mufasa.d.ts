@@ -67,6 +67,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                     base64String: string;
                     manualDocId?: string | undefined;
                 }): Promise<string>;
+                reUpload(fileId: string): Promise<void>;
                 pullCreate: ((fileId: string) => void) & {
                     addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
                         pauseAll: () => Promise<void>;
@@ -250,6 +251,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             getBase64String(): Promise<string>;
             onDelete(): void;
+            reUpload(): void;
             readonly docType: string;
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;
@@ -313,6 +315,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                 base64String: string;
                 manualDocId?: string | undefined;
             }): Promise<string>;
+            reUpload(fileId: string): Promise<void>;
             pullCreate: ((fileId: string) => void) & {
                 addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
                     pauseAll: () => Promise<void>;
@@ -551,6 +554,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
                     base64String: string;
                     manualDocId?: string | undefined;
                 }): Promise<string>;
+                reUpload(fileId: string): Promise<void>;
                 pullCreate: ((fileId: string) => void) & {
                     addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
                         pauseAll: () => Promise<void>;
@@ -734,6 +738,7 @@ export declare function initializeMufasa<C extends Cloud.Persister<any>>(mfsConf
             readonly fileIsDownloaded: import("./Utils.js").Flagged<boolean, typeof import("./Doc.js").OptionalPropFlag>;
             getBase64String(): Promise<string>;
             onDelete(): void;
+            reUpload(): void;
             readonly docType: string;
             readonly _docStore: {
                 readonly loadedFromLocalStorage: Promise<void>;

@@ -386,47 +386,62 @@ export function firebaseWorkspace(config: {
       return doc(config.workspaceInvitesCollection).id;
     },
     onUserMetadata(handle: (metadata: UserMetadata | null) => void) {
-      return onSnapshot(
-        doc(config.userMetadataCollection, config.uid),
-        (snapshot) => {
-          const metadata = snapshot.data() as undefined | UserMetadata;
-          handle(metadata ?? null);
-        },
-        (error) => {
-          console.warn(error);
-          if (error.code === "permission-denied") {
-            config.refreshCustomClaims();
-          }
-        },
-      );
+      let disposeSnapShot = () => {};
+      const startOnSnapshot = () => {
+        disposeSnapShot = onSnapshot(
+          doc(config.userMetadataCollection, config.uid),
+          (snapshot) => {
+            const metadata = snapshot.data() as undefined | UserMetadata;
+            handle(metadata ?? null);
+          },
+          (error) => {
+            console.warn(error);
+            if (error.code === "permission-denied") {
+              config.refreshCustomClaims().then(() => startOnSnapshot());
+            }
+          },
+        );
+      };
+      startOnSnapshot();
+      return () => disposeSnapShot();
     },
     watchEntitlements(workspaceId, onEntitlements) {
-      return onSnapshot(
-        doc(config.workspacesCollection, workspaceId),
-        (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []),
-        (error) => {
-          console.warn(error);
-          if (error.code === "permission-denied") {
-            config.refreshCustomClaims();
-          }
-        },
-      );
+      let disposeSnapShot = () => {};
+      const startOnSnapshot = () => {
+        disposeSnapShot = onSnapshot(
+          doc(config.workspacesCollection, workspaceId),
+          (snapshot) => onEntitlements(snapshot.data()?.entitlements ?? []),
+          (error) => {
+            console.warn(error);
+            if (error.code === "permission-denied") {
+              config.refreshCustomClaims().then(() => startOnSnapshot());
+            }
+          },
+        );
+      };
+      startOnSnapshot();
+      return () => disposeSnapShot();
     },
     watchMembers(workspaceId, onMembers) {
-      return onSnapshot(
-        query(
-          config.userMetadataCollection,
-          where("workspaceId", "==", workspaceId),
-        ),
-        (snapshot) =>
-          onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
-        (error) => {
-          console.warn(error);
-          if (error.code === "permission-denied") {
-            config.refreshCustomClaims();
-          }
-        },
-      );
+      let disposeSnapShot = () => {};
+      const startOnSnapshot = () => {
+        disposeSnapShot = onSnapshot(
+          query(
+            config.userMetadataCollection,
+            where("workspaceId", "==", workspaceId),
+          ),
+          (snapshot) =>
+            onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
+          (error) => {
+            console.warn(error);
+            if (error.code === "permission-denied") {
+              config.refreshCustomClaims().then(() => startOnSnapshot());
+            }
+          },
+        );
+      };
+      startOnSnapshot();
+      return () => disposeSnapShot();
     },
     async createWorkspaceInterface(params: {
       inviteCode: string;

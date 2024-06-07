@@ -86,3 +86,9 @@ export type Flag<FlagSym extends symbol> = {
 //     flagSym,
 //   } as const;
 // }
+
+// SECTION: Branded
+declare const __brand: unique symbol;
+type Brand<B> = { [__brand]: B };
+/** From: https://egghead.io/blog/using-branded-types-in-typescript */
+export type Branded<T, B> = T & Brand<B>;

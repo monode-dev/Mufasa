@@ -45,7 +45,7 @@ export function createFileStore(config) {
         const fileData = await config.deviceDirectoryPersister.readFile(fileId);
         if (!isValid(fileData))
             return;
-        config.cloudWorkspacePersister.uploadFile?.(fileId, fileData);
+        await config.cloudWorkspacePersister.uploadFile?.(fileId, fileData);
         // Manually persist globally to signify that the file is uploaded.
         docStore.batchUpdate({
             [fileId]: {
@@ -87,6 +87,16 @@ export function createFileStore(config) {
             }, docId);
             pushCreate(docId);
             return docId;
+        },
+        async reUpload(fileId) {
+            config.trackUpload();
+            if (!isValid(fileId))
+                return;
+            const fileData = await config.deviceDirectoryPersister.readFile(fileId);
+            if (!isValid(fileData))
+                return;
+            await config.cloudWorkspacePersister.uploadFile?.(fileId, fileData);
+            config.untrackUpload();
         },
         pullCreate,
         pushDelete,

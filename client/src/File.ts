@@ -51,4 +51,8 @@ class File extends Doc {
   onDelete(): void {
     this._fileStore.pushDelete(this.docId);
   }
+
+  reUpload() {
+    this._fileStore.reUpload(this.docId);
+  }
 }

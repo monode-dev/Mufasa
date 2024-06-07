@@ -207,6 +207,7 @@ export declare function initializeStoreBank(bankConfig: {
                 base64String: string;
                 manualDocId?: string | undefined;
             }): Promise<string>;
+            reUpload(fileId: string): Promise<void>;
             pullCreate: ((fileId: string) => void) & {
                 addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
                     pauseAll: () => Promise<void>;
@@ -443,6 +444,7 @@ export declare function initializeStoreBank(bankConfig: {
             base64String: string;
             manualDocId?: string | undefined;
         }): Promise<string>;
+        reUpload(fileId: string): Promise<void>;
         pullCreate: ((fileId: string) => void) & {
             addStep: <NewOut>(func: (args: string | null) => Promise<NewOut>) => ((fileId: string) => void) & {
                 pauseAll: () => Promise<void>;
