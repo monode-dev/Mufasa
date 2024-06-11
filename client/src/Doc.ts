@@ -276,7 +276,7 @@ type PropValue<T extends PropType | PropInst = PropType | PropInst> =
   T extends any[]
     ? PropValue<T[number]>
     : T extends typeof Doc
-    ? InstanceType<T>
+    ? InstanceType<T> | null
     : T extends typeof Boolean
     ? boolean
     : T extends typeof Number
