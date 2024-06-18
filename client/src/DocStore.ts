@@ -383,10 +383,9 @@ export function initializeStoreBank(bankConfig: {
 
               // Save the new workspace signature to disk
               if (isValid(instConfigJson)) {
-                instConfigJson
-                  .batchUpdate((data) => {
-                    data.value = newInstConfig;
-                  });
+                instConfigJson.batchUpdate((data) => {
+                  data.value = newInstConfig;
+                });
               } else {
                 currentInstConfig.value = newInstConfig;
               }
@@ -631,8 +630,15 @@ export function createDocStore(config: DocStoreParams) {
       return haveCompletedFirstSync.value;
     },
 
+    exists(docId: string) {
+      return config.sessionTablePersister.docExists(docId);
+    },
+
     async export(path: string, shouldInclude?: (filePath: string) => boolean) {
-      await config.deviceDirectoryPersister.export(path, shouldInclude ?? (() => true));
+      await config.deviceDirectoryPersister.export(
+        path,
+        shouldInclude ?? (() => true),
+      );
     },
   } as const;
 }

@@ -5,6 +5,7 @@ import {
   PrimVal,
   WritablePersistanceTaggedUpdateBatch,
   StoreBank,
+  DocStore,
 } from "./DocStore.js";
 import {
   Flagged,
@@ -89,7 +90,7 @@ function _initializeInst<T extends Doc>(
     } else {
       Object.defineProperty(inst, key, {
         get: function () {
-          const storeValue: PrimVal = this._docStore.getProp(
+          const storeValue: PrimVal = (this._docStore as DocStore).getProp(
             docId,
             key,
             propConfig.getFallbackValue(),
@@ -101,7 +102,7 @@ function _initializeInst<T extends Doc>(
               set: function (value) {
                 const asPrim = propConfig.toPrim!(value);
                 // TODO: Only do update if value is different.
-                this._docStore.batchUpdate(
+                (this._docStore as DocStore).batchUpdate(
                   {
                     [docId]: {
                       [key]: {
@@ -135,6 +136,9 @@ function _initializeInst<T extends Doc>(
 export class Doc {
   // private constructor() {}
   static readonly RootClass = Doc;
+  static exists(docId: string): boolean {
+    return this._docStore.exists(docId);
+  }
 
   /*** NOTE: This can be overridden to manually specify a type name. */
   static get docType() {
@@ -341,6 +345,9 @@ export function prop<
           console.error(
             `Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`,
           );
+          return null;
+        }
+        if (!TypeClass.exists(prim)) {
           return null;
         }
         return TypeClass._fromId(prim);
