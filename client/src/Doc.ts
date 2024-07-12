@@ -271,8 +271,7 @@ export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 // TODO: Delete docs that depend on non-nullable docs.
 type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc;
 type PropType<T extends PropClass = PropClass> = T | [T, null];
-type _PropInst = boolean | number | string | Doc | null;
-type PropInst = _PropInst | (() => _PropInst);
+type PropInst = boolean | number | string | Doc | null;
 type PropValue<T extends PropType | PropInst = PropType | PropInst> =
   T extends any[]
     ? PropValue<T[number]>
@@ -290,8 +289,6 @@ type PropValue<T extends PropType | PropInst = PropType | PropInst> =
     ? number
     : T extends string
     ? string
-    : T extends () => infer U
-    ? U
     : null;
 export function prop<
   FirstParam extends PropType | PropValue,
@@ -324,24 +321,19 @@ export function prop<
       : typeof firstParam === `number`
       ? Number
       : String;
-  const getInitValue = (): _PropInst | undefined => {
-    const correctParam: PropInst | undefined = [
-      `boolean`,
-      `number`,
-      `string`,
-    ].includes(typeof firstParam)
-      ? firstParam
-      : (secondParam as any);
-    return typeof correctParam === `function` ? correctParam() : correctParam;
-  };
+  const initValue: PropValue | undefined = [
+    `boolean`,
+    `number`,
+    `string`,
+  ].includes(typeof firstParam)
+    ? firstParam
+    : (secondParam as any);
   if (isDocClass(TypeClass)) {
     return {
       [IsCustomProp]: true,
       isFullCustom: false,
-      getInitValue: () => {
-        const initValue = getInitValue();
-        return initValue instanceof Doc ? initValue.docId : initValue;
-      },
+      getInitValue: () =>
+        initValue instanceof Doc ? initValue.docId : initValue,
       getFallbackValue: () => null,
       fromPrim: (prim) => {
         if (prim === null) return null;
@@ -362,8 +354,8 @@ export function prop<
     return {
       [IsCustomProp]: true,
       isFullCustom: false,
-      getInitValue: getInitValue as () => PrimVal,
-      getFallbackValue: getInitValue as () => PrimVal,
+      getInitValue: () => initValue as any,
+      getFallbackValue: () => initValue as PrimVal,
       fromPrim: (prim: PrimVal) => prim,
       toPrim: (inst) => inst,
       persistance,

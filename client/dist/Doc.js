@@ -195,24 +195,18 @@ persistance = Persistance.global) {
                     : typeof firstParam === `number`
                         ? Number
                         : String;
-    const getInitValue = () => {
-        const correctParam = [
-            `boolean`,
-            `number`,
-            `string`,
-        ].includes(typeof firstParam)
-            ? firstParam
-            : secondParam;
-        return typeof correctParam === `function` ? correctParam() : correctParam;
-    };
+    const initValue = [
+        `boolean`,
+        `number`,
+        `string`,
+    ].includes(typeof firstParam)
+        ? firstParam
+        : secondParam;
     if (isDocClass(TypeClass)) {
         return {
             [IsCustomProp]: true,
             isFullCustom: false,
-            getInitValue: () => {
-                const initValue = getInitValue();
-                return initValue instanceof Doc ? initValue.docId : initValue;
-            },
+            getInitValue: () => initValue instanceof Doc ? initValue.docId : initValue,
             getFallbackValue: () => null,
             fromPrim: (prim) => {
                 if (prim === null)
@@ -232,8 +226,8 @@ persistance = Persistance.global) {
         return {
             [IsCustomProp]: true,
             isFullCustom: false,
-            getInitValue: getInitValue,
-            getFallbackValue: getInitValue,
+            getInitValue: () => initValue,
+            getFallbackValue: () => initValue,
             fromPrim: (prim) => prim,
             toPrim: (inst) => inst,
             persistance,
