@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "341748622809",
+    "project_id": "ninety-percent",
+    "storage_bucket": "ninety-percent.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341748622809:android:83f42efda978625f8de5c8",
+        "android_client_info": {
+          "package_name": "us.tke.ninetypercent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341748622809-svdl9gk0sjo1cgab9ggk892vqdblmhpq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "us.tke.ninetypercent",
+            "certificate_hash": "a7f319a89e7a420979af33ebcd9c4fb28007f8cd"
+          }
+        },
+        {
+          "client_id": "341748622809-dvuhen59vt6mji564rcpbur95jukaqrm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzue1kSDJYDXxTNVDcsj_Ym_qAmTl1XXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341748622809-dvuhen59vt6mji564rcpbur95jukaqrm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "341748622809-f1flufl1tvlj2p5iu9i2cf06gud7ubne.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "us.tke.ninetypercent",
+                "app_store_id": "6446333792"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,275 @@
+import { mdiPencil, mdiCheck, mdiMapMarker, mdiPhoneInTalk } from "@mdi/js";
+import {
+  Box,
+  Card,
+  Column,
+  Row,
+  Txt,
+  Icon,
+  exists,
+  formatPosixTime,
+  pushPage,
+  HiddenDelete,
+  useProp,
+  useFormula,
+  mdColors,
+} from "miwi";
+import { DeliveryPage } from "./DeliveryPage";
+import { For, Show } from "solid-js";
+import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
+import { Delivery, SubDelivery } from "./Delivery";
+import DeleteDialog from "@/components/DeleteDialog";
+import { CallAndMapButtons } from "@/Clients/CallAndMapToButtons";
+import { autoSavingProp } from "@/Utils";
+import {
+  callPhoneNumber,
+  canCallPhoneNumber,
+  canMapToAddress,
+  mapToAddress,
+  spaceChar,
+  tankDisplayName,
+} from "@/AppData";
+
+export const numDeliveriesExpanded = autoSavingProp<number>(
+  `numDeliveriesExpanded`,
+  0,
+);
+
+export function DeliveryCard(props: { delivery: Delivery }) {
+  const shouldShowCompleteDate = useFormula(() =>
+    exists(props.delivery.completedTimePosix),
+  );
+  const optionsButtonNextToCompleteDate = useFormula(
+    () => shouldShowCompleteDate.value,
+  );
+  const shouldShowNotes = useFormula(
+    () =>
+      exists(props.delivery.notes) && props.delivery.notes.trim().length > 0,
+  );
+  const optionsButtonNextToNotes = useFormula(
+    () =>
+      !optionsButtonNextToCompleteDate.value && shouldShowNotes.value && false,
+  );
+  const optionsButtonNextToClient = useFormula(
+    () =>
+      !optionsButtonNextToCompleteDate.value && !optionsButtonNextToNotes.value,
+  );
+
+  const noFocus = useProp(false);
+  return (
+    <Card
+      alignTopLeft
+      padBetween={0.5}
+      preventClickPropagation
+      stroke={props.delivery.isCompleted ? $theme.colors.hint : undefined}
+      onClick={() =>
+        pushPage(DeliveryPage, {
+          delivery: props.delivery,
+        })
+      }
+    >
+      {/* Time */}
+      <Show when={shouldShowCompleteDate.value}>
+        <Row>
+          <Txt singleLine widthGrows>
+            {formatPosixTime(props.delivery.completedTimePosix!)}
+          </Txt>
+          <DeliveryCardActionButtons
+            show={optionsButtonNextToCompleteDate.value}
+            delivery={props.delivery}
+          />
+        </Row>
+      </Show>
+
+      {/* Client */}
+      <Row>
+        <Txt singleLine widthGrows>
+          {props.delivery.title}
+        </Txt>
+        <DeliveryCardActionButtons
+          show={optionsButtonNextToClient.value}
+          delivery={props.delivery}
+        />
+      </Row>
+
+      <For
+        each={props.delivery.sortedSubDeliveries}
+        fallback={
+          <>
+            <Box />
+            <Txt widthGrows alignCenter stroke={$theme.colors.warning}>
+              No Sub-Deliveries!
+            </Txt>
+          </>
+        }
+      >
+        {(subDelivery) => <SubDeliveryRow subDelivery={subDelivery} />}
+      </For>
+      <Show when={props.delivery.isCompleted}>
+        <Txt singleLine widthGrows bold>
+          Total: ${props.delivery.totalMoney}
+        </Txt>
+      </Show>
+
+      {/* Notes */}
+      <Show when={shouldShowNotes.value}>
+        <Row>
+          <Row alignTop padBetween={0.125}>
+            <Txt alignTop width={3}>
+              Notes:
+            </Txt>
+            <Txt alignTop widthGrows>
+              {props.delivery.notes}
+            </Txt>
+          </Row>
+          <DeliveryCardActionButtons
+            show={optionsButtonNextToNotes.value}
+            delivery={props.delivery}
+          />
+        </Row>
+      </Show>
+
+      {/* Call and Map */}
+      <Show when={!props.delivery.isCompleted}>
+        <Box />
+        <CallAndMapButtons
+          phoneNumber={props.delivery.phoneNumber}
+          address={props.delivery.address}
+        />
+      </Show>
+    </Card>
+  );
+}
+
+export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
+  const tank = useFormula(() => props.subDelivery.selectedTank);
+  const tankName = useFormula(() => tankDisplayName(tank.value));
+  const galStr = useFormula(
+    () => (props.subDelivery.gallons ?? `x`) + spaceChar + `Gal.`,
+  );
+
+  function handleComplete() {
+    pushPage(CompleteSubDeliveryDialog, {
+      subDelivery: props.subDelivery,
+    });
+  }
+
+  return (
+    <Column>
+      <Row alignTopLeft>
+        <Show when={!props.subDelivery.isCompleted}>
+          <Box
+            onClick={handleComplete}
+            outlineSize={1 / 8}
+            width={1}
+            height={1}
+            outlineColor={$theme.colors.primary}
+          />
+        </Show>
+        <Show when={props.subDelivery.isCompleted}>
+          <Box
+            outlineSize={1 / 8}
+            width={1}
+            height={1}
+            outlineColor={$theme.colors.hint}
+            fill={$theme.colors.hint}
+          >
+            <Icon iconPath={mdiCheck} scale={1} stroke={mdColors.white} />
+          </Box>
+        </Show>
+        <Box>
+          <Txt singleLine widthShrinks asTallAsParent>
+            {galStr.value}
+          </Txt>
+        </Box>
+        <Box>
+          <Txt alignRight widthGrows>
+            {tankName.value}
+          </Txt>
+        </Box>
+      </Row>
+    </Column>
+  );
+}
+
+function DeliveryCardActionButtons(props: {
+  show: boolean;
+  delivery: Delivery;
+}) {
+  const isOpen = useProp(false);
+
+  function handleEdit() {
+    pushPage(DeliveryPage, {
+      delivery: props.delivery,
+    });
+  }
+
+  function handleDelete() {
+    pushPage(DeleteDialog, {
+      obj: props.delivery,
+      message: `Are you sure you want to permanently delete this delivery?`,
+    });
+  }
+
+  return (
+    <Show when={props.show}>
+      <HiddenDelete
+        isOpen={isOpen}
+        onDelete={() => {
+          handleDelete();
+        }}
+      >
+        <Row
+          alignCenterLeft
+          padBetween={0.25}
+          onClick={() => {
+            isOpen.value = false;
+            handleEdit();
+          }}
+          stroke={$theme.colors.text}
+        >
+          <Txt>Edit</Txt>
+          <Icon iconPath={mdiPencil} />
+        </Row>
+        <Show when={canCallPhoneNumber(props.delivery.phoneNumber)}>
+          <Row
+            alignCenterLeft
+            padBetween={0.25}
+            onClick={() => {
+              isOpen.value = false;
+              if (canCallPhoneNumber(props.delivery.phoneNumber))
+                callPhoneNumber(props.delivery.phoneNumber);
+            }}
+            stroke={
+              canCallPhoneNumber(props.delivery.phoneNumber)
+                ? $theme.colors.text
+                : $theme.colors.hint
+            }
+          >
+            <Txt>Call</Txt>
+            <Icon iconPath={mdiPhoneInTalk} />
+          </Row>
+        </Show>
+        <Show when={canMapToAddress(props.delivery.address)}>
+          <Row
+            alignCenterLeft
+            padBetween={0.25}
+            onClick={() => {
+              isOpen.value = false;
+              if (canMapToAddress(props.delivery.address))
+                mapToAddress(props.delivery.phoneNumber);
+            }}
+            stroke={
+              canMapToAddress(props.delivery.address)
+                ? $theme.colors.text
+                : $theme.colors.hint
+            }
+          >
+            <Txt>Map</Txt>
+            <Icon iconPath={mdiMapMarker} />
+          </Row>
+        </Show>
+      </HiddenDelete>
+    </Show>
+  );
+}

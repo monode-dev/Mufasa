@@ -1,7 +1,17 @@
 @font-face {
   font-family: "Roboto";
-  src: local("Roboto"),
-    url(../fonts/Roboto/Roboto-Regular.ttf) format("truetype");
+  src:
+    local("Roboto"),
+    url(./fonts/Roboto/Roboto-Regular.ttf) format("truetype");
+}
+
+/* html {
+  font-size: 26px;
+} */
+
+:root {
+  touch-action: pan-x pan-y;
+  height: 100%;
 }
 
 body {
@@ -9,7 +19,7 @@ body {
   /* padding: env(safe-area-inset-top) 0 0 0; */
   padding: 0;
   box-sizing: border-box;
-  background-color: #4caf50ff;
+  background-color: var(--primary-color);
   min-height: 100vh;
   height: 100vh;
   max-height: 100vh;
@@ -27,6 +37,11 @@ body {
   -webkit-tap-highlight-color: transparent;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+
+  /* For now we want to do this. */
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 ::-webkit-scrollbar {
   display: none;
