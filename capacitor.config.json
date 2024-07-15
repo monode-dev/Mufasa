@@ -1,24 +1,37 @@
 {
   "appId": "us.tke.ninetypercent",
-  "appName": "90%",
-  "webDir": "dist",
-  "backgroundColor": "#4caf50",
+  "appName": "Ninety Percent",
+  "webDir": "dist/website",
+  "backgroundColor": "#f9fafdff",
   "bundledWebRuntime": false,
+  "android": {
+    "path": "dist/android"
+  },
+  "ios": {
+    "path": "dist/ios"
+  },
   "plugins": {
-    "CapacitorUpdater": {
-      "autoUpdate": false,
-      "updateUrl": "https://us-central1-tke-ota.cloudfunctions.net/checkLatestOtaPatch"
-    },
     "SplashScreen": {
       "launchAutoHide": false,
-      "backgroundColor": "#4caf50",
+      "backgroundColor": "#ffffff",
       "androidSplashResourceName": "splash",
       "androidScaleType": "CENTER_CROP",
-      "showSpinner": false,
       "splashFullScreen": true,
-      "splashImmersive": true,
-      "layoutName": "launch_screen",
-      "useDialog": true
+      "showSpinner": false,
+      "layoutName": "launch_screen"
+    },
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "clientId": "341748622809-dvuhen59vt6mji564rcpbur95jukaqrm.apps.googleusercontent.com",
+      "serverClientId": "341748622809-dvuhen59vt6mji564rcpbur95jukaqrm.apps.googleusercontent.com",
+      "androidClientId": "341748622809-dvuhen59vt6mji564rcpbur95jukaqrm.apps.googleusercontent.com",
+      "devAndroidClientId": "341748622809-svdl9gk0sjo1cgab9ggk892vqdblmhpq.apps.googleusercontent.com",
+      "prodAndroidClientId": "341748622809-svdl9gk0sjo1cgab9ggk892vqdblmhpq.apps.googleusercontent.com",
+      "iosClientId": "341748622809-f1flufl1tvlj2p5iu9i2cf06gud7ubne.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
     }
+  },
+  "server": {
+    "androidScheme": "https"
   }
 }

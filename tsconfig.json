@@ -1,17 +1,24 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "es2022",
-    "target": "es2022",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "allowJs": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "lib": ["ESNext", "DOM"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
-    "esModuleInterop": true
+    "noEmit": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true
   },
-  "include": ["env.d.ts", "src/**/*.vue", "src/**/*.ts", "types/global.d.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["dist/**/*"]
 }

@@ -1,0 +1,4 @@
+{
+  "clientId": "us.tke.ninetypercent-auth",
+  "redirectURI": "https://ninety-percent.firebaseapp.com/__/auth/handler"
+}
