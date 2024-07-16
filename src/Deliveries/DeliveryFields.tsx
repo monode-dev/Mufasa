@@ -1,5 +1,5 @@
 import ClientSelector from "@/Clients/ClientSelector";
-import { ONE_TIME, NONE_SELECTED } from "@/Utils";
+import { ONE_TIME, NONE_SELECTED } from "@/utils";
 import {
   mdiAccount,
   mdiLabel,

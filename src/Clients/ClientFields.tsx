@@ -6,7 +6,7 @@ import {
   mdiTextBox,
 } from "@mdi/js";
 import { Field, Prop } from "miwi";
-import { formatAddress, formatPhoneNumber } from "@/Utils";
+import { formatAddress, formatPhoneNumber } from "@/utils";
 
 export function ClientFields(props: {
   name: Prop<string>;

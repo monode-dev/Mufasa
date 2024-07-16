@@ -1,4 +1,4 @@
-import { formatPosixTime } from "@/Utils";
+import { formatPosixTime } from "@/utils";
 import {
   Card,
   Field,

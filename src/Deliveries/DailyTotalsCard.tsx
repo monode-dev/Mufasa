@@ -1,6 +1,6 @@
 import { Card, Txt, Column, useFormula, exists, Box } from "miwi";
 import { Delivery } from "./Delivery";
-import { formatNumWithCommas } from "@/Utils";
+import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
 
 export function DailyTotalsCard() {
