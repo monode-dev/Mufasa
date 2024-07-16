@@ -35,7 +35,7 @@ workflows:
           npm run sync:android
       - name: Set up local.properties
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/dist/android/local.properties"
       - name: Run Clean
         script: |
           cd dist/android
