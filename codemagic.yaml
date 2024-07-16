@@ -91,13 +91,13 @@ workflows:
         recipients:
           - melchiah@tke.us
           - melchiah.mauck@gmail.com
-          - chrusionpuroo@gmail.com
         notify:
           success: true
           failure: false
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
+        submit_as_draft: true
         #track: beta
   ios-workflow:
     name: iOS Workflow
