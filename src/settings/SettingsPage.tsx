@@ -48,6 +48,7 @@ import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { listFuelTypes } from "@/AppData";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
+import {Match, Switch} from "solid-js/web";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -201,21 +202,25 @@ export function SettingsPage() {
               scale={1.25}
             />
           </Row>
-          <Show when={FuelType.getAllDocs().length === 0}>
-            <Txt hint>No Fuel Types</Txt>
-          </Show>
-          <Row widthGrows padBetween={1} alignLeft>
-            <Txt bold widthGrows>
-              Name
-            </Txt>
-            <Txt align={$Align.centerRight} width={5} bold>
-              Rate $/Gal.
-            </Txt>
-            <Box width={1} />
-          </Row>
-          <For each={listFuelTypes(FuelType.getAllDocs())}>
-            {(FuelType) => <FuelTypeEntry fuelType={FuelType} />}
-          </For>
+          <Switch>
+            <Match when={FuelType.getAllDocs().length === 0}>
+              <Txt hint>No Fuel Types</Txt>
+            </Match>
+            <Match when={FuelType.getAllDocs().length > 0}>
+              <Row widthGrows padBetween={1} alignLeft>
+                <Txt bold widthGrows>
+                  Name
+                </Txt>
+                <Txt align={$Align.centerRight} width={5} bold>
+                  Rate $/Gal.
+                </Txt>
+                <Box width={1} />
+              </Row>
+              <For each={listFuelTypes(FuelType.getAllDocs())}>
+                {(FuelType) => <FuelTypeEntry fuelType={FuelType} />}
+              </For>
+            </Match>
+          </Switch>
         </Card>
 
         {/* SECTION: Team Members */}
