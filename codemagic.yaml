@@ -84,8 +84,8 @@ workflows:
       #     git push origin $TARGET_BRANCH
 
     artifacts:
-      - android/app/build/outputs/**/*.apk
-      - android/app/build/outputs/**/*.aab
+      - dist/android/app/build/outputs/**/*.apk
+      - dist/android/app/build/outputs/**/*.aab
     publishing:
       email:
         recipients:
@@ -159,8 +159,8 @@ workflows:
       #     git push origin $TARGET_BRANCH
 
     artifacts:
-      - ios/App/build/ios/ipa/*.ipa
-      - /ios/App/tmp/xcodebuild_logs/*.log
+      - dist/ios/App/build/ios/ipa/*.ipa
+      - dist/ios/App/tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
