@@ -144,6 +144,8 @@ function CreateTankDialog(props: {
           iconPath={mdiLabel}
           underlined
           multiline
+          capitalize={"sentences"}
+          keyboard={"text"}
         />
 
         <Show when={showWarning}>
