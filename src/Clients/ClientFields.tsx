@@ -21,21 +21,23 @@ export function ClientFields(props: {
         hintText={`Name`}
         iconPath={mdiAccount} //mdiDomain
         value={props.name}
-        capitalize={`words`}
         underlined
+        capitalize={`words`}
+        keyboard={"text"}
       />
       <Field
         hintText={`Client ID`}
         iconPath={mdiIdentifier}
         value={props.clientId}
         underlined
+        keyboard={"numeric"}
       />
       <Field
         hintText={`Phone`}
         iconPath={mdiPhone}
         value={props.phoneNumber}
-        formatInput={formatPhoneNumber}
         underlined
+        formatInput={formatPhoneNumber}
         keyboard="tel"
       />
       <Field
@@ -43,17 +45,19 @@ export function ClientFields(props: {
         multiline
         iconPath={mdiMapMarker}
         value={props.address}
+        underlined
         formatInput={formatAddress}
         capitalize={`words`}
-        underlined
+        keyboard={"text"}
       />
       <Field
         hintText={`Notes`}
         multiline
         iconPath={mdiTextBox}
         value={props.notes}
-        capitalize={`sentences`}
         underlined
+        capitalize={`sentences`}
+        keyboard={"text"}
       />
     </>
   );
