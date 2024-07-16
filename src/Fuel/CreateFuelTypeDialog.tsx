@@ -72,7 +72,8 @@ function CreateFuelTypeDialog(props: {
         <Txt h1>Create Fuel Type</Txt>
         {/* TODO Doest it need autofocus like other cards (for consistency)? */}
         <Label label="Name" widthGrows>
-          <Field value={name} hintText="Unnamed" underlined />
+          <Field value={name} hintText="Unnamed" underlined
+          capitalize={"words"} keyboard={"text"}/>
         </Label>
         <Label label="Rate" widthGrows>
           <NumField
