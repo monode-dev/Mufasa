@@ -86,7 +86,12 @@ export const doFullCapacitorRebuild = async <
   });
 
   // Open xcode project
-  const { xcodeProject, xcodeProjectPath, xcodeBuildConfigs } = doNow(() => {
+  const { xcodeProject, xcodeProjectPath, xcodeBuildConfigs } = doNow((): {
+    xcodeProject: ReturnType<typeof project>;
+    xcodeProjectPath: string;
+    xcodeBuildConfigs: any;
+  } => {
+    if (config.platform === Platform.android) return {} as any;
     const xcodeProjectPath = `./dist/ios/App/App.xcodeproj/project.pbxproj`;
     const xcodeProject = project(xcodeProjectPath);
     xcodeProject.parseSync();
@@ -848,12 +853,14 @@ export const doFullCapacitorRebuild = async <
   });
 
   // Save xcode project
-  fs.writeFileSync(
-    xcodeProjectPath,
-    xcodeProject.writeSync({
-      omitEmptyValues: true,
-    }),
-  );
+  if (config.platform === Platform.ios) {
+    fs.writeFileSync(
+      xcodeProjectPath,
+      xcodeProject.writeSync({
+        omitEmptyValues: true,
+      }),
+    );
+  }
 };
 
 const doNow = <T>(doFunc: () => T) => doFunc();
