@@ -10,7 +10,7 @@
     "sync:ios": "tsx app.config.ts ios",
     "sync:android": "tsx app.config.ts android",
     "sync:android:old": "vite build && npx cap sync android",
-    "pub:funcs": "firebase deploy --only functions",
+    "pub:funcs": "cd firebase && firebase deploy --only functions --account melchiahmauck@gmail.com",
     "icons": "npx @capacitor/assets generate --iconBackgroundColor \"#ffffff\" --splashBackgroundColor \"#ffffff\" --splashBackgroundColorDark \"#ffffff\" --logoSplashScale 0.4",
     "icons:android": "npx @capacitor/assets generate --iconBackgroundColor \"#ffffff\" --splashBackgroundColor \"#ffffff\" --splashBackgroundColorDark \"#ffffff\" --logoSplashScale 0.25 --android"
   },
