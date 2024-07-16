@@ -51,12 +51,11 @@ export function AddressField(props: {
           {/* TODO: Disable when not in editing mode. */}
           <Field
             hintText={props.hintText?.value ?? ``}
-            limitLines={false}
             widthGrows
             asTallAsParent
             overflowXWraps
             alignTopLeft
-            lineCount={100}
+            maxLines={100}
             hasFocus={useFormula(
               () => addressState.value === AddressState.editing,
               (isEditing) =>
