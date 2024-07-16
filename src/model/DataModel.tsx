@@ -58,12 +58,12 @@ export const store = miapStore({
     );
   },
   apiKeys: {
-    ios: ``,
-    android: ``,
+    ios: `appl_IXiiZhzdEIiqfJMBClcOYUfeTHg`,
+    android: `goog_qHEqPAbdsCMzFblmVncPsoiUcFy`,
   },
   products: {
     premium: {
-      ios: "",
+      ios: "pro.monthly.07.16.2024",
       android: "",
     },
   },

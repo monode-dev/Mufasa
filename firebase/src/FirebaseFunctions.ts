@@ -37,7 +37,7 @@ export const {
 //   workspaceId: string;
 //   workspaceEntitlements: Set<string>;
 // };
-// https://handlerevenuecatnotification-d5ftfn3a4a-uc.a.run.app
+// https://handlerevenuecatnotification-ao5fjrcd7q-uc.a.run.app
 export const handleRevenueCatNotification = onRequest(
   // TODO: Maybe lock cors to only RevenueCat servers
   { cors: true },
