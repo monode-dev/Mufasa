@@ -23,6 +23,10 @@ workflows:
         KEYSTORE_PATH: "/tmp/keystore.keystore"
       node: latest
     scripts:
+      # Had to add this because "npm install" was failing. From: https://stackoverflow.com/a/73346047
+      - name: Install Canvas Dependencies
+        script: |
+          brew install pkg-config cairo pango libpng jpeg giflib librsvg
       - name: Install npm dependencies
         script: |
           npm install
