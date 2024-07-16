@@ -1,6 +1,6 @@
 import { prop, initializeMufasa } from "mufasa";
 import { useProp, doWatch, exists, doNow, useFormula, useRoot } from "miwi";
-import { autoSavingProp, devLog } from "../Utils";
+import { autoSavingProp, devLog } from "@/utils";
 import { createRoot } from "solid-js";
 import { capacitorPersister } from "mufasa/capacitor";
 import { solidPersister } from "mufasa/solid-js";

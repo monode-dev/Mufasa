@@ -1,6 +1,6 @@
 import { Button, Card, Page, Row, Txt, popPage, useProp, ONE_TIME, pushPage } from "miwi";
 import { Delivery, SelectedClient } from "./Delivery";
-import { NONE_SELECTED } from "@/Utils";
+import { NONE_SELECTED } from "@/utils";
 import { DeliveryFields } from "./DeliveryFields";
 import { Show } from "solid-js";
 import { withLimitConfirmation } from "@/model/LimitUi";

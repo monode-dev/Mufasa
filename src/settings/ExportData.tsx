@@ -16,9 +16,9 @@ import { Show } from "solid-js";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import JSZip from "jszip";
 import { Share } from "@capacitor/share";
-import { devLog } from "@/Utils";
-import { Tank } from "@/Tanks/Tank";
-import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
+import { devLog } from "@/utils";
+import {Tank} from "@/Tanks/Tank";
+import {Delivery, SubDelivery} from "@/Deliveries/Delivery";
 
 export function exportData() {
   pushPage(ExportingDataPopup, {});

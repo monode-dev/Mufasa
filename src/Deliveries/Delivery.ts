@@ -16,7 +16,7 @@ import {
   NONE_SELECTED,
   ONE_TIME,
   formatNumWithCommas,
-} from "@/Utils";
+} from "@/utils";
 import { FloatSort, doNow, exists } from "miwi";
 import { prop, list } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";

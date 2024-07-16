@@ -20,7 +20,7 @@ import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { CallAndMapButtons } from "@/Clients/CallAndMapToButtons";
-import { autoSavingProp } from "@/Utils";
+import { autoSavingProp } from "@/utils";
 import {
   callPhoneNumber,
   canCallPhoneNumber,

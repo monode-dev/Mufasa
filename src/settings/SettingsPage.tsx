@@ -25,9 +25,9 @@ import {
   isSubscribing,
   store,
   FuelType,
+  mfs,
 } from "@/model/DataModel";
 import { inviteTeamMember, memberLimit } from "@/model/Team";
-import { mfs } from "@/model/DataModel";
 import { Capacitor } from "@capacitor/core";
 import {
   mdiAccountCogOutline,
@@ -39,7 +39,7 @@ import {
 import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
 import { PrivacyPolicyPage } from "./PrivacyPolicyPage";
 import { FloatingActionButton } from "@/components/Floating";
-import { autoSavingProp, devLogs } from "@/Utils";
+import { autoSavingProp, devLogs } from "@/utils";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { SimpleDocEntry } from "@/components/SimpleDocEntry";
 import { SubscribePrompt, withLimitConfirmation } from "@/model/LimitUi";

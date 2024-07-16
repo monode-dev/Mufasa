@@ -27,7 +27,7 @@ import {
   createReactiveTankGeometry,
   getTankShape,
 } from "@/Calculator/ShapeUtils";
-import { formatNumWithCommas } from "@/Utils";
+import { formatNumWithCommas } from "@/utils";
 import CompleteSubDeliveryDialog from "@/Deliveries/CompleteSubDelivery.dialog";
 import TankFields from "@/Tanks/TankFields";
 import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";

@@ -69,5 +69,10 @@
       "@typescript-eslint/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "warn"
     }
+  },
+  "volta": {
+    "node": "20.15.1",
+    "yarn": "4.3.1",
+    "npm": "10.8.2"
   }
 }

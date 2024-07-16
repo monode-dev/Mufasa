@@ -1,5 +1,5 @@
 import { getClientLabel, listClients } from "@/AppData";
-import { ONE_TIME } from "@/Utils";
+import { ONE_TIME } from "@/utils";
 import {
   Box,
   Icon,

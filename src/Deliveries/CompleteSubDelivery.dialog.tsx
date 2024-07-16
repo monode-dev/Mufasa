@@ -11,7 +11,7 @@ import {
 } from "miwi";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import { SubDelivery } from "./Delivery";
-import { JUST_FUEL, ONE_TIME } from "@/Utils";
+import { JUST_FUEL, ONE_TIME } from "@/utils";
 
 // noinspection t
 export default function CompleteSubDeliveryDialog(props: {
