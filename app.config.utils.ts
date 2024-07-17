@@ -855,29 +855,30 @@ export const doFullCapacitorRebuild = async <
   // IAP
   const applyIap = doNow(() => {
     if (config.platform === Platform.android) return;
-    if (config.iosStoreKitPath === undefined) return;
-    // Add file
-    fs.copyFileSync(
-      config.iosStoreKitPath,
-      `./dist/ios/App/App/StoreKit.storekit`,
-    );
-    const storeKitFile = xcodeProject.addFile(`App/StoreKit.storekit`)!;
-    // PBXBuildFile
-    const storKitBuildFileId = xcodeProject.generateUuid();
-    xcodeProject.addToPbxBuildFileSection({
-      ...storeKitFile,
-      uuid: storKitBuildFileId,
-    });
-    // PBXGroup
-    xcodeProject.addToPbxGroup(
-      storeKitFile,
-      xcodeProject.getFirstProject().firstProject.mainGroup,
-    );
-    // PBXResourcesBuildPhase
-    xcodeProject.addToPbxResourcesBuildPhase({
-      ...storeKitFile,
-      uuid: storKitBuildFileId,
-    });
+    if (config.iosStoreKitPath !== undefined) {
+      // Add file
+      fs.copyFileSync(
+        config.iosStoreKitPath,
+        `./dist/ios/App/App/StoreKit.storekit`,
+      );
+      const storeKitFile = xcodeProject.addFile(`App/StoreKit.storekit`)!;
+      // PBXBuildFile
+      const storKitBuildFileId = xcodeProject.generateUuid();
+      xcodeProject.addToPbxBuildFileSection({
+        ...storeKitFile,
+        uuid: storKitBuildFileId,
+      });
+      // PBXGroup
+      xcodeProject.addToPbxGroup(
+        storeKitFile,
+        xcodeProject.getFirstProject().firstProject.mainGroup,
+      );
+      // PBXResourcesBuildPhase
+      xcodeProject.addToPbxResourcesBuildPhase({
+        ...storeKitFile,
+        uuid: storKitBuildFileId,
+      });
+    }
   });
 
   // Save xcode project
