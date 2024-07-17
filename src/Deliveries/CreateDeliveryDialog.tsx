@@ -1,10 +1,23 @@
-import { Button, Card, Page, Row, Txt, popPage, useProp, ONE_TIME } from "miwi";
+import { Button, Card, Page, Row, Txt, popPage, useProp, ONE_TIME, pushPage } from "miwi";
 import { Delivery, SelectedClient } from "./Delivery";
 import { NONE_SELECTED } from "@/Utils";
 import { DeliveryFields } from "./DeliveryFields";
 import { Show } from "solid-js";
+import { withLimitConfirmation } from "@/model/LimitUi";
 
-export function CreateDeliveryDialog(props: {
+export const openCreateClientDialog = (props: {
+  onCreate: (delivery: Delivery) => void;
+}) => 
+  withLimitConfirmation({
+    count: Delivery.limit.count,
+    limit: Delivery.limit.max,
+    labelSingular: `Delivery`,
+    labelPlural: `Deliveries`,
+    action: () =>
+      pushPage(CreateDeliveryDialog, props),
+  });
+
+function CreateDeliveryDialog(props: {
   onCreate: (delivery: Delivery) => void;
 }) {
   const explicitPhoneNumber = useProp(``);

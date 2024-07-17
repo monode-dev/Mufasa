@@ -6,7 +6,7 @@ import { prop, list } from "mufasa";
 export class Client extends mfs.Doc(`Client`) {
   static readonly limit = createLimitTrackers({
     free: 10,
-    premium: 100,
+    premium: 500,
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => Client.getAllDocs().length,
   });

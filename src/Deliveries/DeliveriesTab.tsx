@@ -14,7 +14,7 @@ import { For } from "solid-js";
 import { DeliveryPage } from "./DeliveryPage";
 import { DeliveryCard } from "./DeliveryCard";
 import { Delivery } from "./Delivery";
-import { CreateDeliveryDialog } from "./CreateDeliveryDialog";
+import { openCreateClientDialog } from "./CreateDeliveryDialog";
 import { DailyTotalsCard } from "./DailyTotalsCard";
 
 export default function DeliveriesTab() {
@@ -33,14 +33,12 @@ export default function DeliveriesTab() {
           <Icon
             iconPath={mdiPlus}
             scale={1.25}
-            onClick={() =>
-              pushPage(CreateDeliveryDialog, {
-                onCreate: (delivery) => {
-                  console.log(`Created Delivery:`, delivery);
-                  pushPage(DeliveryPage, { delivery });
-                },
-              })
-            }
+            onClick={() => openCreateClientDialog({
+              onCreate: (delivery) => {
+                console.log(`Created Delivery:`, delivery);
+                pushPage(DeliveryPage, { delivery });
+              },
+            })}
           />
         </Box>
       </Row>

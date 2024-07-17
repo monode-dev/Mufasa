@@ -1,8 +1,7 @@
 import { ONE_TIME, NONE_SELECTED } from "@/Utils";
-import { CreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
+import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import {
   useProp,
-  pushPage,
   Row,
   Txt,
   Icon,
@@ -105,11 +104,9 @@ export function FuelTypeSelector(props: {
               padBetween={0.125}
               alignCenterLeft
               stroke={$theme.colors.primary}
-              onClick={() => {
-                pushPage(CreateFuelTypeDialog, {
-                  onCreate: (newObject: any) => selectOption(newObject),
-                });
-              }}
+              onClick={() => openCreateFuelTypeDialog({
+                onCreate: (newObject: any) => selectOption(newObject),
+              })}
             >
               <Txt>New </Txt>
               <Icon iconPath={mdiPlus} />

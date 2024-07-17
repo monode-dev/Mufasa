@@ -23,13 +23,13 @@ import {
 import { mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
 import { SettingsPage } from "@/settings/SettingsPage";
-import CreateTankDialog from "@/Tanks/CreateTankDialog";
 import DeleteDialog from "@/components/DeleteDialog";
 import { TankCard } from "@/Tanks/TankCard";
 import { CallAndMapButtons } from "./CallAndMapToButtons";
 import { Delivery } from "@/Deliveries/Delivery";
 import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
+import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 
 export default function ClientPage(props: { client: Client }) {
   createEffect(() => {
@@ -124,8 +124,7 @@ export default function ClientPage(props: { client: Client }) {
             <Icon
               iconPath={mdiPlus}
               scale={1.25}
-              onClick={() =>
-                pushPage(CreateTankDialog, { client: props.client })
+              onClick={() => openCreateTankDialog({ client: props.client })
               }
             />
           </Box>

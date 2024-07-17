@@ -46,7 +46,7 @@ import { SubscribePrompt, withLimitConfirmation } from "@/model/LimitUi";
 import { exportData } from "./ExportData";
 import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { listFuelTypes } from "@/AppData";
-import { CreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
+import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
@@ -197,7 +197,7 @@ export function SettingsPage() {
             {/* TODO Is newObject in CreateFuelTypeDialog optional here? */}
             <Icon
               iconPath={mdiPlus}
-              onClick={() => pushPage(CreateFuelTypeDialog, {})}
+              onClick={() => openCreateFuelTypeDialog({})}
               scale={1.25}
             />
           </Row>

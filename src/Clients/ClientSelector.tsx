@@ -9,13 +9,12 @@ import {
   Txt,
   useFormula,
   exists,
-  pushPage,
   useProp,
 } from "miwi";
 import { For, Show } from "solid-js";
-import CreateClientDialog from "./CreateClientDialog";
 import { mdiPlus } from "@mdi/js";
 import { Client } from "./Client";
+import { openCreateClientDialog } from "./CreateClientDialog";
 
 // import { Selector } from "@/Mock/_Selector";
 
@@ -68,11 +67,9 @@ export default function ClientSelector(props: {
           <Show when={props.showNewOption}>
             {/* New Client */}
             <Row
-              onClick={() => {
-                pushPage(CreateClientDialog, {
-                  onCreate: (newObject) => selectOption(newObject),
-                });
-              }}
+              onClick={() => openCreateClientDialog({
+                onCreate: (newObject) => selectOption(newObject),
+              })}
               widthGrows
               padBetween={0.125}
               align={$Align.centerLeft}
