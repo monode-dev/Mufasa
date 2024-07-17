@@ -97,6 +97,9 @@ workflows:
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
+        # We added this property because we got the following error
+        # "Only releases with status draft may be created on draft app."
+        # Documentation: https://docs.codemagic.io/yaml-publishing/google-play/
         submit_as_draft: true
         #track: beta
   ios-workflow:
