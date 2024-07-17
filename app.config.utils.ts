@@ -33,7 +33,7 @@ export const doFullCapacitorRebuild = async <
       pathToAssetDirectory: string;
       backgroundColor: string;
     };
-    iosStoreKitPath: string;
+    iosStoreKitPath?: string;
     iosMobileProvisionPath: string;
     appleDevelopmentTeamId: string;
   } & (`@capacitor/camera` extends keyof PackageJson[`dependencies`]
@@ -88,25 +88,22 @@ export const doFullCapacitorRebuild = async <
   const setAndroidSdkVersion = doNow(() => {
     if (config.platform === Platform.ios) return;
     const buildGradlePath = `./dist/android/variables.gradle`;
-    const buildGradleLines = fs.readFileSync(buildGradlePath).toString().split(`\n`);
+    const buildGradleLines = fs
+      .readFileSync(buildGradlePath)
+      .toString()
+      .split(`\n`);
     buildGradleLines.splice(
-      buildGradleLines.findIndex((line) =>
-        line.includes(`minSdkVersion`),
-      ),
+      buildGradleLines.findIndex((line) => line.includes(`minSdkVersion`)),
       1,
       `    minSdkVersion = 34`,
     );
     buildGradleLines.splice(
-      buildGradleLines.findIndex((line) =>
-        line.includes(`compileSdkVersion`),
-      ),
+      buildGradleLines.findIndex((line) => line.includes(`compileSdkVersion`)),
       1,
       `    compileSdkVersion = 34`,
     );
     buildGradleLines.splice(
-      buildGradleLines.findIndex((line) =>
-        line.includes(`targetSdkVersion`),
-      ),
+      buildGradleLines.findIndex((line) => line.includes(`targetSdkVersion`)),
       1,
       `    targetSdkVersion = 34`,
     );
@@ -114,28 +111,30 @@ export const doFullCapacitorRebuild = async <
   });
 
   // Open xcode project
-  const { xcodeProject, xcodeProjectPath, xcodeBuildConfigs } = doNow((): {
-    xcodeProject: ReturnType<typeof project>;
-    xcodeProjectPath: string;
-    xcodeBuildConfigs: any;
-  } => {
-    if (config.platform === Platform.android) return {} as any;
-    const xcodeProjectPath = `./dist/ios/App/App.xcodeproj/project.pbxproj`;
-    const xcodeProject = project(xcodeProjectPath);
-    xcodeProject.parseSync();
-    const configList =
-      xcodeProject.pbxXCConfigurationList()[
-        xcodeProject.pbxTargetByName(`App`).buildConfigurationList
-      ];
-    const xcodeBuildConfigs = configList.buildConfigurations.map(
-      (entry) => xcodeProject.pbxXCBuildConfigurationSection()[entry.value],
-    );
-    return {
-      xcodeProject,
-      xcodeProjectPath,
-      xcodeBuildConfigs,
-    };
-  });
+  const { xcodeProject, xcodeProjectPath, xcodeBuildConfigs } = doNow(
+    (): {
+      xcodeProject: ReturnType<typeof project>;
+      xcodeProjectPath: string;
+      xcodeBuildConfigs: any;
+    } => {
+      if (config.platform === Platform.android) return {} as any;
+      const xcodeProjectPath = `./dist/ios/App/App.xcodeproj/project.pbxproj`;
+      const xcodeProject = project(xcodeProjectPath);
+      xcodeProject.parseSync();
+      const configList =
+        xcodeProject.pbxXCConfigurationList()[
+          xcodeProject.pbxTargetByName(`App`).buildConfigurationList
+        ];
+      const xcodeBuildConfigs = configList.buildConfigurations.map(
+        (entry) => xcodeProject.pbxXCBuildConfigurationSection()[entry.value],
+      );
+      return {
+        xcodeProject,
+        xcodeProjectPath,
+        xcodeBuildConfigs,
+      };
+    },
+  );
 
   // Set the screen orientation
   const applyScreenOrientation = doNow(() => {
@@ -856,6 +855,7 @@ export const doFullCapacitorRebuild = async <
   // IAP
   const applyIap = doNow(() => {
     if (config.platform === Platform.android) return;
+    if (config.iosStoreKitPath === undefined) return;
     // Add file
     fs.copyFileSync(
       config.iosStoreKitPath,
