@@ -1,4 +1,4 @@
-import { ONE_TIME, NONE_SELECTED } from "@/Utils";
+import { ONE_TIME, NONE_SELECTED } from "@/utils";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import {
   useProp,
