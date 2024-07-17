@@ -10,12 +10,11 @@ import {
   Txt,
   useFormula,
   mdColors,
-  pushPage,
   useProp,
   exists,
 } from "miwi";
 import { For, Show } from "solid-js";
-import CreateTankDialog from "./CreateTankDialog";
+import { openCreateTankDialog } from "./CreateTankDialog";
 import { Client } from "@/Clients/Client";
 import { Tank } from "./Tank";
 
@@ -64,12 +63,10 @@ export default function TankSelector(
         <Row
           padBetween={0.1}
           stroke={mdColors.green}
-          onClick={() => {
-            pushPage(CreateTankDialog, {
-              client: props.client, // Is this safe?
-              onCreate: (newObject) => selectOption(newObject),
-            });
-          }}
+          onClick={() => openCreateTankDialog({
+            client: props.client, 
+            onCreate: (newObject) => selectOption(newObject),
+          })}
         >
           <Txt>New</Txt>
           <Icon iconPath={mdiPlus} />

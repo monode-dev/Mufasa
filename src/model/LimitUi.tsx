@@ -11,10 +11,12 @@ import {
 } from "miwi";
 import { ConfirmationPopUp } from "../components/ConfirmationPopUp";
 import { Client } from "@/Clients/Client";
-import { mfs, store, premiumEnabled } from "@/model/DataModel";
+import { mfs, store, premiumEnabled, FuelType } from "@/model/DataModel";
 import { PrivacyPolicyPage } from "@/settings/PrivacyPolicyPage";
 import { openTermsOfUse } from "@/settings/SettingsPage";
 import { memberLimit } from "@/model/Team";
+import { Tank } from "@/Tanks/Tank";
+import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 
 export function withLimitConfirmation(props: {
   limit: number;
@@ -105,8 +107,12 @@ export function LimitText(props: {
 export function CurrentLimitText(props: {} & BoxProps) {
   return (
     <Txt hint widthGrows alignCenterLeft overrideProps={props}>
-      You have {Client.limit.count} / {Client.limit.max} clients and{" "}
-      {memberLimit.count} / {memberLimit.max} team members.
+      You have {Client.limit.count} / {Client.limit.max} clients,{" "}
+      {Tank.limit.count} / {Tank.limit.max} tanks, {FuelType.limit.count} /{" "}
+      {FuelType.limit.max} fuel types, {Delivery.limit.count} /{" "}
+      {Delivery.limit.max} deliveries, {SubDelivery.limit.count} /{" "}
+      {SubDelivery.limit.max} individual deliveries, and {memberLimit.count} /{" "}
+      {memberLimit.max} team members.
     </Txt>
   );
 }
@@ -128,7 +134,10 @@ export function SubscribePrompt() {
         <Txt hint widthGrows alignCenterLeft>
           <span>
             Pro Team: Subscribed teams can have up to {memberLimit.proLimit}{" "}
-            members and {Client.limit.proLimit} clients.
+            members, {Client.limit.proLimit} clients, {Tank.limit.proLimit}{" "}
+            tanks, {FuelType.limit.proLimit} fuel types,{" "}
+            {Delivery.limit.proLimit} deliveries, and{" "}
+            {SubDelivery.limit.proLimit} individual deliveries.
           </span>
         </Txt>
       </Column>

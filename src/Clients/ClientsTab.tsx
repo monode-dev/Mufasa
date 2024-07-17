@@ -15,7 +15,7 @@ import ClientActionBar from "./ClientActionBar";
 import { mdiPlus } from "@mdi/js";
 import { For, Show } from "solid-js";
 import ClientEntry from "./ClientEntry";
-import CreateClientDialog from "./CreateClientDialog";
+import { openCreateClientDialog } from "./CreateClientDialog";
 import ClientPage from "./ClientPage";
 import { Client } from "./Client";
 
@@ -58,24 +58,22 @@ export default function ClientsTab() {
             padBetween={0.1}
             stroke={mdColors.green}
             alignLeft
-            onClick={() => {
-              pushPage(CreateClientDialog, {
-                initName: Number.isNaN(Number(filterString.value))
-                  ? filterString.value
-                  : undefined,
-                initClientId: Number.isNaN(Number(filterString.value))
-                  ? undefined
-                  : filterString.value,
-                onCreate: (newObject) => {
-                  pushPage(ClientPage, { client: newObject });
-                  // We delay this to prevent UI flicker.
-                  doNow(async () => {
-                    await new Promise((resolve) => setTimeout(resolve, 300));
-                    isSearching.value = false;
-                  });
-                },
-              });
-            }}
+            onClick={() => openCreateClientDialog({
+              initName: Number.isNaN(Number(filterString.value))
+                ? filterString.value
+                : undefined,
+              initClientId: Number.isNaN(Number(filterString.value))
+                ? undefined
+                : filterString.value,
+              onCreate: (newObject) => {
+                pushPage(ClientPage, { client: newObject });
+                // We delay this to prevent UI flicker.
+                doNow(async () => {
+                  await new Promise((resolve) => setTimeout(resolve, 300));
+                  isSearching.value = false;
+                });
+              },
+            })}
           >
             <Txt>New Client</Txt>
             <Icon iconPath={mdiPlus} />

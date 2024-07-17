@@ -1,5 +1,5 @@
 import { Client } from "@/Clients/Client";
-import { mfs } from "@/model/DataModel";
+import { FuelType, mfs } from "@/model/DataModel";
 import {
   Dialog,
   Txt,
@@ -17,6 +17,8 @@ import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import JSZip from "jszip";
 import { Share } from "@capacitor/share";
 import { devLog } from "@/Utils";
+import { Tank } from "@/Tanks/Tank";
+import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 
 export function exportData() {
   pushPage(ExportingDataPopup, {});
@@ -138,7 +140,13 @@ async function _exportData() {
       directory: Directory.Cache,
       recursive: true,
     });
-    await Promise.all([Client.export(`${compiledPath}/Client`)]);
+    await Promise.all([
+      FuelType.export(`${compiledPath}/FuelType`),
+      Tank.export(`${compiledPath}/Tank`),
+      Client.export(`${compiledPath}/Client`),
+      SubDelivery.export(`${compiledPath}/SubDelivery`),
+      Delivery.export(`${compiledPath}/Delivery`),
+    ]);
 
     // Compile the zip
     const zip = new JSZip();

@@ -1,4 +1,5 @@
 import { FuelType } from "@/model/DataModel";
+import { withLimitConfirmation } from "@/model/LimitUi";
 import {
   useFormula,
   useProp,
@@ -14,9 +15,22 @@ import {
   Row,
   mdColors,
   Txt,
+  pushPage,
 } from "miwi";
 
-export function CreateFuelTypeDialog(props: {
+export const openCreateFuelTypeDialog = (props: {
+  onCreate?: (newObject: FuelType) => void;
+}) => 
+  withLimitConfirmation({
+    count: FuelType.limit.count,
+    limit: FuelType.limit.max,
+    labelSingular: `Fuel Type`,
+    labelPlural: `Fuel Types`,
+    action: () =>
+      pushPage(CreateFuelTypeDialog, props),
+  });
+
+function CreateFuelTypeDialog(props: {
   onCreate?: (newObject: FuelType) => void;
 }) {
   // Assign prop defaults

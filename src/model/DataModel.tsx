@@ -76,8 +76,8 @@ export const store = miapStore({
 // SECTION: Data Model
 export class FuelType extends mfs.Doc(`FuelType`) {
   static readonly limit = createLimitTrackers({
-    free: 10,
-    premium: 100,
+    free: 5,
+    premium: 50,
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => FuelType.getAllDocs().length,
   });

@@ -12,6 +12,7 @@ import {
   Button,
   FloatSort,
   doWatch,
+  pushPage,
 } from "miwi";
 import { isTankValid } from "@/AppData";
 import { createReactiveTankGeometry } from "@/Calculator/ShapeUtils";
@@ -22,8 +23,22 @@ import { Show } from "solid-js";
 import { Client } from "@/Clients/Client";
 import { Tank } from "./Tank";
 import { FuelType } from "@/model/DataModel";
+import { withLimitConfirmation } from "@/model/LimitUi";
 
-export default function CreateTankDialog(props: {
+export const openCreateTankDialog = (props: {
+  client: Client;
+  onCreate?: (newTank: Tank) => void | undefined;
+}) => 
+  withLimitConfirmation({
+    count: Tank.limit.count,
+    limit: Tank.limit.max,
+    labelSingular: `Tank`,
+    labelPlural: `Tanks`,
+    action: () =>
+      pushPage(CreateTankDialog, props),
+  });
+
+function CreateTankDialog(props: {
   client: Client;
   onCreate?: (newTank: Tank) => void | undefined;
 }) {

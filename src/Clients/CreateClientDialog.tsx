@@ -9,12 +9,28 @@ import {
   mdColors,
   popPage,
   useProp,
+  pushPage,
 } from "miwi";
 import { ClientFields } from "./ClientFields";
 import { Show } from "solid-js";
 import { Client } from "./Client";
+import { withLimitConfirmation } from "@/model/LimitUi";
 
-export default function CreateClientDialog(props: {
+export const openCreateClientDialog = (props: {
+  initName?: string;
+  initClientId?: string;
+  onCreate?: (client: Client) => string | undefined | void;
+}) => 
+  withLimitConfirmation({
+    count: Client.limit.count,
+    limit: Client.limit.max,
+    labelSingular: `Client`,
+    labelPlural: `Clients`,
+    action: () =>
+      pushPage(CreateClientDialog, props),
+  });
+
+function CreateClientDialog(props: {
   initName?: string;
   initClientId?: string;
   onCreate?: (client: Client) => string | undefined | void;

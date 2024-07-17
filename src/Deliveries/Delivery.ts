@@ -19,6 +19,7 @@ import {
 } from "@/Utils";
 import { FloatSort, doNow, exists } from "miwi";
 import { prop, list } from "mufasa";
+import { withLimitConfirmation } from "@/model/LimitUi";
 
 // SECTION: Delivery
 export type SelectedClient = Client | ONE_TIME | NONE_SELECTED;
@@ -26,8 +27,8 @@ export type SelectedClient = Client | ONE_TIME | NONE_SELECTED;
 const invalid = `!Invalid - `;
 export class Delivery extends mfs.Doc(`Delivery`) {
   static readonly limit = createLimitTrackers({
-    free: 10,
-    premium: 100,
+    free: 30,
+    premium: 100000,
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => Delivery.getAllDocs().length,
   });
@@ -177,13 +178,20 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
 
   createSubDelivery() {
-    return SubDelivery.create({
-      mx_parent: this,
-      _sortPosition: FloatSort.getNewEndPos({
-        list: this.floatSortedSubDeliveries,
-        getPos: (sub) => sub.sortPosition,
-        getUid: (sub) => sub.docId ?? ``,
-      }),
+    return withLimitConfirmation({
+      count: SubDelivery.limit.count,
+      limit: SubDelivery.limit.max,
+      labelSingular: `Individual Delivery`,
+      labelPlural: `Individual Deliveries`,
+      action: () =>
+        SubDelivery.create({
+          mx_parent: this,
+          _sortPosition: FloatSort.getNewEndPos({
+            list: this.floatSortedSubDeliveries,
+            getPos: (sub) => sub.sortPosition,
+            getUid: (sub) => sub.docId ?? ``,
+          }),
+        }),
     });
   }
 
@@ -222,8 +230,8 @@ export type SelectedTank = Tank | JUST_FUEL | NONE_SELECTED;
 export type SelectedFuel = FuelType | ONE_TIME | NONE_SELECTED;
 export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   static readonly limit = createLimitTrackers({
-    free: 10,
-    premium: 100,
+    free: 90,
+    premium: 300000,
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => Delivery.getAllDocs().length,
   });
