@@ -94,7 +94,21 @@ export const doFullCapacitorRebuild = async <
         line.includes(`minSdkVersion`),
       ),
       1,
-      `    minSdkVersion = 33`,
+      `    minSdkVersion = 34`,
+    );
+    buildGradleLines.splice(
+      buildGradleLines.findIndex((line) =>
+        line.includes(`compileSdkVersion`),
+      ),
+      1,
+      `    compileSdkVersion = 34`,
+    );
+    buildGradleLines.splice(
+      buildGradleLines.findIndex((line) =>
+        line.includes(`targetSdkVersion`),
+      ),
+      1,
+      `    targetSdkVersion = 34`,
     );
     fs.writeFileSync(buildGradlePath, buildGradleLines.join(`\n`));
   });
