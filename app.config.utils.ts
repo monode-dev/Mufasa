@@ -85,6 +85,20 @@ export const doFullCapacitorRebuild = async <
     });
   });
 
+  const setAndroidSdkVersion = doNow(() => {
+    if (config.platform === Platform.ios) return;
+    const buildGradlePath = `./dist/android/variables.gradle`;
+    const buildGradleLines = fs.readFileSync(buildGradlePath).toString().split(`\n`);
+    buildGradleLines.splice(
+      buildGradleLines.findIndex((line) =>
+        line.includes(`minSdkVersion`),
+      ),
+      1,
+      `    minSdkVersion = 33`,
+    );
+    fs.writeFileSync(buildGradlePath, buildGradleLines.join(`\n`));
+  });
+
   // Open xcode project
   const { xcodeProject, xcodeProjectPath, xcodeBuildConfigs } = doNow((): {
     xcodeProject: ReturnType<typeof project>;
