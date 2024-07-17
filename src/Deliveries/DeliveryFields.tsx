@@ -1,5 +1,5 @@
 import ClientSelector from "@/Clients/ClientSelector";
-import { ONE_TIME, NONE_SELECTED } from "@/utils";
+import {ONE_TIME, NONE_SELECTED, formatPhoneNumber, formatAddress} from "@/utils";
 import {
   mdiAccount,
   mdiLabel,
@@ -54,6 +54,8 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.label = v),
           )}
           widthGrows
+          capitalize={"words"}
+          keyboard={"text"}
         />
         <Field
           underlined
@@ -64,6 +66,8 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.explicitPhoneNumber = v),
           )}
           widthGrows
+          formatInput={formatPhoneNumber}
+          keyboard="tel"
         />
         <Field
           multiline
@@ -75,6 +79,9 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.explicitAddress = v),
           )}
           widthGrows
+          formatInput={formatAddress}
+          capitalize={`words`}
+          keyboard={"text"}
         />
       </Show>
       <Field
@@ -87,6 +94,8 @@ export function DeliveryFields(props: {
           (v) => (props.delivery.notes = v),
         )}
         widthGrows
+        capitalize={`sentences`}
+        keyboard={"text"}
       />
     </Column>
   );

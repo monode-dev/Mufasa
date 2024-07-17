@@ -42,6 +42,8 @@ export default function CompletedSubDeliveryFields(props: {
           underlined
           hintText="Fuel Name"
           stroke={fuelShouldBeGrey.value ? mdColors.grey : undefined}
+          capitalize={`words`}
+          keyboard={"text"}
         />
       </Label>
       {/** Rate */}

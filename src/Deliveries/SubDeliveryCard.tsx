@@ -151,6 +151,8 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   )}
                   underlined
                   hintText="Fuel Name"
+                  capitalize={`words`}
+                  keyboard={"text"}
                 />
               </Label>
             </Show>
