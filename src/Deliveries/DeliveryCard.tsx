@@ -83,7 +83,12 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 
       {/* Client */}
       <Row>
-        <Txt singleLine widthGrows>
+        <Txt
+          padLeft={0.2}
+          singleLine
+          widthGrows
+          // scale={1.05} bold
+        >
           {props.delivery.title}
         </Txt>
         <DeliveryCardActionButtons
@@ -93,7 +98,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Row>
 
       <For
-        each={props.delivery.sortedSubDeliveries}
+        each={[...props.delivery.subDeliveries]}
         fallback={
           <>
             <Box />
@@ -154,16 +159,22 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
     });
   }
 
+  const combinedStringTankEntry = useFormula(
+    () => `${galStr.value} ${tankName.value}`,
+  );
+  const checkboxCornerRadious = 1 / 7;
+
   return (
     <Column>
-      <Row alignTopLeft>
+      <Row alignTopLeft widthGrows>
         <Show when={!props.subDelivery.isCompleted}>
           <Box
-            onClick={handleComplete}
+            onClick={handleComplete} // Does this need to be toggle-able ?
             outlineSize={1 / 8}
             width={1}
             height={1}
             outlineColor={$theme.colors.primary}
+            cornerRadius={checkboxCornerRadious}
           />
         </Show>
         <Show when={props.subDelivery.isCompleted}>
@@ -173,20 +184,21 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
             height={1}
             outlineColor={$theme.colors.hint}
             fill={$theme.colors.hint}
+            cornerRadius={checkboxCornerRadious}
           >
-            <Icon iconPath={mdiCheck} scale={1} stroke={mdColors.white} />
+            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
           </Box>
         </Show>
-        <Box>
-          <Txt singleLine widthShrinks asTallAsParent>
-            {galStr.value}
+        <Box alignLeft>
+          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
+            {combinedStringTankEntry.value}
           </Txt>
         </Box>
-        <Box>
-          <Txt alignRight widthGrows>
+        {/* <Box>
+          <Txt fill={mdColors.red}  alignRight widthGrows>
             {tankName.value}
           </Txt>
-        </Box>
+        </Box> */}
       </Row>
     </Column>
   );
