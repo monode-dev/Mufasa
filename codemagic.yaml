@@ -133,9 +133,9 @@ workflows:
       - name: Export TS project
         script: |
           npm run sync:ios
-      # - name: Cocoapods installation
-      #   script: |
-      #     cd dist/ios/App && pod install
+      - name: Cocoapods installation
+        script: |
+          cd dist/ios/App && pod install
       - name: Set up code signing settings on Xcode project
         script: |
           cd dist/ios/App
