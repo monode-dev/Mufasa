@@ -9,7 +9,7 @@ doFullCapacitorRebuild<typeof packageJson>({
   },
   screenOrientations: [ScreenOrientation.portrait],
   iosMobileProvisionPath: `./src/assets/MobileProvision.mobileprovision`,
-  iosStoreKitPath: `./src/assets/StoreKit.storekit`,
+  // iosStoreKitPath: `./src/assets/StoreKit.storekit`,
   appleDevelopmentTeamId: `6BFWW87ZUF`,
   googleAuth: {
     jsonPath: `./src/assets/google-services.json`,
