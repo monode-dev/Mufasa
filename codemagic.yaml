@@ -133,9 +133,10 @@ workflows:
       - name: Export TS project
         script: |
           npm run sync:ios
-      - name: Cocoapods installation
-        script: |
-          cd dist/ios/App && pod install
+      # Moved into app.config.utils.ts
+      # - name: Cocoapods installation
+      #   script: |
+      #     cd dist/ios/App && pod install
       - name: Set up code signing settings on Xcode project
         script: |
           cd dist/ios/App
@@ -149,7 +150,7 @@ workflows:
       - name: Build ipa for distribution
         script: |
           cd dist/ios/App
-          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME" -verbose
       # - name: Push changes to the published branch
       #   script: |
       #     PLATFORM="ios"
