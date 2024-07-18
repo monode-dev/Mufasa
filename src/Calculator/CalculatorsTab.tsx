@@ -262,11 +262,7 @@ export default function Calculator() {
                     </Txt>
                   </Show>
 
-                  <For
-                    each={
-                      selectedDelivery.value?.floatSortedSubDeliveries ?? []
-                    }
-                  >
+                  <For each={selectedDelivery.value?.sortedSubDeliveries ?? []}>
                     {(subDelivery) => (
                       <Txt
                         onclick={() => {

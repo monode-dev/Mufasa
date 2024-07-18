@@ -6,7 +6,7 @@ import { For, Show } from "solid-js";
 export function DailyTotalsCard() {
   const upcomingSubDeliveries = useFormula(() => {
     return Delivery.upcomingDeliveries.flatMap((delivery) =>
-      delivery.floatSortedSubDeliveries.filter((sub) => !sub.isCompleted),
+      delivery.sortedSubDeliveries.filter((sub) => !sub.isCompleted),
     );
   });
   const leftPerFuel = useFormula(() => {
@@ -32,7 +32,7 @@ export function DailyTotalsCard() {
         (delivery) => (delivery.completedTimePosix ?? 0) > threeAm.getTime(),
       ),
     ].flatMap((delivery) =>
-      delivery.floatSortedSubDeliveries.filter(
+      delivery.sortedSubDeliveries.filter(
         (sub) =>
           sub.isCompleted && (sub.completedTimePosix ?? 0) > threeAm.getTime(),
       ),

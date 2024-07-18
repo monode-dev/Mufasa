@@ -98,7 +98,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Row>
 
       <For
-        each={[...props.delivery.subDeliveries]}
+        each={props.delivery.sortedSubDeliveries}
         fallback={
           <>
             <Box />
