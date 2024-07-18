@@ -82,26 +82,28 @@ export function DeliveryPage(props: { delivery: Delivery }) {
         </Row>
 
         <Column padBetween={1}>
-          <Show when={props.delivery.sortedSubDeliveries.length === 0}>
-            <Txt hint>Tap + to add an individual delivery.</Txt>
-          </Show>
-          <SortableColumn
-            shouldLog
-            onSort={(sortProps) =>
-              FloatSort.moveItem({
-                sortedList: props.delivery.incompleteSubDeliveries,
-                fromIndex: sortProps.from,
-                toIndex: sortProps.to,
-                getPos: (delivery) => delivery.sortPosition!,
-                setPos: (delivery, pos) => (delivery.sortPosition = pos),
-              })
-            }
+          <Show
+            when={props.delivery.sortedSubDeliveries.length > 0}
+            fallback={<Txt hint>Tap + to add an individual delivery.</Txt>}
           >
-            <For each={props.delivery.incompleteSubDeliveries}>
-              {(subDelivery) => <SubDeliveryCard subDelivery={subDelivery} />}
-            </For>
-          </SortableColumn>
-          <For
+            <SortableColumn
+              shouldLog
+              onSort={(sortProps) =>
+                FloatSort.moveItem({
+                  sortedList: props.delivery.sortedSubDeliveries,
+                  fromIndex: sortProps.from,
+                  toIndex: sortProps.to,
+                  getPos: (delivery) => delivery.sortPosition!,
+                  setPos: (delivery, pos) => (delivery.sortPosition = pos),
+                })
+              }
+            >
+              <For each={props.delivery.sortedSubDeliveries}>
+                {(subDelivery) => <SubDeliveryCard subDelivery={subDelivery} />}
+              </For>
+            </SortableColumn>
+          </Show>
+          {/* <For
             each={props.delivery.completedSubDeliveries
               .slice()
               .sort(
@@ -110,7 +112,7 @@ export function DeliveryPage(props: { delivery: Delivery }) {
               )}
           >
             {(subDelivery) => <SubDeliveryCard subDelivery={subDelivery} />}
-          </For>
+          </For> */}
         </Column>
 
         {/* SECTION Related Deliveries */}

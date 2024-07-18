@@ -18,7 +18,7 @@ import {
   formatNumWithCommas,
 } from "@/utils";
 import { FloatSort, doNow, exists } from "miwi";
-import { prop, list } from "mufasa";
+import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
 
 // SECTION: Delivery
@@ -38,9 +38,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   clientAddress = prop(String, ``);
   clientPhoneNumber = prop(String, ``);
   onDelete() {
-    this.floatSortedSubDeliveries.forEach((subDelivery) =>
-      subDelivery.deleteDoc(),
-    );
+    this.sortedSubDeliveries.forEach((subDelivery) => subDelivery.deleteDoc());
   }
 
   static get upcomingDeliveriesForAllUsers() {
@@ -65,77 +63,76 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
 
   // Client
-  get selectedClient() {
-    return this._isOneTimeClient ? ONE_TIME : this._client ?? NONE_SELECTED;
-  }
-  set selectedClient(value) {
-    if (value === ONE_TIME) {
-      this._isOneTimeClient = true;
-      this._client = null;
-    } else if (value === NONE_SELECTED) {
-      this._isOneTimeClient = false;
-      this._client = null;
-    } else {
-      this._isOneTimeClient = false;
-      this._client = value;
-    }
-  }
-  get selectedKnownClient(): Client | null {
-    return this.selectedClient !== ONE_TIME &&
-      this.selectedClient !== NONE_SELECTED
+  selectedClient: SelectedClient | Client = formula(
+    () => (this._isOneTimeClient ? ONE_TIME : this._client ?? NONE_SELECTED),
+    (value) => {
+      if (value === ONE_TIME) {
+        this._isOneTimeClient = true;
+        this._client = null;
+      } else if (value === NONE_SELECTED) {
+        this._isOneTimeClient = false;
+        this._client = null;
+      } else {
+        this._isOneTimeClient = false;
+        this._client = value;
+      }
+    },
+  );
+  readonly selectedKnownClient = formula(() =>
+    this.selectedClient !== ONE_TIME && this.selectedClient !== NONE_SELECTED
       ? this.selectedClient
-      : null;
-  }
+      : null,
+  );
 
   // Label
   static getMayEditLabel(selectedClient: SelectedClient) {
     return selectedClient === ONE_TIME;
   }
-  get mayEditLabel() {
-    return Delivery.getMayEditLabel(this.selectedClient);
-  }
-  get label() {
-    return this.clientLabel ?? ``;
-  }
-  set label(value: string) {
-    this.clientLabel = value;
-  }
-  get title() {
+  readonly mayEditLabel = formula(() =>
+    Delivery.getMayEditLabel(this.selectedClient),
+  );
+  label = formula(
+    () => this.clientLabel ?? ``,
+    (value) => {
+      this.clientLabel = value;
+    },
+  );
+  readonly title = formula(() => {
     const valid = this.isValid ? `` : invalid;
     const client = this.selectedClient;
     const name = client === ONE_TIME ? this.label : getClientLabel(client);
     return valid + name;
-  }
+  });
 
   // Address & Phone
   static getMayEditAddressAndPhone(selectedClient: SelectedClient) {
     return selectedClient === ONE_TIME;
   }
-  get mayEditAddressAndPhone() {
-    return Delivery.getMayEditAddressAndPhone(this.selectedClient);
-  }
-  get explicitAddress() {
-    return this.clientAddress ?? ``;
-  }
-  set explicitAddress(value: string) {
-    this.clientAddress = value;
-  }
-  get address() {
-    return this.selectedClient === ONE_TIME
+  readonly mayEditAddressAndPhone = formula(() =>
+    Delivery.getMayEditAddressAndPhone(this.selectedClient),
+  );
+  explicitAddress = formula(
+    () => this.clientAddress ?? ``,
+    (value) => {
+      this.clientAddress = value;
+    },
+  );
+  readonly address = formula(() =>
+    this.selectedClient === ONE_TIME
       ? this.explicitAddress
-      : this.selectedClient?.address ?? ``;
-  }
-  get explicitPhoneNumber() {
-    return this.clientPhoneNumber ?? ``;
-  }
-  set explicitPhoneNumber(value: string) {
-    this.clientPhoneNumber = value;
-  }
-  get phoneNumber() {
-    return this.selectedClient === ONE_TIME
+      : this.selectedClient?.address ?? ``,
+  );
+  explicitPhoneNumber = formula(
+    () => this.clientPhoneNumber ?? ``,
+    (value) => {
+      this.clientPhoneNumber = value;
+    },
+  );
+  readonly phoneNumber = formula(() =>
+    this.selectedClient === ONE_TIME
       ? this.explicitPhoneNumber
-      : this.selectedClient?.phoneNumber ?? ``;
-  }
+      : this.selectedClient?.phoneNumber ?? ``,
+  );
 
   // Notes
   notes = prop(String, ``);
@@ -147,35 +144,28 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   // private _subDeliveries: SubDelivery[] = [];
   // private _subDeliveriesSig: Prop<SubDelivery[]> = useProp([]);
   readonly subDeliveries = list(SubDelivery, `mx_parent`);
-  get floatSortedSubDeliveries(): ReadonlyArray<SubDelivery> {
-    return FloatSort.toSorted({
+  readonly sortedSubDeliveries = formula(() =>
+    FloatSort.toSorted({
       list: this.subDeliveries,
       getPos: (sub) => sub.sortPosition,
       getUid: (sub) => sub.docId ?? ``,
-    });
-  }
-
-  get incompleteSubDeliveries(): ReadonlyArray<SubDelivery> {
-    return this.floatSortedSubDeliveries.filter((sub) => !sub.isCompleted);
-  }
-
-  get completedSubDeliveries(): ReadonlyArray<SubDelivery> {
-    return this.floatSortedSubDeliveries
+    }),
+  );
+  readonly incompleteSubDeliveries = formula(() =>
+    this.sortedSubDeliveries.filter((sub) => !sub.isCompleted),
+  );
+  readonly completedSubDeliveries = formula(() =>
+    this.sortedSubDeliveries
       .filter((subDelivery) => subDelivery.isCompleted)
-      .sort((a, b) => a.completedTimePosix! - b.completedTimePosix!);
-  }
+      .sort((a, b) => a.completedTimePosix! - b.completedTimePosix!),
+  );
 
-  get sortedSubDeliveries(): ReadonlyArray<SubDelivery> {
-    // Combine the two arrays
-    return [...this.incompleteSubDeliveries, ...this.completedSubDeliveries];
-  }
-
-  get totalMoney() {
-    return formatNumWithCommas(
-      this.floatSortedSubDeliveries.reduce((sum, sub) => sum + sub.income, 0),
+  readonly totalMoney = formula(() =>
+    formatNumWithCommas(
+      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.income, 0),
       2,
-    );
-  }
+    ),
+  );
 
   createSubDelivery() {
     return withLimitConfirmation({
@@ -187,7 +177,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
         SubDelivery.create({
           mx_parent: this,
           _sortPosition: FloatSort.getNewEndPos({
-            list: this.floatSortedSubDeliveries,
+            list: this.sortedSubDeliveries,
             getPos: (sub) => sub.sortPosition,
             getUid: (sub) => sub.docId ?? ``,
           }),
@@ -202,27 +192,27 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   user = prop(String, ``);
 
   // Checks
-  get isValid() {
+  readonly isValid = formula(() => {
     if (this.selectedClient === NONE_SELECTED) return false;
     if (this.selectedClient === ONE_TIME && this.label.trim() === ``)
       return false;
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
       return false;
-    return !this.floatSortedSubDeliveries.some((sub) => !sub.isValid);
-  }
+    return !this.sortedSubDeliveries.some((sub) => !sub.isValid);
+  });
 
-  get isCompleted() {
-    return (
-      this.floatSortedSubDeliveries.length > 0 &&
-      this.floatSortedSubDeliveries.every((sub) => sub.isCompleted)
-    );
-  }
-  get completedTimePosix() {
-    if (!this.isCompleted) return null;
-    return Math.max(
-      ...this.floatSortedSubDeliveries.map((sub) => sub.completedTimePosix!),
-    );
-  }
+  readonly isCompleted = formula(
+    () =>
+      this.sortedSubDeliveries.length > 0 && this.completedTimePosix !== null,
+  );
+  readonly completedTimePosix = formula(() => {
+    let mostRecent = 0;
+    for (const sub of this.sortedSubDeliveries) {
+      if (!sub.isCompleted) return null;
+      mostRecent = Math.max(mostRecent, sub.completedTimePosix ?? 0);
+    }
+    return mostRecent;
+  });
 }
 
 // SECTION: SubDelivery
@@ -245,96 +235,103 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   _sortPosition = prop([Number, null], null);
 
   // Tank
-  get shouldShowTankSelector() {
-    return (
+  readonly shouldShowTankSelector = formula(
+    () =>
       (this.selectedTank !== JUST_FUEL &&
         this.selectedTank !== NONE_SELECTED) ||
-      exists(this.delivery?.selectedKnownClient)
-    );
-  }
-  get selectedTank() {
-    if (!exists(this._isJustFuel) || !exists(this._tank)) {
-      return NONE_SELECTED;
-    }
-    return this._isJustFuel ? JUST_FUEL : this._tank;
-  }
-  set selectedTank(value: SelectedTank) {
-    if (value === JUST_FUEL) {
-      this._isJustFuel = true;
-      this._tank = null;
-    } else if (value === NONE_SELECTED) {
-      this._isJustFuel = false;
-      this._tank = null;
-    } else {
-      this._isJustFuel = false;
-      this._tank = value;
-    }
-  }
-  get selectedKnownTank(): Tank | null {
-    return this.selectedTank !== JUST_FUEL &&
-      this.selectedTank !== NONE_SELECTED
+      exists(this.delivery?.selectedKnownClient),
+  );
+  selectedTank: SelectedTank = formula(
+    () => {
+      if (!exists(this._isJustFuel) || !exists(this._tank)) {
+        return NONE_SELECTED;
+      }
+      return this._isJustFuel ? JUST_FUEL : this._tank;
+    },
+    (value) => {
+      if (value === JUST_FUEL) {
+        this._isJustFuel = true;
+        this._tank = null;
+      } else if (value === NONE_SELECTED) {
+        this._isJustFuel = false;
+        this._tank = null;
+      } else {
+        this._isJustFuel = false;
+        this._tank = value;
+      }
+    },
+  );
+  readonly selectedKnownTank = formula(() =>
+    this.selectedTank !== JUST_FUEL && this.selectedTank !== NONE_SELECTED
       ? this.selectedTank
-      : null;
-  }
-  get tankGeometry(): TankGeometry | null {
-    return this.shouldShowTankSelector &&
-      this.selectedTank !== JUST_FUEL &&
-      this.selectedTank !== NONE_SELECTED
+      : null,
+  );
+  readonly tankGeometry: TankGeometry | null = formula(() =>
+    this.shouldShowTankSelector &&
+    this.selectedTank !== JUST_FUEL &&
+    this.selectedTank !== NONE_SELECTED
       ? this.selectedTank
-      : null;
-  }
+      : null,
+  );
 
   // Fuel
-  get shouldShowFuelSelector() {
-    return (
+  readonly shouldShowFuelSelector = formula(
+    () =>
       this.selectedTank === JUST_FUEL ||
-      this.delivery?.selectedClient === ONE_TIME
-    );
-  }
-  get selectedFuel() {
-    if (!exists(this._isOneTimeFuel) || !exists(this._fuelType)) {
-      return NONE_SELECTED;
-    }
-    return this._isOneTimeFuel ? ONE_TIME : this._fuelType;
-  }
-  set selectedFuel(value: SelectedFuel) {
-    if (value === ONE_TIME) {
-      this._isOneTimeFuel = true;
-      this._fuelType = null;
-    } else if (value === NONE_SELECTED) {
-      this._isOneTimeFuel = false;
-      this._fuelType = null;
-    } else {
-      this._isOneTimeFuel = false;
-      this._fuelType = value;
-    }
-  }
+      this.delivery?.selectedClient === ONE_TIME,
+  );
+  selectedFuel: SelectedFuel = formula(
+    () => {
+      if (!exists(this._isOneTimeFuel) || !exists(this._fuelType)) {
+        return NONE_SELECTED;
+      }
+      return this._isOneTimeFuel ? ONE_TIME : this._fuelType;
+    },
+    (value) => {
+      if (value === ONE_TIME) {
+        this._isOneTimeFuel = true;
+        this._fuelType = null;
+      } else if (value === NONE_SELECTED) {
+        this._isOneTimeFuel = false;
+        this._fuelType = null;
+      } else {
+        this._isOneTimeFuel = false;
+        this._fuelType = value;
+      }
+    },
+  );
 
   // Fuel Name
-  get shouldShowFuelNameField() {
-    return this.selectedFuel === ONE_TIME;
-  }
-  get explicitFuelName() {
-    return this.fuelName ?? ``;
-  }
-  set explicitFuelName(value: string) {
-    this.fuelName = value;
-  }
+  readonly shouldShowFuelNameField = formula(
+    () => this.selectedFuel === ONE_TIME,
+  );
+  explicitFuelName = formula(
+    () => this.fuelName ?? ``,
+    (value) => {
+      this.fuelName = value;
+    },
+  );
 
   // Rate
-  get shouldShowFuelRateField() {
-    return this.selectedFuel === ONE_TIME;
-  }
-  get explicitRate() {
-    return this.rate ?? null;
-  }
-  set explicitRate(value: number | null) {
-    this.rate = value;
-  }
-  get fuelSpecs(): {
-    name: string | null;
-    rate: number | null;
-  } | null {
+  // get shouldShowFuelRateField() {
+  //   return this.selectedFuel === ONE_TIME;
+  // }
+  readonly shouldShowFuelRateField = formula(
+    () => this.selectedFuel === ONE_TIME,
+  );
+  // get explicitRate() {
+  //   return this.rate ?? null;
+  // }
+  // set explicitRate(value: number | null) {
+  //   this.rate = value;
+  // }
+  explicitRate = formula(
+    () => this.rate ?? null,
+    (value) => {
+      this.rate = value;
+    },
+  );
+  readonly fuelSpecs = formula(() => {
     if (exists(this.selectedKnownTank)) {
       const fuelType = this.selectedKnownTank.fuelType;
       return exists(fuelType)
@@ -363,18 +360,18 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     } else {
       return null;
     }
-  }
+  });
 
   // Gallons
   gallons = prop([Number, null], null);
 
   // Income
-  get income() {
+  readonly income = formula(() => {
     return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0);
-  }
+  });
 
   // Full Title
-  get subTitle() {
+  readonly subTitle = formula(() => {
     const valid = this.isValid ? `` : invalid;
     const tank = this.selectedTank;
     if (tank === JUST_FUEL || !this.shouldShowTankSelector) {
@@ -383,25 +380,25 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
         fuel === ONE_TIME ? this.explicitFuelName : fuel?.name ?? ``;
       return `${valid}${formatNumWithCommas(this.gallons ?? 0, 0)} gal. of ${fuelName}`;
     } else return valid + tankDisplayName(tank);
-  }
+  });
 
   // Sort Position
-  get sortPosition() {
-    if (!exists(this._sortPosition)) {
-      this._sortPosition = Math.floor(Math.random() * 100);
-    }
-    return this._sortPosition;
-  }
-  set sortPosition(value: number) {
-    this._sortPosition = value;
-  }
+  sortPosition = formula(
+    () => {
+      if (!exists(this._sortPosition)) {
+        this._sortPosition = Math.floor(Math.random() * 100);
+      }
+      return this._sortPosition;
+    },
+    (value) => {
+      this._sortPosition = value;
+    },
+  );
 
   // Completion
-  get isCompleted() {
-    return exists(this.completedTimePosix);
-  }
+  isCompleted = formula(() => exists(this.completedTimePosix));
   completedTimePosix = prop([Number, null], null);
-  get isValid() {
+  readonly isValid = formula(() => {
     const fuelNameIsValid =
       exists(this.explicitFuelName) && this.explicitFuelName.trim() !== ``;
     const rateIsValid = exists(this.explicitRate) && this.explicitRate >= 0;
@@ -429,7 +426,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       }
     });
     return payloadIsValid && gallonsIsValid;
-  }
+  });
   complete(props: { fuelName: string; rate: number; gallons: number }) {
     this.explicitFuelName = props.fuelName;
     this.explicitRate = props.rate;
@@ -438,8 +435,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   }
   // TODO: Implement an un-complete method
 
-  get delivery() {
+  readonly delivery = formula(() => {
     // We have to do this cast otherwise this prop is flagged as required
     return this.mx_parent as Delivery;
-  }
+  });
 }
