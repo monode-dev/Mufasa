@@ -103,16 +103,6 @@ export function DeliveryPage(props: { delivery: Delivery }) {
               </For>
             </SortableColumn>
           </Show>
-          {/* <For
-            each={props.delivery.completedSubDeliveries
-              .slice()
-              .sort(
-                (a, b) =>
-                  (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
-              )}
-          >
-            {(subDelivery) => <SubDeliveryCard subDelivery={subDelivery} />}
-          </For> */}
         </Column>
 
         {/* SECTION Related Deliveries */}
