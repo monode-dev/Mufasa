@@ -178,6 +178,11 @@ export default function Calculator() {
     return val * 100 > maxSafe ? fillColor(val) : undefined;
   }
 
+  const TankFields_warning = useProp("");
+  const showWarning = useFormula(
+    () => exists(TankFields_warning.value),
+  );
+
   return (
     <Body asWideAsParent padBetween={0.5}>
       <Txt h2>Tank Details</Txt>
@@ -307,7 +312,13 @@ export default function Calculator() {
 
         {/* DIMENSIONS TAB */}
         <Show when={selectedTab.value === tabs.dimensions}>
-          <TankFields tankGeometry={tankGeometry.value!} />
+          <TankFields tankGeometry={tankGeometry.value!}
+          warningMessage={TankFields_warning} />
+          <Show when={showWarning}>
+            <Txt widthGrows stroke={$theme.colors.warning}>
+              {TankFields_warning.value}
+            </Txt>
+          </Show>
         </Show>
 
         {/* Other Fields */}
