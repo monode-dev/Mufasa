@@ -66,7 +66,13 @@ export default function TankFields(props: {
       <Box padBottom={0.25}>
         <ShapeSelector
           value={useFormula(
-            () => props.tankGeometry.shape ?? null,
+            () => {
+              // is crashing with props.tankGeometry.shape ?? null
+              // so...
+              const tg = props.tankGeometry;
+              if(exists(tg)) if(exists(tg.shape)) return tg.shape
+              return null;
+            },
             (newValue) => (props.tankGeometry.shape = newValue),
           )}
           label="Shape"
