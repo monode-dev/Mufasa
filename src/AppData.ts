@@ -145,13 +145,20 @@ export function isTankValid(tank: Partial<Tank> | null | undefined): boolean {
   if (tank?.shape == `truckBedTank`) {
     let td = tank.topDepth ?? 0;
     let fd = tank.fullDepth ?? 0;
-    if (td <= 0 || fd <= 0) {
+    if (td <= 0 || fd <= 0)
       return false;
-    }
-    if (td >= fd) {
+    if (td >= fd)
       return false;
-    }
   }
+  else if(tank?.shape == `oval` ){
+    let sh = tank.squareHeight ?? 0;
+    let fh = tank.fullHeight ?? 0;
+    if(sh <= 0 || fh <= 0)
+      return false;
+    if(sh >= fh)
+      return false;
+  }
+
   const shapeUtils = getTankShape(tank?.shape);
   const volume = shapeUtils?.calcTotalVolume(tank);
   return (

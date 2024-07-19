@@ -107,14 +107,24 @@ export default function Calculator() {
       tankGeometry.value,
     ),
   );
+
+  const TankFields_warning = useProp("");
+  const showWarning = useFormula(
+    () => exists(TankFields_warning.value),
+  );
+
   const currentGallons = useFormula(() =>
-    getTankShape(tankGeometry.value?.shape)?.calcFilledVolume(
-      tankGeometry.value,
-      stickedInches.value,
-    ),
+    !showWarning.value
+      ? getTankShape(tankGeometry.value?.shape)?.calcFilledVolume(
+          tankGeometry.value,
+          stickedInches.value,
+        )
+      : undefined,
   );
   const currentFillPercent = useFormula(() =>
-    exists(totalGallons.value) && exists(currentGallons.value)
+    (!showWarning.value
+      && exists(totalGallons.value)
+      && exists(currentGallons.value))
       ? totalGallons.value === 0
         ? 0
         : currentGallons.value / totalGallons.value
@@ -177,11 +187,6 @@ export default function Calculator() {
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
   }
-
-  const TankFields_warning = useProp("");
-  const showWarning = useFormula(
-    () => exists(TankFields_warning.value),
-  );
 
   return (
     <Body asWideAsParent padBetween={0.5}>
