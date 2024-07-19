@@ -32,29 +32,43 @@ export default function TankFields(props: {
   });
 
   doWatch(() => {
+    const warning = props.warningMessage;
+    // no reason to process this if nobody wants the message
+    if(!exists(warning)) return;
+
     const shapeId = props.tankGeometry.shape;
-    let message = null;
-    if (!exists(shapeId)) message = `Please select a shape.`;
+    warning.value = null;
+    if (!exists(shapeId)) {
+      warning.value = `Please select a shape.`;
+      return;
+    }
+
+    switch(shapeId) {
+      case "truckBedTank":
+        if (props.tankGeometry.topDepth! >= props.tankGeometry.fullDepth!) {
+          warning.value = "Top Depth must be less than Full Depth.";
+          return;
+        } else if (
+          props.tankGeometry.wideHeight! >= props.tankGeometry.fullHeight!
+        ) {
+          warning.value = "Wide Height must be less than Full Height.";
+          return;
+        }
+        break;
+      case "oval":
+        if(props.tankGeometry.squareHeight! >= props.tankGeometry.fullHeight!) {
+          warning.value = "Rect. Height must be less than Full Height.";
+          return;
+        }
+    }
+
     for (const dimension of dimensions.value) {
       const size = props.tankGeometry[dimension];
       if (toNum(size) <= 0) {
-        message = `All dimensions must be greater than zero.`;
-        break;
+        warning.value = `All dimensions must be greater than zero.`;
+        return;
       }
     }
-    if (shapeId == "truckBedTank") {
-      if (props.tankGeometry.topDepth! >= props.tankGeometry.fullDepth!) {
-        message = "Top Depth must be less than Full Depth.";
-      } else if (
-        props.tankGeometry.wideHeight! >= props.tankGeometry.fullHeight!
-      ) {
-        message = "Wide Height must be less than Full Height.";
-      }
-    }
-    if (props.warningMessage) {
-      props.warningMessage.value = message;
-    }
-    return;
   });
 
   function toNum(size: number | null | undefined): number {
