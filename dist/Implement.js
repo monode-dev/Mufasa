@@ -183,6 +183,7 @@ function listProx(typeName, objFormats, localCache, isChild = false, mx_parent) 
 //
 // SECTION: Define
 function _defineAppDataStructure(modelName, firebaseOptions, reactivity, options) {
+    console.log(`Starting mufasa: ${modelName}...`);
     // Setup Reactivity
     _computed = reactivity.computed;
     _signal = reactivity.signal;

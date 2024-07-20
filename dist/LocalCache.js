@@ -121,6 +121,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
             }
         }
         for (const typeName in typeSchemas) {
+            console.log(`Starting snapshot for ${getCollectionName(typeName)}`);
             (0, firestore_1.onSnapshot)((0, firestore_1.query)((0, firestore_1.collection)(firestoreDb, getCollectionName(typeName)), (0, firestore_1.where)(exports.CHANGE_DATE_KEY, ">", new Date((clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
                 0) *
                 1000 -

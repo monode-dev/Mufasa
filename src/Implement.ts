@@ -22,7 +22,7 @@ import {
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 // import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
-    // "@capacitor-firebase/authentication": "^1.4.0",
+// "@capacitor-firebase/authentication": "^1.4.0",
 
 //
 //
@@ -314,6 +314,7 @@ export function _defineAppDataStructure<
     typeSchemas: TSD;
   },
 ) {
+  console.log(`Starting mufasa: ${modelName}...`);
   // Setup Reactivity
   _computed = reactivity.computed;
   _signal = reactivity.signal;

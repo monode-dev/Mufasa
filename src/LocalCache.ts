@@ -216,6 +216,7 @@ export function createCache({
       }
     }
     for (const typeName in typeSchemas) {
+      console.log(`Starting snapshot for ${getCollectionName(typeName)}`);
       onSnapshot(
         query(
           collection(firestoreDb, getCollectionName(typeName)),
