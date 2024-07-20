@@ -31,7 +31,9 @@ function loadChangeUploader(firestoreDb, firebaseApp, getClientStorage, serverFi
         if (isFileChange(change)) {
             // Upload file
             if (!change.haveUploadedFile) {
-                const data = await clientStorage.readFile(change.newFileId);
+                const data = await clientStorage
+                    .readFile(change.newFileId)
+                    .catch(() => undefined);
                 if (!(0, utils_1.exists)(data)) {
                     clientStorage.updateData({
                         [changeId]: undefined,

@@ -80,7 +80,9 @@ export function loadChangeUploader(
     if (isFileChange(change)) {
       // Upload file
       if (!change.haveUploadedFile) {
-        const data = await clientStorage.readFile(change.newFileId);
+        const data = await clientStorage
+          .readFile(change.newFileId)
+          .catch(() => undefined);
         if (!exists(data)) {
           clientStorage.updateData({
             [changeId]: undefined,

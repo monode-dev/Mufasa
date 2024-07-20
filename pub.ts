@@ -44,7 +44,7 @@ try {
 
   // Publish to npm
   // Make sure you're already logged in to npm (npm login)
-  execSync("npm publish", { stdio: "inherit" });
+  execSync("npm publish --tag ninety-percent-vue", { stdio: "inherit" });
   console.log("Successfully published the package");
 
   // Commit the version change

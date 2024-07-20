@@ -7,7 +7,9 @@ function capacitorStorage(fileSystem) {
         fileName = `${fileName}.json`;
         // Load data
         let data = await (async () => {
-            const savedData = await fileSystem.readFile(fileName);
+            const savedData = await fileSystem
+                .readFile(fileName)
+                .catch(() => undefined);
             if ((0, utils_1.exists)(savedData)) {
                 return JSON.parse(savedData);
             }

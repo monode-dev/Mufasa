@@ -197,7 +197,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                 if (fileIsUploading)
                     return Parse_1.UPLOADING_FILE;
                 // Read the file from storage.
-                return clientStorage?.readFile(propValue) ?? null;
+                return clientStorage?.readFile(propValue).catch(() => null) ?? null;
             }
             else {
                 return propValue;

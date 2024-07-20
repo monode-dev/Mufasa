@@ -322,7 +322,7 @@ export function createCache({
         if (fileIsUploading) return UPLOADING_FILE;
 
         // Read the file from storage.
-        return clientStorage?.readFile(propValue) ?? null;
+        return clientStorage?.readFile(propValue).catch(() => null) ?? null;
       } else {
         return propValue;
       }

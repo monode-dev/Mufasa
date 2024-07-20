@@ -11,7 +11,9 @@ export function capacitorStorage(fileSystem: {
 
     // Load data
     let data: JsonObject = await (async () => {
-      const savedData = await fileSystem.readFile(fileName);
+      const savedData = await fileSystem
+        .readFile(fileName)
+        .catch(() => undefined);
       if (exists(savedData)) {
         return JSON.parse(savedData);
       } else {

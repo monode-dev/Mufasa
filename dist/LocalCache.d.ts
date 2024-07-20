@@ -26,7 +26,7 @@ export declare function createCache({ typeSchemas, getCollectionName, firebaseAp
     getChildDocs(childType: string, parentId: string): string[];
     getPropValue(typeName: string, docId: string, propName: string): string | number | boolean | {
         readonly mx_unad: "UploadingFile";
-    } | Promise<string | undefined> | null | undefined;
+    } | Promise<string | null | undefined> | null | undefined;
     addDoc(typeName: string, props: {
         [propName: string]: any;
     }): string;
