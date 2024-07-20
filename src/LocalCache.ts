@@ -230,10 +230,13 @@ export function createCache({
             CHANGE_DATE_KEY,
             ">",
             new Date(
-              (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
-                0) *
-                1000 -
-                30,
+              Math.max(
+                (clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ??
+                  0) *
+                  1000 -
+                  30,
+                0,
+              ),
             ),
           ),
         ),
