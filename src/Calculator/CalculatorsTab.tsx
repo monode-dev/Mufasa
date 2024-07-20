@@ -110,7 +110,7 @@ export default function Calculator() {
 
   const TankFields_warning = useProp("");
   const showWarning = useFormula(
-    () => exists(TankFields_warning.value),
+    () => exists(TankFields_warning.value) && selectedTab.value == tabs.dimensions,
   );
 
   const currentGallons = useFormula(() =>
