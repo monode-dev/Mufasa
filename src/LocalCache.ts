@@ -276,6 +276,7 @@ export function createCache({
           console.error(`Error getting snapshot: ${error}`);
         },
       );
+      console.log(`Started snapshot for ${getCollectionName(typeName)}`);
     }
   })();
   const result = {
