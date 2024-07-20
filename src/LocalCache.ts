@@ -231,6 +231,7 @@ export function createCache({
           ),
         ),
         (snapshot) => {
+          console.log(`got snapshot`);
           let mostRecentChangeDate =
             clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0;
           snapshot.docChanges().forEach((change) => {

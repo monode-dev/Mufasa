@@ -125,6 +125,7 @@ function createCache({ typeSchemas, getCollectionName, firebaseApp, firestoreDb,
                 0) *
                 1000 -
                 30))), (snapshot) => {
+                console.log(`got snapshot`);
                 let mostRecentChangeDate = clientStorage.data.lastChangeDate?.[lastChangeDateProdKey] ?? 0;
                 snapshot.docChanges().forEach((change) => {
                     if (change.type !== "removed") {
