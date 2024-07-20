@@ -217,7 +217,9 @@ export function createCache({
     }
     for (const typeName in typeSchemas) {
       console.log(
-        `Starting snapshot for ${getCollectionName(typeName)}, after ${
+        `Starting snapshot for ${getCollectionName(
+          typeName,
+        )}, after ${CHANGE_DATE_KEY}: ${
           clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]
         }`,
       );
