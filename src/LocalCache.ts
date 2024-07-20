@@ -216,7 +216,11 @@ export function createCache({
       }
     }
     for (const typeName in typeSchemas) {
-      console.log(`Starting snapshot for ${getCollectionName(typeName)}`);
+      console.log(
+        `Starting snapshot for ${getCollectionName(typeName)}, after ${
+          clientStorage.data.lastChangeDate?.[lastChangeDateProdKey]
+        }`,
+      );
       onSnapshot(
         query(
           collection(firestoreDb, getCollectionName(typeName)),
@@ -262,6 +266,9 @@ export function createCache({
               } as any,
             });
           }
+        },
+        (error) => {
+          console.error(`Error getting snapshot: ${error}`);
         },
       );
     }
