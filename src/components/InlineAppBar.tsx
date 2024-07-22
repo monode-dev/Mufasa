@@ -15,7 +15,7 @@ import {
   pushPage,
   getMyPageIndex,
   theme,
-  Align,
+  Align, Button,
 } from "miwi";
 import { mdiArrowLeft, mdiCogOutline } from "@mdi/js";
 import { JSXElement, Show, onMount } from "solid-js";
@@ -164,8 +164,11 @@ export function InlineAppBar(
           overflowXSpills
         >
           <Show when={showBackButton.value}>
+            <Button pill width={iconSize + .5} height={iconSize + .5}
+                    fill={$theme.colors.pageBackground}
+                    outlineSize={1/16} outlineColor={$theme.colors.text}
+                    onClick={popPage} />
             <Icon iconPath={mdiArrowLeft} scale={iconSize} />
-            <Box width={iconSize + 1} height={iconSize + 1} onClick={popPage} />
           </Show>
         </Stack>
         {/* </Show> */}
