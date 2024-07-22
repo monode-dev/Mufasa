@@ -300,7 +300,7 @@ export function SettingsPage() {
 
         {/* SECTION: Fuel Types */}
         <>
-          <Row widthGrows align={$Align.spaceBetween}>
+          <Row padTop={1} widthGrows align={$Align.spaceBetween}>
             <Icon
               scale={1.125}
               stroke={`transparent`}
