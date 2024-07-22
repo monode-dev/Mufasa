@@ -16,7 +16,7 @@ import {
   Card,
 } from "miwi";
 import { InlineAppBar } from "@/components/InlineAppBar";
-import { SimplePage } from "@/components/SimplePage";
+import {pagePadding, SimplePage} from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
 import { For, Show } from "solid-js";
@@ -128,7 +128,13 @@ export function SettingsPage() {
       }
     >
       <InlineAppBar name={`Account`} />
-      <SimpleBody>
+      <Box
+      minWidth={10}
+      maxWidth={25}
+      padTop={0}
+      padAround={pagePadding}
+      padBetween={1}
+      heightShrinks>
         {/* SECTION: Account Options */}
         <Show when={mfs.user.isSignedIn}>
           <Row padBetween={0.5}>
@@ -190,38 +196,8 @@ export function SettingsPage() {
             </HiddenOptions>
           </Row>
         </Show>
-
-        {/* SECTION: Fuel Types */}
-        <Card>
-          <Row widthGrows align={$Align.spaceBetween}>
-            <Txt h2>Fuel Types</Txt>
-            {/* TODO Is newObject in CreateFuelTypeDialog optional here? */}
-            <Icon
-              iconPath={mdiPlus}
-              onClick={() => openCreateFuelTypeDialog({})}
-              scale={1.25}
-            />
-          </Row>
-          <Switch>
-            <Match when={FuelType.getAllDocs().length === 0}>
-              <Txt hint>No Fuel Types</Txt>
-            </Match>
-            <Match when={FuelType.getAllDocs().length > 0}>
-              <Row widthGrows padBetween={1} alignLeft>
-                <Txt bold widthGrows>
-                  Name
-                </Txt>
-                <Txt align={$Align.centerRight} width={5} bold>
-                  Rate $/Gal.
-                </Txt>
-                <Box width={1} />
-              </Row>
-              <For each={listFuelTypes(FuelType.getAllDocs())}>
-                {(FuelType) => <FuelTypeEntry fuelType={FuelType} />}
-              </For>
-            </Match>
-          </Switch>
-        </Card>
+      </Box>
+      <SimpleBody>
 
         {/* SECTION: Team Members */}
         <Show when={mfs.user.workspace?.isOwner}>
@@ -298,6 +274,7 @@ export function SettingsPage() {
             )}
           </For>
         </Show>
+
         {/* SECTION: Subscription */}
         <Show when={isOwner.value}>
           <Show
@@ -320,6 +297,43 @@ export function SettingsPage() {
             <></>
           </Show>
         </Show>
+
+        {/* SECTION: Fuel Types */}
+        <>
+          <Row widthGrows align={$Align.spaceBetween}>
+            <Icon
+              scale={1.125}
+              stroke={`transparent`}
+              iconPath={mdiDotsVertical}
+            />
+            <Txt h2>Fuel Types</Txt>
+            {/* TODO Is newObject in CreateFuelTypeDialog optional here? */}
+            <Icon
+              iconPath={mdiPlus}
+              onClick={() => openCreateFuelTypeDialog({})}
+              scale={1.25}
+            />
+          </Row>
+          <Switch>
+            <Match when={FuelType.getAllDocs().length === 0}>
+              <Txt hint>No Fuel Types</Txt>
+            </Match>
+            <Match when={FuelType.getAllDocs().length > 0}>
+              <Row widthGrows padBetween={1} alignLeft>
+                <Txt bold widthGrows>
+                  Name
+                </Txt>
+                <Txt align={$Align.centerRight} width={5} bold>
+                  Rate $/Gal.
+                </Txt>
+                <Box width={1} />
+              </Row>
+              <For each={listFuelTypes(FuelType.getAllDocs())}>
+                {(FuelType) => <FuelTypeEntry fuelType={FuelType} />}
+              </For>
+            </Match>
+          </Switch>
+        </>
 
         {/* SECTION: Developer Logs */}
         <Show when={developerModeEnabled.value}>
