@@ -22,6 +22,7 @@ import { SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck } from "@mdi/js";
 import { Client } from "@/Clients/Client";
+import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
 
 export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
   function handleComplete() {
@@ -83,8 +84,8 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                     hintColorOverride={tankHintColor.value}
                   />
                 </Label>
-                <HiddenDelete onDelete={handleDeleteRequest} isOpen={isOpen}>
-                  <Row
+                <HiddenOptions showIcons onDelete={handleDeleteRequest} isOpen={isOpen}>
+                  <HiddenOption
                     scale={scale}
                     alignCenterLeft
                     padBetween={0.25}
@@ -93,11 +94,10 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                       handleComplete();
                     }}
                     stroke={$theme.colors.primary}
-                  >
-                    <Txt>Complete</Txt>
-                    <Icon iconPath={mdiCheck} />
-                  </Row>
-                </HiddenDelete>
+                    text={`Complete`}
+                    icon={mdiCheck}
+                  />
+                </HiddenOptions>
               </Row>
             </Show>
 
@@ -122,8 +122,8 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   />
                 </Row>
                 <Show when={!props.subDelivery.shouldShowTankSelector}>
-                  <HiddenDelete onDelete={handleDeleteRequest} isOpen={isOpen}>
-                    <Row
+                  <HiddenOptions showIcons onDelete={handleDeleteRequest} isOpen={isOpen}>
+                    <HiddenOption
                       scale={scale}
                       alignCenterLeft
                       padBetween={0.25}
@@ -132,11 +132,10 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                         handleComplete();
                       }}
                       stroke={$theme.colors.primary}
-                    >
-                      <Txt>Complete</Txt>
-                      <Icon iconPath={mdiCheck} />
-                    </Row>
-                  </HiddenDelete>
+                      text={`Complete`}
+                      icon={mdiCheck}
+                    />
+                  </HiddenOptions>
                 </Show>
               </Row>
             </Show>
@@ -203,7 +202,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
               ? formatPosixTime(props.subDelivery.completedTimePosix)
               : "Unknown Date"}
           </Txt>
-          <HiddenDelete onDelete={handleDeleteOfCompletedSubDelivery} />
+          <HiddenOptions showIcons onDelete={handleDeleteOfCompletedSubDelivery} />
         </Row>
         {/* NOTE propToSig is interfering with turning the text in the card gray when subDelivery is completed */}
         <CompletedSubDeliveryFields

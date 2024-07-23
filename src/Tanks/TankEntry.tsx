@@ -14,6 +14,7 @@ import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
 import { mdiLabel } from "@mdi/js";
 import { FuelType } from "@/model/DataModel";
 import { Tank } from "./Tank";
+import {HiddenOptions} from "@/components/HiddenOptions";
 
 export default function TankEntry(props: Readonly<{ tank: Tank }>) {
   return (
@@ -36,7 +37,7 @@ export default function TankEntry(props: Readonly<{ tank: Tank }>) {
           )}
           showNewOption={true}
         />
-        <HiddenDelete
+        <HiddenOptions showIcons
           onDelete={() => {
             pushPage(DeleteDialog, {
               obj: props.tank,

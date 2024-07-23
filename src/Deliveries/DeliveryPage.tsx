@@ -23,6 +23,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
+import {HiddenOptions} from "@/components/HiddenOptions";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
@@ -58,7 +59,7 @@ export function DeliveryPage(props: { delivery: Delivery }) {
           <Txt h2 widthGrows alignCenter>
             Client
           </Txt>
-          <HiddenDelete onDelete={handleDeleteRequest} scale={1.125} />
+          <HiddenOptions showIcons onDelete={handleDeleteRequest} scale={1.125} />
         </Row>
         {/* Client Card */}
         <Card pad={1} widthGrows>
