@@ -16,6 +16,7 @@ import {
 import TankFields from "./TankFields";
 import { Client } from "@/Clients/Client";
 import { Tank } from "./Tank";
+import {HiddenOptions} from "@/components/HiddenOptions";
 
 export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
   return (
@@ -27,7 +28,7 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
       <Row widthGrows alignTopLeft padBetween={0.5}>
         {/* tankDisplayName (tank, amount Of Note Characters) */}
         <Txt widthGrows>{tankDisplayName(props.tank, 5)}</Txt>
-        <HiddenDelete
+        <HiddenOptions showIcons
           onDelete={() =>
             pushPage(DeleteDialog, {
               obj: props.tank,

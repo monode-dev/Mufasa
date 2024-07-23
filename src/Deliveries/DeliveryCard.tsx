@@ -29,6 +29,7 @@ import {
   spaceChar,
   tankDisplayName,
 } from "@/AppData";
+import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -225,13 +226,13 @@ function DeliveryCardActionButtons(props: {
 
   return (
     <Show when={props.show}>
-      <HiddenDelete
+      <HiddenOptions showIcons
         isOpen={isOpen}
         onDelete={() => {
           handleDelete();
         }}
       >
-        <Row
+        <HiddenOption
           alignCenterLeft
           padBetween={0.25}
           onClick={() => {
@@ -239,12 +240,11 @@ function DeliveryCardActionButtons(props: {
             handleEdit();
           }}
           stroke={$theme.colors.text}
-        >
-          <Txt>Edit</Txt>
-          <Icon iconPath={mdiPencil} />
-        </Row>
+          text={`Edit`}
+          icon={mdiPencil}
+        />
         <Show when={canCallPhoneNumber(props.delivery.phoneNumber)}>
-          <Row
+          <HiddenOption
             alignCenterLeft
             padBetween={0.25}
             onClick={() => {
@@ -257,13 +257,12 @@ function DeliveryCardActionButtons(props: {
                 ? $theme.colors.text
                 : $theme.colors.hint
             }
-          >
-            <Txt>Call</Txt>
-            <Icon iconPath={mdiPhoneInTalk} />
-          </Row>
+            text={`Call`}
+            icon={mdiPhoneInTalk}
+          />
         </Show>
         <Show when={canMapToAddress(props.delivery.address)}>
-          <Row
+          <HiddenOption
             alignCenterLeft
             padBetween={0.25}
             onClick={() => {
@@ -276,12 +275,11 @@ function DeliveryCardActionButtons(props: {
                 ? $theme.colors.text
                 : $theme.colors.hint
             }
-          >
-            <Txt>Map</Txt>
-            <Icon iconPath={mdiMapMarker} />
-          </Row>
+            text={`Map`}
+            icon={mdiMapMarker}
+          />
         </Show>
-      </HiddenDelete>
+      </HiddenOptions>
     </Show>
   );
 }

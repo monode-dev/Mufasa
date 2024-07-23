@@ -3,6 +3,7 @@ import DeleteDialog from "../components/DeleteDialog";
 import { isClientValid, getClientLabel } from "@/AppData";
 import ClientPage from "./ClientPage";
 import { Client } from "./Client";
+import {HiddenOptions} from "@/components/HiddenOptions";
 
 export default function ClientEntery(props: { client: Client }) {
   function deletePressed() {
@@ -38,7 +39,7 @@ export default function ClientEntery(props: { client: Client }) {
       >
         {getClientLabel(props.client)}
       </Txt>
-      <HiddenDelete onDelete={deletePressed} />
+      <HiddenOptions showIcons onDelete={deletePressed} />
     </Row>
   );
 }

@@ -30,6 +30,7 @@ import { Delivery } from "@/Deliveries/Delivery";
 import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
+import {HiddenOptions} from "@/components/HiddenOptions";
 
 export default function ClientPage(props: { client: Client }) {
   createEffect(() => {
@@ -81,7 +82,7 @@ export default function ClientPage(props: { client: Client }) {
         <Row widthGrows alignX={$Align.spaceBetween} alignY={$Align.start}>
           <Icon iconPath={mdiDotsVertical} stroke={mdColors.transparent} />
           <Txt h2>Client Info</Txt>
-          <HiddenDelete onDelete={deletePressed} />
+          <HiddenOptions showIcons onDelete={deletePressed} />
         </Row>
         <Card>
           <ClientFields

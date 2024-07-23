@@ -1,6 +1,7 @@
 import DeleteDialog from "@/components/DeleteDialog";
 import { Field, HiddenDelete, NumField, Row, pushPage, useFormula } from "miwi";
 import { FuelType } from "@/model/DataModel";
+import {HiddenOptions} from "@/components/HiddenOptions";
 
 export default function FuelTypeEntry(props: { fuelType: FuelType }) {
   function deletePressed() {
@@ -33,7 +34,7 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         align={$Align.centerLeft}
         width={5}
       />
-      <HiddenDelete onDelete={deletePressed} />
+      <HiddenOptions showIcons onDelete={deletePressed} />
     </Row>
   );
 }
