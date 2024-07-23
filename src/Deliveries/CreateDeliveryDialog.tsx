@@ -1,12 +1,14 @@
-import { Button, Card, Page, Row, Txt, popPage, useProp, ONE_TIME, pushPage } from "miwi";
+import {Button, Card, Page, Row, Txt, popPage, useProp, ONE_TIME, pushPage, exists} from "miwi";
 import { Delivery, SelectedClient } from "./Delivery";
 import { NONE_SELECTED } from "@/utils";
 import { DeliveryFields } from "./DeliveryFields";
 import { Show } from "solid-js";
 import { withLimitConfirmation } from "@/model/LimitUi";
+import {Client} from "@/Clients/Client";
 
 export const openCreateClientDialog = (props: {
   onCreate: (delivery: Delivery) => void;
+  setClient?: Client;
 }) => 
   withLimitConfirmation({
     count: Delivery.limit.count,
@@ -19,11 +21,13 @@ export const openCreateClientDialog = (props: {
 
 function CreateDeliveryDialog(props: {
   onCreate: (delivery: Delivery) => void;
+  setClient?: Client;
 }) {
   const explicitPhoneNumber = useProp(``);
   const explicitAddress = useProp(``);
   const label = useProp(``);
-  const selectedClient = useProp<SelectedClient>(NONE_SELECTED);
+  const selectedClient = useProp<SelectedClient>(
+    exists(props.setClient) ? props.setClient : NONE_SELECTED);
   const notes = useProp(``);
   const deliveryProps = {
     get selectedClient() {

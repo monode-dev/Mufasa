@@ -100,11 +100,11 @@ export function HiddenOption(
       minWidth={`fit-content`}
     >
       {props.children}
-      <Show when={exists(props.text)}>
-        <Txt singleLine={props.singleLine}>{props.text}</Txt>
-      </Show>
       <Show when={exists(props.icon)}>
         <Icon iconPath={props.icon!} />
+      </Show>
+      <Show when={exists(props.text)}>
+        <Txt singleLine={props.singleLine}>{props.text}</Txt>
       </Show>
     </Row>
   );

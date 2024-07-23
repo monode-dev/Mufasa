@@ -3,7 +3,10 @@ import DeleteDialog from "../components/DeleteDialog";
 import { isClientValid, getClientLabel } from "@/AppData";
 import ClientPage from "./ClientPage";
 import { Client } from "./Client";
-import {HiddenOptions} from "@/components/HiddenOptions";
+import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
+import {mdiPencil, mdiTruckDeliveryOutline} from "@mdi/js";
+import {openCreateClientDialog} from "@/Deliveries/CreateDeliveryDialog";
+import {DeliveryPage} from "@/Deliveries/DeliveryPage";
 
 export default function ClientEntery(props: { client: Client }) {
   function deletePressed() {
@@ -39,7 +42,19 @@ export default function ClientEntery(props: { client: Client }) {
       >
         {getClientLabel(props.client)}
       </Txt>
-      <HiddenOptions showIcons onDelete={deletePressed} />
+      <HiddenOptions showIcons onDelete={deletePressed} >
+        <HiddenOption
+          text={`Delivery`}
+          icon={mdiTruckDeliveryOutline}
+            onClick={() => openCreateClientDialog({
+              onCreate: (delivery) => {
+                console.log(`Created Delivery:`, delivery);
+                pushPage(DeliveryPage, { delivery });
+              },
+              setClient: props.client,
+            })}
+        />
+      </HiddenOptions>
     </Row>
   );
 }
