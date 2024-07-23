@@ -16,7 +16,7 @@ import {
   Card,
 } from "miwi";
 import { InlineAppBar } from "@/components/InlineAppBar";
-import {pagePadding, SimplePage} from "@/components/SimplePage";
+import { pagePadding, SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
 import { For, Show } from "solid-js";
@@ -34,6 +34,7 @@ import {
   mdiAccountMultiplePlusOutline,
   mdiClose,
   mdiDotsVertical,
+  mdiInformationVariantCircleOutline,
   mdiPlus,
 } from "@mdi/js";
 import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
@@ -48,7 +49,8 @@ import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { listFuelTypes } from "@/AppData";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
-import {Match, Switch} from "solid-js/web";
+import { Match, Switch } from "solid-js/web";
+import { InfoCard } from "@/components/InfoCard";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -127,14 +129,24 @@ export function SettingsPage() {
         </Show>
       }
     >
-      <InlineAppBar name={`Account`} />
+      <InlineAppBar
+        name={`Account`}
+        right={
+          <Icon
+            iconPath={mdiInformationVariantCircleOutline}
+            scale={1.5}
+            onClick={() => pushPage(InfoCard, { info: `` })}
+          />
+        }
+      />
       <Box
-      minWidth={10}
-      maxWidth={25}
-      padTop={0}
-      padAround={pagePadding}
-      padBetween={1}
-      heightShrinks>
+        minWidth={10}
+        maxWidth={25}
+        padTop={0}
+        padAround={pagePadding}
+        padBetween={1}
+        heightShrinks
+      >
         {/* SECTION: Account Options */}
         <Show when={mfs.user.isSignedIn}>
           <Row padBetween={0.5}>
@@ -198,7 +210,6 @@ export function SettingsPage() {
         </Show>
       </Box>
       <SimpleBody>
-
         {/* SECTION: Team Members */}
         <Show when={mfs.user.workspace?.isOwner}>
           <Box height={0} />
