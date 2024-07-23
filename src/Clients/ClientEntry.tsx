@@ -1,10 +1,10 @@
-import { HiddenDelete, Row, Txt, mdColors, pushPage, useProp } from "miwi";
+import {Row, Txt, pushPage, useProp, mdColors} from "miwi";
 import DeleteDialog from "../components/DeleteDialog";
 import { isClientValid, getClientLabel } from "@/AppData";
 import ClientPage from "./ClientPage";
 import { Client } from "./Client";
 import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
-import {mdiPencil, mdiTruckDeliveryOutline} from "@mdi/js";
+import { mdiTankerTruck } from "@mdi/js";
 import {openCreateClientDialog} from "@/Deliveries/CreateDeliveryDialog";
 import {DeliveryPage} from "@/Deliveries/DeliveryPage";
 
@@ -45,7 +45,7 @@ export default function ClientEntery(props: { client: Client }) {
       <HiddenOptions showIcons onDelete={deletePressed} >
         <HiddenOption
           text={`Delivery`}
-          icon={mdiTruckDeliveryOutline}
+          icon={mdiTankerTruck}
             onClick={() => openCreateClientDialog({
               onCreate: (delivery) => {
                 console.log(`Created Delivery:`, delivery);
