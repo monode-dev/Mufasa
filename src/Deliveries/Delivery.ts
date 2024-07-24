@@ -434,6 +434,9 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     this.completedTimePosix = Date.now();
   }
   // TODO: Implement an un-complete method
+  unComplete() {
+    this.completedTimePosix = null;
+  }
 
   readonly delivery = formula(() => {
     // We have to do this cast otherwise this prop is flagged as required
