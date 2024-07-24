@@ -160,6 +160,10 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
     });
   }
 
+  function handleUnComplete() {
+    props.subDelivery.unComplete();
+  }
+
   const combinedStringTankEntry = useFormula(
     () => `${galStr.value} ${tankName.value}`,
   );
@@ -186,6 +190,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
             outlineColor={$theme.colors.hint}
             fill={$theme.colors.hint}
             cornerRadius={checkboxCornerRadious}
+            onClick={handleUnComplete}
           >
             <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
           </Box>
