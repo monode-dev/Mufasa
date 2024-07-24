@@ -342,7 +342,11 @@ export function initializeStoreBank(bankConfig: {
 
     return doNow(() => {
       const store = useRoot(() => useProp(createStore(null)));
-      console.log(`${params.docType} - Temporarily using mock store.`);
+      console.log(
+        `${params.docType} - ${
+          Date.now() - (window as any).startTime
+        } - Temporarily using mock store.`,
+      );
       const instConfigJson = persistance
         .devicePersister?.(params.docType)
         .jsonFile(`currentWorkspaceInstConfig.json`)
@@ -364,11 +368,23 @@ export function initializeStoreBank(bankConfig: {
             : useProp(null),
         );
         store.value = createStore(currentInstConfig.value);
-        console.log(`${params.docType} - loaded signature: ${JSON.stringify(currentInstConfig.value, null, 2)}`);
+        console.log(
+          `${params.docType} - ${
+            Date.now() - (window as any).startTime
+          } - loaded signature: ${JSON.stringify(
+            currentInstConfig.value,
+            null,
+            2,
+          )}`,
+        );
 
         // Watch for changes in the signature
         const incomingSignature = await params.workspaceSignature;
-        console.log(`${params.docType} - received incoming signature.`);
+        console.log(
+          `${params.docType} - ${
+            Date.now() - (window as any).startTime
+          } - received incoming signature.`,
+        );
         useRoot(() =>
           doWatch(
             () => {
@@ -386,10 +402,9 @@ export function initializeStoreBank(bankConfig: {
 
               // Save the new workspace signature to disk
               if (isValid(instConfigJson)) {
-                instConfigJson
-                  .batchUpdate((data) => {
-                    data.value = newInstConfig;
-                  });
+                instConfigJson.batchUpdate((data) => {
+                  data.value = newInstConfig;
+                });
               } else {
                 currentInstConfig.value = newInstConfig;
               }
@@ -636,7 +651,10 @@ export function createDocStore(config: DocStoreParams) {
     },
 
     async export(path: string, shouldInclude?: (filePath: string) => boolean) {
-      await config.deviceDirectoryPersister.export(path, shouldInclude ?? (() => true));
+      await config.deviceDirectoryPersister.export(
+        path,
+        shouldInclude ?? (() => true),
+      );
     },
   } as const;
 }

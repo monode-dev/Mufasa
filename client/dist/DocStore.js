@@ -140,7 +140,7 @@ export function initializeStoreBank(bankConfig) {
         };
         return doNow(() => {
             const store = useRoot(() => useProp(createStore(null)));
-            console.log(`${params.docType} - Temporarily using mock store.`);
+            console.log(`${params.docType} - ${Date.now() - window.startTime} - Temporarily using mock store.`);
             const instConfigJson = persistance
                 .devicePersister?.(params.docType)
                 .jsonFile(`currentWorkspaceInstConfig.json`)
@@ -160,10 +160,10 @@ export function initializeStoreBank(bankConfig) {
                     }
                     : useProp(null));
                 store.value = createStore(currentInstConfig.value);
-                console.log(`${params.docType} - loaded signature: ${JSON.stringify(currentInstConfig.value, null, 2)}`);
+                console.log(`${params.docType} - ${Date.now() - window.startTime} - loaded signature: ${JSON.stringify(currentInstConfig.value, null, 2)}`);
                 // Watch for changes in the signature
                 const incomingSignature = await params.workspaceSignature;
-                console.log(`${params.docType} - received incoming signature.`);
+                console.log(`${params.docType} - ${Date.now() - window.startTime} - received incoming signature.`);
                 useRoot(() => doWatch(() => {
                     // Only do something if the workspace signature has changed.
                     const newInstSignature = incomingSignature.value;
@@ -176,8 +176,7 @@ export function initializeStoreBank(bankConfig) {
                         : null;
                     // Save the new workspace signature to disk
                     if (isValid(instConfigJson)) {
-                        instConfigJson
-                            .batchUpdate((data) => {
+                        instConfigJson.batchUpdate((data) => {
                             data.value = newInstConfig;
                         });
                     }
