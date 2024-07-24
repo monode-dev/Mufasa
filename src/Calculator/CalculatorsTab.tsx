@@ -19,7 +19,6 @@ import {
   pushPage,
   useProp,
   Selector,
-  Slider,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -34,6 +33,7 @@ import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
+import { Slider } from "@/components/Slider";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -387,10 +387,11 @@ export default function Calculator() {
         </Row>
         <Slider
           min={0.75}
-          valueSig={desiredFill}
+          value={desiredFill}
           max={1}
-          // knobHSL={sliderColor.value}
-          // trackHSL={sliderColor.value}
+          knobHSL={sliderColor.value}
+          trackHSL={sliderColor.value}
+          step={1}
         />
       </Card>
       <Show when={selectedTab.value === tabs.delivery}>
