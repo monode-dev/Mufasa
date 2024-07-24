@@ -7,7 +7,7 @@ import { Client } from "@/Clients/Client";
 export class Tank extends mfs.Doc(`Tank`) {
   static readonly limit = createLimitTrackers({
     free: 30,
-    premium: 2000,
+    premium: 25000,
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => Tank.getAllDocs().length,
   });

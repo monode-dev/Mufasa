@@ -7,3 +7,6 @@ firebase-debug.log
 /.gradle
 .DS_Store
 .env
+/android
+/ios
+/src/components.d.ts
