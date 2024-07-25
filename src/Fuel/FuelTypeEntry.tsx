@@ -2,6 +2,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { Field, HiddenDelete, NumField, Row, pushPage, useFormula } from "miwi";
 import { FuelType } from "@/model/DataModel";
 import {HiddenOptions} from "@/components/HiddenOptions";
+import {Flag} from "mufasa/dist/Utils";
 
 export default function FuelTypeEntry(props: { fuelType: FuelType }) {
   function deletePressed() {
@@ -11,6 +12,10 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         props.fuelType.name ?? `this fuel type`
       }"? Associated tanks will have their fuel type set to "None".`,
     });
+  }
+
+  function setRate(v: null | number | (number & Flag<symbol>)) {
+    return (v ?? 0) > 0 ? v : null;
   }
 
   return (
@@ -27,8 +32,8 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         negativesAreAllowed={false}
         underlined
         valueSig={useFormula(
-          () => props.fuelType.rate ?? 0,
-          (v) => (props.fuelType.rate = v),
+          () => (props.fuelType.rate ?? 0) == 0 ? null : props.fuelType.rate,
+          (v) => props.fuelType.rate = setRate(v),
         )}
         hint="$/gal."
         align={$Align.centerLeft}
