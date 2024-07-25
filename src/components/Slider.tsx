@@ -11,7 +11,7 @@ export function Slider(
   } & BoxProps,
 ) {
   const thumbHeight = 1;
-  const trackHeight = 0.5;
+  const trackHeight = .5;
   let isDragging = useProp(false);
   let slider: HTMLElement | undefined = undefined;
   
@@ -94,6 +94,7 @@ export function Slider(
               cornerRadius={thumbHeight / 2}
               fill={props.trackHSL}
               preventClickPropagation={true}
+              bonusTouchArea
             />
           </Box>
         </Row>
