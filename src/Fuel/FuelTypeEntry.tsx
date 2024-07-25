@@ -1,5 +1,5 @@
 import DeleteDialog from "@/components/DeleteDialog";
-import { Field, HiddenDelete, NumField, Row, pushPage, useFormula } from "miwi";
+import {Field, HiddenDelete, NumField, Row, pushPage, useFormula, exists} from "miwi";
 import { FuelType } from "@/model/DataModel";
 import {HiddenOptions} from "@/components/HiddenOptions";
 import {Flag} from "mufasa/dist/Utils";
@@ -28,7 +28,7 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         negativesAreAllowed={false}
         underlined
         valueSig={useFormula(
-          () => (props.fuelType.rate ?? 0) == 0 ? null : props.fuelType.rate,
+          () => props.fuelType.rate,
           (v) => props.fuelType.rate = v,
         )}
         hint="$/gal."
