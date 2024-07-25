@@ -14,10 +14,6 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
     });
   }
 
-  function setRate(v: null | number | (number & Flag<symbol>)) {
-    return (v ?? 0) > 0 ? v : null;
-  }
-
   return (
     <Row widthGrows padBetween={1} alignLeft>
       <Field
@@ -33,7 +29,7 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         underlined
         valueSig={useFormula(
           () => (props.fuelType.rate ?? 0) == 0 ? null : props.fuelType.rate,
-          (v) => props.fuelType.rate = setRate(v),
+          (v) => props.fuelType.rate = v,
         )}
         hint="$/gal."
         align={$Align.centerLeft}
