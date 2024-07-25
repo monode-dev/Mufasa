@@ -30,6 +30,7 @@ import {
   tankDisplayName,
 } from "@/AppData";
 import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
+import  ShowNotes  from "./ShowNotes";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -121,12 +122,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       <Show when={shouldShowNotes.value}>
         <Row>
           <Row alignTop padBetween={0.125}>
-            <Txt alignTop width={3}>
-              Notes:
-            </Txt>
-            <Txt alignTop widthGrows>
-              {props.delivery.notes}
-            </Txt>
+            <ShowNotes notes={props.delivery.notes} shouldShowFullNotes/>
           </Row>
           <DeliveryCardActionButtons
             show={optionsButtonNextToNotes.value}
