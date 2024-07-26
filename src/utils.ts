@@ -140,6 +140,15 @@ export function formatPhoneNumber(input: string, event: InputEvent) {
   };
 }
 
+export function formatIdNumber(input: string, event: InputEvent) {
+  let caretPos = (event.target as any)?.selectionStart; // GET CURRENT CURSOR POSITION
+  let justNums = input?.replace(/\D/g, ""); // STRIP NON-NUMERIC CHARS
+  return {
+    input: justNums,
+    caret: caretPos as number,
+  };
+}
+
 export function formatAddress(input: string, event: InputEvent) {
   for (let i = 0; i < input.length; i++) {
     if (i == 0 || input.charAt(i - 1) == " ") {
