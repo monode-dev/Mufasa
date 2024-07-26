@@ -212,6 +212,11 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           </Txt>
         </Box> */}
       </Row>
+      <Show when={props.subDelivery.subInvalidError.value != ''}>
+        <Txt stroke={$theme.colors.warning}>
+          {props.subDelivery.subInvalidError.value}
+        </Txt>
+      </Show>
     </Column>
   );
 }
