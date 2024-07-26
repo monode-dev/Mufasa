@@ -107,9 +107,6 @@ export function SettingsPage() {
     () => isOwner.value && premiumEnabled.value,
   );
 
-  console.log( "fuelTypes", FuelType.sortedList())
-  const sortedFuels = FuelType.sortedList();
-
   return (
     <SimplePage
       floating={
@@ -351,16 +348,16 @@ export function SettingsPage() {
               <SortableColumn
                 onSort={(props) =>
                   FloatSort.moveItem({
-                    sortedList: sortedFuels,
+                    sortedList: FuelType.sortedFuelTypes,
                     fromIndex: props.from,
                     toIndex: props.to,
-                    getPos: (fuelTypes) => fuelTypes.sortPos!,
+                    getPos: (fuelTypes) => fuelTypes.sortPos,
                     setPos: (fuelTypes, pos) => (fuelTypes.sortPos = pos),
                   })
                 }
               >
                 <For
-                  each={sortedFuels}
+                  each={FuelType.sortedFuelTypes}
                   fallback={<Txt hint>Tap + to add Fuel Types.</Txt>}
                 >
                   {(fuelTypes) => <FuelTypeEntry fuelType={fuelTypes} />}

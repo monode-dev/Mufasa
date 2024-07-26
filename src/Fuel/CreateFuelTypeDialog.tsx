@@ -16,6 +16,7 @@ import {
   mdColors,
   Txt,
   pushPage,
+  FloatSort,
 } from "miwi";
 
 export const openCreateFuelTypeDialog = (props: {
@@ -53,9 +54,15 @@ function CreateFuelTypeDialog(props: {
   function handleYes() {
     if (!fuelTypeIsValid.value) return;
     popPage();
+    const createdPosix = Date.now();
     const newFuelType = FuelType.create({
       ...computedFuelType.value,
-      createdPosix: Date.now(),
+      createdPosix: createdPosix,
+      _sortPos: FloatSort.getNewEndPos({
+        list: FuelType.sortedFuelTypes,
+        getPos: (fuelType) => fuelType.sortPos,
+        getUid: (fuelType) => fuelType.docId,
+      }),
     });
     if (exists(props.onCreate)) props.onCreate(newFuelType);
   }
