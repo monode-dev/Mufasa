@@ -36,7 +36,7 @@
 		"miwi": "^0.0.759",
 		"mufasa": "^0.2.340",
 		"sha.js": "^2.4.11",
-		"solid-js": "1.8.18",
+		"solid-js": "1.8.19",
 		"xcode": "^3.0.1"
 	},
 	"devDependencies": {
@@ -54,7 +54,7 @@
 		"sucrase": "^3.35.0",
 		"tsx": "^4.16.2",
 		"typescript": "5.4.5",
-		"vite": "5.3.4",
+		"vite": "5.3.5",
 		"vite-plugin-solid": "^2.10.2",
 		"xml-js": "^1.6.11",
 		"xml2js": "^0.6.2"

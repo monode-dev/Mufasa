@@ -30,6 +30,7 @@ import {
   tankDisplayName,
 } from "@/AppData";
 import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
+import  ShowNotes  from "./ShowNotes";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -126,12 +127,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       <Show when={shouldShowNotes.value}>
         <Row>
           <Row alignTop padBetween={0.125}>
-            <Txt alignTop width={3}>
-              Notes:
-            </Txt>
-            <Txt alignTop widthGrows>
-              {props.delivery.notes}
-            </Txt>
+            <ShowNotes notes={props.delivery.notes} shouldShowFullNotes/>
           </Row>
           <DeliveryCardActionButtons
             show={optionsButtonNextToNotes.value}
@@ -176,29 +172,31 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
 
   return (
     <Column>
-      <Row alignTopLeft widthGrows>
+     <Row alignTopLeft widthGrows>  
         <Show when={!props.subDelivery.isCompleted}>
-          <Box
-            onClick={handleComplete} // Does this need to be toggle-able ?
-            outlineSize={1 / 8}
-            width={1}
-            height={1}
-            outlineColor={$theme.colors.primary}
-            cornerRadius={checkboxCornerRadious}
-          />
+            <Box
+              bonusTouchArea
+              onClick={handleComplete}
+              outlineSize={1 / 8}
+              width={1}
+              height={1}
+              outlineColor={$theme.colors.primary}
+              cornerRadius={checkboxCornerRadious}
+            />
         </Show>
         <Show when={props.subDelivery.isCompleted}>
-          <Box
-            outlineSize={1 / 8}
-            width={1}
-            height={1}
-            outlineColor={$theme.colors.hint}
-            fill={$theme.colors.hint}
-            cornerRadius={checkboxCornerRadious}
-            onClick={handleUnComplete}
-          >
-            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-          </Box>
+            <Box
+              bonusTouchArea
+              outlineSize={1 / 8}
+              width={1}
+              height={1}
+              outlineColor={$theme.colors.hint}
+              fill={$theme.colors.hint}
+              cornerRadius={checkboxCornerRadious}
+              onClick={handleUnComplete}
+            >
+              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
+            </Box>
         </Show>
         <Box alignLeft>
           <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
