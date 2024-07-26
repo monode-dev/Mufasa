@@ -140,17 +140,12 @@ export function formatPhoneNumber(input: string, event: InputEvent) {
   };
 }
 
-export function formatAddress(input: string, event: InputEvent) {
-  for (let i = 0; i < input.length; i++) {
-    if (i == 0 || input.charAt(i - 1) == " ") {
-      input =
-        input.slice(0, i) + input.charAt(i).toUpperCase() + input.slice(i + 1);
-    }
-  }
-
+export function formatIdNumber(input: string, event: InputEvent) {
+  let caretPos = (event.target as any)?.selectionStart; // GET CURRENT CURSOR POSITION
+  let justNums = input?.replace(/\D/g, ""); // STRIP NON-NUMERIC CHARS
   return {
-    input: input,
-    caret: (event.target as any)?.selectionStart,
+    input: justNums,
+    caret: caretPos as number,
   };
 }
 

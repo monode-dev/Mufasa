@@ -2,8 +2,6 @@ import { formatPosixTime } from "@/utils";
 import {
   Card,
   Field,
-  HiddenDelete,
-  Icon,
   Label,
   Row,
   Txt,
@@ -58,8 +56,6 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
     exists(selectedTank.value) ? undefined : $theme.colors.warning,
   );
 
-  // TODO: Put complete option in hidden delete drop down. J: Done
-  // TODO: Highlight orange when invalid.
   return (
     <Card
       widthGrows
@@ -187,6 +183,11 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                 hint="Est. gal."
               />
             </Label>
+            <Show when={props.subDelivery.invalidError.value != ''}>
+              <Txt stroke={$theme.colors.warning}>
+                {props.subDelivery.invalidError.value}
+              </Txt>
+            </Show>
           </>
         }
       >

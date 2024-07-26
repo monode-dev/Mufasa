@@ -29,6 +29,8 @@ import { VerifyAccountPage } from "./onboarding/VerifyAccountPage";
 import { Network } from "@capacitor/network";
 import googleAuthConfig from "./assets/google-auth-config.json";
 
+(window as any).startTime = Date.now();
+
 // Set the primary color for Miwi
 setTheme({
   colors: {

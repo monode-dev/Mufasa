@@ -33,6 +33,7 @@ export default function CompleteSubDeliveryDialog(props: {
         : props.subDelivery.selectedFuel?.rate ?? null
       : props.subDelivery.selectedTank?.fuelType?.rate ?? null,
   );
+
   const gallons = useProp<number | null>(props.subDelivery.gallons);
   const canComplete = useFormula(
     () =>
