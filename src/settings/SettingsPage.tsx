@@ -14,6 +14,9 @@ import {
   strokeTexture,
   theme,
   Card,
+  Button,
+  SortableColumn,
+  FloatSort,
 } from "miwi";
 import { InlineAppBar } from "@/components/InlineAppBar";
 import { pagePadding, SimplePage } from "@/components/SimplePage";
@@ -103,6 +106,9 @@ export function SettingsPage() {
   const showInviteMember = useFormula(
     () => isOwner.value && premiumEnabled.value,
   );
+
+  console.log( "fuelTypes", FuelType.sortedList())
+  const sortedFuels = FuelType.sortedList();
 
   return (
     <SimplePage
@@ -339,9 +345,27 @@ export function SettingsPage() {
                 </Txt>
                 <Box width={1} />
               </Row>
-              <For each={listFuelTypes(FuelType.getAllDocs())}>
+              {/* <For each={listFuelTypes(FuelType.getAllDocs())}>
                 {(FuelType) => <FuelTypeEntry fuelType={FuelType} />}
-              </For>
+              </For> */}
+              <SortableColumn
+                onSort={(props) =>
+                  FloatSort.moveItem({
+                    sortedList: sortedFuels,
+                    fromIndex: props.from,
+                    toIndex: props.to,
+                    getPos: (fuelTypes) => fuelTypes.sortPos!,
+                    setPos: (fuelTypes, pos) => (fuelTypes.sortPos = pos),
+                  })
+                }
+              >
+                <For
+                  each={sortedFuels}
+                  fallback={<Txt hint>Tap + to add Fuel Types.</Txt>}
+                >
+                  {(fuelTypes) => <FuelTypeEntry fuelType={fuelTypes} />}
+                </For>
+              </SortableColumn>
             </Match>
           </Switch>
         </>
