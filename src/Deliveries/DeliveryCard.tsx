@@ -9,10 +9,10 @@ import {
   exists,
   formatPosixTime,
   pushPage,
-  HiddenDelete,
   useProp,
   useFormula,
   mdColors,
+  doWatch,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -55,6 +55,11 @@ export function DeliveryCard(props: { delivery: Delivery }) {
     () =>
       !optionsButtonNextToCompleteDate.value && !optionsButtonNextToNotes.value,
   );
+
+  doWatch(() => {
+    props.delivery.sortedSubDeliveries;
+    console.log(`subDeliveries updated: ${Date.now() - (window as any).startTime}`)
+  })
 
   const noFocus = useProp(false);
   return (

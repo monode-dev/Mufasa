@@ -140,20 +140,6 @@ export function formatPhoneNumber(input: string, event: InputEvent) {
   };
 }
 
-export function formatAddress(input: string, event: InputEvent) {
-  for (let i = 0; i < input.length; i++) {
-    if (i == 0 || input.charAt(i - 1) == " ") {
-      input =
-        input.slice(0, i) + input.charAt(i).toUpperCase() + input.slice(i + 1);
-    }
-  }
-
-  return {
-    input: input,
-    caret: (event.target as any)?.selectionStart,
-  };
-}
-
 // Tue, March 10th 2021 - 3:00 PM
 export function formatPosixTime(posixTime: number) {
   // Create a new Date object from the posix time
