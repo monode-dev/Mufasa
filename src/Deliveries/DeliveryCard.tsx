@@ -171,15 +171,18 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   const checkboxCornerRadious = 1 / 7;
 
   return (
-    <Column>
+    <Column
+      outlineSize={1 / 8}
+      outlineColor={props.subDelivery.isValid ? undefined : $theme.colors.warning}
+    >
      <Row alignTopLeft widthGrows>  
         <Show when={!props.subDelivery.isCompleted}>
             <Box
               bonusTouchArea
               onClick={handleComplete}
-              outlineSize={1 / 8}
               width={1}
               height={1}
+              outlineSize={1 / 8}
               outlineColor={$theme.colors.primary}
               cornerRadius={checkboxCornerRadious}
             />
