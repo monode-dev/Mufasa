@@ -15,7 +15,7 @@ import {
   ONE_TIME,
   formatNumWithCommas,
 } from "@/utils";
-import {FloatSort, doNow, exists } from "miwi";
+import {FloatSort, doNow, exists, useProp } from "miwi";
 import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
 
@@ -95,8 +95,11 @@ export class Delivery extends mfs.Doc(`Delivery`) {
       this.clientLabel = value;
     },
   );
+  readonly invalidError = useProp(``);
   readonly title = formula(() => {
-    const valid = this.isValid ? `` : invalid;
+    const v = this.isValid;
+    const valid = v[0] ? `` : invalid;
+    this.invalidError.value = v[1];
     const client = this.selectedClient;
     const name = client === ONE_TIME ? this.label : getClientLabel(client);
     return valid + name;
@@ -190,13 +193,18 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   user = prop(String, ``);
 
   // Checks
-  readonly isValid = formula(() => {
-    if (this.selectedClient === NONE_SELECTED) return false;
+  readonly isValid = formula(() : [boolean, string] => {
+    if (this.selectedClient === NONE_SELECTED) return [false, 'Please select a client.'];
     if (this.selectedClient === ONE_TIME && this.label.trim() === ``)
-      return false;
+      return [false, 'Please enter a name.'];
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
-      return false;
-    return !this.sortedSubDeliveries.some((sub) => !sub.isValid);
+      return [false, 'Please select a valid client.'];
+    this.sortedSubDeliveries.forEach((sub) => {
+      if(!sub.isValid){
+        return [false, sub.subInvalidError]
+      }
+    });
+    return [true, ``];
   });
 
   readonly isCompleted = formula(
@@ -386,8 +394,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   isCompleted = formula(() => exists(this.completedTimePosix));
   completedTimePosix = prop([Number, null], null);
 
-  readonly isValid = formula(() => exists(this.invalidError) && this.invalidError.trim() !== ``);
-  readonly invalidError = formula<string | undefined>(() => {
+  readonly isValid = formula(() => exists(this.subInvalidError) && this.subInvalidError.trim() !== ``);
+  readonly subInvalidError = formula<string | undefined>(() => {
     const nonGallonsErrorMessage = doNow(() => {
       // Fuel
       const explicitFuelError =
