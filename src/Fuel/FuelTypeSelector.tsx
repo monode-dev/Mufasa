@@ -119,9 +119,7 @@ export function FuelTypeSelector(props: {
               heightShrinks
               overflowX={$Overflow.wrap}
               stroke={$theme.colors.primary}
-              onClick={() => {
-                selectOption(ONE_TIME);
-              }}
+              onClick={() => selectOption(ONE_TIME)}
             >
               {oneTimeLabel}
             </Txt>
