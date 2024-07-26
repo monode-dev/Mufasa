@@ -183,9 +183,9 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                 hint="Est. gal."
               />
             </Label>
-            <Show when={props.subDelivery.invalidError.value != ''}>
+            <Show when={props.subDelivery.subInvalidError.value != ''}>
               <Txt stroke={$theme.colors.warning}>
-                {props.subDelivery.invalidError.value}
+                {props.subDelivery.subInvalidError.value}
               </Txt>
             </Show>
           </>

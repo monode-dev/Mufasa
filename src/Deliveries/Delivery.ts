@@ -97,8 +97,11 @@ export class Delivery extends mfs.Doc(`Delivery`) {
       this.clientLabel = value;
     },
   );
+  readonly invalidError = useProp(``);
   readonly title = formula(() => {
-    const valid = this.isValid ? `` : invalid;
+    const v = this.isValid;
+    const valid = v[0] ? `` : invalid;
+    this.invalidError.value = v[1];
     const client = this.selectedClient;
     const name = client === ONE_TIME ? this.label : getClientLabel(client);
     return valid + name;
@@ -192,13 +195,18 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   user = prop(String, ``);
 
   // Checks
-  readonly isValid = formula(() => {
-    if (this.selectedClient === NONE_SELECTED) return false;
+  readonly isValid = formula(() : [boolean, string] => {
+    if (this.selectedClient === NONE_SELECTED) return [false, 'Please select a client.'];
     if (this.selectedClient === ONE_TIME && this.label.trim() === ``)
-      return false;
+      return [false, 'Please enter a name.'];
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
-      return false;
-    return !this.sortedSubDeliveries.some((sub) => !sub.isValid);
+      return [false, 'Please select a valid client.'];
+    this.sortedSubDeliveries.forEach((sub) => {
+      if(!sub.isValid){
+        return [false, sub.subInvalidError.value]
+      }
+    });
+    return [true, ``];
   });
 
   readonly isCompleted = formula(
@@ -399,12 +407,12 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   isCompleted = formula(() => exists(this.completedTimePosix));
   completedTimePosix = prop([Number, null], null);
 
-  readonly invalidError = useProp(``);
+  readonly subInvalidError = useProp(``);
   readonly isValid = formula(() => {
-    this.invalidError.value = ``;
+    this.subInvalidError.value = ``;
     const gallonsIsValid = exists(this.gallons) && this.gallons >= 0;
     if (!gallonsIsValid) {
-      this.invalidError.value = `Gallons must be greater than 0.`;
+      this.subInvalidError.value = `Gallons must be greater than 0.`;
       return false;
     }
 
@@ -423,43 +431,43 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
     const payloadIsValid = doNow(() => {
       if (this.isCompleted) {
-        this.invalidError.value = fuelFieldsAreValid.value[1];
+        this.subInvalidError.value = fuelFieldsAreValid.value[1];
         return fuelFieldsAreValid.value[0];
       } else {
         if (this.selectedTank === NONE_SELECTED) {
           if (this.delivery?.selectedClient !== ONE_TIME){
-            this.invalidError.value = `Please select a tank.`;
+            this.subInvalidError.value = `Please select a tank.`;
             return false;
           }
           else {
-            this.invalidError.value = fuelFieldsAreValid.value[1];
+            this.subInvalidError.value = fuelFieldsAreValid.value[1];
             return fuelFieldsAreValid.value[0];
           }
         }
         if (this.selectedTank === JUST_FUEL) {
           if (this.selectedFuel === NONE_SELECTED) {
-            this.invalidError.value = `Please select a fuel.`;
+            this.subInvalidError.value = `Please select a fuel.`;
             return false;
           }
           if (this.selectedFuel === ONE_TIME) {
-            this.invalidError.value = fuelFieldsAreValid.value[1];
+            this.subInvalidError.value = fuelFieldsAreValid.value[1];
             return fuelFieldsAreValid.value[0];
           }
           if (!FuelType.isValid(this.selectedFuel)) {
-            this.invalidError.value = `Please select a valid fuel.`;
+            this.subInvalidError.value = `Please select a valid fuel.`;
             return false;
           } else return true;
         } else {
           if(!exists(this.selectedTank)) {
-            this.invalidError.value = `Please select a tank.`;
+            this.subInvalidError.value = `Please select a tank.`;
             return false;
           }
           if(!isTankValid(this.selectedTank)) {
-            this.invalidError.value = `Please select a valid tank.`;
+            this.subInvalidError.value = `Please select a valid tank.`;
             return false;
           }
           if(!FuelType.isValid(this.selectedTank.fuelType)) {
-            this.invalidError.value = `Please select a valid fuel.`;
+            this.subInvalidError.value = `Please select a valid fuel.`;
             return false;
           }
           return true;
