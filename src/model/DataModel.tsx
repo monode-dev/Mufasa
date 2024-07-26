@@ -79,7 +79,7 @@ export class FuelType extends mfs.Doc(`FuelType`) {
     free: 5,
     premium: 50,
     getPremiumEnabled: () => premiumEnabled.value,
-    getCount: () => FuelType.getAllDocs().length,
+    getCount: () => FuelType.sortedFuelTypes.length,
   });
   name = prop([String, null], null);
   rate = prop([Number, null], null);

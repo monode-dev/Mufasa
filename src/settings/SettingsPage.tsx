@@ -329,10 +329,10 @@ export function SettingsPage() {
             />
           </Row>
           <Switch>
-            <Match when={FuelType.getAllDocs().length === 0}>
+            <Match when={FuelType.sortedFuelTypes.length === 0}>
               <Txt hint>No Fuel Types</Txt>
             </Match>
-            <Match when={FuelType.getAllDocs().length > 0}>
+            <Match when={FuelType.sortedFuelTypes.length > 0}>
               <Row widthGrows padBetween={1} alignLeft>
                 <Txt bold widthGrows>
                   Name
@@ -342,7 +342,7 @@ export function SettingsPage() {
                 </Txt>
                 <Box width={1} />
               </Row>
-              {/* <For each={listFuelTypes(FuelType.getAllDocs())}>
+              {/* <For each={listFuelTypes(FuelType.sortedFuelTypes)}>
                 {(FuelType) => <FuelTypeEntry fuelType={FuelType} />}
               </For> */}
               <SortableColumn
