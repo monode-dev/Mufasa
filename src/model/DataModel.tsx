@@ -84,11 +84,22 @@ export class FuelType extends mfs.Doc(`FuelType`) {
   name = prop([String, null], null);
   rate = prop([Number, null], null);
   createdPosix = prop(Number);
+  sortPos = prop([Number, null], null);
 
   static get all() {
     return FuelType.getAllDocs().sort(
       (a, b) => a.createdPosix - b.createdPosix,
     );
+  }
+
+  static sortedList() {
+    const docs = FuelType.getAllDocs();
+    docs.forEach(doc => {
+      if (doc.sortPos === null) {
+        doc.sortPos =(Math.random() * 1000000);
+      }
+    });
+    return docs.sort((a, b) => a.createdPosix - b.createdPosix);
   }
 
   static isValid(fuelType: Partial<FuelType> | null | undefined) {
