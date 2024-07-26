@@ -47,7 +47,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
   const scale = 1;
   const isOpen = useProp(false);
 
-  const selectedFuel = useFormula(() => props.subDelivery.selectedFuel);
+  const selectedFuel = useFormula(() => props.subDelivery.selectedFuel, (v) => (props.subDelivery.selectedFuel = v));
   const selectedTank = useFormula(
     () => props.subDelivery.selectedTank,
     (v) => (props.subDelivery.selectedTank = v),
@@ -100,23 +100,14 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
             {/* Fuel Type */}
             <Show when={props.subDelivery.shouldShowFuelSelector}>
               <Row padBetween={1}>
-                <Row>
-                  <Txt
-                    stroke={
-                      exists(selectedFuel.value)
-                        ? undefined
-                        : $theme.colors.warning
-                    }
-                  >
-                    Fuel:{" "}
-                  </Txt>
+                <Label label="Fuel" stroke={tankHintColor.value}>
                   <FuelTypeSelector
                     hideIcon
                     fuelType={selectedFuel}
-                    showNewOption={true}
-                    showOneTimeOption={true}
+                    showNewOption
+                    showOneTimeOption
                   />
-                </Row>
+                </Label>
                 <Show when={!props.subDelivery.shouldShowTankSelector}>
                   <HiddenOptions showIcons onDelete={handleDeleteRequest} isOpen={isOpen}>
                     <HiddenOption
@@ -183,9 +174,9 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                 hint="Est. gal."
               />
             </Label>
-            <Show when={props.subDelivery.invalidError.value != ''}>
+            <Show when={exists(props.subDelivery.invalidError) && props.subDelivery.invalidError != ``}>
               <Txt stroke={$theme.colors.warning}>
-                {props.subDelivery.invalidError.value}
+                {props.subDelivery.invalidError}
               </Txt>
             </Show>
           </>
