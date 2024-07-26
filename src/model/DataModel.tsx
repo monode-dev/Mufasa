@@ -1,7 +1,7 @@
-import { prop, initializeMufasa } from "mufasa";
-import { useProp, doWatch, exists, doNow, useFormula, useRoot } from "miwi";
+import { prop, initializeMufasa, formula } from "mufasa";
+import { useProp, doWatch, exists, doNow, useFormula, useRoot, FloatSort } from "miwi";
 import { autoSavingProp, devLog } from "@/utils";
-import { createRoot } from "solid-js";
+import { createRoot, untrack } from "solid-js";
 import { capacitorPersister } from "mufasa/capacitor";
 import { solidPersister } from "mufasa/solid-js";
 import { cloudPersister } from "./CloudPersister";
@@ -84,22 +84,22 @@ export class FuelType extends mfs.Doc(`FuelType`) {
   name = prop([String, null], null);
   rate = prop([Number, null], null);
   createdPosix = prop(Number);
-  sortPos = prop([Number, null], null);
-
-  static get all() {
-    return FuelType.getAllDocs().sort(
-      (a, b) => a.createdPosix - b.createdPosix,
-    );
-  }
-
-  static sortedList() {
-    const docs = FuelType.getAllDocs();
-    docs.forEach(doc => {
-      if (doc.sortPos === null) {
-        doc.sortPos =(Math.random() * 1000000);
+  _sortPos = prop([Number, null]);
+  sortPos = formula(() => {
+      if (!exists(this._sortPos)) {
+        this._sortPos = untrack(() => this.createdPosix);
       }
+      return this._sortPos as number;
+    },
+    (newVal) => (this._sortPos = newVal),
+  );
+
+  static get sortedFuelTypes() {
+    return FloatSort.toSorted({
+      list: FuelType.getAllDocs(),
+      getPos: (doc) => doc.sortPos,
+      getUid: (doc) => doc.docId,
     });
-    return docs.sort((a, b) => a.createdPosix - b.createdPosix);
   }
 
   static isValid(fuelType: Partial<FuelType> | null | undefined) {

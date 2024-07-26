@@ -131,7 +131,7 @@ export function FuelTypeSelector(props: {
             <Box widthGrows height={0.125} fill={mdColors.grey} />
           </Show>
           {/* Fuel Types */}
-          <Show when={FuelType.all.length == 0}>
+          <Show when={FuelType.sortedFuelTypes.length == 0}>
             <Txt
               hint
               widthGrows
@@ -142,7 +142,7 @@ export function FuelTypeSelector(props: {
               No Fuel Types
             </Txt>
           </Show>
-          <For each={FuelType.all}>
+          <For each={FuelType.sortedFuelTypes}>
             {(fuel) => (
               <Txt
                 widthGrows
