@@ -1,5 +1,5 @@
 import ClientSelector from "@/Clients/ClientSelector";
-import {ONE_TIME, NONE_SELECTED, formatPhoneNumber, formatAddress} from "@/utils";
+import {ONE_TIME, NONE_SELECTED, formatPhoneNumber } from "@/utils";
 import {
   mdiAccount,
   mdiLabel,
@@ -79,7 +79,6 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.explicitAddress = v),
           )}
           widthGrows
-          formatInput={formatAddress}
           capitalize={`words`}
           keyboard={"text"}
         />
