@@ -140,6 +140,15 @@ export function formatPhoneNumber(input: string, event: InputEvent) {
   };
 }
 
+export function formatIdNumber(input: string, event: InputEvent) {
+  let caretPos = (event.target as any)?.selectionStart; // GET CURRENT CURSOR POSITION
+  let justNums = input?.replace(/\D/g, ""); // STRIP NON-NUMERIC CHARS
+  return {
+    input: justNums,
+    caret: caretPos as number,
+  };
+}
+
 // Tue, March 10th 2021 - 3:00 PM
 export function formatPosixTime(posixTime: number) {
   // Create a new Date object from the posix time
