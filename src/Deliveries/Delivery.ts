@@ -337,7 +337,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       return exists(fuelType)
         ? {
             name: fuelType.name ?? null,
-            rate: fuelType.rate ?? null,
+            rate: this.explicitRate !== fuelType.rate ? this.explicitRate : fuelType.rate ?? null, //Used to be just be fuelType.rate so we would never use the users inputed rate.
           }
         : null;
     } else if (
