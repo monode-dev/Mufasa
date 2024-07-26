@@ -6,7 +6,7 @@ import {
   mdiTextBox,
 } from "@mdi/js";
 import { Field, Prop } from "miwi";
-import { formatAddress, formatPhoneNumber } from "@/utils";
+import { formatAddress, formatPhoneNumber, formatIdNumber } from "@/utils";
 
 export function ClientFields(props: {
   name: Prop<string>;
@@ -30,6 +30,7 @@ export function ClientFields(props: {
         iconPath={mdiIdentifier}
         value={props.clientId}
         underlined
+        formatInput={formatIdNumber}
         keyboard={"numeric"}
       />
       <Field

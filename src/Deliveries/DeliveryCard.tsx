@@ -13,8 +13,6 @@ import {
   useProp,
   useFormula,
   mdColors,
-  SIZE_SHRINKS,
-  Stack,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
