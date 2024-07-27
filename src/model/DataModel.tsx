@@ -105,7 +105,7 @@ export class FuelType extends mfs.Doc(`FuelType`) {
   static isValid(fuelType: Partial<FuelType> | null | undefined) {
     return (
       exists(fuelType) &&
-      exists(fuelType.name) &&
+      exists(fuelType.name) &&  
       fuelType.name.trim() !== `` &&
       exists(fuelType.rate) &&
       fuelType.rate > 0
