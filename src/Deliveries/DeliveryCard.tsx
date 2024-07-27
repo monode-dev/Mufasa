@@ -29,8 +29,8 @@ import {
   spaceChar,
   tankDisplayName,
 } from "@/AppData";
-import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
-import  ShowNotes  from "./ShowNotes";
+import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
+import ShowNotes from "./ShowNotes";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -59,8 +59,10 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 
   doWatch(() => {
     props.delivery.sortedSubDeliveries;
-    console.log(`subDeliveries updated: ${Date.now() - (window as any).startTime}`)
-  })
+    console.log(
+      `subDeliveries updated: ${Date.now() - (window as any).startTime}`,
+    );
+  });
 
   const noFocus = useProp(false);
   return (
@@ -126,9 +128,12 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       {/* Notes */}
       <Show when={shouldShowNotes.value}>
         <Row>
-          <Row alignTop padBetween={0.125}>
+          <Txt widthGrows alignBottomLeft>
+            {`Notes: ${props.delivery.notes.trim()}`}
+          </Txt>
+          {/* <Row alignTop padBetween={0.125}>
             <ShowNotes notes={props.delivery.notes} shouldShowFullNotes/>
-          </Row>
+          </Row> */}
           <DeliveryCardActionButtons
             show={optionsButtonNextToNotes.value}
             delivery={props.delivery}
@@ -173,33 +178,35 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   return (
     <Column
       outlineSize={1 / 8}
-      outlineColor={props.subDelivery.isValid ? undefined : $theme.colors.warning}
+      outlineColor={
+        props.subDelivery.isValid ? undefined : $theme.colors.warning
+      }
     >
-     <Row alignTopLeft widthGrows>  
+      <Row alignTopLeft widthGrows>
         <Show when={!props.subDelivery.isCompleted}>
-            <Box
-              bonusTouchArea
-              onClick={handleComplete}
-              width={1}
-              height={1}
-              outlineSize={1 / 8}
-              outlineColor={$theme.colors.primary}
-              cornerRadius={checkboxCornerRadious}
-            />
+          <Box
+            bonusTouchArea
+            onClick={handleComplete}
+            width={1}
+            height={1}
+            outlineSize={1 / 8}
+            outlineColor={$theme.colors.primary}
+            cornerRadius={checkboxCornerRadious}
+          />
         </Show>
         <Show when={props.subDelivery.isCompleted}>
-            <Box
-              bonusTouchArea
-              outlineSize={1 / 8}
-              width={1}
-              height={1}
-              outlineColor={$theme.colors.hint}
-              fill={$theme.colors.hint}
-              cornerRadius={checkboxCornerRadious}
-              onClick={handleUnComplete}
-            >
-              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-            </Box>
+          <Box
+            bonusTouchArea
+            outlineSize={1 / 8}
+            width={1}
+            height={1}
+            outlineColor={$theme.colors.hint}
+            fill={$theme.colors.hint}
+            cornerRadius={checkboxCornerRadious}
+            onClick={handleUnComplete}
+          >
+            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
+          </Box>
         </Show>
         <Box alignLeft>
           <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
@@ -212,9 +219,9 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           </Txt>
         </Box> */}
       </Row>
-      <Show when={props.subDelivery.subInvalidError.value != ''}>
+      <Show when={props.subDelivery.subInvalidError != ""}>
         <Txt stroke={$theme.colors.warning}>
-          {props.subDelivery.subInvalidError.value}
+          {props.subDelivery.subInvalidError}
         </Txt>
       </Show>
     </Column>
@@ -242,7 +249,8 @@ function DeliveryCardActionButtons(props: {
 
   return (
     <Show when={props.show}>
-      <HiddenOptions showIcons
+      <HiddenOptions
+        showIcons
         isOpen={isOpen}
         onDelete={() => {
           handleDelete();
