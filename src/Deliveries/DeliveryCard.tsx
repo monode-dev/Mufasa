@@ -13,6 +13,7 @@ import {
   useFormula,
   mdColors,
   doWatch,
+  Stack,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -31,6 +32,7 @@ import {
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import ShowNotes from "./ShowNotes";
+import deselectDeliveryCheckbox from "./deselectDeliveryCheckbox";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -156,6 +158,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   const tank = useFormula(() => props.subDelivery.selectedTank);
   const tankName = useFormula(() => tankDisplayName(tank.value));
+  const checkboxCornerRadious = 1 / 7;
   const galStr = useFormula(
     () => (props.subDelivery.gallons ?? `x`) + spaceChar + `Gal.`,
   );
@@ -167,13 +170,14 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   }
 
   function handleUnComplete() {
-    props.subDelivery.unComplete();
+    pushPage(deselectDeliveryCheckbox, {
+      subDelivery: props.subDelivery,
+    });
   }
 
   const combinedStringTankEntry = useFormula(
     () => `${galStr.value} ${tankName.value}`,
   );
-  const checkboxCornerRadious = 1 / 7;
 
   return (
     <Column
@@ -183,31 +187,34 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
       }
     >
       <Row alignTopLeft widthGrows>
-        <Show when={!props.subDelivery.isCompleted}>
-          <Box
-            bonusTouchArea
-            onClick={handleComplete}
-            width={1}
-            height={1}
-            outlineSize={1 / 8}
-            outlineColor={$theme.colors.primary}
-            cornerRadius={checkboxCornerRadious}
-          />
-        </Show>
-        <Show when={props.subDelivery.isCompleted}>
-          <Box
-            bonusTouchArea
-            outlineSize={1 / 8}
-            width={1}
-            height={1}
-            outlineColor={$theme.colors.hint}
-            fill={$theme.colors.hint}
-            cornerRadius={checkboxCornerRadious}
-            onClick={handleUnComplete}
-          >
-            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-          </Box>
-        </Show>
+        <Stack width={1} height={1} overflowXSpills overflowYSpills>
+          <Show when={!props.subDelivery.isCompleted}>
+            <Box
+              bonusTouchArea
+              onClick={handleComplete}
+              width={1}
+              height={1}
+              outlineSize={1 / 8}
+              outlineColor={$theme.colors.primary}
+              cornerRadius={checkboxCornerRadious}
+            />
+          </Show>
+          <Show when={props.subDelivery.isCompleted}>
+            <Box
+              bonusTouchArea
+              outlineSize={1 / 8}
+              width={1}
+              height={1}
+              outlineColor={$theme.colors.hint}
+              fill={$theme.colors.hint}
+              cornerRadius={checkboxCornerRadious}
+              onClick={handleUnComplete}
+            >
+              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
+            </Box>
+          </Show>
+          <Box width={1.5} height={1.5} />
+        </Stack>
         <Box alignLeft>
           <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
             {combinedStringTankEntry.value}

@@ -118,7 +118,7 @@ export function tankVolumeRoundStr(label: TankLabel) {
 
 export function tankDisplayName(
   tank: Partial<Tank> | null | undefined,
-  amountOfNoteCharacters: number = 0,
+  amountOfNoteCharacters: number = 20, //IMPORTANT: This is the default value which we should deicide on.
 ): string {
   const label = getTankLabel(tank);
   let note = label.notesPart.trim();
