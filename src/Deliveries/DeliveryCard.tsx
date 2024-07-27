@@ -31,7 +31,6 @@ import {
   tankDisplayName,
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import ShowNotes from "./ShowNotes";
 import deselectDeliveryCheckbox from "./deselectDeliveryCheckbox";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
@@ -108,6 +107,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         />
       </Row>
 
+      {/* Sub-Deliveries */}
       <For
         each={props.delivery.sortedSubDeliveries}
         fallback={
@@ -121,6 +121,8 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       >
         {(subDelivery) => <SubDeliveryRow subDelivery={subDelivery} />}
       </For>
+
+      {/* Total */}
       <Show when={props.delivery.isCompleted}>
         <Txt singleLine widthGrows bold>
           Total: ${props.delivery.totalMoney}
@@ -133,9 +135,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Txt widthGrows alignBottomLeft>
             {`Notes: ${props.delivery.notes.trim()}`}
           </Txt>
-          {/* <Row alignTop padBetween={0.125}>
-            <ShowNotes notes={props.delivery.notes} shouldShowFullNotes/>
-          </Row> */}
           <DeliveryCardActionButtons
             show={optionsButtonNextToNotes.value}
             delivery={props.delivery}
