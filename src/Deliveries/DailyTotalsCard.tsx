@@ -38,6 +38,19 @@ export function DailyTotalsCard() {
       ),
     );
   });
+  const deliveredPerFuel = useFormula(() => {
+    const deliveredPerFuel = new Map<string, number>();
+    completedSubDeliveriesSince3am.value.forEach((sub) => {
+      const fuelName = sub.fuelSpecs?.name;
+      if (!exists(fuelName)) return;
+      if (!deliveredPerFuel.has(fuelName)) deliveredPerFuel.set(fuelName, 0);
+      deliveredPerFuel.set(
+        fuelName,
+        deliveredPerFuel.get(fuelName)! + (sub.gallons ?? 0),
+      );
+    });
+    return deliveredPerFuel;
+  });
   const totalGallons = useFormula(() =>
     formatNumWithCommas(
       completedSubDeliveriesSince3am.value.reduce(
@@ -57,16 +70,18 @@ export function DailyTotalsCard() {
     ),
   );
 
+  const uniqueSubDeliveries = completedSubDeliveriesSince3am.value;
+
   return (
     <Card widthGrows padBetween={0.75}>
-      <Show when={Array.from(completedSubDeliveriesSince3am.value.entries()).length > 0}>
+      <Show when={Array.from(deliveredPerFuel.value.entries()).length > 0}>
         <For
-          each={Array.from(completedSubDeliveriesSince3am.value.entries())}
+          each={Array.from(deliveredPerFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
         >
-          {([_, delivery]) => (
+          {([fuelName, gallons]) => (
             <Txt widthGrows alignLeft>
-              {delivery.fuelName}: {delivery.gallons} gal. delivered
+              {fuelName}: {gallons} gal. delivered
             </Txt>
           )}
         </For>
