@@ -63,6 +63,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
       outlineColor={
         props.subDelivery.isValid ? undefined : $theme.colors.warning
       }
+      preventClickPropagation
     >
       <Show
         when={props.subDelivery.isCompleted}

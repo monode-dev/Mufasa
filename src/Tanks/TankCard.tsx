@@ -24,6 +24,7 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
       outlineSize={1 / 8}
       outlineColor={isTankValid(props.tank) ? undefined : $theme.colors.warning}
       padBetween={0.75}
+      preventClickPropagation
     >
       <Row widthGrows alignTopLeft padBetween={0.5}>
         {/* tankDisplayName (tank, amount Of Note Characters) */}
