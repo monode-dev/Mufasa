@@ -30,8 +30,9 @@ import {
   spaceChar,
   tankDisplayName,
 } from "@/AppData";
-import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
-import  ShowNotes  from "./ShowNotes";
+import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
+import ShowNotes from "./ShowNotes";
+import deselectDeliveryCheckbox from "./deselectDeliveryCheckbox";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -60,8 +61,10 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 
   doWatch(() => {
     props.delivery.sortedSubDeliveries;
-    console.log(`subDeliveries updated: ${Date.now() - (window as any).startTime}`)
-  })
+    console.log(
+      `subDeliveries updated: ${Date.now() - (window as any).startTime}`,
+    );
+  });
 
   const noFocus = useProp(false);
   return (
@@ -128,7 +131,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       <Show when={shouldShowNotes.value}>
         <Row>
           <Row alignTop padBetween={0.125}>
-            <ShowNotes notes={props.delivery.notes} shouldShowFullNotes/>
+            <ShowNotes notes={props.delivery.notes} shouldShowFullNotes />
           </Row>
           <DeliveryCardActionButtons
             show={optionsButtonNextToNotes.value}
@@ -152,6 +155,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   const tank = useFormula(() => props.subDelivery.selectedTank);
   const tankName = useFormula(() => tankDisplayName(tank.value));
+  const checkboxCornerRadious = 1 / 7;
   const galStr = useFormula(
     () => (props.subDelivery.gallons ?? `x`) + spaceChar + `Gal.`,
   );
@@ -163,60 +167,55 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   }
 
   function handleUnComplete() {
-    props.subDelivery.unComplete();
+    pushPage(deselectDeliveryCheckbox, {
+      subDelivery: props.subDelivery,
+    });
   }
 
   const combinedStringTankEntry = useFormula(
     () => `${galStr.value} ${tankName.value}`,
   );
-  const checkboxCornerRadious = 1 / 7;
 
   return (
     <Column
       outlineSize={1 / 8}
-      outlineColor={props.subDelivery.isValid ? undefined : $theme.colors.warning}
+      outlineColor={
+        props.subDelivery.isValid ? undefined : $theme.colors.warning
+      }
     >
-     <Row alignTopLeft widthGrows>  
-      <Stack
-        width={1}
-        height={1}
-        overflowXSpills
-        overflowYSpills
-      >
+      <Row alignTopLeft widthGrows>
+        <Stack width={1} height={1} overflowXSpills overflowYSpills>
           <Show when={!props.subDelivery.isCompleted}>
-              <Box
-                bonusTouchArea
-                onClick={handleComplete}
-                width={1}
-                height={1}
-                outlineSize={1 / 8}
-                outlineColor={$theme.colors.primary}
-                cornerRadius={checkboxCornerRadious}
-              />
+            <Box
+              bonusTouchArea
+              onClick={handleComplete}
+              width={1}
+              height={1}
+              outlineSize={1 / 8}
+              outlineColor={$theme.colors.primary}
+              cornerRadius={checkboxCornerRadious}
+            />
           </Show>
           <Show when={props.subDelivery.isCompleted}>
-              <Box
-                bonusTouchArea
-                outlineSize={1 / 8}
-                width={1}
-                height={1}
-                outlineColor={$theme.colors.hint}
-                fill={$theme.colors.hint}
-                cornerRadius={checkboxCornerRadious}
-                onClick={handleUnComplete}
-              >
-                <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-              </Box>
+            <Box
+              bonusTouchArea
+              outlineSize={1 / 8}
+              width={1}
+              height={1}
+              outlineColor={$theme.colors.hint}
+              fill={$theme.colors.hint}
+              cornerRadius={checkboxCornerRadious}
+              onClick={handleUnComplete}
+            >
+              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
+            </Box>
           </Show>
-          <Box
-            width={1.5}
-            height={1.5}
-          />
+          <Box width={1.5} height={1.5} />
         </Stack>
         <Box alignLeft>
-            <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
-              {combinedStringTankEntry.value}
-            </Txt>
+          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
+            {combinedStringTankEntry.value}
+          </Txt>
         </Box>
         {/* <Box>
           <Txt fill={mdColors.red}  alignRight widthGrows>
@@ -224,7 +223,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           </Txt>
         </Box> */}
       </Row>
-      <Show when={props.subDelivery.subInvalidError != ''}>
+      <Show when={props.subDelivery.subInvalidError != ""}>
         <Txt stroke={$theme.colors.warning}>
           {props.subDelivery.subInvalidError}
         </Txt>
@@ -254,7 +253,8 @@ function DeliveryCardActionButtons(props: {
 
   return (
     <Show when={props.show}>
-      <HiddenOptions showIcons
+      <HiddenOptions
+        showIcons
         isOpen={isOpen}
         onDelete={() => {
           handleDelete();
