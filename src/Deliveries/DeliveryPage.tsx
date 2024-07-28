@@ -23,15 +23,16 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
-import {HiddenOptions} from "@/components/HiddenOptions";
+import { HiddenOptions } from "@/components/HiddenOptions";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
     Delivery.completedDeliveriesForAllUsers.filter(
       (delivery) =>
         exists(delivery.selectedKnownClient?.docId) &&
-        exists(props.delivery.selectedClient) &&
-        delivery.selectedKnownClient.docId === props.delivery.selectedClient,
+        exists(props.delivery.selectedKnownClient) &&
+        delivery.selectedKnownClient.docId ===
+          props.delivery.selectedKnownClient.docId,
     ),
   );
 
@@ -59,7 +60,11 @@ export function DeliveryPage(props: { delivery: Delivery }) {
           <Txt h2 widthGrows alignCenter>
             Client
           </Txt>
-          <HiddenOptions showIcons onDelete={handleDeleteRequest} scale={1.125} />
+          <HiddenOptions
+            showIcons
+            onDelete={handleDeleteRequest}
+            scale={1.125}
+          />
         </Row>
         {/* Client Card */}
         <Card pad={1} widthGrows>
