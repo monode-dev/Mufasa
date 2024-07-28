@@ -181,9 +181,6 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   return (
     <Column
       outlineSize={1 / 8}
-      outlineColor={
-        props.subDelivery.isValid ? undefined : $theme.colors.warning
-      }
     >
       <Row alignTopLeft widthGrows>
         <Stack width={1} height={1} overflowXSpills overflowYSpills>
@@ -194,7 +191,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
               width={1}
               height={1}
               outlineSize={1 / 8}
-              outlineColor={$theme.colors.primary}
+              outlineColor={props.subDelivery.isValid ? $theme.colors.primary : $theme.colors.warning}
               cornerRadius={checkboxCornerRadious}
             />
           </Show>
@@ -204,8 +201,8 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
               outlineSize={1 / 8}
               width={1}
               height={1}
-              outlineColor={$theme.colors.hint}
-              fill={$theme.colors.hint}
+              outlineColor={props.subDelivery.isValid ? $theme.colors.hint : $theme.colors.warning}
+              fill={props.subDelivery.isValid ? $theme.colors.hint : $theme.colors.warning}
               cornerRadius={checkboxCornerRadious}
               onClick={handleUnComplete}
             >
@@ -215,7 +212,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           <Box width={1.5} height={1.5} />
         </Stack>
         <Box alignLeft>
-          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}>
+          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap} stroke={props.subDelivery.isValid ? undefined : $theme.colors.warning}>
             {combinedStringTankEntry.value}
           </Txt>
         </Box>
@@ -225,11 +222,6 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           </Txt>
         </Box> */}
       </Row>
-      <Show when={props.subDelivery.subInvalidError != ""}>
-        <Txt stroke={$theme.colors.warning}>
-          {props.subDelivery.subInvalidError}
-        </Txt>
-      </Show>
     </Column>
   );
 }
