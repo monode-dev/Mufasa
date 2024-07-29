@@ -212,7 +212,12 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           <Box width={1.5} height={1.5} />
         </Stack>
         <Box alignLeft>
-          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap} stroke={props.subDelivery.isValid || props.subDelivery.isCompleted ? undefined : $theme.colors.warning}>
+          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}     
+            stroke={
+              !props.subDelivery.isCompleted && !props.subDelivery.isValid
+                ? $theme.colors.warning
+                : undefined
+            }>
             {combinedStringTankEntry.value}
           </Txt>
         </Box>
