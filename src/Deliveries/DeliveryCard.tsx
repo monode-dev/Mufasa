@@ -40,7 +40,7 @@ export const numDeliveriesExpanded = autoSavingProp<number>(
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   const shouldShowCompleteDate = useFormula(() =>
-    exists(props.delivery.completedTimePosix),
+    exists(props.delivery.completedTimePosix ? 0 : null),
   );
   const optionsButtonNextToCompleteDate = useFormula(
     () => shouldShowCompleteDate.value,
@@ -64,7 +64,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       `subDeliveries updated: ${Date.now() - (window as any).startTime}`,
     );
   });
-
   const noFocus = useProp(false);
   return (
     <Card
