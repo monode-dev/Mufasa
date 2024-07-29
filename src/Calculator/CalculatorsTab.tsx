@@ -330,7 +330,7 @@ export default function Calculator() {
         <Label
           label={`Sticked Inches`}
           outlineSize={1 / 8}
-          outlineColor={fillOutline(currentFillPercent.value)}
+          stroke={fillOutline(currentFillPercent.value)}
         >
           <NumField
             valueSig={stickedInches}
