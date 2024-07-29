@@ -319,7 +319,7 @@ export default function Calculator() {
         <Show when={selectedTab.value === tabs.dimensions}>
           <TankFields tankGeometry={tankGeometry.value!}
           warningMessage={TankFields_warning} />
-          <Show when={showWarning}>
+          <Show when={showWarning.value}>
             <Txt widthGrows stroke={$theme.colors.warning}>
               {TankFields_warning.value}
             </Txt>
