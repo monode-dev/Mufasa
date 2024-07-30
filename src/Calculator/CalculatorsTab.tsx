@@ -279,9 +279,15 @@ export default function Calculator() {
 
                   <For each={selectedDelivery.value?.sortedSubDeliveries ?? []} 
                     fallback={                     
-                      <Box onClick={() => selectedDelivery.value?.createSubDelivery() }> 
+                      <Box 
+                        onClick={() => { 
+                          if(selectedDelivery.value?._client?.tanks?.count! <= 0) {
+                            openCreateTankDialog({client:selectedDelivery.value?._client as Client});
+                          }
+                          selectedDelivery.value?.createSubDelivery();
+                        }}> 
                         <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>                   
-                          <Txt>Add Sub Delivery</Txt> 
+                          <Txt>Add Tank</Txt> 
                           <Icon iconPath={mdiPlus} />    
                         </Row>
                       </Box>
@@ -290,6 +296,11 @@ export default function Calculator() {
                     {(subDelivery) => (
                       <Txt
                         onclick={() => {
+                          selectedDelivery.value?._client?.tanks.forEach(tank => {
+                            if(subDelivery) {
+                              subDelivery.selectedTank = tank;
+                            }
+                          });
                           selectedSubDelivery.value = subDelivery;
                           subDeliverySelectorIsOpen.value = false;
                         }}
@@ -418,10 +429,6 @@ export default function Calculator() {
           }
           onClick={() => {
             selectedTab.value = tabs.delivery;
-            if(selectedSubDelivery.value){ 
-              selectedSubDelivery.value.selectedTank = JUST_FUEL; 
-              selectedSubDelivery.value.selectedFuel = ONE_TIME;
-            }
             completeDelivery();
           }}
         >
