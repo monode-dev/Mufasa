@@ -15,7 +15,7 @@ import {
   ONE_TIME,
   formatNumWithCommas,
 } from "@/utils";
-import {FloatSort, doNow, exists, useProp } from "miwi";
+import { FloatSort, doNow, exists, useProp } from "miwi";
 import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
 
@@ -62,7 +62,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
 
   // Client
   selectedClient: SelectedClient = formula(
-    () => (this._isOneTimeClient ? ONE_TIME : this._client ?? NONE_SELECTED),
+    () => (this._isOneTimeClient ? ONE_TIME : (this._client ?? NONE_SELECTED)),
     (value) => {
       if (value === ONE_TIME) {
         this._isOneTimeClient = true;
@@ -121,7 +121,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly address = formula(() =>
     this.selectedClient === ONE_TIME
       ? this.explicitAddress
-      : this.selectedClient?.address ?? ``,
+      : (this.selectedClient?.address ?? ``),
   );
   explicitPhoneNumber = formula(
     () => this.clientPhoneNumber ?? ``,
@@ -132,7 +132,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly phoneNumber = formula(() =>
     this.selectedClient === ONE_TIME
       ? this.explicitPhoneNumber
-      : this.selectedClient?.phoneNumber ?? ``,
+      : (this.selectedClient?.phoneNumber ?? ``),
   );
 
   // Notes
@@ -193,15 +193,16 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   user = prop(String, ``);
 
   // Checks
-  readonly isValid = formula(() : [boolean, string] => {
-    if (this.selectedClient === NONE_SELECTED) return [false, 'Please select a client.'];
+  readonly isValid = formula((): [boolean, string] => {
+    if (this.selectedClient === NONE_SELECTED)
+      return [false, "Please select a client."];
     if (this.selectedClient === ONE_TIME && this.label.trim() === ``)
-      return [false, 'Please enter a name.'];
+      return [false, "Please enter a name."];
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
-      return [false, 'Please select a valid client.'];
+      return [false, "Please select a valid client."];
     this.sortedSubDeliveries.forEach((sub) => {
-      if(!sub.isValid){
-        return [false, sub.subInvalidError]
+      if (!sub.isValid) {
+        return [false, sub.subInvalidError];
       }
     });
     return [true, ``];
@@ -249,9 +250,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedTank: SelectedTank = formula(
     () => {
-      return this._isJustFuel
-        ? JUST_FUEL
-        : this._tank ?? NONE_SELECTED;
+      return this._isJustFuel ? JUST_FUEL : (this._tank ?? NONE_SELECTED);
     },
     (value) => {
       if (value === JUST_FUEL) {
@@ -287,9 +286,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedFuel: SelectedFuel = formula(
     () => {
-      return this._isOneTimeFuel
-        ? ONE_TIME
-        : this._fuelType ?? NONE_SELECTED;
+      return this._isOneTimeFuel ? ONE_TIME : (this._fuelType ?? NONE_SELECTED);
     },
     (value) => {
       if (value === ONE_TIME) {
@@ -332,7 +329,10 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       return exists(fuelType)
         ? {
             name: fuelType.name ?? null,
-            rate: this.explicitRate !== fuelType.rate ? this.explicitRate : fuelType.rate ?? null, //Used to be just be fuelType.rate so we would never use the users inputed rate.
+            rate:
+              this.explicitRate !== fuelType.rate
+                ? this.explicitRate
+                : (fuelType.rate ?? null), //Used to be just be fuelType.rate so we would never use the users inputed rate.
           }
         : null;
     } else if (
@@ -372,7 +372,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     if (tank === JUST_FUEL || !this.shouldShowTankSelector) {
       const fuel = this.selectedFuel;
       const fuelName =
-        fuel === ONE_TIME ? this.explicitFuelName : fuel?.name ?? ``;
+        fuel === ONE_TIME ? this.explicitFuelName : (fuel?.name ?? ``);
       return `${valid}${formatNumWithCommas(this.gallons ?? 0, 0)} gal. of ${fuelName}`;
     } else return valid + tankDisplayName(tank);
   });
@@ -394,51 +394,55 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   isCompleted = formula(() => exists(this.completedTimePosix));
   completedTimePosix = prop([Number, null], null);
 
-  readonly isValid = formula(() => exists(this.subInvalidError) && this.subInvalidError.trim() !== ``);
+  readonly isValid = formula(
+    () => !exists(this.subInvalidError) || this.subInvalidError.trim() === ``,
+  );
   readonly subInvalidError = formula<string | undefined>(() => {
     const nonGallonsErrorMessage = doNow(() => {
       // Fuel
       const explicitFuelError =
-      !exists(this.explicitFuelName) || this.explicitFuelName.trim() === ``
-        ? `Give the fuel a name.`
-        : !exists(this.explicitRate) || this.explicitRate < 0
-          ? `Give the fuel a rate.`
-          : undefined;
+        !exists(this.explicitFuelName) || this.explicitFuelName.trim() === ``
+          ? `Give the fuel a name.`
+          : !exists(this.explicitRate) || this.explicitRate < 0
+            ? `Give the fuel a rate.`
+            : undefined;
 
       // Completed
       if (this.isCompleted) return explicitFuelError;
 
       // Selected Tank
       if (this.selectedTank === NONE_SELECTED) {
-      // No Tank
-      return this.delivery?.selectedClient !== ONE_TIME && this.delivery?.selectedClient !== NONE_SELECTED
-        ? `Please select a tank.`
-        : explicitFuelError
+        // No Tank
+        return this.delivery?.selectedClient !== ONE_TIME &&
+          this.delivery?.selectedClient !== NONE_SELECTED
+          ? `Please select a tank.`
+          : explicitFuelError;
       } else if (this.selectedTank === JUST_FUEL) {
-      // Just Fuel
-      return this.selectedFuel === NONE_SELECTED
-        ? `Please select a fuel.`
-        : this.selectedFuel === ONE_TIME
-          ? explicitFuelError
-          : !FuelType.isValid(this.selectedFuel)
-            ? `Please select a valid fuel.`
-            : undefined;
+        // Just Fuel
+        return this.selectedFuel === NONE_SELECTED
+          ? `Please select a fuel.`
+          : this.selectedFuel === ONE_TIME
+            ? explicitFuelError
+            : !FuelType.isValid(this.selectedFuel)
+              ? `Please select a valid fuel.`
+              : undefined;
       } else {
-      // Tank
-      return !exists(this.selectedTank)
-        ? `Please select a tank.`
-        : !isTankValid(this.selectedTank)
-          ? `Please select a valid tank.`
-          : !FuelType.isValid(this.selectedTank.fuelType)
-            ? `Please select a valid fuel.`
-            : undefined;
+        // Tank
+        return !exists(this.selectedTank)
+          ? `Please select a tank.`
+          : !isTankValid(this.selectedTank)
+            ? `Please select a valid tank.`
+            : !FuelType.isValid(this.selectedTank.fuelType)
+              ? `Please select a valid fuel.`
+              : undefined;
       }
     });
 
     // Gallons
-    const gallonsErrorMessage = !exists(this.gallons) || this.gallons < 0
-      ? `Gallons must be greater than 0.`
-      : undefined;
+    const gallonsErrorMessage =
+      !exists(this.gallons) || this.gallons < 0
+        ? `Gallons must be greater than 0.`
+        : undefined;
 
     // We need Gallons error message to go last because it is the last field.
     return nonGallonsErrorMessage ?? gallonsErrorMessage;
