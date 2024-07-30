@@ -133,7 +133,7 @@ export function tankDisplayName(
     (0 == note.length ? "" : note + " - ") +
     (label.fuelName ?? "New Fuel") +
     " - " +
-    (label.dimensionsPart ?? "No Dimensions") +
+    (label.dimensionsPart.trim() === "" ? "No Dimensions" : label.dimensionsPart) +
     " - " +
     (label.shapeName ?? "Shape") +
     " - " +
@@ -211,7 +211,6 @@ export function getTankLabel(
         result += `${dimAcronym}:${roundToString(dimValue)} `;
       }
     }
-
     result = result.slice(0, -1);
     return result;
   })();

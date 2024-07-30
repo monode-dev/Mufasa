@@ -40,7 +40,7 @@ export const numDeliveriesExpanded = autoSavingProp<number>(
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   const shouldShowCompleteDate = useFormula(() =>
-    exists(props.delivery.completedTimePosix),
+    exists(props.delivery.completedTimePosix ? 0 : null),
   );
   const optionsButtonNextToCompleteDate = useFormula(
     () => shouldShowCompleteDate.value,
@@ -64,7 +64,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       `subDeliveries updated: ${Date.now() - (window as any).startTime}`,
     );
   });
-
   const noFocus = useProp(false);
   return (
     <Card
@@ -201,8 +200,8 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
               outlineSize={1 / 8}
               width={1}
               height={1}
-              outlineColor={props.subDelivery.isValid ? $theme.colors.hint : $theme.colors.warning}
-              fill={props.subDelivery.isValid ? $theme.colors.hint : $theme.colors.warning}
+              outlineColor={$theme.colors.hint}
+              fill={$theme.colors.hint}
               cornerRadius={checkboxCornerRadious}
               onClick={handleUnComplete}
             >
@@ -212,7 +211,12 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           <Box width={1.5} height={1.5} />
         </Stack>
         <Box alignLeft>
-          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap} stroke={props.subDelivery.isValid ? undefined : $theme.colors.warning}>
+          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}     
+            stroke={
+              !props.subDelivery.isCompleted && !props.subDelivery.isValid
+                ? $theme.colors.warning
+                : undefined
+            }>
             {combinedStringTankEntry.value}
           </Txt>
         </Box>
