@@ -20,6 +20,8 @@ import {
   useProp,
   Selector,
   Icon,
+  JUST_FUEL,
+  ONE_TIME,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -308,7 +310,7 @@ export default function Calculator() {
               <Show
                 when={
                   exists(selectedSubDelivery.value) &&
-                  !exists(selectedSubDelivery.value.tankGeometry)
+                  !exists(selectedSubDelivery.value.tankGeometry) 
                 }
               >
                 <TankFields tankGeometry={tankGeometry.value!} />
@@ -416,6 +418,10 @@ export default function Calculator() {
           }
           onClick={() => {
             selectedTab.value = tabs.delivery;
+            if(selectedSubDelivery.value){ 
+              selectedSubDelivery.value.selectedTank = JUST_FUEL; 
+              selectedSubDelivery.value.selectedFuel = ONE_TIME;
+            }
             completeDelivery();
           }}
         >
