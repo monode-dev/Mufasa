@@ -50,7 +50,6 @@ function CreateTankDialog(props: {
   const live_error_msg = useFormula(
     () => !tankIsValid.value && show_errors.value,
   );
-
   const fuel_warn_message = useFormula(() => {
     if (show_errors.value) {
       if (!exists(fuelType.value)) {
