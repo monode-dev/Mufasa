@@ -19,6 +19,7 @@ import {
   pushPage,
   useProp,
   Selector,
+  Icon,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -34,6 +35,8 @@ import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
 import { Slider } from "@/components/Slider";
+import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
+import { mdiPlus } from "@mdi/js";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -187,7 +190,7 @@ export default function Calculator() {
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
   }
-
+  
   return (
     <Body asWideAsParent padBetween={0.5}>
       <Txt h2>Tank Details</Txt>
@@ -229,7 +232,7 @@ export default function Calculator() {
                 {/* Selector does not allow invalid deliveries */}
                 <For
                   each={Delivery.upcomingDeliveries.filter(
-                    (delivery) => delivery.isValid[0],
+                    (delivery) => delivery.isValid[0], 
                   )}
                   fallback={<Txt hint>No Upcoming Deliveries</Txt>}
                 >
@@ -260,7 +263,7 @@ export default function Calculator() {
                   getLabelForData={getSubDeliveryName}
                   emptyListText={"No Clients"}
                 >
-                  <Show when={Delivery.upcomingDeliveries.length === 0}>
+                  <Show when={Delivery.upcomingDeliveries.length < 0}>
                     <Txt
                       onclick={() => {
                         subDeliverySelectorIsOpen.value = false;
@@ -272,7 +275,16 @@ export default function Calculator() {
                     </Txt>
                   </Show>
 
-                  <For each={selectedDelivery.value?.sortedSubDeliveries ?? []}>
+                  <For each={selectedDelivery.value?.sortedSubDeliveries ?? []} 
+                    fallback={                     
+                      <Box onClick={() => selectedDelivery.value?.createSubDelivery() }> 
+                        <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>                   
+                          <Txt>Add Sub Delivery</Txt> 
+                          <Icon iconPath={mdiPlus} />    
+                        </Row>
+                      </Box>
+                    }
+                  >
                     {(subDelivery) => (
                       <Txt
                         onclick={() => {
@@ -300,7 +312,7 @@ export default function Calculator() {
                 }
               >
                 <TankFields tankGeometry={tankGeometry.value!} />
-                {/* TODO: Show a button to add this tank to the client. */}
+                {/* TODO: Show a button to add this tank to the client. */}          
               </Show>
             </Show>
           </Column>
