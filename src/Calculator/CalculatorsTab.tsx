@@ -19,6 +19,9 @@ import {
   pushPage,
   useProp,
   Selector,
+  Icon,
+  JUST_FUEL,
+  ONE_TIME,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -34,6 +37,8 @@ import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
 import { Slider } from "@/components/Slider";
+import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
+import { mdiPlus } from "@mdi/js";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -187,7 +192,7 @@ export default function Calculator() {
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
   }
-
+  
   return (
     <Body asWideAsParent padBetween={0.5}>
       <Txt h2>Tank Details</Txt>
@@ -229,7 +234,7 @@ export default function Calculator() {
                 {/* Selector does not allow invalid deliveries */}
                 <For
                   each={Delivery.upcomingDeliveries.filter(
-                    (delivery) => delivery.isValid[0],
+                    (delivery) => delivery.isValid[0], 
                   )}
                   fallback={<Txt hint>No Upcoming Deliveries</Txt>}
                 >
@@ -260,7 +265,7 @@ export default function Calculator() {
                   getLabelForData={getSubDeliveryName}
                   emptyListText={"No Clients"}
                 >
-                  <Show when={Delivery.upcomingDeliveries.length === 0}>
+                  <Show when={Delivery.upcomingDeliveries.length < 0}>
                     <Txt
                       onclick={() => {
                         subDeliverySelectorIsOpen.value = false;
@@ -272,10 +277,30 @@ export default function Calculator() {
                     </Txt>
                   </Show>
 
-                  <For each={selectedDelivery.value?.sortedSubDeliveries ?? []}>
+                  <For each={selectedDelivery.value?.sortedSubDeliveries ?? []} 
+                    fallback={                     
+                      <Box 
+                        onClick={() => { 
+                          if(selectedDelivery.value?._client?.tanks?.count! <= 0) {
+                            openCreateTankDialog({client:selectedDelivery.value?._client as Client});
+                          }
+                          selectedDelivery.value?.createSubDelivery();
+                        }}> 
+                        <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>                   
+                          <Txt>Add Tank</Txt> 
+                          <Icon iconPath={mdiPlus} />    
+                        </Row>
+                      </Box>
+                    }
+                  >
                     {(subDelivery) => (
                       <Txt
                         onclick={() => {
+                          selectedDelivery.value?._client?.tanks.forEach(tank => {
+                            if(subDelivery) {
+                              subDelivery.selectedTank = tank;
+                            }
+                          });
                           selectedSubDelivery.value = subDelivery;
                           subDeliverySelectorIsOpen.value = false;
                         }}
@@ -296,11 +321,11 @@ export default function Calculator() {
               <Show
                 when={
                   exists(selectedSubDelivery.value) &&
-                  !exists(selectedSubDelivery.value.tankGeometry)
+                  !exists(selectedSubDelivery.value.tankGeometry) 
                 }
               >
                 <TankFields tankGeometry={tankGeometry.value!} />
-                {/* TODO: Show a button to add this tank to the client. */}
+                {/* TODO: Show a button to add this tank to the client. */}          
               </Show>
             </Show>
           </Column>
@@ -316,10 +341,10 @@ export default function Calculator() {
         </Show>
 
         {/* DIMENSIONS TAB */}
-        <Show when={selectedTab.value === tabs.dimensions}>
+        <Show when={selectedTab.value === tabs.dimensions} >
           <TankFields tankGeometry={tankGeometry.value!}
-          warningMessage={TankFields_warning} />
-          <Show when={showWarning}>
+          warningMessage={TankFields_warning}/>
+          <Show when={showWarning.value}>
             <Txt widthGrows stroke={$theme.colors.warning}>
               {TankFields_warning.value}
             </Txt>
@@ -330,7 +355,7 @@ export default function Calculator() {
         <Label
           label={`Sticked Inches`}
           outlineSize={1 / 8}
-          outlineColor={fillOutline(currentFillPercent.value)}
+          stroke={fillOutline(currentFillPercent.value)}
         >
           <NumField
             valueSig={stickedInches}
