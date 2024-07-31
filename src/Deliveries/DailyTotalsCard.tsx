@@ -1,4 +1,4 @@
-import { Card, Txt, Column, useFormula, exists, Box } from "miwi";
+import {Card, Txt, Column, useFormula, exists, Box, Row} from "miwi";
 import { Delivery } from "./Delivery";
 import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
@@ -80,9 +80,14 @@ export function DailyTotalsCard() {
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
         >
           {([fuelName, gallons]) => (
-            <Txt widthGrows alignLeft>
-              {fuelName}: {gallons} gal. delivered
-            </Txt>
+            <Row>
+              <Txt widthGrows alignLeft singleLine>
+                {fuelName}
+              </Txt>
+              <Txt width={6} alignLeft singleLine>
+                gal: {gallons}
+              </Txt>
+            </Row>
           )}
         </For>
         <Box widthGrows height={0.125} fill={$theme.colors.text} />
