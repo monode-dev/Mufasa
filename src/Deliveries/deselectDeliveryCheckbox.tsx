@@ -1,7 +1,7 @@
 import { Button, Card, Page, Row, mdColors, popPage, useProp, Txt } from "miwi";
 import { SubDelivery } from "./Delivery";
 
-export default function deselectDeliveryCheckbox(props: {
+export function DeselectDeliveryCheckbox(props: {
   subDelivery: SubDelivery;
 }) {
   function handleYes() {
@@ -28,7 +28,7 @@ export default function deselectDeliveryCheckbox(props: {
         shadowSize={0}
       >
         {/* Message */}
-        <Txt>Are you sure you want to uncheck this completed delivery</Txt>
+        <Txt>Are you sure you want to un-complete this completed delivery.</Txt>
 
         {/* --Buttons-- */}
         <Row widthGrows align={$Align.spaceEvenly}>
@@ -36,7 +36,7 @@ export default function deselectDeliveryCheckbox(props: {
             Cancel
           </Button>
           <Button onclick={handleYes} fill={mdColors.green}>
-            Un-Check
+            Un-Complete
           </Button>
         </Row>
       </Card>

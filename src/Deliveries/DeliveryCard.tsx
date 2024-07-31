@@ -31,7 +31,7 @@ import {
   tankDisplayName,
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import deselectDeliveryCheckbox from "./deselectDeliveryCheckbox";
+import { DeselectDeliveryCheckbox } from "./DeselectDeliveryCheckbox";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -168,7 +168,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   }
 
   function handleUnComplete() {
-    pushPage(deselectDeliveryCheckbox, {
+    pushPage(DeselectDeliveryCheckbox, {
       subDelivery: props.subDelivery,
     });
   }
@@ -178,9 +178,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   );
 
   return (
-    <Column
-      outlineSize={1 / 8}
-    >
+    <Column outlineSize={1 / 8}>
       <Row alignTopLeft widthGrows>
         <Stack width={1} height={1} overflowXSpills overflowYSpills>
           <Show when={!props.subDelivery.isCompleted}>
@@ -190,7 +188,11 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
               width={1}
               height={1}
               outlineSize={1 / 8}
-              outlineColor={props.subDelivery.isValid ? $theme.colors.primary : $theme.colors.warning}
+              outlineColor={
+                props.subDelivery.isValid
+                  ? $theme.colors.primary
+                  : $theme.colors.warning
+              }
               cornerRadius={checkboxCornerRadious}
             />
           </Show>
@@ -211,12 +213,16 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           <Box width={1.5} height={1.5} />
         </Stack>
         <Box alignLeft>
-          <Txt widthGrows asTallAsParent overflowXWraps     
+          <Txt
+            widthGrows
+            asTallAsParent
+            overflowXWraps
             stroke={
               !props.subDelivery.isCompleted && !props.subDelivery.isValid
                 ? $theme.colors.warning
                 : undefined
-            }>
+            }
+          >
             {combinedStringTankEntry.value}
           </Txt>
         </Box>
