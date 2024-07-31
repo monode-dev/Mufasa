@@ -1,4 +1,4 @@
-import { listTanks, tankDisplayName } from "@/AppData";
+import { listTanks } from "@/AppData";
 import { mdiPlus } from "@mdi/js";
 import {
   Box,
@@ -55,7 +55,7 @@ export default function TankSelector(
       getLabelForData={(data: TankType) => {
         if (!exists(data)) return null;
         if (data == JUST_FUEL) return justFuelLabel;
-        return tankDisplayName(data);
+        return data.getLabel();
       }}
     >
       {/* New Tank Type */}
@@ -63,10 +63,12 @@ export default function TankSelector(
         <Row
           padBetween={0.1}
           stroke={mdColors.green}
-          onClick={() => openCreateTankDialog({
-            client: props.client, 
-            onCreate: (newObject) => selectOption(newObject),
-          })}
+          onClick={() =>
+            openCreateTankDialog({
+              client: props.client,
+              onCreate: (newObject) => selectOption(newObject),
+            })
+          }
         >
           <Txt>New</Txt>
           <Icon iconPath={mdiPlus} />
@@ -103,21 +105,18 @@ export default function TankSelector(
           </Txt>
         }
       >
-        {(tank: TankType) => {
-          const tankOption = tankDisplayName(tank);
-          return (
-            <Txt
-              stroke={mdColors.black}
-              onClick={() => {
-                selectOption(tank);
-              }}
-              widthGrows
-              alignCenterLeft
-            >
-              {tankOption}
-            </Txt>
-          );
-        }}
+        {(tank) => (
+          <Txt
+            stroke={mdColors.black}
+            onClick={() => {
+              selectOption(tank);
+            }}
+            widthGrows
+            alignCenterLeft
+          >
+            {tank.getLabel()}
+          </Txt>
+        )}
       </For>
     </Selector>
   );

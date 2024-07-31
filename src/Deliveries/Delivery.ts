@@ -2,7 +2,6 @@ import {
   getClientLabel,
   isClientValid,
   isTankValid,
-  tankDisplayName,
 } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import { mfs, premiumEnabled, FuelType } from "@/model/DataModel";
@@ -307,6 +306,9 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       }
     },
   );
+  computedFuelType: FuelType | null = formula(() =>
+    this.selectedFuel === ONE_TIME ? null : (this.selectedFuel as FuelType),
+  );
 
   // Fuel Name
   readonly shouldShowFuelNameField = formula(
@@ -380,7 +382,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       const fuelName =
         fuel === ONE_TIME ? this.explicitFuelName : (fuel?.name ?? ``);
       return `${valid}${formatNumWithCommas(this.gallons ?? 0, 0)} gal. of ${fuelName}`;
-    } else return valid + tankDisplayName(tank);
+    } else return `${valid}${tank?.getLabel()}`;
   });
 
   // Sort Position
