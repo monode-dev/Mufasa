@@ -28,7 +28,6 @@ import {
   canMapToAddress,
   mapToAddress,
   spaceChar,
-  tankDisplayName,
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { DeselectDeliveryCheckbox } from "./DeselectDeliveryCheckbox";
@@ -159,7 +158,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 
 export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   const tank = useFormula(() => props.subDelivery.selectedTank);
-  const tankName = useFormula(() => tankDisplayName(tank.value));
+  const tankName = useFormula(() => tank.value?.getLabel);
   const checkboxCornerRadious = 1 / 7;
   const galStr = useFormula(
     () => (props.subDelivery.gallons ?? `x`) + spaceChar + `Gal.`,

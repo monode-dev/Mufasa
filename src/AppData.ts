@@ -1,23 +1,24 @@
 import {
-  getDimensionLabel,
   getTankShape,
   TankGeometry,
   TankDimension,
 } from "@/Calculator/ShapeUtils";
-import {
-  FloatSort,
-  useFormula,
-  exists,
-  roundToString,
-  Prop,
-  mdColors,
-  doNow,
-} from "miwi";
+import { FloatSort, useFormula, exists, Prop, mdColors, doNow } from "miwi";
 import { FuelType } from "./model/DataModel";
 import { Client } from "./Clients/Client";
 import { Tank } from "./Tanks/Tank";
 
 export const spaceChar: string = "\u00A0";
+
+export function cropAndTrimString(str: string, maxChar: number) {
+  str = str.trim();
+  // Check if we need to shorten the str
+  if (maxChar > 0 && str.length > maxChar) {
+    str = str.slice(0, maxChar);
+  }
+  return str.trim();
+}
+
 // SECTION: Client
 export function isClientValid(
   client: Partial<Client> | null | undefined,
@@ -112,57 +113,18 @@ export function mapToAddress(address: string | null | undefined) {
 }
 
 // SECTION: Tank
-export function tankVolumeRoundStr(label: TankLabel) {
-  return roundToString(label.volume ?? 0, 0) + spaceChar + "Gal.";
-}
-
-function cropString(str: string, maxChar: number) {
-  str = str.trim();
-  // Check if we need to shorten the str
-  if (maxChar > 0 && str.length > maxChar) {
-    str = str.slice(0, maxChar);
-  }
-  return str;
-}
-
-export function tankDisplayName(
-  tank: Partial<Tank> | null | undefined,
-  amountOfNoteCharacters: number = 20, //IMPORTANT: This is the default value which we should deicide on.
-): string {
-  const label = getTankLabel(tank);
-  let note = cropString(label.notesPart, amountOfNoteCharacters);
-  if (amountOfNoteCharacters === 0) {
-    note = ``;
-  }
-  let fuel = cropString(label.fuelName ?? "New Fuel", amountOfNoteCharacters);
-  return (
-    (0 == note.length ? "" : note + " - ") +
-    (fuel) +
-    " - " +
-    (label.dimensionsPart.trim() === "" ? "No Dimensions" : label.dimensionsPart) +
-    " - " +
-    (label.shapeName ?? "Shape") +
-    " - " +
-    tankVolumeRoundStr(label)
-  );
-}
 
 export function isTankValid(tank: Partial<Tank> | null | undefined): boolean {
   if (tank?.shape == `truckBedTank`) {
     let td = tank.topDepth ?? 0;
     let fd = tank.fullDepth ?? 0;
-    if (td <= 0 || fd <= 0)
-      return false;
-    if (td >= fd)
-      return false;
-  }
-  else if(tank?.shape == `oval` ){
+    if (td <= 0 || fd <= 0) return false;
+    if (td >= fd) return false;
+  } else if (tank?.shape == `oval`) {
     let sh = tank.squareHeight ?? 0;
     let fh = tank.fullHeight ?? 0;
-    if(sh <= 0 || fh <= 0)
-      return false;
-    if(sh >= fh)
-      return false;
+    if (sh <= 0 || fh <= 0) return false;
+    if (sh >= fh) return false;
   }
 
   const shapeUtils = getTankShape(tank?.shape);
@@ -174,55 +136,7 @@ export function isTankValid(tank: Partial<Tank> | null | undefined): boolean {
     volume > 0
   );
 }
-export class TankLabel {
-  dimensionsPart: string;
-  fuelName: string | null | undefined;
-  notesPart: string;
-  shapeName: string | undefined;
-  volume: number | undefined;
-  constructor(
-    dimensionsPart: string,
-    fuelName: string | null | undefined,
-    notesPart: string,
-    shapeName: string | undefined,
-    volume: number | undefined,
-  ) {
-    this.dimensionsPart = dimensionsPart;
-    this.fuelName = fuelName;
-    this.notesPart = notesPart;
-    this.shapeName = shapeName;
-    this.volume = volume;
-  }
-}
 
-export function getTankLabel(
-  tank: Partial<Tank> | null | undefined,
-): TankLabel {
-  // if (!isTankValid(tank)) return `Incomplete Tank`;
-  const shapeUtils = getTankShape(tank?.shape);
-  const fuelName = tank?.fuelType?.name;
-  const volume = shapeUtils?.calcTotalVolume(tank);
-  const shapeName = shapeUtils?.nameShort;
-  const notesPart =
-    exists(tank?.notes) && tank?.notes?.trim() !== `` ? `${tank?.notes}` : ``;
-  const dimensionsPart = (() => {
-    let result = ``;
-    for (const dimension of shapeUtils?.dimensions ?? []) {
-      const dimAcronym = getDimensionLabel(dimension)
-        ?.split(` `)
-        .map((x) => x[0].toUpperCase())
-        .join(``);
-      const dimValue = tank?.[dimension];
-      if (exists(dimValue) && exists(dimAcronym)) {
-        result += `${dimAcronym}:${roundToString(dimValue)} `;
-      }
-    }
-    result = result.slice(0, -1);
-    return result;
-  })();
-
-  return new TankLabel(dimensionsPart, fuelName, notesPart, shapeName, volume);
-}
 export function listTanks(
   tanks: Iterable<Tank> | undefined,
   excludeInvalidTanks: boolean = false,

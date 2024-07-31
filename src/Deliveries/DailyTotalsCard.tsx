@@ -1,7 +1,8 @@
-import {Card, Txt, Column, useFormula, exists, Box, Row} from "miwi";
+import { Card, Txt, Column, useFormula, exists, Box, Row } from "miwi";
 import { Delivery } from "./Delivery";
 import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
+import { FuelType } from "@/model/DataModel";
 
 export function DailyTotalsCard() {
   const upcomingSubDeliveries = useFormula(() => {
@@ -51,6 +52,22 @@ export function DailyTotalsCard() {
     });
     return deliveredPerFuel;
   });
+  // const fuelTotals = useFormula(() => {
+  //   const fuelTotals = new Map<
+  //     FuelType,
+  //     {
+  //       left: number;
+  //       dailyTotal: number;
+  //     }
+  //   >();
+  //   upcomingSubDeliveries.value.forEach((sub) => {
+  //     const fuelName = sub.fuelSpecs?.name;
+  //     if (!exists(fuelName)) return;
+  //     if (!fuelTotals.has(fuelName))
+  //       fuelTotals.set(fuelName, { left: 0, dailyTotal: 0 });
+  //     fuelTotals.get(fuelName)!.left += sub.gallons ?? 0;
+  //   });
+  // });
   const totalGallons = useFormula(() =>
     formatNumWithCommas(
       completedSubDeliveriesSince3am.value.reduce(
@@ -75,7 +92,9 @@ export function DailyTotalsCard() {
   return (
     <Card widthGrows padBetween={0.75}>
       <Show when={Array.from(deliveredPerFuel.value.entries()).length > 0}>
-        <Txt bold alignCenter>Delivered</Txt>
+        <Txt bold alignCenter>
+          Delivered
+        </Txt>
         <For
           each={Array.from(deliveredPerFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
@@ -94,7 +113,9 @@ export function DailyTotalsCard() {
         <Box widthGrows height={0.125} fill={$theme.colors.text} />
       </Show>
       <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
-        <Txt bold alignCenter>Upcoming</Txt>
+        <Txt bold alignCenter>
+          Upcoming
+        </Txt>
         <For
           each={Array.from(leftPerFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
