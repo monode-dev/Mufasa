@@ -1,8 +1,4 @@
-import {
-  getClientLabel,
-  isClientValid,
-  isTankValid,
-} from "@/AppData";
+import { getClientLabel, isClientValid, isTankValid } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import { mfs, premiumEnabled, FuelType } from "@/model/DataModel";
 import { createLimitTrackers } from "@/model/LimitUtils";
@@ -241,6 +237,9 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   // Tank
   _isJustFuel = prop([Boolean, null], null);
   _tank = prop([Tank, null], null);
+  readonly justFuelIsOnlyOptions = formula(
+    () => !exists(this.delivery?.selectedKnownClient),
+  );
   readonly shouldShowTankSelector = formula(
     () =>
       (this.selectedTank !== JUST_FUEL &&
@@ -249,6 +248,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedTank: SelectedTank = formula(
     () => {
+      if (this.justFuelIsOnlyOptions) return JUST_FUEL;
       return this._isJustFuel ? JUST_FUEL : (this._tank ?? NONE_SELECTED);
     },
     (value) => {
@@ -374,15 +374,25 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   });
 
   // Full Title
-  readonly subTitle = formula(() => {
-    const valid = this.isValid ? `` : invalid;
-    const tank = this.selectedTank;
-    if (tank === JUST_FUEL || !this.shouldShowTankSelector) {
+  readonly title = formula(() => {
+    // TODO: Maybe when gallons is undefined use "An unknown number of gallons" instead of "0 gallons"
+    const gallonsPart = `${formatNumWithCommas(this.gallons ?? 0, 0)} gal.`;
+
+    if (this.selectedTank instanceof Tank) {
+      // Known Tank
+      return `${gallonsPart} to ${this.selectedTank.getLabel({
+        shouldShowVolume: false,
+      })}`;
+    } else if (this.selectedTank === JUST_FUEL) {
+      // Just Fuel
       const fuel = this.selectedFuel;
       const fuelName =
         fuel === ONE_TIME ? this.explicitFuelName : (fuel?.name ?? ``);
-      return `${valid}${formatNumWithCommas(this.gallons ?? 0, 0)} gal. of ${fuelName}`;
-    } else return `${valid}${tank?.getLabel()}`;
+      return `${gallonsPart} of ${fuelName}`;
+    } else {
+      // None Selected
+      return gallonsPart;
+    }
   });
 
   // Sort Position
