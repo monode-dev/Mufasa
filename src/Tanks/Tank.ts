@@ -38,14 +38,19 @@ export class Tank extends mfs.Doc(`Tank`) {
     return Tank.getLabel(this, options);
   }
 
-  static getLabel(tank: Tank, options?: { limitNotesCharacters?: number }) {
+  static getLabel(
+    tank: Tank,
+    options?: { limitNotesCharacters?: number; shouldShowVolume?: boolean },
+  ) {
     // if (!isTankValid(tank)) return `Incomplete Tank`;
     const shapeUtils = getTankShape(tank?.shape);
     const fuelName = tank?.fuelType?.name;
     const volume = shapeUtils?.calcTotalVolume(tank);
     const shapeName = shapeUtils?.nameShort;
     const notesPart =
-      exists(tank?.notes) && tank?.notes?.trim() !== `` ? `${tank?.notes}` : ``;
+      exists(tank?.notes) && tank?.notes?.trim() !== ``
+        ? `"${tank?.notes?.replaceAll(/\s+/g, ` `).trim()}"`
+        : ``;
     const dimensionsPart = doNow(() => {
       let result = ``;
       for (const dimension of shapeUtils?.dimensions ?? []) {
@@ -71,17 +76,18 @@ export class Tank extends mfs.Doc(`Tank`) {
       fuelName ?? "New Fuel",
       limitNotesCharacters,
     );
+    const shouldShowVolume = options?.shouldShowVolume ?? true;
+    const volumePart = shouldShowVolume
+      ? ` - ${roundToString(volume ?? 0, 0)}${spaceChar}Gal.`
+      : ``;
     return (
       (0 == note.length ? "" : note + " - ") +
       fuel +
       " - " +
       (dimensionsPart.trim() === "" ? "No Dimensions" : dimensionsPart) +
       " - " +
-      (shapeName ?? "Shape") +
-      " - " +
-      roundToString(volume ?? 0, 0) +
-      spaceChar +
-      "Gal."
+      (shapeName ?? "Unknown Shape") +
+      volumePart
     );
   }
 }

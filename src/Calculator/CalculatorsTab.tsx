@@ -88,7 +88,7 @@ export default function Calculator() {
   });
   const subDeliverySelectorIsOpen = useProp(false);
   function getSubDeliveryName(subDelivery: SubDelivery | null) {
-    return subDelivery?.subTitle ?? null;
+    return subDelivery?.title ?? null;
   }
   // Tank Tab
   const selectedClient = useProp(null) as Prop<Client | null | undefined>;

@@ -157,12 +157,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 }
 
 export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
-  const tank = useFormula(() => props.subDelivery.selectedTank);
-  const tankName = useFormula(() => tank.value?.getLabel);
   const checkboxCornerRadious = 1 / 7;
-  const galStr = useFormula(
-    () => (props.subDelivery.gallons ?? `x`) + spaceChar + `Gal.`,
-  );
 
   function handleComplete() {
     pushPage(CompleteSubDeliveryDialog, {
@@ -175,10 +170,6 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
       subDelivery: props.subDelivery,
     });
   }
-
-  const combinedStringTankEntry = useFormula(
-    () => `${galStr.value} ${tankName.value}`,
-  );
 
   return (
     <Column outlineSize={1 / 8}>
@@ -226,7 +217,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
                 : undefined
             }
           >
-            {combinedStringTankEntry.value}
+            {props.subDelivery.title}
           </Txt>
         </Box>
         {/* <Box>
