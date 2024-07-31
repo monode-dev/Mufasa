@@ -98,7 +98,7 @@ export default function Calculator() {
   // Calculations
   const tankGeometry = useFormula(() =>
     selectedTab.value === tabs.delivery
-      ? selectedSubDelivery.value?.tankGeometry ?? explicitTankGeometry
+      ? (selectedSubDelivery.value?.tankGeometry ?? explicitTankGeometry)
       : selectedTab.value === tabs.tank
         ? selectedTank.value
         : explicitTankGeometry,
@@ -113,7 +113,8 @@ export default function Calculator() {
 
   const TankFields_warning = useProp("");
   const showWarning = useFormula(
-    () => exists(TankFields_warning.value) && selectedTab.value == tabs.dimensions,
+    () =>
+      exists(TankFields_warning.value) && selectedTab.value == tabs.dimensions,
   );
 
   const currentGallons = useFormula(() =>
@@ -125,9 +126,9 @@ export default function Calculator() {
       : undefined,
   );
   const currentFillPercent = useFormula(() =>
-    (!showWarning.value
-      && exists(totalGallons.value)
-      && exists(currentGallons.value))
+    !showWarning.value &&
+    exists(totalGallons.value) &&
+    exists(currentGallons.value)
       ? totalGallons.value === 0
         ? 0
         : currentGallons.value / totalGallons.value
@@ -151,13 +152,23 @@ export default function Calculator() {
   });
   function completeDelivery() {
     if (!exists(selectedSubDelivery.value)) return;
-    if (!selectedSubDelivery.value.isValid){ 
-      if(selectedSubDelivery.value.gallons && selectedSubDelivery.value.explicitRate && selectedSubDelivery.value.fuelName){
+    if (!selectedSubDelivery.value.isValid) {
+      if (
+        selectedSubDelivery.value.gallons &&
+        selectedSubDelivery.value.explicitRate &&
+        selectedSubDelivery.value.fuelName
+      ) {
         return;
       }
     }
-    if (!exists(gallonsToReachDesiredFill.value)){ console.log("157"); return;}
-    if (gallonsToReachDesiredFill.value <= 0){ console.log("158"); return;}
+    if (!exists(gallonsToReachDesiredFill.value)) {
+      console.log("157");
+      return;
+    }
+    if (gallonsToReachDesiredFill.value <= 0) {
+      console.log("158");
+      return;
+    }
     pushPage(CompleteSubDeliveryDialog, {
       subDelivery: selectedSubDelivery.value,
     });
@@ -194,7 +205,7 @@ export default function Calculator() {
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
   }
-  
+
   return (
     <Body asWideAsParent padBetween={0.5}>
       <Txt h2>Tank Details</Txt>
@@ -236,7 +247,7 @@ export default function Calculator() {
                 {/* Selector does not allow invalid deliveries */}
                 <For
                   each={Delivery.upcomingDeliveries.filter(
-                    (delivery) => delivery.isValid[0], 
+                    (delivery) => delivery.isValid[0],
                   )}
                   fallback={<Txt hint>No Upcoming Deliveries</Txt>}
                 >
@@ -267,7 +278,12 @@ export default function Calculator() {
                   getLabelForData={getSubDeliveryName}
                   emptyListText={"No Clients"}
                 >
-                  <Show when={Delivery.upcomingDeliveries.length < 0}>
+                  <Show
+                    when={
+                      (selectedDelivery.value?.sortedSubDeliveries?.length ??
+                        0) <= 0
+                    }
+                  >
                     <Txt
                       onclick={() => {
                         subDeliverySelectorIsOpen.value = false;
@@ -275,25 +291,26 @@ export default function Calculator() {
                       hint
                       widthGrows
                     >
-                      No Upcoming Deliveries
+                      No Individual Deliveries
                     </Txt>
                   </Show>
-                  
-                  <For each={selectedDelivery.value?.sortedSubDeliveries ?? []} 
-                    fallback={                     
-                      <Box 
-                        onClick={async () => { 
-                          selectedDelivery.value?.createSubDelivery();
-                          if(selectedDelivery.value?._client?.tanks.count! >=0) {
-                            selectedDelivery.value?._client?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
-                          }
-                        }}> 
-                        <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>                   
-                          <Txt>Add Sub Delivery</Txt> 
-                          <Icon iconPath={mdiPlus} />    
-                        </Row>
-                      </Box>
-                    }
+
+                  <For
+                    each={selectedDelivery.value?.sortedSubDeliveries ?? []}
+                    // fallback={
+                    //   <Box
+                    //     onClick={async () => {
+                    //       selectedDelivery.value?.createSubDelivery();
+                    //       if(selectedDelivery.value?._client?.tanks.count! >=0) {
+                    //         selectedDelivery.value?._client?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
+                    //       }
+                    //     }}>
+                    //     <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>
+                    //       <Txt>Add Sub Delivery</Txt>
+                    //       <Icon iconPath={mdiPlus} />
+                    //     </Row>
+                    //   </Box>
+                    // }
                   >
                     {(subDelivery) => (
                       <Txt
@@ -314,14 +331,12 @@ export default function Calculator() {
                   </For>
                 </Selector>
               </Label>
-              <Show
+              {/* <Show
                 when={
                   exists(selectedSubDelivery.value) &&
                   !exists(selectedSubDelivery.value.tankGeometry) 
                 }
               >
-                {/*<TankFields tankGeometry={tankGeometry.value!} />*/}
-                {/* TODO: Show a button to add this tank to the client. */} 
                 <Box
                   onClick={() => {
                     openCreateTankDialog({
@@ -339,7 +354,7 @@ export default function Calculator() {
                     <Icon iconPath={mdiPlus} />
                   </Row>
                 </Box>      
-              </Show>
+              </Show> */}
             </Show>
           </Column>
         </Show>
@@ -354,9 +369,11 @@ export default function Calculator() {
         </Show>
 
         {/* DIMENSIONS TAB */}
-        <Show when={selectedTab.value === tabs.dimensions} >
-          <TankFields tankGeometry={tankGeometry.value!}
-          warningMessage={TankFields_warning}/>
+        <Show when={selectedTab.value === tabs.dimensions}>
+          <TankFields
+            tankGeometry={tankGeometry.value!}
+            warningMessage={TankFields_warning}
+          />
           <Show when={showWarning.value}>
             <Txt widthGrows stroke={$theme.colors.warning}>
               {TankFields_warning.value}
@@ -390,8 +407,12 @@ export default function Calculator() {
               ? `${roundToString(100 * currentFillPercent.value)}%`
               : emptyText}
           </Label>
-          <Label label="Current Gal" align={$Align.centerLeft}
-                 widthGrows overflowXCrops>
+          <Label
+            label="Current Gal"
+            align={$Align.centerLeft}
+            widthGrows
+            overflowXCrops
+          >
             {exists(currentGallons.value) && !isNaN(currentGallons.value)
               ? formatNumWithCommas(currentGallons.value)
               : emptyText}
