@@ -233,8 +233,6 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     getCount: () => Delivery.getAllDocs().length,
   });
   mx_parent = prop(Delivery);
-  _isJustFuel = prop([Boolean, null], null);
-  _tank = prop([Tank, null], null);
   _isOneTimeFuel = prop(Boolean, false);
   _fuelType = prop([FuelType, null], null);
   fuelName = prop(String, ``);
@@ -242,6 +240,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   _sortPosition = prop([Number, null], null);
 
   // Tank
+  _isJustFuel = prop([Boolean, null], null);
+  _tank = prop([Tank, null], null);
   readonly shouldShowTankSelector = formula(
     () =>
       (this.selectedTank !== JUST_FUEL &&
@@ -286,6 +286,12 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedFuel: SelectedFuel = formula(
     () => {
+      const selectedFuel = this._isOneTimeFuel
+        ? ONE_TIME
+        : (this._fuelType ?? NONE_SELECTED);
+      console.log(
+        `selectedFuel instanceof FuelType: ${selectedFuel instanceof FuelType}`,
+      );
       return this._isOneTimeFuel ? ONE_TIME : (this._fuelType ?? NONE_SELECTED);
     },
     (value) => {
@@ -324,36 +330,36 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     },
   );
   readonly fuelSpecs = formula(() => {
-    if (exists(this.selectedKnownTank)) {
-      const fuelType = this.selectedKnownTank.fuelType;
-      return exists(fuelType)
-        ? {
-            name: fuelType.name ?? null,
-            rate:
-              this.explicitRate !== fuelType.rate
-                ? this.explicitRate
-                : (fuelType.rate ?? null), //Used to be just be fuelType.rate so we would never use the users inputed rate.
-          }
-        : null;
-    } else if (
-      !this.shouldShowTankSelector ||
-      this.selectedTank === JUST_FUEL
-    ) {
+    if (this.isCompleted) {
+      // Use the explicit value
+      return {
+        name: this.explicitFuelName,
+        rate: this.explicitRate,
+      };
+    } else if (exists(this.selectedKnownTank)) {
+      // Infer from Tank info
+      return {
+        name: this.selectedKnownTank.fuelType?.name ?? null,
+        rate: this.selectedKnownTank.fuelType?.rate ?? null,
+      };
+    } else {
+      // Infer from selected Fuel
       if (this.selectedFuel === ONE_TIME) {
         return {
           name: this.explicitFuelName,
           rate: this.explicitRate,
         };
+      } else if (this.selectedFuel instanceof FuelType) {
+        return {
+          name: this.selectedFuel.name ?? null,
+          rate: this.selectedFuel.rate ?? null,
+        };
       } else {
-        return exists(this.selectedFuel)
-          ? {
-              name: this.selectedFuel.name ?? null,
-              rate: this.selectedFuel.rate ?? null,
-            }
-          : null;
+        return {
+          name: null,
+          rate: null,
+        };
       }
-    } else {
-      return null;
     }
   });
 
