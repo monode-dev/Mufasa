@@ -112,9 +112,13 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         fallback={
           <>
             <Box />
-            <Txt widthGrows alignCenter stroke={$theme.colors.warning}>
-              No Sub-Deliveries!
-            </Txt>
+            {/* If there is only a little text it should be centered, if there is a
+             * lot of text it should be left aligned. */}
+            <Box widthGrows alignCenter>
+              <Txt alignLeft stroke={$theme.colors.warning}>
+                No Sub-Deliveries!
+              </Txt>
+            </Box>
           </>
         }
       >
