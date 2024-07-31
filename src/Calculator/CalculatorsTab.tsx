@@ -39,6 +39,7 @@ import { Tank } from "@/Tanks/Tank";
 import { Slider } from "@/components/Slider";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 import { mdiPlus } from "@mdi/js";
+import { prop } from "mufasa";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -153,9 +154,13 @@ export default function Calculator() {
   });
   function completeDelivery() {
     if (!exists(selectedSubDelivery.value)) return;
-    if (!selectedSubDelivery.value.isValid) return;
-    if (!exists(gallonsToReachDesiredFill.value)) return;
-    if (gallonsToReachDesiredFill.value <= 0) return;
+    if (!selectedSubDelivery.value.isValid){ 
+      if(selectedSubDelivery.value.gallons && selectedSubDelivery.value.explicitRate && selectedSubDelivery.value.fuelName){
+        return;
+      }
+    }
+    if (!exists(gallonsToReachDesiredFill.value)){ console.log("157"); return;}
+    if (gallonsToReachDesiredFill.value <= 0){ console.log("158"); return;}
     pushPage(CompleteSubDeliveryDialog, {
       subDelivery: selectedSubDelivery.value,
     });
@@ -276,31 +281,24 @@ export default function Calculator() {
                       No Upcoming Deliveries
                     </Txt>
                   </Show>
-
+                  
                   <For each={selectedDelivery.value?.sortedSubDeliveries ?? []} 
                     fallback={                     
                       <Box 
-                        onClick={() => { 
-                          if(selectedDelivery.value?._client?.tanks?.count! <= 0) {
-                            openCreateTankDialog({client:selectedDelivery.value?._client as Client});
-                          }
+                        onClick={async () => { 
                           selectedDelivery.value?.createSubDelivery();
                         }}> 
                         <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>                   
-                          <Txt>Add Tank</Txt> 
+                          <Txt>Add Sub Delivery</Txt> 
                           <Icon iconPath={mdiPlus} />    
                         </Row>
                       </Box>
                     }
+
                   >
                     {(subDelivery) => (
                       <Txt
                         onclick={() => {
-                          selectedDelivery.value?._client?.tanks.forEach(tank => {
-                            if(subDelivery) {
-                              subDelivery.selectedTank = tank;
-                            }
-                          });
                           selectedSubDelivery.value = subDelivery;
                           subDeliverySelectorIsOpen.value = false;
                         }}
@@ -317,15 +315,31 @@ export default function Calculator() {
                   </For>
                 </Selector>
               </Label>
-
               <Show
                 when={
                   exists(selectedSubDelivery.value) &&
                   !exists(selectedSubDelivery.value.tankGeometry) 
                 }
               >
-                <TankFields tankGeometry={tankGeometry.value!} />
-                {/* TODO: Show a button to add this tank to the client. */}          
+                {/*<TankFields tankGeometry={tankGeometry.value!} />*/}
+                {/* TODO: Show a button to add this tank to the client. */} 
+                <Box
+                  onClick={() => {
+                    openCreateTankDialog({
+                      client:selectedDelivery.value?._client!,
+                      onCreate(newTank) {                     
+                        if(selectedSubDelivery.value){
+                          selectedSubDelivery.value._tank = newTank;
+                        }
+                      },
+                    })
+                  }}
+                >
+                  <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>
+                    <Txt>Add Tank</Txt>
+                    <Icon iconPath={mdiPlus} />
+                  </Row>
+                </Box>      
               </Show>
             </Show>
           </Column>
