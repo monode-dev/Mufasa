@@ -390,7 +390,8 @@ export default function Calculator() {
               ? `${roundToString(100 * currentFillPercent.value)}%`
               : emptyText}
           </Label>
-          <Label label="Current Gal" align={$Align.centerLeft} widthGrows>
+          <Label label="Current Gal" align={$Align.centerLeft}
+                 widthGrows overflowXCrops>
             {exists(currentGallons.value) && !isNaN(currentGallons.value)
               ? formatNumWithCommas(currentGallons.value)
               : emptyText}
@@ -413,9 +414,10 @@ export default function Calculator() {
           </Label>
           <Label
             stroke={desiredFillTextColor.value}
-            label="Gallons to Add"
+            label="Gal. to Add"
             align={$Align.centerLeft}
             widthGrows
+            overflowXCrops
           >
             {exists(gallonsToReachDesiredFill.value) &&
             !isNaN(gallonsToReachDesiredFill.value)
