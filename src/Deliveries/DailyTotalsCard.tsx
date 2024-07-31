@@ -75,6 +75,7 @@ export function DailyTotalsCard() {
   return (
     <Card widthGrows padBetween={0.75}>
       <Show when={Array.from(deliveredPerFuel.value.entries()).length > 0}>
+        <Txt bold alignCenter>Delivered</Txt>
         <For
           each={Array.from(deliveredPerFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
@@ -93,14 +94,20 @@ export function DailyTotalsCard() {
         <Box widthGrows height={0.125} fill={$theme.colors.text} />
       </Show>
       <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
+        <Txt bold alignCenter>Upcoming</Txt>
         <For
           each={Array.from(leftPerFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
         >
           {([fuelName, gallons]) => (
-            <Txt widthGrows alignLeft>
-              {fuelName}: {gallons} gal. left
-            </Txt>
+            <Row>
+              <Txt widthGrows alignLeft singleLine>
+                {fuelName}
+              </Txt>
+              <Txt width={6} alignLeft singleLine>
+                gal: {gallons}
+              </Txt>
+            </Row>
           )}
         </For>
         <Box widthGrows height={0.125} fill={$theme.colors.text} />
