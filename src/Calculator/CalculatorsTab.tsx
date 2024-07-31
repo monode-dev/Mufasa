@@ -20,8 +20,6 @@ import {
   useProp,
   Selector,
   Icon,
-  JUST_FUEL,
-  ONE_TIME,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -39,7 +37,6 @@ import { Tank } from "@/Tanks/Tank";
 import { Slider } from "@/components/Slider";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 import { mdiPlus } from "@mdi/js";
-import { prop } from "mufasa";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -287,6 +284,9 @@ export default function Calculator() {
                       <Box 
                         onClick={async () => { 
                           selectedDelivery.value?.createSubDelivery();
+                          if(selectedDelivery.value?._client?.tanks.count! >=0) {
+                            selectedDelivery.value?._client?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
+                          }
                         }}> 
                         <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>                   
                           <Txt>Add Sub Delivery</Txt> 
@@ -294,7 +294,6 @@ export default function Calculator() {
                         </Row>
                       </Box>
                     }
-
                   >
                     {(subDelivery) => (
                       <Txt
