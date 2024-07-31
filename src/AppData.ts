@@ -116,22 +116,28 @@ export function tankVolumeRoundStr(label: TankLabel) {
   return roundToString(label.volume ?? 0, 0) + spaceChar + "Gal.";
 }
 
+function cropString(str: string, maxChar: number) {
+  str = str.trim();
+  // Check if we need to shorten the str
+  if (maxChar > 0 && str.length > maxChar) {
+    str = str.slice(0, maxChar);
+  }
+  return str;
+}
+
 export function tankDisplayName(
   tank: Partial<Tank> | null | undefined,
   amountOfNoteCharacters: number = 20, //IMPORTANT: This is the default value which we should deicide on.
 ): string {
   const label = getTankLabel(tank);
-  let note = label.notesPart.trim();
-  // Check if we need to shorten the note
-  if (amountOfNoteCharacters > 0 && note.length > amountOfNoteCharacters) {
-    note = note.slice(0, amountOfNoteCharacters);
-  }
+  let note = cropString(label.notesPart, amountOfNoteCharacters);
   if (amountOfNoteCharacters === 0) {
     note = ``;
   }
+  let fuel = cropString(label.fuelName ?? "New Fuel", amountOfNoteCharacters);
   return (
     (0 == note.length ? "" : note + " - ") +
-    (label.fuelName ?? "New Fuel") +
+    (fuel) +
     " - " +
     (label.dimensionsPart.trim() === "" ? "No Dimensions" : label.dimensionsPart) +
     " - " +

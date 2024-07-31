@@ -131,7 +131,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       {/* Notes */}
       <Show when={shouldShowNotes.value}>
         <Row>
-          <Txt widthGrows alignBottomLeft>
+          <Txt widthGrows alignBottomLeft singleLine>
             {`Notes: ${props.delivery.notes.trim()}`}
           </Txt>
           <DeliveryCardActionButtons
@@ -211,7 +211,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           <Box width={1.5} height={1.5} />
         </Stack>
         <Box alignLeft>
-          <Txt widthGrows asTallAsParent overflowX={$Overflow.wrap}     
+          <Txt widthGrows asTallAsParent overflowXWraps     
             stroke={
               !props.subDelivery.isCompleted && !props.subDelivery.isValid
                 ? $theme.colors.warning
