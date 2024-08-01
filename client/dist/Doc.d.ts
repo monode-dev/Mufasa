@@ -591,7 +591,7 @@ export declare const IsCustomProp: unique symbol;
 export type CustomProp = {
     [IsCustomProp]: true;
     otherDocsToStartSyncing: (typeof Doc)[];
-    key?: string;
+    overrideKey?: string;
 } & (({
     isFullCustom: false;
     getInitValue: () => PrimVal | undefined;

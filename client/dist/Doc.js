@@ -41,7 +41,8 @@ getDocId) {
                 : propConfig.getInitValue();
             if (initValue === undefined)
                 return;
-            initProps[jsKey] = {
+            const mfsKey = propConfig.overrideKey ?? jsKey;
+            initProps[mfsKey] = {
                 value: initValue,
                 maxPersistance: propConfig.persistance,
             };
@@ -56,12 +57,12 @@ getDocId) {
     });
     // Setup all custom props.
     Object.entries(customProps).forEach(([jsKey, propConfig]) => {
-        const mfsKey = propConfig.key ?? jsKey;
+        const mfsKey = propConfig.overrideKey ?? jsKey;
         if (propConfig.isFullCustom) {
             propConfig.init(inst, mfsKey);
         }
         else {
-            Object.defineProperty(inst, mfsKey, {
+            Object.defineProperty(inst, jsKey, {
                 get: function () {
                     const storeValue = this._docStore.getProp(docId, mfsKey, propConfig.getFallbackValue());
                     return propConfig.fromPrim(storeValue);
@@ -222,7 +223,7 @@ options = {}) {
             toPrim: (inst) => inst?.docId ?? null,
             persistance,
             otherDocsToStartSyncing: [TypeClass],
-            key: options.key,
+            overrideKey: options.key,
         };
     }
     else {
@@ -235,7 +236,7 @@ options = {}) {
             toPrim: (inst) => inst,
             persistance,
             otherDocsToStartSyncing: [],
-            key: options.key,
+            overrideKey: options.key,
         };
     }
 }

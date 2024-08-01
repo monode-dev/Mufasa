@@ -46,7 +46,7 @@ export function initializeDocClass(config: {
 const _allDocInstances = new Map<string, Doc>();
 function _initializeInst<T extends Doc>(
   inst: T,
-  overrideProps: { [key: string | number]: PrimVal },
+  overrideProps: { [jsKey: string | number]: PrimVal },
   // We should try not making docId reactive, and then decide if that was the wrong idea.
   getDocId: (initProps: PersistanceTaggedUpdateBatch[string]) => string,
 ): T {
@@ -67,7 +67,8 @@ function _initializeInst<T extends Doc>(
           ? propConfig.toPrim(overrideProps[jsKey])
           : propConfig.getInitValue();
       if (initValue === undefined) return;
-      initProps[jsKey] = {
+      const mfsKey = propConfig.overrideKey ?? jsKey;
+      initProps[mfsKey] = {
         value: initValue,
         maxPersistance: propConfig.persistance,
       };
@@ -84,11 +85,11 @@ function _initializeInst<T extends Doc>(
 
   // Setup all custom props.
   Object.entries(customProps).forEach(([jsKey, propConfig]) => {
-    const mfsKey = propConfig.key ?? jsKey;
+    const mfsKey = propConfig.overrideKey ?? jsKey;
     if (propConfig.isFullCustom) {
       propConfig.init(inst, mfsKey);
     } else {
-      Object.defineProperty(inst, mfsKey, {
+      Object.defineProperty(inst, jsKey, {
         get: function () {
           const storeValue: PrimVal = this._docStore.getProp(
             docId,
@@ -354,7 +355,7 @@ export function prop<
         inst?.docId ?? null,
       persistance,
       otherDocsToStartSyncing: [TypeClass],
-      key: options.key,
+      overrideKey: options.key,
     } satisfies CustomProp as any;
   } else {
     return {
@@ -366,7 +367,7 @@ export function prop<
       toPrim: (inst) => inst,
       persistance,
       otherDocsToStartSyncing: [],
-      key: options.key,
+      overrideKey: options.key,
     } satisfies CustomProp as any;
   }
 }
@@ -387,7 +388,7 @@ export const IsCustomProp = Symbol(`IsCustomProp`);
 export type CustomProp = {
   [IsCustomProp]: true;
   otherDocsToStartSyncing: (typeof Doc)[];
-  key?: string;
+  overrideKey?: string;
 } & (
   | ({
       isFullCustom: false;
