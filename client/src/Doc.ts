@@ -83,15 +83,16 @@ function _initializeInst<T extends Doc>(
   });
 
   // Setup all custom props.
-  Object.entries(customProps).forEach(([key, propConfig]) => {
+  Object.entries(customProps).forEach(([jsKey, propConfig]) => {
+    const mfsKey = propConfig.key ?? jsKey;
     if (propConfig.isFullCustom) {
-      propConfig.init(inst, key);
+      propConfig.init(inst, mfsKey);
     } else {
-      Object.defineProperty(inst, key, {
+      Object.defineProperty(inst, mfsKey, {
         get: function () {
           const storeValue: PrimVal = this._docStore.getProp(
             docId,
-            key,
+            mfsKey,
             propConfig.getFallbackValue(),
           );
           return propConfig.fromPrim(storeValue);
@@ -104,7 +105,7 @@ function _initializeInst<T extends Doc>(
                 this._docStore.batchUpdate(
                   {
                     [docId]: {
-                      [key]: {
+                      [mfsKey]: {
                         value: asPrim,
                         maxPersistance: propConfig.persistance,
                       },
@@ -300,7 +301,10 @@ export function prop<
   secondParam?: SecondParam,
   /* TODO: Make third param be an options obj. Both "key" and "persistance" should
    * be options. Alternately we could do prop.customize({ ...options }); */
-  persistance: Persistance = Persistance.global,
+  options: {
+    persistance?: Persistance;
+    key?: string;
+  } = {},
 ): Flagged<
   PropValue<FirstParam>,
   FirstParam extends PropType
@@ -328,6 +332,7 @@ export function prop<
   ].includes(typeof firstParam)
     ? firstParam
     : (secondParam as any);
+  const persistance: Persistance = options.persistance ?? Persistance.global;
   if (isDocClass(TypeClass)) {
     return {
       [IsCustomProp]: true,
@@ -349,6 +354,7 @@ export function prop<
         inst?.docId ?? null,
       persistance,
       otherDocsToStartSyncing: [TypeClass],
+      key: options.key,
     } satisfies CustomProp as any;
   } else {
     return {
@@ -360,6 +366,7 @@ export function prop<
       toPrim: (inst) => inst,
       persistance,
       otherDocsToStartSyncing: [],
+      key: options.key,
     } satisfies CustomProp as any;
   }
 }
@@ -380,6 +387,7 @@ export const IsCustomProp = Symbol(`IsCustomProp`);
 export type CustomProp = {
   [IsCustomProp]: true;
   otherDocsToStartSyncing: (typeof Doc)[];
+  key?: string;
 } & (
   | ({
       isFullCustom: false;

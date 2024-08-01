@@ -55,14 +55,15 @@ getDocId) {
         },
     });
     // Setup all custom props.
-    Object.entries(customProps).forEach(([key, propConfig]) => {
+    Object.entries(customProps).forEach(([jsKey, propConfig]) => {
+        const mfsKey = propConfig.key ?? jsKey;
         if (propConfig.isFullCustom) {
-            propConfig.init(inst, key);
+            propConfig.init(inst, mfsKey);
         }
         else {
-            Object.defineProperty(inst, key, {
+            Object.defineProperty(inst, mfsKey, {
                 get: function () {
-                    const storeValue = this._docStore.getProp(docId, key, propConfig.getFallbackValue());
+                    const storeValue = this._docStore.getProp(docId, mfsKey, propConfig.getFallbackValue());
                     return propConfig.fromPrim(storeValue);
                 },
                 ...(isValid(propConfig.toPrim)
@@ -72,7 +73,7 @@ getDocId) {
                             // TODO: Only do update if value is different.
                             this._docStore.batchUpdate({
                                 [docId]: {
-                                    [key]: {
+                                    [mfsKey]: {
                                         value: asPrim,
                                         maxPersistance: propConfig.persistance,
                                     },
@@ -183,7 +184,7 @@ export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 export function prop(firstParam, secondParam, 
 /* TODO: Make third param be an options obj. Both "key" and "persistance" should
  * be options. Alternately we could do prop.customize({ ...options }); */
-persistance = Persistance.global) {
+options = {}) {
     const TypeClass = typeof firstParam === `function`
         ? firstParam
         : Array.isArray(firstParam)
@@ -202,6 +203,7 @@ persistance = Persistance.global) {
     ].includes(typeof firstParam)
         ? firstParam
         : secondParam;
+    const persistance = options.persistance ?? Persistance.global;
     if (isDocClass(TypeClass)) {
         return {
             [IsCustomProp]: true,
@@ -220,6 +222,7 @@ persistance = Persistance.global) {
             toPrim: (inst) => inst?.docId ?? null,
             persistance,
             otherDocsToStartSyncing: [TypeClass],
+            key: options.key,
         };
     }
     else {
@@ -232,6 +235,7 @@ persistance = Persistance.global) {
             toPrim: (inst) => inst,
             persistance,
             otherDocsToStartSyncing: [],
+            key: options.key,
         };
     }
 }

@@ -581,13 +581,17 @@ type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc;
 type PropType<T extends PropClass = PropClass> = T | [T, null];
 type PropInst = boolean | number | string | Doc | null;
 type PropValue<T extends PropType | PropInst = PropType | PropInst> = T extends any[] ? PropValue<T[number]> : T extends typeof Doc ? InstanceType<T> | null : T extends typeof Boolean ? boolean : T extends typeof Number ? number : T extends typeof String ? string : T extends boolean ? boolean : T extends number ? number : T extends string ? string : null;
-export declare function prop<FirstParam extends PropType | PropValue, SecondParam extends FirstParam extends PropType ? PropValue<FirstParam> | undefined : never>(firstParam: FirstParam, secondParam?: SecondParam, persistance?: Persistance): Flagged<PropValue<FirstParam>, FirstParam extends PropType ? undefined extends SecondParam ? RequiredPropFlag : OptionalPropFlag : OptionalPropFlag>;
+export declare function prop<FirstParam extends PropType | PropValue, SecondParam extends FirstParam extends PropType ? PropValue<FirstParam> | undefined : never>(firstParam: FirstParam, secondParam?: SecondParam, options?: {
+    persistance?: Persistance;
+    key?: string;
+}): Flagged<PropValue<FirstParam>, FirstParam extends PropType ? undefined extends SecondParam ? RequiredPropFlag : OptionalPropFlag : OptionalPropFlag>;
 export declare function formula<T>(compute: () => T, set?: (newVal: T) => void): T;
 export type IsCustomProp = typeof IsCustomProp;
 export declare const IsCustomProp: unique symbol;
 export type CustomProp = {
     [IsCustomProp]: true;
     otherDocsToStartSyncing: (typeof Doc)[];
+    key?: string;
 } & (({
     isFullCustom: false;
     getInitValue: () => PrimVal | undefined;

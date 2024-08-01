@@ -26,8 +26,12 @@ class File extends Doc {
     static get _docStore() {
         return this._fileStore.docStore;
     }
-    fileIsUploaded = prop(Boolean, false, Persistance.local);
-    fileIsDownloaded = prop(Boolean, false, Persistance.local);
+    fileIsUploaded = prop(Boolean, false, {
+        persistance: Persistance.local,
+    });
+    fileIsDownloaded = prop(Boolean, false, {
+        persistance: Persistance.local,
+    });
     /** Won't resolve until it retrieves and returns the base64String. */
     async getBase64String() {
         let base64String;
