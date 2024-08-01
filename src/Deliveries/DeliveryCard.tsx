@@ -30,7 +30,7 @@ import {
   spaceChar,
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import { DeselectDeliveryCheckbox } from "./DeselectDeliveryCheckbox";
+import { DeliveryCheckbox } from "./DeliveryCheckbox";
 
 export const numDeliveriesExpanded = autoSavingProp<number>(
   `numDeliveriesExpanded`,
@@ -166,7 +166,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   }
 
   function handleUnComplete() {
-    pushPage(DeselectDeliveryCheckbox, {
+    pushPage(DeliveryCheckbox, {
       subDelivery: props.subDelivery,
     });
   }
