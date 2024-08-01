@@ -53,21 +53,21 @@ function _initializeInst<T extends Doc>(
   // Create Instance
   const initProps: WritablePersistanceTaggedUpdateBatch[string] = {};
   const customProps: {
-    [key: string]: CustomProp;
+    [jsKey: string]: CustomProp;
   } = {};
-  listObjEntries(inst).forEach(([key, propConfig]) => {
+  listObjEntries(inst).forEach(([jsKey, propConfig]) => {
     if (!isCustomProp(propConfig)) return;
-    if (typeof key !== `string`) return;
-    customProps[key] = propConfig;
+    if (typeof jsKey !== `string`) return;
+    customProps[jsKey] = propConfig;
     doNow(() => {
-      if (typeof key !== `string`) return;
+      if (typeof jsKey !== `string`) return;
       if (propConfig.isFullCustom) return;
       const initValue =
-        overrideProps[key] !== undefined && isValid(propConfig.toPrim)
-          ? propConfig.toPrim(overrideProps[key])
+        overrideProps[jsKey] !== undefined && isValid(propConfig.toPrim)
+          ? propConfig.toPrim(overrideProps[jsKey])
           : propConfig.getInitValue();
       if (initValue === undefined) return;
-      initProps[key] = {
+      initProps[jsKey] = {
         value: initValue,
         maxPersistance: propConfig.persistance,
       };
