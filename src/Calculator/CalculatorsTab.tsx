@@ -246,7 +246,7 @@ export default function Calculator() {
                 {/* Selector does not allow invalid deliveries */}
                 <For
                   each={Delivery.upcomingDeliveries.filter(
-                    (delivery) => delivery.isValid[0],
+                    (delivery) => delivery.isValid,
                   )}
                   fallback={<Txt hint>No Upcoming Deliveries</Txt>}
                 >

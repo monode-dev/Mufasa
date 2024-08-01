@@ -1,5 +1,5 @@
 import ClientSelector from "@/Clients/ClientSelector";
-import {ONE_TIME, NONE_SELECTED, formatPhoneNumber } from "@/utils";
+import { ONE_TIME, NONE_SELECTED, formatPhoneNumber } from "@/utils";
 import {
   mdiAccount,
   mdiLabel,
@@ -15,9 +15,9 @@ export function DeliveryFields(props: {
   delivery: Pick<
     Delivery,
     | "explicitAddress"
-    | "explicitPhoneNumber"
-    | "mayEditLabel"
-    | "label"
+    | "phoneNumber"
+    | "mayEditTitle"
+    | "title"
     | "mayEditAddressAndPhone"
     | "selectedClient"
     | "notes"
@@ -50,8 +50,8 @@ export function DeliveryFields(props: {
           hintText={`Client Name`}
           iconPath={mdiLabel}
           value={useFormula(
-            () => props.delivery.label,
-            (v) => (props.delivery.label = v),
+            () => props.delivery.title,
+            (v) => (props.delivery.title = v),
           )}
           widthGrows
           capitalize={"words"}
@@ -62,8 +62,8 @@ export function DeliveryFields(props: {
           hintText={`Phone`}
           iconPath={mdiPhone}
           value={useFormula(
-            () => props.delivery.explicitPhoneNumber,
-            (v) => (props.delivery.explicitPhoneNumber = v),
+            () => props.delivery.phoneNumber,
+            (v) => (props.delivery.phoneNumber = v),
           )}
           widthGrows
           formatInput={formatPhoneNumber}
@@ -75,8 +75,8 @@ export function DeliveryFields(props: {
           hintText={`Address`}
           iconPath={mdiMapMarker}
           value={useFormula(
-            () => props.delivery.explicitAddress,
-            (v) => (props.delivery.explicitAddress = v),
+            () => props.delivery.address,
+            (v) => (props.delivery.address = v),
           )}
           widthGrows
           capitalize={`words`}

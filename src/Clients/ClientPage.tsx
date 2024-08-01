@@ -6,7 +6,6 @@ import {
   Box,
   Column,
   FloatSort,
-  HiddenDelete,
   Icon,
   Page,
   Row,
@@ -30,7 +29,7 @@ import { Delivery } from "@/Deliveries/Delivery";
 import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
-import {HiddenOptions} from "@/components/HiddenOptions";
+import { HiddenOptions } from "@/components/HiddenOptions";
 
 export default function ClientPage(props: { client: Client }) {
   createEffect(() => {
@@ -43,11 +42,11 @@ export default function ClientPage(props: { client: Client }) {
 
   const sortedTanks = useFormula(() => listTanks(props.client.tanks));
   const relatedDeliveries = useFormula(() =>
-    Delivery.completedDeliveriesForAllUsers.filter(
+    Delivery.completedDeliveries.filter(
       (delivery) =>
-        exists(delivery.selectedKnownClient?.docId) &&
+        exists(delivery.selectedClientDoc?.docId) &&
         exists(props.client.docId) &&
-        delivery.selectedKnownClient.docId === props.client.docId,
+        delivery.selectedClientDoc.docId === props.client.docId,
     ),
   );
 
@@ -125,8 +124,7 @@ export default function ClientPage(props: { client: Client }) {
             <Icon
               iconPath={mdiPlus}
               scale={1.25}
-              onClick={() => openCreateTankDialog({ client: props.client })
-              }
+              onClick={() => openCreateTankDialog({ client: props.client })}
             />
           </Box>
         </Row>

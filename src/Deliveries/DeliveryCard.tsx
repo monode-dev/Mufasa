@@ -27,7 +27,6 @@ import {
   canCallPhoneNumber,
   canMapToAddress,
   mapToAddress,
-  spaceChar,
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { DeliveryCheckbox } from "./DeliveryCheckbox";
@@ -38,9 +37,7 @@ export const numDeliveriesExpanded = autoSavingProp<number>(
 );
 
 export function DeliveryCard(props: { delivery: Delivery }) {
-  const shouldShowCompleteDate = useFormula(() =>
-    exists(props.delivery.completedTimePosix ? 0 : null),
-  );
+  const shouldShowCompleteDate = useFormula(() => props.delivery.isCompleted);
   const optionsButtonNextToCompleteDate = useFormula(
     () => shouldShowCompleteDate.value,
   );

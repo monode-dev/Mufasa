@@ -10,52 +10,41 @@ import {
   ONE_TIME,
   formatNumWithCommas,
 } from "@/utils";
-import { FloatSort, doNow, exists, useProp } from "miwi";
+import { FloatSort, doNow, exists } from "miwi";
 import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
 
 // SECTION: Delivery
 export type SelectedClient = Client | ONE_TIME | NONE_SELECTED;
-
-const invalid = `!Invalid - `;
 export class Delivery extends mfs.Doc(`Delivery`) {
+  // General
   static readonly limit = createLimitTrackers({
     free: 30,
     premium: 100000,
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => Delivery.getAllDocs().length,
   });
-  _isOneTimeClient = prop(Boolean, false);
-  _client = prop([Client, null], null);
-  clientLabel = prop(String, ``);
-  clientAddress = prop(String, ``);
-  clientPhoneNumber = prop(String, ``);
   onDelete() {
     this.sortedSubDeliveries.forEach((subDelivery) => subDelivery.deleteDoc());
   }
-
-  static get upcomingDeliveriesForAllUsers() {
+  static get upcomingDeliveries() {
     return FloatSort.toSorted({
       list: Delivery.getAllDocs().filter((delivery) => !delivery.isCompleted),
       getPos: (delivery) => delivery.sortPosition,
       getUid: (delivery) => delivery.docId ?? ``,
     });
   }
-  static get upcomingDeliveries() {
-    return this.upcomingDeliveriesForAllUsers;
-  }
-  static get completedDeliveriesForAllUsers() {
+  static get completedDeliveries() {
     return Delivery.getAllDocs()
       .filter((delivery) => delivery.isCompleted)
       .sort(
         (a, b) => (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
       );
   }
-  static get completedDeliveries() {
-    return this.completedDeliveriesForAllUsers;
-  }
 
   // Client
+  _isOneTimeClient = prop(Boolean, false);
+  _client = prop([Client, null], null);
   selectedClient: SelectedClient = formula(
     () => (this._isOneTimeClient ? ONE_TIME : (this._client ?? NONE_SELECTED)),
     (value) => {
@@ -71,34 +60,35 @@ export class Delivery extends mfs.Doc(`Delivery`) {
       }
     },
   );
-  readonly selectedKnownClient = formula(() =>
+  readonly selectedClientDoc = formula(() =>
     this.selectedClient !== ONE_TIME && this.selectedClient !== NONE_SELECTED
       ? this.selectedClient
       : null,
   );
 
-  // Label
-  static getMayEditLabel(selectedClient: SelectedClient) {
-    return selectedClient === ONE_TIME;
-  }
-  readonly mayEditLabel = formula(() =>
-    Delivery.getMayEditLabel(this.selectedClient),
-  );
-  label = formula(
-    () => this.clientLabel ?? ``,
+  // Title
+  title = formula<string>(
+    () => {
+      console.log(
+        `this._manualTitle: ${JSON.stringify(this._manualTitle, null, 2)}`,
+      );
+      return this.selectedClient === ONE_TIME
+        ? this._manualTitle
+        : getClientLabel(this.selectedClient);
+    },
     (value) => {
-      this.clientLabel = value;
+      this._manualTitle = value;
     },
   );
-  readonly invalidError = useProp(``);
-  readonly title = formula(() => {
-    const v = this.isValid;
-    const valid = v[0] ? `` : invalid;
-    this.invalidError.value = v[1];
-    const client = this.selectedClient;
-    const name = client === ONE_TIME ? this.label : getClientLabel(client);
-    return valid + name;
+  _manualTitle = prop(String, ``, {
+    key: `clientLabel`,
   });
+  static getMayEditTitle(selectedClient: SelectedClient) {
+    return selectedClient === ONE_TIME;
+  }
+  readonly mayEditTitle = formula(() =>
+    Delivery.getMayEditTitle(this.selectedClient),
+  );
 
   // Address & Phone
   static getMayEditAddressAndPhone(selectedClient: SelectedClient) {
@@ -107,28 +97,30 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly mayEditAddressAndPhone = formula(() =>
     Delivery.getMayEditAddressAndPhone(this.selectedClient),
   );
-  explicitAddress = formula(
-    () => this.clientAddress ?? ``,
+  readonly address = formula(
+    () =>
+      this.selectedClient === ONE_TIME
+        ? this._manualClientAddress
+        : (this.selectedClient?.address ?? ``),
     (value) => {
-      this.clientAddress = value;
+      this._manualClientAddress = value;
     },
   );
-  readonly address = formula(() =>
-    this.selectedClient === ONE_TIME
-      ? this.explicitAddress
-      : (this.selectedClient?.address ?? ``),
-  );
-  explicitPhoneNumber = formula(
-    () => this.clientPhoneNumber ?? ``,
+  _manualClientAddress = prop(String, ``, {
+    key: `clientAddress`,
+  });
+  phoneNumber = formula(
+    () =>
+      this.selectedClient === ONE_TIME
+        ? this._manualPhoneNumber
+        : (this.selectedClient?.phoneNumber ?? ``),
     (value) => {
-      this.clientPhoneNumber = value;
+      this._manualPhoneNumber = value;
     },
   );
-  readonly phoneNumber = formula(() =>
-    this.selectedClient === ONE_TIME
-      ? this.explicitPhoneNumber
-      : (this.selectedClient?.phoneNumber ?? ``),
-  );
+  _manualPhoneNumber = prop(String, ``, {
+    key: `clientPhoneNumber`,
+  });
 
   // Notes
   notes = prop(String, ``);
@@ -155,14 +147,6 @@ export class Delivery extends mfs.Doc(`Delivery`) {
       .filter((subDelivery) => subDelivery.isCompleted)
       .sort((a, b) => a.completedTimePosix! - b.completedTimePosix!),
   );
-
-  readonly totalMoney = formula(() =>
-    formatNumWithCommas(
-      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.income, 0),
-      2,
-    ),
-  );
-
   createSubDelivery() {
     return withLimitConfirmation({
       count: SubDelivery.limit.count,
@@ -180,6 +164,12 @@ export class Delivery extends mfs.Doc(`Delivery`) {
         }),
     });
   }
+  readonly totalMoney = formula(() =>
+    formatNumWithCommas(
+      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.income, 0),
+      2,
+    ),
+  );
 
   // Creation Time
   creationTimePosix = prop(Number);
@@ -188,30 +178,25 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   user = prop(String, ``);
 
   // Checks
-  readonly isValid = formula((): [boolean, string] => {
-    if (this.selectedClient === NONE_SELECTED)
-      return [false, "Please select a client."];
-    if (this.selectedClient === ONE_TIME && this.label.trim() === ``)
-      return [false, "Please enter a name."];
+  readonly isValid = formula(() => !exists(this.invalidError));
+  readonly invalidError = formula((): string | undefined => {
+    if (this.selectedClient === NONE_SELECTED) return "Please select a client.";
+    if (this.selectedClient === ONE_TIME && this.title.trim() === ``)
+      return "Please enter a name.";
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
-      return [false, "Please select a valid client."];
-    this.sortedSubDeliveries.forEach((sub) => {
-      if (!sub.isValid) {
-        return [false, sub.subInvalidError];
-      }
-    });
-    return [true, ``];
+      return "Please select a valid client.";
+    const subInvalidError = this.sortedSubDeliveries.find(
+      (sub) => !sub.isValid,
+    )?.subInvalidError;
+    if (subInvalidError) return subInvalidError;
+    return undefined;
   });
-
-  readonly isCompleted = formula(
-    () =>
-      this.sortedSubDeliveries.length > 0 && this.completedTimePosix !== null,
-  );
+  readonly isCompleted = formula(() => this.completedTimePosix !== null);
   readonly completedTimePosix = formula(() => {
-    let mostRecent = 0;
+    let mostRecent: number | null = null;
     for (const sub of this.sortedSubDeliveries) {
       if (!sub.isCompleted) return null;
-      mostRecent = Math.max(mostRecent, sub.completedTimePosix ?? 0);
+      mostRecent = Math.max(mostRecent ?? 0, sub.completedTimePosix ?? 0);
     }
     return mostRecent;
   });
@@ -238,13 +223,13 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   _isJustFuel = prop([Boolean, null], null);
   _tank = prop([Tank, null], null);
   readonly justFuelIsOnlyOptions = formula(
-    () => !exists(this.delivery?.selectedKnownClient),
+    () => !exists(this.delivery?.selectedClientDoc),
   );
   readonly shouldShowTankSelector = formula(
     () =>
       (this.selectedTank !== JUST_FUEL &&
         this.selectedTank !== NONE_SELECTED) ||
-      exists(this.delivery?.selectedKnownClient),
+      exists(this.delivery?.selectedClientDoc),
   );
   selectedTank: SelectedTank = formula(
     () => {
