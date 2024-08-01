@@ -1,33 +1,44 @@
-import {Button, Card, Page, Row, Txt, popPage, useProp, ONE_TIME, pushPage, exists} from "miwi";
+import {
+  Button,
+  Card,
+  Page,
+  Row,
+  Txt,
+  popPage,
+  useProp,
+  ONE_TIME,
+  pushPage,
+  exists,
+} from "miwi";
 import { Delivery, SelectedClient } from "./Delivery";
 import { NONE_SELECTED } from "@/utils";
 import { DeliveryFields } from "./DeliveryFields";
 import { Show } from "solid-js";
 import { withLimitConfirmation } from "@/model/LimitUi";
-import {Client} from "@/Clients/Client";
+import { Client } from "@/Clients/Client";
 
 export const openCreateClientDialog = (props: {
   onCreate: (delivery: Delivery) => void;
   setClient?: Client;
-}) => 
+}) =>
   withLimitConfirmation({
     count: Delivery.limit.count,
     limit: Delivery.limit.max,
     labelSingular: `Delivery`,
     labelPlural: `Deliveries`,
-    action: () =>
-      pushPage(CreateDeliveryDialog, props),
+    action: () => pushPage(CreateDeliveryDialog, props),
   });
 
 function CreateDeliveryDialog(props: {
   onCreate: (delivery: Delivery) => void;
   setClient?: Client;
 }) {
-  const explicitPhoneNumber = useProp(``);
+  const phoneNumber = useProp(``);
   const explicitAddress = useProp(``);
-  const label = useProp(``);
+  const title = useProp(``);
   const selectedClient = useProp<SelectedClient>(
-    exists(props.setClient) ? props.setClient : NONE_SELECTED);
+    exists(props.setClient) ? props.setClient : NONE_SELECTED,
+  );
   const notes = useProp(``);
   const deliveryProps = {
     get selectedClient() {
@@ -36,23 +47,23 @@ function CreateDeliveryDialog(props: {
     set selectedClient(v) {
       selectedClient.value = v;
     },
-    get mayEditLabel() {
-      return Delivery.getMayEditLabel(selectedClient.value);
+    get mayEditTitle() {
+      return Delivery.getMayEditTitle(selectedClient.value);
     },
-    get label() {
-      return label.value;
+    get title() {
+      return title.value;
     },
-    set label(v) {
-      label.value = v;
+    set title(v) {
+      title.value = v;
     },
     get mayEditAddressAndPhone() {
       return Delivery.getMayEditAddressAndPhone(selectedClient.value);
     },
-    get explicitPhoneNumber() {
-      return explicitPhoneNumber.value;
+    get phoneNumber() {
+      return phoneNumber.value;
     },
-    set explicitPhoneNumber(v) {
-      explicitPhoneNumber.value = v;
+    set phoneNumber(v) {
+      phoneNumber.value = v;
     },
     get explicitAddress() {
       return explicitAddress.value;
@@ -83,8 +94,8 @@ function CreateDeliveryDialog(props: {
         selectedClient.value === NONE_SELECTED
           ? null
           : selectedClient.value,
-      clientLabel: label.value,
-      clientPhoneNumber: explicitPhoneNumber.value,
+      _manualTitle: title.value,
+      _manualPhoneNumber: phoneNumber.value,
       clientAddress: explicitAddress.value,
       notes: notes.value,
       sortPosition: Date.now(),

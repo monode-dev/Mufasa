@@ -6,7 +6,6 @@ import {
   Card,
   Column,
   FloatSort,
-  HiddenDelete,
   Icon,
   Page,
   Row,
@@ -27,12 +26,12 @@ import { HiddenOptions } from "@/components/HiddenOptions";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
-    Delivery.completedDeliveriesForAllUsers.filter(
+    Delivery.completedDeliveries.filter(
       (delivery) =>
-        exists(delivery.selectedKnownClient?.docId) &&
-        exists(props.delivery.selectedKnownClient) &&
-        delivery.selectedKnownClient.docId ===
-          props.delivery.selectedKnownClient.docId,
+        exists(delivery.selectedClientDoc?.docId) &&
+        exists(props.delivery.selectedClientDoc) &&
+        delivery.selectedClientDoc.docId ===
+          props.delivery.selectedClientDoc.docId,
     ),
   );
 
