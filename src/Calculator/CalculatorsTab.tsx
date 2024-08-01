@@ -19,7 +19,7 @@ import {
   pushPage,
   useProp,
   Selector,
-  Icon,
+  Slider,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -34,7 +34,6 @@ import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
-import { Slider } from "@/components/Slider";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 import { mdiPlus } from "@mdi/js";
 
@@ -450,8 +449,7 @@ export default function Calculator() {
           min={0.75}
           value={desiredFill}
           max={1}
-          knobHSL={sliderColor.value}
-          trackHSL={sliderColor.value}
+          color={sliderColor.value}
           step={1}
         />
       </Card>
