@@ -7,7 +7,7 @@ import {
   TankShapeId,
 } from "@/Calculator/ShapeUtils";
 import { Client } from "@/Clients/Client";
-import { cropAndTrimString, spaceChar } from "@/AppData";
+import { spaceChar } from "@/AppData";
 import { exists, roundToString, doNow } from "miwi";
 
 export class Tank extends mfs.Doc(`Tank`) {
@@ -40,54 +40,51 @@ export class Tank extends mfs.Doc(`Tank`) {
 
   static getLabel(
     tank: Tank,
-    options?: { limitNotesCharacters?: number; shouldShowVolume?: boolean },
+    options?: {
+      excludeParts?: (`fuel` | `dimensions` | `shape` | `volume` | `notes`)[];
+    },
   ) {
-    // if (!isTankValid(tank)) return `Incomplete Tank`;
+    // Utils
     const shapeUtils = getTankShape(tank?.shape);
-    const fuelName = tank?.fuelType?.name;
-    const volume = shapeUtils?.calcTotalVolume(tank);
-    const shapeName = shapeUtils?.nameShort;
-    const notesPart =
-      exists(tank?.notes) && tank?.notes?.trim() !== ``
-        ? `"${tank?.notes?.replaceAll(/\s+/g, ` `).trim()}"`
-        : ``;
-    const dimensionsPart = doNow(() => {
-      let result = ``;
-      for (const dimension of shapeUtils?.dimensions ?? []) {
-        const dimAcronym = getDimensionLabel(dimension)
-          ?.split(` `)
-          .map((x) => x[0].toUpperCase())
-          .join(``);
-        const dimValue = tank?.[dimension];
-        if (exists(dimValue) && exists(dimAcronym)) {
-          result += `${dimAcronym}:${roundToString(dimValue)} `;
-        }
-      }
-      result = result.slice(0, -1);
-      return result;
-    });
-    const limitNotesCharacters =
-      options?.limitNotesCharacters ?? Number.POSITIVE_INFINITY;
-    let note = cropAndTrimString(notesPart, limitNotesCharacters);
-    if (limitNotesCharacters === 0) {
-      note = ``;
-    }
-    const fuel = cropAndTrimString(
-      fuelName ?? "New Fuel",
-      limitNotesCharacters,
-    );
-    const shouldShowVolume = options?.shouldShowVolume ?? true;
-    const volumePart = shouldShowVolume
-      ? ` - ${roundToString(volume ?? 0, 0)}${spaceChar}Gal.`
-      : ``;
-    return (
-      (0 == note.length ? "" : note + " - ") +
-      fuel +
-      " - " +
-      (dimensionsPart.trim() === "" ? "No Dimensions" : dimensionsPart) +
-      " - " +
-      (shapeName ?? "Unknown Shape") +
-      volumePart
-    );
+    const excludeParts = options?.excludeParts ?? [];
+
+    // Calculate Label Parts
+    const labelParts: {
+      [Key in (typeof excludeParts)[number]]: string;
+    } = {
+      fuel: tank?.fuelType?.name?.trim() ?? "Unspecified Fuel",
+      dimensions: (shapeUtils?.dimensions ?? [])
+        .reduce((text, dimensionId) => {
+          const acronym = getDimensionLabel(dimensionId)
+            .split(` `)
+            .map((x) => x[0].toUpperCase())
+            .join(``);
+          const value = exists(tank[dimensionId])
+            ? roundToString(tank[dimensionId])
+            : `?`;
+          return `${text} ${acronym}:${value}`;
+        }, ``)
+        .trim(),
+      shape: shapeUtils?.nameShort ?? "Unknown Shape",
+      volume: doNow(() => {
+        const volume = shapeUtils?.calcTotalVolume(tank);
+        return exists(volume)
+          ? `${roundToString(volume ?? 0, 0)}${spaceChar}Gal.`
+          : `Unknown Volume`;
+      }),
+      notes:
+        exists(tank?.notes) && tank?.notes?.trim() !== ``
+          ? `"${tank?.notes?.replaceAll(/\s+/g, ` `).trim()}"`
+          : ``,
+    } as const;
+
+    // Join Label Parts
+    return Object.entries(labelParts)
+      .filter(
+        ([key, partText]) =>
+          !excludeParts.includes(key as any) && partText.trim() !== ``,
+      )
+      .map(([_, partText]) => partText)
+      .join(` - `);
   }
 }

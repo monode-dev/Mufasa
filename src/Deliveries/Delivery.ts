@@ -185,7 +185,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
       return "Please enter a name.";
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
       return "Please select a valid client.";
-    if(this.isDeleted) return `This delivery has been deleted.`;
+    if (this.isDeleted) return `This delivery has been deleted.`;
     const subInvalidError = this.sortedSubDeliveries.find(
       (sub) => !sub.isValid,
     )?.subInvalidError;
@@ -231,7 +231,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       (this.selectedTank !== JUST_FUEL &&
         this.selectedTank !== NONE_SELECTED) ||
       exists(this.delivery?.selectedClientDoc),
-);
+  );
   selectedTank: SelectedTank = formula(
     () => {
       if (this.justFuelIsOnlyOptions) return JUST_FUEL;
@@ -361,24 +361,16 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Full Title
   readonly title = formula(() => {
-    // TODO: Maybe when gallons is undefined use "An unknown number of gallons" instead of "0 gallons"
     const gallonsPart = `${formatNumWithCommas(this.gallons ?? 0, 0)} gal.`;
+    const fuelPart = `of ${this.fuelSpecs?.name ?? `an unknown fuel`}`;
+    const tankPart =
+      this.selectedTank instanceof Tank
+        ? ` to ${this.selectedTank.getLabel({
+            excludeParts: [`fuel`, `volume`],
+          })}`
+        : ``;
 
-    if (this.selectedTank instanceof Tank) {
-      // Known Tank
-      return `${gallonsPart} to ${this.selectedTank.getLabel({
-        shouldShowVolume: false,
-      })}`;
-    } else if (this.selectedTank === JUST_FUEL) {
-      // Just Fuel
-      const fuel = this.selectedFuel;
-      const fuelName =
-        fuel === ONE_TIME ? this.explicitFuelName : (fuel?.name ?? ``);
-      return `${gallonsPart} of ${fuelName}`;
-    } else {
-      // None Selected
-      return gallonsPart;
-    }
+    return `${gallonsPart}${fuelPart}${tankPart}`;
   });
 
   // Sort Position
@@ -414,9 +406,13 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       // Completed
       if (this.isCompleted) return explicitFuelError;
 
-      if(this._tank?.isDeleted){
+      if (this._tank?.isDeleted) {
         return `The tank you selected has been deleted.`;
-      } else if(!this._tank?.isDeleted && !this._isJustFuel && this._tank ? !this.delivery._client?.tanks?.has(this._tank as Tank) : false) {
+      } else if (
+        !this._tank?.isDeleted && !this._isJustFuel && this._tank
+          ? !this.delivery._client?.tanks?.has(this._tank as Tank)
+          : false
+      ) {
         return `This tank is from a different client.`;
       }
 
@@ -450,7 +446,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
     // Gallons
     const gallonsErrorMessage =
-      (!exists(this.gallons) || this.gallons <= 0)
+      !exists(this.gallons) || this.gallons <= 0
         ? `Gallons must be greater than 0.`
         : undefined;
 
