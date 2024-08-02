@@ -230,7 +230,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       (this.selectedTank !== JUST_FUEL &&
         this.selectedTank !== NONE_SELECTED) ||
       exists(this.delivery?.selectedClientDoc),
-  );
+);
   selectedTank: SelectedTank = formula(
     () => {
       if (this.justFuelIsOnlyOptions) return JUST_FUEL;

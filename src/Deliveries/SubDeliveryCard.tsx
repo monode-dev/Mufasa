@@ -77,8 +77,8 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   <TankSelector
                     value={selectedTank}
                     client={props.subDelivery.delivery.selectedClient as Client}
-                    showNewOption={true}
-                    showJustFuelOption={true}
+                    showNewOption={!props.subDelivery.delivery._client?.isDeleted}
+                    showJustFuelOption={!props.subDelivery.delivery._client?.isDeleted}
                     hintColorOverride={tankHintColor.value}
                   />
                 </Label>
