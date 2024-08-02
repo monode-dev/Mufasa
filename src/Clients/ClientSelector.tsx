@@ -100,7 +100,7 @@ export default function ClientSelector(props: {
       )}
       {/* Clients */}
       <Show when={filteredClients.value.length === 0}>
-        <Txt
+        <Txt     
           onClick={() => {
             dropDownIsOpen.value = false;
           }}

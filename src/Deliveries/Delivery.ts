@@ -413,6 +413,12 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       // Completed
       if (this.isCompleted) return explicitFuelError;
 
+      if(this._tank?.isDeleted){
+        return `The tank you selected has been deleted.`;
+      } else if(!this._tank?.isDeleted && !this._isJustFuel && this._tank ? !this.delivery._client?.tanks?.has(this._tank as Tank) : false) {
+        return `This tank is from a different client.`;
+      }
+
       // Selected Tank
       if (this.selectedTank === NONE_SELECTED) {
         // No Tank
