@@ -7,7 +7,7 @@ import {
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import { Column, Row, Icon, exists, mdColors, Field, useFormula } from "miwi";
+import { Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt } from "miwi";
 import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
 
@@ -23,13 +23,21 @@ export function DeliveryFields(props: {
     | "notes"
   >;
 }) {
+   function clientIsValid() { 
+    if(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted){
+      return true;
+    }
+    return false;
+   }
   return (
     <Column>
       <Row>
         <Icon
           iconPath={mdiAccount}
           stroke={
-            exists(props.delivery.selectedClient !== NONE_SELECTED)
+            clientIsValid() 
+            ? mdColors.orange 
+            : exists(props.delivery.selectedClient !== NONE_SELECTED)
               ? mdColors.black
               : mdColors.grey
           }
@@ -97,6 +105,13 @@ export function DeliveryFields(props: {
         keyboard={"text"}
         overflowXWraps
       />
+      <Show when={clientIsValid()}>
+        <Box widthGrows alignCenter>
+          <Txt alignLeft stroke={$theme.colors.warning}>
+            This client was deleted.
+          </Txt>
+        </Box>
+      </Show>
     </Column>
   );
 }

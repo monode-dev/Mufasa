@@ -97,16 +97,6 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   />
                 </HiddenOptions>
               </Row>
-              <Show when={props.subDelivery?._tank?.isDeleted}>   
-                <Txt stroke={$theme.colors.warning}>
-                  This tank was deleted.
-                </Txt>
-              </Show>
-              <Show when={!props.subDelivery._tank?.isDeleted && !props.subDelivery._isJustFuel && selectedTank.value ? !props.subDelivery.delivery._client?.tanks?.has(selectedTank.value as Tank) : false}>   
-                <Txt stroke={$theme.colors.warning}>
-                  This tank is from a different client.
-                </Txt>
-              </Show>
             </Show>
 
             {/* Fuel Type */}
