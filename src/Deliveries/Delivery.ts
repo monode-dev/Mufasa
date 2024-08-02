@@ -450,7 +450,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
     // Gallons
     const gallonsErrorMessage =
-      !exists(this.gallons) || this.gallons < 0
+      (!exists(this.gallons) || this.gallons <= 0)
         ? `Gallons must be greater than 0.`
         : undefined;
 
