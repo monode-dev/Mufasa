@@ -37,6 +37,7 @@ export default function ClientEntery(props: { client: Client }) {
       stroke={myTextColor.value}
     >
       <Txt
+        widthGrows
         singleLine
         stroke={isClientValid(props.client) ? myTextColor.value : mdColors.grey}
       >

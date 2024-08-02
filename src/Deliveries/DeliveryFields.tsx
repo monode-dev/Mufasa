@@ -14,7 +14,7 @@ import { Delivery } from "./Delivery";
 export function DeliveryFields(props: {
   delivery: Pick<
     Delivery,
-    | "explicitAddress"
+    | "address"
     | "phoneNumber"
     | "mayEditTitle"
     | "title"
@@ -92,9 +92,10 @@ export function DeliveryFields(props: {
           () => props.delivery.notes,
           (v) => (props.delivery.notes = v),
         )}
-        widthGrows
+        asWideAsParent
         capitalize={`sentences`}
         keyboard={"text"}
+        overflowXWraps
       />
     </Column>
   );

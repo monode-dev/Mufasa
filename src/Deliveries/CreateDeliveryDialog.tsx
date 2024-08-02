@@ -96,7 +96,7 @@ function CreateDeliveryDialog(props: {
           : selectedClient.value,
       _manualTitle: title.value,
       _manualPhoneNumber: phoneNumber.value,
-      clientAddress: explicitAddress.value,
+      address: explicitAddress.value,
       notes: notes.value,
       sortPosition: Date.now(),
       creationTimePosix: Date.now(),
