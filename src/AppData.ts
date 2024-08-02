@@ -29,7 +29,8 @@ export function isClientValid(
   const nameExists = useFormula(() =>
     !client ? false : (client.name ?? ``).trim() !== ``,
   );
-  return clientIdExists.value || nameExists.value;
+  const isDeleted = useFormula(() => client?.isDeleted ?? false);
+  return clientIdExists.value || nameExists.value || isDeleted.value;
 }
 export function getClientLabel(client: Client | null | undefined): string {
   if (!exists(client) || !exists(client?.docId)) return `No Client`;

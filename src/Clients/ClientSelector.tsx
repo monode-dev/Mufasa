@@ -73,7 +73,7 @@ export default function ClientSelector(props: {
               widthGrows
               padBetween={0.125}
               align={$Align.centerLeft}
-              stroke={`green`}
+              stroke={$theme.colors.primary}
             >
               <Txt>New</Txt>
               <Icon iconPath={mdiPlus} />
@@ -119,6 +119,7 @@ export default function ClientSelector(props: {
             widthGrows
             heightShrinks
             overflowX={$Overflow.wrap}
+            stroke={$theme.colors.text}
           >
             {getClientLabel(client)}
           </Txt>

@@ -1,5 +1,5 @@
 import TankSelector from "@/Tanks/TankSelector";
-import { Label, Prop, exists } from "miwi";
+import { Label, Prop, Txt, exists } from "miwi";
 import { Show, createEffect } from "solid-js";
 import ClientSelector from "./ClientSelector";
 import { Tank } from "@/Tanks/Tank";
@@ -27,10 +27,12 @@ export function ClientAndTankSelector(
       props.tank.value = null;
     }
   });
-
+  function isClientDeleted() {
+    return props.client.value?.isDeleted;
+  }
   return (
     <>
-      <Label label="Client">
+      <Label label="Client" stroke={isClientDeleted() ? $theme.colors.warning : undefined}>
         <ClientSelector
           value={props.client}
           showOneTimeOption={false}
@@ -39,7 +41,7 @@ export function ClientAndTankSelector(
         />
       </Label>
       {/* TODO: Show special text when there are no tanks to pick from.*/}
-      <Show when={exists(props.client.value)}>
+      <Show when={exists(props.client.value) && !isClientDeleted()}>
         {/* TODO: check the value typelogic  */}
         <Label label="Tank">
           <TankSelector
@@ -49,6 +51,11 @@ export function ClientAndTankSelector(
             showJustFuelOption={props.showJustFuelOption ?? false}
           />
         </Label>
+      </Show>
+      <Show when={isClientDeleted()}>
+        <Txt stroke={$theme.colors.warning} widthGrows>
+          This client has been deleted.
+        </Txt>
       </Show>
     </>
   );
