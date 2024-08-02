@@ -233,13 +233,14 @@ export default function Calculator() {
         <Show when={selectedTab.value === tabs.delivery}>
           <Column>
             {/* --Delivery-- */}
-            <Label label="Delivery">
+            <Label label="Delivery" stroke={!selectedDelivery.value?.isValid && selectedDelivery.value ? $theme.colors.warning : undefined}>
               <Selector
                 value={selectedDelivery.value}
                 modalIsOpenSig={deliverySelectorIsOpen}
                 noneLabel={"Select Delivery"}
                 getLabelForData={(delivery) => delivery?.title ?? null}
                 emptyListText={"No Upcoming Deliveries"}
+                stroke={$theme.colors.text}
               >
                 {/* Selector does not allow invalid deliveries */}
                 <For
@@ -257,6 +258,7 @@ export default function Calculator() {
                       widthGrows
                       heightShrinks
                       overflowX={$Overflow.wrap}
+                      stroke={$theme.colors.text}
                     >
                       {delivery.title}
                     </Txt>
@@ -266,14 +268,15 @@ export default function Calculator() {
             </Label>
 
             {/* --Sub Delivery-- */}
-            <Show when={exists(selectedDelivery.value)}>
-              <Label label="Tank">
+            <Show when={exists(selectedDelivery.value) && selectedDelivery.value?.isValid}>
+              <Label label="Tank" stroke={!selectedSubDelivery.value?.isValid && selectedSubDelivery.value && selectedSubDelivery.value?.delivery._client != selectedDelivery.value?._client ? $theme.colors.warning : undefined}>
                 <Selector
                   value={selectedSubDelivery.value}
                   modalIsOpenSig={subDeliverySelectorIsOpen}
                   noneLabel={"Select Tank"}
                   getLabelForData={getSubDeliveryName}
                   emptyListText={"No Clients"}
+                  stroke={$theme.colors.text}
                 >
                   <Show
                     when={
@@ -352,8 +355,25 @@ export default function Calculator() {
                   </Row>
                 </Box>      
               </Show> */}
-            </Show>
+              <Show when={selectedSubDelivery.value}>
+                <Show when={selectedSubDelivery.value?.delivery._client != selectedDelivery.value?._client}>
+                  <Txt stroke={$theme.colors.warning} widthGrows>
+                    This sub delivery is not for the selected client.
+                  </Txt>
+                </Show>
+                <Show when={!selectedSubDelivery.value?.isValid}>
+                  <Txt stroke={$theme.colors.warning} widthGrows>
+                    The selected sub delivery is not valid.
+                  </Txt>
+                </Show>
+              </Show>
+            </Show> 
           </Column>
+          <Show when={!selectedDelivery.value?.isValid && selectedDelivery.value}>
+            <Txt stroke={$theme.colors.warning} widthGrows>
+              This delivery is invalid.
+            </Txt>
+          </Show>
         </Show>
 
         {/* TANK TAB */}
@@ -361,7 +381,7 @@ export default function Calculator() {
           <ClientAndTankSelector
             client={selectedClient}
             tank={selectedTank}
-            showNewOption={true}
+            showNewOption={!selectedClient.value?.isDeleted}
           />
         </Show>
 
