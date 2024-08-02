@@ -361,7 +361,7 @@ export default function Calculator() {
                     This sub delivery is not for the selected client.
                   </Txt>
                 </Show>
-                <Show when={!selectedSubDelivery.value?.isValid}>
+                <Show when={!selectedSubDelivery.value?.isValid && !(selectedSubDelivery.value?.delivery._client != selectedDelivery.value?._client)}>
                   <Txt stroke={$theme.colors.warning} widthGrows>
                     The selected sub delivery is not valid.
                   </Txt>
