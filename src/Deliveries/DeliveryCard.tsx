@@ -93,7 +93,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           singleLine
           widthGrows
           // scale={1.05} bold
-          stroke={props.delivery._client?.isDeleted ? $theme.colors.warning : undefined}
         >
           {props.delivery.title}
         </Txt>
