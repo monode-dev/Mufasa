@@ -11,7 +11,7 @@ import {
   exists,
   useFormula,
 } from "miwi";
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
@@ -21,6 +21,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
+import { Tank } from "@/Tanks/Tank";
 
 export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
   function handleComplete() {
@@ -96,6 +97,16 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   />
                 </HiddenOptions>
               </Row>
+              <Show when={props.subDelivery?._tank?.isDeleted}>   
+                <Txt stroke={$theme.colors.warning}>
+                  This tank was deleted.
+                </Txt>
+              </Show>
+              <Show when={!props.subDelivery._tank?.isDeleted && !props.subDelivery._isJustFuel && selectedTank.value ? !props.subDelivery.delivery._client?.tanks?.has(selectedTank.value as Tank) : false}>   
+                <Txt stroke={$theme.colors.warning}>
+                  This tank is from a different client.
+                </Txt>
+              </Show>
             </Show>
 
             {/* Fuel Type */}
