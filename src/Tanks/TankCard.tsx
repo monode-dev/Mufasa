@@ -29,7 +29,7 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
         {/* tankDisplayName (tank, amount Of Note Characters) */}
         <Txt widthGrows>
           {props.tank.getLabel({
-            limitNotesCharacters: 0,
+            excludeParts: [`notes`],
           })}
         </Txt>
         <HiddenOptions
