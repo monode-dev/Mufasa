@@ -46,6 +46,8 @@ export default function Calculator() {
   const selectedDelivery = useProp<Delivery | null>(null);
   const deliverySelectorIsOpen = useProp(false);
   const selectedSubDelivery = useProp<SubDelivery | null>(null);
+  
+  // combined 3 doWatch into one to avoid a possible infinite loop
   doWatch(() => {
     if (
       selectedSubDelivery.value?.isCompleted ||
@@ -61,9 +63,8 @@ export default function Calculator() {
       selectedDelivery.value = null;
       stickedInches.value = null;
     }
-  });
-  // If there is only one subDelivery, select it.
-  doWatch(() => {
+    
+    // If there is only one subDelivery, select it.
     if (
       exists(selectedDelivery.value) &&
       !exists(selectedSubDelivery.value) &&
@@ -72,9 +73,8 @@ export default function Calculator() {
       selectedSubDelivery.value =
         selectedDelivery.value.incompleteSubDeliveries[0];
     }
-  });
-  // When the delivery changes unselect the subDelivery.
-  doWatch(() => {
+    
+    // When the delivery changes unselect the subDelivery.
     if (
       selectedSubDelivery.value?.delivery.docId !==
       selectedDelivery.value?.docId
@@ -83,6 +83,7 @@ export default function Calculator() {
       stickedInches.value = null;
     }
   });
+  
   const subDeliverySelectorIsOpen = useProp(false);
   function getSubDeliveryName(subDelivery: SubDelivery | null) {
     return subDelivery?.title ?? null;
