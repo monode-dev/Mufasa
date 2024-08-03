@@ -61,9 +61,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     },
   );
   readonly selectedClientDoc = formula(() =>
-    this.selectedClient !== ONE_TIME && this.selectedClient !== NONE_SELECTED
-      ? this.selectedClient
-      : null,
+    this.selectedClient instanceof Client ? this.selectedClient : null,
   );
 
   // Title
@@ -161,6 +159,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
             getPos: (sub) => sub.sortPosition,
             getUid: (sub) => sub.docId ?? ``,
           }),
+          _isJustFuel: this.selectedClient === ONE_TIME,
         }),
     });
   }
@@ -234,7 +233,6 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedTank: SelectedTank = formula(
     () => {
-      if (this.justFuelIsOnlyOptions) return JUST_FUEL;
       return this._isJustFuel ? JUST_FUEL : (this._tank ?? NONE_SELECTED);
     },
     (value) => {
@@ -265,9 +263,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Fuel
   readonly shouldShowFuelSelector = formula(
-    () =>
-      this.selectedTank === JUST_FUEL ||
-      this.delivery?.selectedClient === ONE_TIME,
+    () => this.selectedTank === JUST_FUEL,
   );
   selectedFuel: SelectedFuel = formula(
     () => {
@@ -393,6 +389,11 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   readonly isValid = formula(
     () => !exists(this.subInvalidError) || this.subInvalidError.trim() === ``,
   );
+  readonly tanksIsFromADifferentClientThanDelivery = formula(
+    () =>
+      exists(this.selectedKnownTank) &&
+      !this.delivery._client?.tanks?.has(this.selectedKnownTank),
+  );
   readonly subInvalidError = formula<string | undefined>(() => {
     const nonGallonsErrorMessage = doNow(() => {
       // Fuel
@@ -406,13 +407,9 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       // Completed
       if (this.isCompleted) return explicitFuelError;
 
-      if (this._tank?.isDeleted) {
+      if (this.selectedKnownTank?.isDeleted) {
         return `The tank you selected has been deleted.`;
-      } else if (
-        !this._tank?.isDeleted && !this._isJustFuel && this._tank
-          ? !this.delivery._client?.tanks?.has(this._tank as Tank)
-          : false
-      ) {
+      } else if (this.tanksIsFromADifferentClientThanDelivery) {
         return `This tank is from a different client.`;
       }
 
