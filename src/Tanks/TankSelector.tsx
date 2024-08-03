@@ -27,6 +27,7 @@ export default function TankSelector(
     showNewOption?: boolean;
     showJustFuelOption?: boolean;
     hintColorOverride?: string;
+    hideTanksList?: boolean;
   }>,
 ) {
   const value: Prop<TankType | null> = useFormula(
@@ -86,38 +87,45 @@ export default function TankSelector(
         </Txt>
       </Show>
       {/* Divider */}
-      <Show when={props.showNewOption || props.showJustFuelOption}>
+      <Show
+        when={
+          (props.showNewOption || props.showJustFuelOption) &&
+          !props.hideTanksList
+        }
+      >
         <Box widthGrows height={0.125} fill={mdColors.grey} />
       </Show>
 
       {/* Tanks */}
-      <For
-        each={tanks.value ?? []}
-        fallback={
-          <Txt
-            onClick={() => {
-              dropDownIsOpen.value = false;
-            }}
-            widthGrows
-            stroke={props.hintColorOverride ?? mdColors.grey}
-          >
-            No Tanks
-          </Txt>
-        }
-      >
-        {(tank) => (
-          <Txt
-            stroke={mdColors.black}
-            onClick={() => {
-              selectOption(tank);
-            }}
-            widthGrows
-            alignCenterLeft
-          >
-            {tank.getLabel()}
-          </Txt>
-        )}
-      </For>
+      <Show when={!props.hideTanksList}>
+        <For
+          each={tanks.value ?? []}
+          fallback={
+            <Txt
+              onClick={() => {
+                dropDownIsOpen.value = false;
+              }}
+              widthGrows
+              stroke={props.hintColorOverride ?? mdColors.grey}
+            >
+              No Tanks
+            </Txt>
+          }
+        >
+          {(tank) => (
+            <Txt
+              stroke={mdColors.black}
+              onClick={() => {
+                selectOption(tank);
+              }}
+              widthGrows
+              alignCenterLeft
+            >
+              {tank.getLabel()}
+            </Txt>
+          )}
+        </For>
+      </Show>
     </Selector>
   );
 }

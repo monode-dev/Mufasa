@@ -1,4 +1,4 @@
-import { formatPosixTime } from "@/utils";
+import { formatPosixTime, ONE_TIME } from "@/utils";
 import {
   Card,
   Field,
@@ -20,7 +20,7 @@ import { SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck } from "@mdi/js";
 import { Client } from "@/Clients/Client";
-import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
+import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { Tank } from "@/Tanks/Tank";
 
 export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
@@ -48,13 +48,21 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
   const scale = 1;
   const isOpen = useProp(false);
 
-  const selectedFuel = useFormula(() => props.subDelivery.selectedFuel, (v) => (props.subDelivery.selectedFuel = v));
+  const selectedFuel = useFormula(
+    () => props.subDelivery.selectedFuel,
+    (v) => (props.subDelivery.selectedFuel = v),
+  );
   const selectedTank = useFormula(
     () => props.subDelivery.selectedTank,
     (v) => (props.subDelivery.selectedTank = v),
   );
   const tankHintColor = useFormula(() =>
     exists(selectedTank.value) ? undefined : $theme.colors.warning,
+  );
+  const mayPickTank = useFormula(
+    () =>
+      !props.subDelivery.delivery.selectedClientDoc?.isDeleted &&
+      props.subDelivery.delivery.selectedClient !== ONE_TIME,
   );
 
   return (
@@ -77,12 +85,17 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   <TankSelector
                     value={selectedTank}
                     client={props.subDelivery.delivery.selectedClient as Client}
-                    showNewOption={!props.subDelivery.delivery._client?.isDeleted}
-                    showJustFuelOption={!props.subDelivery.delivery._client?.isDeleted}
+                    showNewOption={mayPickTank.value}
+                    showJustFuelOption={true}
                     hintColorOverride={tankHintColor.value}
+                    hideTanksList={!mayPickTank.value}
                   />
                 </Label>
-                <HiddenOptions showIcons onDelete={handleDeleteRequest} isOpen={isOpen}>
+                <HiddenOptions
+                  showIcons
+                  onDelete={handleDeleteRequest}
+                  isOpen={isOpen}
+                >
                   <HiddenOption
                     scale={scale}
                     alignCenterLeft
@@ -111,7 +124,11 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   />
                 </Label>
                 <Show when={!props.subDelivery.shouldShowTankSelector}>
-                  <HiddenOptions showIcons onDelete={handleDeleteRequest} isOpen={isOpen}>
+                  <HiddenOptions
+                    showIcons
+                    onDelete={handleDeleteRequest}
+                    isOpen={isOpen}
+                  >
                     <HiddenOption
                       scale={scale}
                       alignCenterLeft
@@ -176,7 +193,12 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                 hint="Est. gal."
               />
             </Label>
-            <Show when={exists(props.subDelivery.subInvalidError) && props.subDelivery.subInvalidError != ``}>
+            <Show
+              when={
+                exists(props.subDelivery.subInvalidError) &&
+                props.subDelivery.subInvalidError != ``
+              }
+            >
               <Txt stroke={$theme.colors.warning}>
                 {props.subDelivery.subInvalidError}
               </Txt>
@@ -196,7 +218,10 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
               ? formatPosixTime(props.subDelivery.completedTimePosix)
               : "Unknown Date"}
           </Txt>
-          <HiddenOptions showIcons onDelete={handleDeleteOfCompletedSubDelivery} />
+          <HiddenOptions
+            showIcons
+            onDelete={handleDeleteOfCompletedSubDelivery}
+          />
         </Row>
         {/* NOTE propToSig is interfering with turning the text in the card gray when subDelivery is completed */}
         <CompletedSubDeliveryFields
