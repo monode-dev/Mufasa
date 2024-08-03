@@ -18,10 +18,11 @@ import TankSelector from "@/Tanks/TankSelector";
 import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
 import { SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
-import { mdiCheck } from "@mdi/js";
+import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { Tank } from "@/Tanks/Tank";
+import { DeliveryCheckbox } from "./DeliveryCheckbox";
 
 export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
   function handleComplete() {
@@ -64,6 +65,12 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
       !props.subDelivery.delivery.selectedClientDoc?.isDeleted &&
       props.subDelivery.delivery.selectedClient !== ONE_TIME,
   );
+  
+  function handleUnComplete() {
+    pushPage(DeliveryCheckbox, {
+      subDelivery: props.subDelivery,
+    });
+  }
 
   return (
     <Card
@@ -221,7 +228,15 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
           <HiddenOptions
             showIcons
             onDelete={handleDeleteOfCompletedSubDelivery}
-          />
+          >
+            <HiddenOption
+              stroke={$theme.colors.warning}
+              text={`Uncomplete`}
+              icon={mdiUndo}
+              onClick={handleUnComplete
+              }
+            />
+          </HiddenOptions>
         </Row>
         {/* NOTE propToSig is interfering with turning the text in the card gray when subDelivery is completed */}
         <CompletedSubDeliveryFields
