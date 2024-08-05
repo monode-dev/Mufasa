@@ -158,9 +158,7 @@ export function InlineAppBar(
           width={iconSize}
           height={iconSize}
           alignCenter
-          //alignCenterLect
           scale={iconSize}
-          // overflowXCrops
           overflowXSpills
         >
           <Show when={showBackButton.value}>
