@@ -1,4 +1,4 @@
-import { mdiPencil, mdiCheck, mdiMapMarker, mdiPhoneInTalk } from "@mdi/js";
+import { mdiPencil, mdiCheck, mdiMapMarker, mdiPhoneInTalk, mdiArrowLeft, mdiArrowBottomLeft, mdiArrowDown, mdiArrowDownLeft } from "@mdi/js";
 import {
   Box,
   Card,
@@ -101,7 +101,15 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           delivery={props.delivery}
         />
       </Row>
-
+      <Show when={(props.delivery.subDeliveries.count > 0) && numDeliveriesExpanded.value <= 0 }>
+        <Row stroke={$theme.colors.hint}>        
+          <Icon iconPath={mdiArrowDownLeft} scale={2}/>
+          <Txt>
+            {numDeliveriesExpanded.value}
+            Click here to complete the delivery.
+          </Txt>
+        </Row>
+      </Show>
       {/* Sub-Deliveries */}
       <For
         each={props.delivery.sortedSubDeliveries}
@@ -157,6 +165,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   const checkboxCornerRadious = 1 / 7;
 
   function handleComplete() {
+    numDeliveriesExpanded.value = numDeliveriesExpanded.value + 1;
     pushPage(CompleteSubDeliveryDialog, {
       subDelivery: props.subDelivery,
     });
