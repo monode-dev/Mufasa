@@ -64,17 +64,6 @@ export default function Calculator() {
       stickedInches.value = null;
     }
     
-    // BUG: This code is causing an infinite loop
-    // If there is only one subDelivery, select it.
-    // if (
-    //   exists(selectedDelivery.value) &&
-    //   !exists(selectedSubDelivery.value) &&
-    //   selectedDelivery.value.incompleteSubDeliveries.length === 1
-    // ) {
-    //   selectedSubDelivery.value =
-    //     selectedDelivery.value.incompleteSubDeliveries[0];
-    // }
-    
     // When the delivery changes unselect the subDelivery.
     if (
       selectedSubDelivery.value?.delivery.docId !==

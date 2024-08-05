@@ -13,8 +13,6 @@ import {
   Align,
   strokeTexture,
   theme,
-  Card,
-  Button,
   SortableColumn,
   FloatSort,
 } from "miwi";
@@ -49,7 +47,6 @@ import { SimpleDocEntry } from "@/components/SimpleDocEntry";
 import { SubscribePrompt, withLimitConfirmation } from "@/model/LimitUi";
 import { exportData } from "./ExportData";
 import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
-import { listFuelTypes } from "@/AppData";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 import { Match, Switch } from "solid-js/web";
