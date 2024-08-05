@@ -9,6 +9,7 @@ import { Field, Prop } from "miwi";
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 
 export function ClientFields(props: {
+  firstFieldHasFocus?: Prop<boolean>;
   name: Prop<string>;
   clientId: Prop<string>;
   phoneNumber: Prop<string>;
@@ -18,6 +19,7 @@ export function ClientFields(props: {
   return (
     <>
       <Field
+        hasFocus={props.firstFieldHasFocus}
         hintText={`Name`}
         iconPath={mdiAccount} //mdiDomain
         value={props.name}

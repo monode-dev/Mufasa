@@ -88,6 +88,7 @@ function CreateClientDialog(props: {
       <Card preventClickPropagation width={`75%`} shadowSize={0}>
         <Txt h1>Create Client</Txt>
         <ClientFields
+          firstFieldHasFocus={useProp(true)}
           name={name}
           clientId={clientId}
           phoneNumber={phoneNumber}
