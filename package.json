@@ -29,7 +29,7 @@
     "@revenuecat/purchases-capacitor": "^7.7.1",
     "audit": "^0.0.6",
     "buffer": "^6.0.3",
-    "firebase": "^10.12.4",
+    "firebase": "^10.12.5",
     "gsap": "^3.12.5",
     "jszip": "^3.10.1",
     "miap": "^0.0.9",
@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@capacitor/cli": "5.7.7",
-    "@types/firebase": "^3.2.1",
     "@types/sha.js": "^2.4.4",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "7.18.0",
