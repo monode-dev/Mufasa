@@ -7,9 +7,13 @@ import {
   exists,
   useProp,
   Selector,
+  Icon,
+  pushPage,
 } from "miwi";
 import { TANK_SHAPE_IDS, TankShapeId, getTankShape } from "./ShapeUtils";
 import { For } from "solid-js";
+import { mdiHelpCircleOutline } from "@mdi/js";
+import { InfoCard } from "@/components/InfoCard";
 
 export default function ShapeSelector(
   props: Readonly<{
@@ -57,6 +61,13 @@ export default function ShapeSelector(
             )}
           </For>
         </Selector>
+          <Icon 
+            iconPath={mdiHelpCircleOutline} 
+            onClick={()=> {
+              pushPage(InfoCard, {entriesToOpen: ["Tank", getTankShape(props.value.value)?.nameLong ?? ""]});
+            }}
+          >
+        </Icon>
       </Label>
       {/* <Show when={exists(props.value.value)}>
         <Icon

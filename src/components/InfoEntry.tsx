@@ -6,8 +6,9 @@ export function InfoEntry(props: {
   entryTitle: string;
   entryContent?: string;
   children?: JSX.Element;
+  shouldBeOpen?: boolean;
 }) {
-  const showEntry = useProp(false);
+  const showEntry = props.shouldBeOpen ? useProp(true) : useProp(false);
   function toggleShowEntry() {
     showEntry.value = !showEntry.value;
   }
