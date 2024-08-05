@@ -270,7 +270,7 @@ export default function Calculator() {
 
             {/* --Sub Delivery-- */}
             <Show when={exists(selectedDelivery.value) && selectedDelivery.value?.isValid}>
-              <Label label="Tank" stroke={!selectedSubDelivery.value?.isValid && selectedSubDelivery.value && selectedSubDelivery.value?.delivery._client != selectedDelivery.value?._client ? $theme.colors.warning : undefined}>
+              <Label label="Tank" stroke={!selectedSubDelivery.value?.isValid && selectedSubDelivery.value && selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient ? $theme.colors.warning : undefined}>
                 <Selector
                   value={selectedSubDelivery.value}
                   modalIsOpenSig={subDeliverySelectorIsOpen}
@@ -302,8 +302,8 @@ export default function Calculator() {
                     //   <Box
                     //     onClick={async () => {
                     //       selectedDelivery.value?.createSubDelivery();
-                    //       if(selectedDelivery.value?._client?.tanks.count! >=0) {
-                    //         selectedDelivery.value?._client?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
+                    //       if(selectedDelivery.value?.selectedClient?.tanks.count! >=0) {
+                    //         selectedDelivery.value?.selectedClient?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
                     //       }
                     //     }}>
                     //     <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>
@@ -357,12 +357,12 @@ export default function Calculator() {
                 </Box>      
               </Show> */}
               <Show when={selectedSubDelivery.value}>
-                <Show when={selectedSubDelivery.value?.delivery._client != selectedDelivery.value?._client}>
+                <Show when={selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient}>
                   <Txt stroke={$theme.colors.warning} widthGrows>
                     This sub delivery is not for the selected client.
                   </Txt>
                 </Show>
-                <Show when={!selectedSubDelivery.value?.isValid && !(selectedSubDelivery.value?.delivery._client != selectedDelivery.value?._client)}>
+                <Show when={!selectedSubDelivery.value?.isValid && !(selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient)}>
                   <Txt stroke={$theme.colors.warning} widthGrows>
                     The selected sub delivery is not valid.
                   </Txt>
