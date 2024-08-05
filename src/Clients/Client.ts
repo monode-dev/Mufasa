@@ -1,7 +1,9 @@
 import { mfs, premiumEnabled } from "@/model/DataModel";
 import { createLimitTrackers } from "@/model/LimitUtils";
 import { Tank } from "@/Tanks/Tank";
-import { prop, list } from "mufasa";
+import { doNow, FloatSort } from "miwi";
+import { prop, list, formula } from "mufasa";
+import { createMutable } from "solid-js/store";
 
 export class Client extends mfs.Doc(`Client`) {
   static readonly limit = createLimitTrackers({
@@ -13,10 +15,53 @@ export class Client extends mfs.Doc(`Client`) {
   name = prop(String);
   clientId = prop(String);
   phoneNumber = prop(String, ``);
+  readonly additionalPhoneNumbers = list(ClientPhoneNumber, `client`);
+  readonly sortedAdditionalPhoneNumbers = formula(() =>
+    FloatSort.toSorted({
+      list: this.additionalPhoneNumbers,
+      getPos: (num) => num.sortPosition,
+      getUid: (num) => num.docId ?? ``,
+    }),
+  );
+  addPhoneNumber() {
+    if (this.additionalPhoneNumbers.count >= 5) {
+      console.error(`Cannot add more than 5 phone numbers`);
+      return;
+    }
+    ClientPhoneNumber.create({
+      client: this,
+      sortPosition: FloatSort.getNewEndPos({
+        list: this.sortedAdditionalPhoneNumbers,
+        getPos: (num) => num.sortPosition,
+        getUid: (num) => num.docId ?? ``,
+      }),
+    });
+  }
+  readonly allPhoneNumbers = formula(() =>
+    [
+      {
+        name: "Primary",
+        number: this.phoneNumber,
+      },
+    ].concat(this.sortedAdditionalPhoneNumbers),
+  );
+
   address = prop(String, ``);
   notes = prop(String, ``);
   readonly tanks = list(Tank, `mx_parent`);
   onDelete() {
+    this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
     this.tanks.forEach((tank) => tank.deleteDoc());
+  }
+  // TODO: Limit the number of phone numbers per client
+}
+
+export class ClientPhoneNumber extends mfs.Doc(`ClientPhoneNumber`) {
+  client = prop(Client);
+  name = prop(String, ``);
+  number = prop(String, ``);
+  sortPosition = prop(Number);
+  onDelete() {
+    this.deleteDoc();
   }
 }
