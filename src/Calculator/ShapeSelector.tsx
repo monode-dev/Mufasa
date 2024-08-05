@@ -64,7 +64,7 @@ export default function ShapeSelector(
           <Icon 
             iconPath={mdiHelpCircleOutline} 
             onClick={()=> {
-              pushPage(InfoCard, {entriesToOpen: ["Tank", getTankShape(props.value.value)?.nameLong ?? ""]});
+              pushPage(InfoCard, {entriesToOpen: ["Tank","Shape", getTankShape(props.value.value)?.nameLong ?? ""]});
             }}
           >
         </Icon>

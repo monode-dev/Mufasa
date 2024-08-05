@@ -24,30 +24,40 @@ export function InfoCard(
           shouldBeOpen={props.entriesToOpen?.includes("Tank")}
         >
           <InfoEntry
-            entryTitle="Oval"
-            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-            shouldBeOpen={props.entriesToOpen?.includes("Oval")}
-          />
-          <InfoEntry
-            entryTitle="Rectangle"
-            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-            shouldBeOpen={props.entriesToOpen?.includes("Rectangle")}
-          />
-          <InfoEntry
-            entryTitle="Vertical Cylinder"
-            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-            shouldBeOpen={props.entriesToOpen?.includes("Vertical Cylinder")}
-          />
-          <InfoEntry
-            entryTitle="Ellipse"
-            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-            shouldBeOpen={props.entriesToOpen?.includes("Ellipse")}
-          />
-          <InfoEntry
-            entryTitle="Truck Bed Tank"
-            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-            shouldBeOpen={props.entriesToOpen?.includes("Truck Bed Tank")}
-          />
+          entryTitle="Shape"
+          shouldBeOpen={props.entriesToOpen?.includes("Shape")}
+          >
+            <InfoEntry
+              entryTitle="Horizontal Cylinder"
+              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+              shouldBeOpen={props.entriesToOpen?.includes("Horizontal Cylinder")}
+            />
+            <InfoEntry
+              entryTitle="Oval"
+              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+              shouldBeOpen={props.entriesToOpen?.includes("Oval")}
+            />
+            <InfoEntry
+              entryTitle="Rectangle"
+              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+              shouldBeOpen={props.entriesToOpen?.includes("Rectangle")}
+            />
+            <InfoEntry
+              entryTitle="Vertical Cylinder"
+              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+              shouldBeOpen={props.entriesToOpen?.includes("Vertical Cylinder")}
+            />
+            <InfoEntry
+              entryTitle="Ellipse"
+              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+              shouldBeOpen={props.entriesToOpen?.includes("Ellipse")}
+            />
+            <InfoEntry
+              entryTitle="Truck Bed Tank"
+              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+              shouldBeOpen={props.entriesToOpen?.includes("Truck Bed Tank")}
+            />
+          </InfoEntry>
         </InfoEntry>
         <InfoEntry
           entryTitle="Client"
