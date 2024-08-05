@@ -391,8 +391,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   readonly tanksIsFromADifferentClientThanDelivery = formula(
     () =>
-      exists(this.selectedKnownTank) &&
-      !this.delivery._client?.tanks?.has(this.selectedKnownTank),
+      exists(this.selectedKnownTank) && this.delivery.selectedClient != ONE_TIME &&
+      !this.delivery.selectedClient?.tanks?.has(this.selectedKnownTank),
   );
   readonly subInvalidError = formula<string | undefined>(() => {
     const nonGallonsErrorMessage = doNow(() => {
