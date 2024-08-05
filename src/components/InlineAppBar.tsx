@@ -166,7 +166,7 @@ export function InlineAppBar(
           <Show when={showBackButton.value}>
             <Button pill width={iconSize + .5} height={iconSize + .5}
                     fill={$theme.colors.pageBackground}
-                    outlineSize={1/16} outlineColor={$theme.colors.text}
+                    outlineSize={0} outlineColor={$theme.colors.pageBackground}
                     onClick={popPage} />
             <Icon iconPath={mdiArrowLeft} scale={iconSize} />
           </Show>
