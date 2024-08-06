@@ -1,8 +1,13 @@
-import { mdiPencil, mdiCheck, mdiMapMarker, mdiPhoneInTalk, mdiArrowLeft, mdiArrowBottomLeft, mdiArrowDown, mdiArrowDownLeft } from "@mdi/js";
+import {
+  mdiPencil,
+  mdiCheck,
+  mdiMapMarker,
+  mdiPhoneInTalk,
+  mdiArrowUpLeft,
+} from "@mdi/js";
 import {
   Box,
   Card,
-  Column,
   Row,
   Txt,
   Icon,
@@ -13,7 +18,6 @@ import {
   useFormula,
   mdColors,
   doWatch,
-  Stack,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -21,7 +25,6 @@ import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { CallAndMapButtons } from "@/Clients/CallAndMapToButtons";
-import { autoSavingProp } from "@/utils";
 import {
   callPhoneNumber,
   canCallPhoneNumber,
@@ -29,12 +32,7 @@ import {
   mapToAddress,
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import { DeliveryCheckbox } from "./DeliveryCheckbox";
-
-export const numDeliveriesExpanded = autoSavingProp<number>(
-  `numDeliveriesExpanded`,
-  0,
-);
+import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   const shouldShowCompleteDate = useFormula(() => props.delivery.isCompleted);
@@ -79,7 +77,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Txt singleLine widthGrows>
             {formatPosixTime(props.delivery.completedTimePosix!)}
           </Txt>
-          <DeliveryCardActionButtons
+          <DeliveryCardOptionButtons
             show={optionsButtonNextToCompleteDate.value}
             delivery={props.delivery}
           />
@@ -96,20 +94,12 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         >
           {props.delivery.title}
         </Txt>
-        <DeliveryCardActionButtons
+        <DeliveryCardOptionButtons
           show={optionsButtonNextToClient.value}
           delivery={props.delivery}
         />
       </Row>
-      <Show when={(props.delivery.subDeliveries.count > 0) && numDeliveriesExpanded.value <= 0 }>
-        <Row stroke={$theme.colors.hint}>        
-          <Icon iconPath={mdiArrowDownLeft} scale={2}/>
-          <Txt>
-            {numDeliveriesExpanded.value}
-            Click here to complete the delivery.
-          </Txt>
-        </Row>
-      </Show>
+
       {/* Sub-Deliveries */}
       <For
         each={props.delivery.sortedSubDeliveries}
@@ -129,6 +119,19 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         {(subDelivery) => <SubDeliveryRow subDelivery={subDelivery} />}
       </For>
 
+      {/* Completion hint. */}
+      <Show
+        when={
+          props.delivery.subDeliveries.count > 0 &&
+          SubDelivery.numSubDeliveriesCompleted <= 0
+        }
+      >
+        <Row stroke={$theme.colors.hint} alignTopLeft padBetween={0.25}>
+          <Icon iconPath={mdiArrowUpLeft} scale={1.75} />
+          <Txt>Tap here to complete the delivery.</Txt>
+        </Row>
+      </Show>
+
       {/* Total */}
       <Show when={props.delivery.isCompleted}>
         <Txt singleLine widthGrows bold>
@@ -142,7 +145,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Txt widthGrows alignBottomLeft singleLine>
             {`Notes: ${props.delivery.notes.trim()}`}
           </Txt>
-          <DeliveryCardActionButtons
+          <DeliveryCardOptionButtons
             show={optionsButtonNextToNotes.value}
             delivery={props.delivery}
           />
@@ -162,81 +165,59 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 }
 
 export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
-  const checkboxCornerRadious = 1 / 7;
-
-  function handleComplete() {
-    numDeliveriesExpanded.value = numDeliveriesExpanded.value + 1;
-    pushPage(CompleteSubDeliveryDialog, {
-      subDelivery: props.subDelivery,
-    });
-  }
-
-  function handleUnComplete() {
-    pushPage(DeliveryCheckbox, {
-      subDelivery: props.subDelivery,
-    });
-  }
-
+  const highlightColor = useFormula(() =>
+    props.subDelivery.isCompleted
+      ? $theme.colors.hint
+      : props.subDelivery.isValid
+        ? undefined
+        : $theme.colors.warning,
+  );
   return (
-    <Column outlineSize={1 / 8}>
-      <Row alignTopLeft widthGrows>
-        <Stack width={1} height={1} overflowXSpills overflowYSpills>
-          <Show when={!props.subDelivery.isCompleted}>
-            <Box
-              bonusTouchArea
-              onClick={handleComplete}
-              width={1}
-              height={1}
-              outlineSize={1 / 8}
-              outlineColor={
-                props.subDelivery.isValid
-                  ? $theme.colors.primary
-                  : $theme.colors.warning
-              }
-              cornerRadius={checkboxCornerRadious}
-            />
-          </Show>
+    <Row alignTopLeft widthGrows>
+      <Box
+        /* We want the check box to be vertically centered with a single line of
+         * text. However, the text is not vertically centered in its bounding box.
+         * So we apply a slight offset here to vertically align the check box with
+         * the first line of the description text. */
+        padTop={0.045}
+      >
+        <Box
+          bonusTouchArea
+          onClick={() =>
+            props.subDelivery.isCompleted
+              ? pushPage(ConfirmSubDeliveryUncompletion, {
+                  subDelivery: props.subDelivery,
+                })
+              : pushPage(CompleteSubDeliveryDialog, {
+                  subDelivery: props.subDelivery,
+                })
+          }
+          width={1}
+          height={1}
+          outlineSize={1 / 8}
+          outlineColor={highlightColor.value ?? $theme.colors.primary}
+          cornerRadius={1 / 7}
+          fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+        >
           <Show when={props.subDelivery.isCompleted}>
-            <Box
-              bonusTouchArea
-              outlineSize={1 / 8}
-              width={1}
-              height={1}
-              outlineColor={$theme.colors.hint}
-              fill={$theme.colors.hint}
-              cornerRadius={checkboxCornerRadious}
-              onClick={handleUnComplete}
-            >
-              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-            </Box>
+            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
           </Show>
-          <Box width={1.5} height={1.5} />
-        </Stack>
-        <Box alignLeft>
-          <Txt
-            widthGrows
-            asTallAsParent
-            overflowXWraps
-            stroke={
-              !props.subDelivery.isCompleted && !props.subDelivery.isValid
-                ? $theme.colors.warning
-                : undefined
-            }
-          >
-            {props.subDelivery.title}
-          </Txt>
         </Box>
-        {/* <Box>
-          <Txt fill={mdColors.red}  alignRight widthGrows>
-            {tankName.value}
-          </Txt>
-        </Box> */}
-      </Row>
-    </Column>
+      </Box>
+      <Txt
+        widthGrows
+        asTallAsParent
+        overflowXWraps
+        alignTopLeft
+        stroke={highlightColor.value ?? $theme.colors.text}
+      >
+        {props.subDelivery.title}
+      </Txt>
+    </Row>
   );
 }
 
-function DeliveryCardActionButtons(props: {
+function DeliveryCardOptionButtons(props: {
   show: boolean;
   delivery: Delivery;
 }) {

@@ -1,7 +1,7 @@
 import { Button, Card, Page, Row, mdColors, popPage, useProp, Txt } from "miwi";
 import { SubDelivery } from "./Delivery";
 
-export function DeliveryCheckbox(props: {
+export function ConfirmSubDeliveryUncompletion(props: {
   subDelivery: SubDelivery;
 }) {
   function handleYes() {
