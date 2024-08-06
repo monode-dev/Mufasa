@@ -435,20 +435,15 @@ export function SettingsPage() {
             </Show>
           </Column>
         </SimpleBody>
-        <Box alignTopLeft>
-          <Stack
-            width={iconSize}
-            height={iconSize}
-            alignCenter
-            scale={iconSize}
-            overflowXSpills
-          >
+        <Box alignTopLeft asWideAsParent asTallAsParent>
             <Button pill width={iconSize + .5} height={iconSize + .5}
-                    fill={$theme.colors.warning}
+                    fill={$theme.colors.pageBackground}
                     outlineSize={0} outlineColor={$theme.colors.pageBackground}
-                    onClick={popPage} />
-            <Icon iconPath={mdiArrowLeft} scale={iconSize} />
-          </Stack>
+                    onClick={popPage}>
+              <Icon iconPath={mdiArrowLeft} scale={iconSize}
+                    stroke={$theme.colors.text}
+              />
+            </Button>
         </Box>
       </Stack>
     </SimplePage>
