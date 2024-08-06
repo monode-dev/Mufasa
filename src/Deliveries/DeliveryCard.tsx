@@ -33,6 +33,7 @@ import {
 } from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
+import {CallAndMapToIcons} from "@/Clients/CallAndMapToIcons";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   const shouldShowCompleteDate = useFormula(() => props.delivery.isCompleted);
@@ -94,6 +95,14 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         >
           {props.delivery.title}
         </Txt>
+
+        <Show when={!props.delivery.isCompleted}>
+          <Box />
+          <CallAndMapToIcons
+            phoneNumber={props.delivery.phoneNumber}
+            address={props.delivery.address}
+          />
+        </Show>
         <DeliveryCardOptionButtons
           show={optionsButtonNextToClient.value}
           delivery={props.delivery}
@@ -153,15 +162,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
             delivery={props.delivery}
           />
         </Row>
-      </Show>
-
-      {/* Call and Map */}
-      <Show when={!props.delivery.isCompleted}>
-        <Box />
-        <CallAndMapButtons
-          phoneNumber={props.delivery.phoneNumber}
-          address={props.delivery.address}
-        />
       </Show>
     </Card>
   );
@@ -259,42 +259,6 @@ function DeliveryCardOptionButtons(props: {
           text={`Edit`}
           icon={mdiPencil}
         />
-        <Show when={canCallPhoneNumber(props.delivery.phoneNumber)}>
-          <HiddenOption
-            alignCenterLeft
-            padBetween={0.25}
-            onClick={() => {
-              isOpen.value = false;
-              if (canCallPhoneNumber(props.delivery.phoneNumber))
-                callPhoneNumber(props.delivery.phoneNumber);
-            }}
-            stroke={
-              canCallPhoneNumber(props.delivery.phoneNumber)
-                ? $theme.colors.text
-                : $theme.colors.hint
-            }
-            text={`Call`}
-            icon={mdiPhoneInTalk}
-          />
-        </Show>
-        <Show when={canMapToAddress(props.delivery.address)}>
-          <HiddenOption
-            alignCenterLeft
-            padBetween={0.25}
-            onClick={() => {
-              isOpen.value = false;
-              if (canMapToAddress(props.delivery.address))
-                mapToAddress(props.delivery.phoneNumber);
-            }}
-            stroke={
-              canMapToAddress(props.delivery.address)
-                ? $theme.colors.text
-                : $theme.colors.hint
-            }
-            text={`Map`}
-            icon={mdiMapMarker}
-          />
-        </Show>
       </HiddenOptions>
     </Show>
   );
