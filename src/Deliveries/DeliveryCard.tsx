@@ -145,11 +145,9 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Show>
 
       {/* Total */}
-      <Show when={props.delivery.isCompleted}>
-        <Txt singleLine widthGrows bold>
-          Total: ${props.delivery.totalMoney}
-        </Txt>
-      </Show>
+      <Txt singleLine widthGrows bold>
+        Total: ${props.delivery.totalMoney}
+      </Txt>
 
       {/* Notes */}
       <Show when={shouldShowNotes.value}>
