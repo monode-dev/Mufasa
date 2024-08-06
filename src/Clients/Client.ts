@@ -62,6 +62,8 @@ export class ClientPhoneNumber extends mfs.Doc(`ClientPhoneNumber`) {
   number = prop(String, ``);
   sortPosition = prop(Number);
   onDelete() {
-    this.deleteDoc();
+    //this.deleteDoc();
+    //super.onDelete();  
+    //this.client?.additionalPhoneNumbers.remove(this);
   }
 }

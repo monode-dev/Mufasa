@@ -18,6 +18,8 @@ import {
   useNav,
   exists,
   Card,
+  useProp,
+  Prop,
 } from "miwi";
 import { mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
@@ -85,6 +87,50 @@ export default function ClientPage(props: { client: Client }) {
         </Row>
         <Card>
           <ClientFields
+            client={useFormula(
+              () => props.client ?? '',
+              (val) => (props.client = val),
+            )}
+            additionalPhoneNumberName={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[0].name ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[0].name = val),
+            )}
+            additionalPhoneNumber={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[0].number ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[0].number = val),
+            )}
+            additionalPhoneNumberName1={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[1].name ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[1].name = val),
+            )}
+            additionalPhoneNumber1={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[1].number ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[1].number = val),
+            )}           
+            additionalPhoneNumberName2={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[2].name ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[2].name = val),
+            )}
+            additionalPhoneNumber2={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[2].number ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[2].number = val),
+            )}           
+            additionalPhoneNumberName3={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[3].name ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[3].name = val),
+            )}
+            additionalPhoneNumber3={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[3].number ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[3].number = val),
+            )}            
+            additionalPhoneNumberName4={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[4].name ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[4].name = val),
+            )}
+            additionalPhoneNumber4={useFormula(
+              () => props.client.sortedAdditionalPhoneNumbers[4].number ?? '',
+              (val) => (props.client.sortedAdditionalPhoneNumbers[4].number = val),
+            )}
             name={useFormula(
               () => props.client.name ?? ``,
               (val) => (props.client.name = val),
