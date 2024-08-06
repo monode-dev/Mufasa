@@ -8,6 +8,7 @@ import {
   JUST_FUEL,
   NONE_SELECTED,
   ONE_TIME,
+  autoSavingProp,
   formatNumWithCommas,
 } from "@/utils";
 import { FloatSort, doNow, exists } from "miwi";
@@ -385,13 +386,33 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   // Completion
   isCompleted = formula(() => exists(this.completedTimePosix));
   completedTimePosix = prop([Number, null], null);
+  // TODO: In future this should be tied per user not per device. We need to fix that after we upgrade Mufasa.
+  static readonly _numSubDeliveriesCompleted = autoSavingProp<number>(
+    `numSubDeliveriesCompleted`,
+    0,
+  );
+  static get numSubDeliveriesCompleted() {
+    return SubDelivery._numSubDeliveriesCompleted.value;
+  }
+  complete(props: { fuelName: string; rate: number; gallons: number }) {
+    this.explicitFuelName = props.fuelName;
+    this.explicitRate = props.rate;
+    this.gallons = props.gallons;
+    this.completedTimePosix = Date.now();
+    SubDelivery._numSubDeliveriesCompleted.value += 1;
+  }
+  unComplete() {
+    this.completedTimePosix = null;
+  }
 
+  // Validity
   readonly isValid = formula(
     () => !exists(this.subInvalidError) || this.subInvalidError.trim() === ``,
   );
   readonly tanksIsFromADifferentClientThanDelivery = formula(
     () =>
-      exists(this.selectedKnownTank) && this.delivery.selectedClient != ONE_TIME &&
+      exists(this.selectedKnownTank) &&
+      this.delivery.selectedClient != ONE_TIME &&
       !this.delivery.selectedClient?.tanks?.has(this.selectedKnownTank),
   );
   readonly subInvalidError = formula<string | undefined>(() => {
@@ -450,17 +471,6 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     // We need Gallons error message to go last because it is the last field.
     return nonGallonsErrorMessage ?? gallonsErrorMessage;
   });
-
-  complete(props: { fuelName: string; rate: number; gallons: number }) {
-    this.explicitFuelName = props.fuelName;
-    this.explicitRate = props.rate;
-    this.gallons = props.gallons;
-    this.completedTimePosix = Date.now();
-  }
-
-  unComplete() {
-    this.completedTimePosix = null;
-  }
 
   readonly delivery = formula(() => {
     // We have to do this cast otherwise this prop is flagged as required
