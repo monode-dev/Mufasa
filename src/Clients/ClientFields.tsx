@@ -15,6 +15,7 @@ export function ClientFields(props: {
   phoneNumber: Prop<string>;
   address: Prop<string>;
   notes: Prop<string>;
+  create?: boolean;
 }) {
   return (
     <>
@@ -26,6 +27,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
+        enterKeyHint={props.create && props.clientId.value.trim().length > 0 ? `next` : `done`}
       />
       <Field
         hintText={`Client ID`}
@@ -34,6 +36,7 @@ export function ClientFields(props: {
         underlined
         formatInput={formatIdNumber}
         keyboard={"numeric"}
+        enterKeyHint={props.create && props.phoneNumber.value.trim().length > 0 ? `next` : `done`}
       />
       <Field
         hintText={`Phone`}
@@ -42,6 +45,7 @@ export function ClientFields(props: {
         underlined
         formatInput={formatPhoneNumber}
         keyboard="tel"
+        enterKeyHint={props.create && props.address.value.trim().length > 0 ? `next` : `done`}
       />
       <Field
         hintText={`Address`}
@@ -51,6 +55,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
+        enterKeyHint={props.create && props.notes.value.trim().length > 0 ? `next` : `done`}
       />
       <Field
         hintText={`Notes`}
@@ -60,6 +65,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`sentences`}
         keyboard={"text"}
+        enterKeyHint={`done`}
       />
     </>
   );
