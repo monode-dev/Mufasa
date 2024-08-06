@@ -95,7 +95,7 @@ export const doFullCapacitorRebuild = async <
     buildGradleLines.splice(
       buildGradleLines.findIndex((line) => line.includes(`minSdkVersion`)),
       1,
-      `    minSdkVersion = 34`,
+      `    minSdkVersion = 22`,
     );
     buildGradleLines.splice(
       buildGradleLines.findIndex((line) => line.includes(`compileSdkVersion`)),
