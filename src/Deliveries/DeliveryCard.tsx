@@ -99,6 +99,9 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           delivery={props.delivery}
         />
       </Row>
+      <Txt widthGrows>
+        "{props.delivery._client?.notes}"
+      </Txt>
 
       {/* Sub-Deliveries */}
       <For
