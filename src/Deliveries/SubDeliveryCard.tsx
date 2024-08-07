@@ -11,7 +11,7 @@ import {
   exists,
   useFormula,
 } from "miwi";
-import { For, Show } from "solid-js";
+import { Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
@@ -21,8 +21,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import { Tank } from "@/Tanks/Tank";
-import { DeliveryCheckbox } from "./DeliveryCheckbox";
+import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 
 export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
   function handleComplete() {
@@ -65,9 +64,9 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
       !props.subDelivery.delivery.selectedClientDoc?.isDeleted &&
       props.subDelivery.delivery.selectedClient !== ONE_TIME,
   );
-  
+
   function handleUnComplete() {
-    pushPage(DeliveryCheckbox, {
+    pushPage(ConfirmSubDeliveryUncompletion, {
       subDelivery: props.subDelivery,
     });
   }
@@ -233,8 +232,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
               stroke={$theme.colors.warning}
               text={`Uncomplete`}
               icon={mdiUndo}
-              onClick={handleUnComplete
-              }
+              onClick={handleUnComplete}
             />
           </HiddenOptions>
         </Row>

@@ -1,8 +1,16 @@
 import DeleteDialog from "@/components/DeleteDialog";
-import {Field, HiddenDelete, NumField, Row, pushPage, useFormula, exists } from "miwi";
+import {
+  Field,
+  HiddenDelete,
+  NumField,
+  Row,
+  pushPage,
+  useFormula,
+  exists,
+} from "miwi";
 import { FuelType } from "@/model/DataModel";
-import {HiddenOptions} from "@/components/HiddenOptions";
-import {Flag} from "mufasa/dist/Utils";
+import { HiddenOptions } from "@/components/HiddenOptions";
+import { Flag } from "mufasa/dist/Utils";
 
 export default function FuelTypeEntry(props: { fuelType: FuelType }) {
   function deletePressed() {
@@ -29,10 +37,13 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         underlined
         valueSig={useFormula(
           () => props.fuelType.rate,
-          (v) => props.fuelType.rate = v,
+          (v) => (props.fuelType.rate = v),
         )}
         hint="$/gal."
         align={$Align.centerLeft}
+        /* We set the rate to a fixed width, because most fuel doesn't have a very big
+         * rate. All the rest of the space can be given to the name. Maybe we'll change
+         * this in future if it looks too weird. */
         width={5}
       />
       <HiddenOptions showIcons onDelete={deletePressed} />
