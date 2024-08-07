@@ -18,8 +18,6 @@ import {
   useNav,
   exists,
   Card,
-  useProp,
-  Prop,
 } from "miwi";
 import { mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
@@ -62,6 +60,7 @@ export default function ClientPage(props: { client: Client }) {
       }"?`,
     });
   }
+
 
   return (
     <Page>
@@ -153,7 +152,6 @@ export default function ClientPage(props: { client: Client }) {
               (val) => (props.client.notes = val),
             )}
           />
-
           <CallAndMapButtons
             phoneNumber={props.client.phoneNumber}
             address={props.client.address}
