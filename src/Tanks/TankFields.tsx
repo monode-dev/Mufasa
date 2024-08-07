@@ -45,23 +45,23 @@ export default function TankFields(props: {
 
     switch(shapeId) {
       case "truckBedTank":
-        if (props.tankGeometry.topDepth! >= props.tankGeometry.fullDepth!) {
+        if (props.tankGeometry.topDepth && props.tankGeometry.fullDepth && props.tankGeometry.topDepth >= props.tankGeometry.fullDepth) {
           warning.value = "Top Depth must be less than Full Depth.";
           return;
         } else if (
-          props.tankGeometry.wideHeight! >= props.tankGeometry.fullHeight!
+          props.tankGeometry.wideHeight && props.tankGeometry.fullHeight && props.tankGeometry.wideHeight >= props.tankGeometry.fullHeight
         ) {
           warning.value = "Wide Height must be less than Full Height.";
           return;
         }
         break;
       case "oval":
-        if(props.tankGeometry.squareHeight! >= props.tankGeometry.fullHeight!) {
+        if(props.tankGeometry.squareHeight && props.tankGeometry.fullHeight && props.tankGeometry.squareHeight >= props.tankGeometry.fullHeight) {
           warning.value = "Rect. Height must be less than Full Height.";
           return;
         }
     }
-
+    /*
     for (const dimension of dimensions.value) {
       const size = props.tankGeometry[dimension];
       if (toNum(size) <= 0) {
@@ -69,6 +69,7 @@ export default function TankFields(props: {
         return;
       }
     }
+    */
   });
 
   function toNum(size: number | null | undefined): number {
