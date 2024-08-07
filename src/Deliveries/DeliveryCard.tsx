@@ -63,7 +63,16 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <DeliveryCardOptionButtons delivery={props.delivery} />
         </Show>
       </Row>
-      <Txt widthGrows>"{props.delivery._client?.notes}"</Txt>
+
+      {/* Client Notes */}
+      <Show
+        when={
+          exists(props.delivery._client?.notes) &&
+          props.delivery._client.notes.trim().length > 0
+        }
+      >
+        <Txt widthGrows>"{props.delivery._client?.notes}"</Txt>
+      </Show>
 
       {/* Sub-Deliveries */}
       <For
