@@ -1,4 +1,4 @@
-import { isClientValid } from "@/AppData";
+import { isClientValid, listClients } from "@/AppData";
 import {
   Button,
   Card,
@@ -15,6 +15,7 @@ import { ClientFields } from "./ClientFields";
 import { Show } from "solid-js";
 import { Client } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
+import Fuse from "fuse.js";
 
 export const openCreateClientDialog = (props: {
   initName?: string;
@@ -45,6 +46,36 @@ function CreateClientDialog(props: {
     popPage();
   }
 
+
+  function isClientNameAlreadyUsed() {
+    const allClients = listClients(Client.getAllDocs(), true);
+    const allClientNames = allClients.map((client) => client.name.toLowerCase());
+
+    const options = {
+      keys: [name.value.toLowerCase()],
+      threshold: 0.2, //TODO - check if this is the best value
+    };
+
+    const fuse = new Fuse(allClientNames, options);
+    const result = fuse.search(name.value.toLowerCase());
+
+    return (result.length > 0) ? true : false;
+  }
+
+  function isClientIdAlreadyUsed() {
+    const allClients = listClients(Client.getAllDocs(), true);
+    const allClientIds = allClients.map((client) => client.clientId);
+    let result = false;
+
+    allClientIds.forEach((id) => {
+      if(id === clientId.value && clientId.value !== "") {
+        result = true;
+      }
+    });
+
+    return result;
+  }
+
   const clientInitFromFields = useFormula(() => {
     return {
       name: name.value,
@@ -62,6 +93,16 @@ function CreateClientDialog(props: {
   const live_error_msg = useFormula(
     () => !clientIsValid.value && show_errors.value,
   );
+
+  function showErrorMessages() {
+    if(live_error_msg.value) return "Name or Client ID is needed";
+
+    if(isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+
+    if(isClientIdAlreadyUsed()) return "Client ID is already in use.";
+
+    return "";
+  }
 
   function showErrors() {
     show_errors.value = true;
@@ -95,8 +136,8 @@ function CreateClientDialog(props: {
           address={address}
           notes={notes}
         />
-        <Show when={live_error_msg.value}>
-          <Txt stroke={$theme.colors.warning}>Name or Client ID is needed</Txt>
+        <Show when={showErrorMessages() != ""}>
+          <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
         </Show>
         <Row widthGrows align={$Align.spaceEvenly}>
           <Button outlined onClick={closePopUp}>

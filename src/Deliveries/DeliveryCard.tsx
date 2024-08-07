@@ -1,8 +1,7 @@
-import { mdiPencil, mdiCheck, mdiMapMarker, mdiPhoneInTalk, mdiArrowLeft, mdiArrowBottomLeft, mdiArrowDown, mdiArrowDownLeft } from "@mdi/js";
+import { mdiPencil, mdiCheck, mdiArrowUpLeft } from "@mdi/js";
 import {
   Box,
   Card,
-  Column,
   Row,
   Txt,
   Icon,
@@ -12,55 +11,17 @@ import {
   useProp,
   useFormula,
   mdColors,
-  doWatch,
-  Stack,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
-import { CallAndMapButtons } from "@/Clients/CallAndMapToButtons";
-import { autoSavingProp } from "@/utils";
-import {
-  callPhoneNumber,
-  canCallPhoneNumber,
-  canMapToAddress,
-  mapToAddress,
-} from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import { DeliveryCheckbox } from "./DeliveryCheckbox";
-
-export const numDeliveriesExpanded = autoSavingProp<number>(
-  `numDeliveriesExpanded`,
-  0,
-);
+import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
+import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
-  const shouldShowCompleteDate = useFormula(() => props.delivery.isCompleted);
-  const optionsButtonNextToCompleteDate = useFormula(
-    () => shouldShowCompleteDate.value,
-  );
-  const shouldShowNotes = useFormula(
-    () =>
-      exists(props.delivery.notes) && props.delivery.notes.trim().length > 0,
-  );
-  const optionsButtonNextToNotes = useFormula(
-    () =>
-      !optionsButtonNextToCompleteDate.value && shouldShowNotes.value && false,
-  );
-  const optionsButtonNextToClient = useFormula(
-    () =>
-      !optionsButtonNextToCompleteDate.value && !optionsButtonNextToNotes.value,
-  );
-
-  doWatch(() => {
-    props.delivery.sortedSubDeliveries;
-    console.log(
-      `subDeliveries updated: ${Date.now() - (window as any).startTime}`,
-    );
-  });
-  const noFocus = useProp(false);
   return (
     <Card
       alignTopLeft
@@ -74,15 +35,12 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       }
     >
       {/* Time */}
-      <Show when={shouldShowCompleteDate.value}>
+      <Show when={props.delivery.isCompleted}>
         <Row>
           <Txt singleLine widthGrows>
             {formatPosixTime(props.delivery.completedTimePosix!)}
           </Txt>
-          <DeliveryCardActionButtons
-            show={optionsButtonNextToCompleteDate.value}
-            delivery={props.delivery}
-          />
+          <DeliveryCardOptionButtons delivery={props.delivery} />
         </Row>
       </Show>
 
@@ -96,20 +54,26 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         >
           {props.delivery.title}
         </Txt>
-        <DeliveryCardActionButtons
-          show={optionsButtonNextToClient.value}
-          delivery={props.delivery}
+
+        <CallAndMapToIcons
+          phoneNumber={props.delivery.phoneNumber}
+          address={props.delivery.address}
         />
+        <Show when={!props.delivery.isCompleted}>
+          <DeliveryCardOptionButtons delivery={props.delivery} />
+        </Show>
       </Row>
-      <Show when={(props.delivery.subDeliveries.count > 0) && numDeliveriesExpanded.value <= 0 }>
-        <Row stroke={$theme.colors.hint}>        
-          <Icon iconPath={mdiArrowDownLeft} scale={2}/>
-          <Txt>
-            {numDeliveriesExpanded.value}
-            Click here to complete the delivery.
-          </Txt>
-        </Row>
+
+      {/* Client Notes */}
+      <Show
+        when={
+          exists(props.delivery._client?.notes) &&
+          props.delivery._client.notes.trim().length > 0
+        }
+      >
+        <Txt widthGrows>"{props.delivery._client?.notes}"</Txt>
       </Show>
+
       {/* Sub-Deliveries */}
       <For
         each={props.delivery.sortedSubDeliveries}
@@ -129,189 +93,127 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         {(subDelivery) => <SubDeliveryRow subDelivery={subDelivery} />}
       </For>
 
-      {/* Total */}
-      <Show when={props.delivery.isCompleted}>
-        <Txt singleLine widthGrows bold>
-          Total: ${props.delivery.totalMoney}
-        </Txt>
-      </Show>
-
-      {/* Notes */}
-      <Show when={shouldShowNotes.value}>
-        <Row>
-          <Txt widthGrows alignBottomLeft singleLine>
-            {`Notes: ${props.delivery.notes.trim()}`}
-          </Txt>
-          <DeliveryCardActionButtons
-            show={optionsButtonNextToNotes.value}
-            delivery={props.delivery}
-          />
+      {/* Completion hint. */}
+      <Show
+        when={
+          props.delivery.subDeliveries.count > 0 &&
+          SubDelivery.numSubDeliveriesCompleted <= 0
+        }
+      >
+        <Row stroke={$theme.colors.hint} alignTopLeft padBetween={0.25}>
+          <Icon iconPath={mdiArrowUpLeft} scale={1.75} />
+          <Txt>Tap the </Txt>
+          <Box
+            bonusTouchArea
+            width={1}
+            height={1}
+            outlineSize={1 / 8}
+            outlineColor={$theme.colors.hint}
+            cornerRadius={1 / 7}
+          ></Box>
+          <Txt>to complete the delivery.</Txt>
         </Row>
       </Show>
 
-      {/* Call and Map */}
-      <Show when={!props.delivery.isCompleted}>
-        <Box />
-        <CallAndMapButtons
-          phoneNumber={props.delivery.phoneNumber}
-          address={props.delivery.address}
-        />
+      {/* Total */}
+      <Txt singleLine widthGrows bold>
+        Total: ${props.delivery.totalMoney}
+      </Txt>
+
+      {/* Notes */}
+      <Show
+        when={
+          exists(props.delivery.notes) && props.delivery.notes.trim().length > 0
+        }
+      >
+        <Txt widthGrows alignBottomLeft singleLine>
+          {`Notes: ${props.delivery.notes.trim()}`}
+        </Txt>
       </Show>
     </Card>
   );
 }
 
 export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
-  const checkboxCornerRadious = 1 / 7;
-
-  function handleComplete() {
-    numDeliveriesExpanded.value = numDeliveriesExpanded.value + 1;
-    pushPage(CompleteSubDeliveryDialog, {
-      subDelivery: props.subDelivery,
-    });
-  }
-
-  function handleUnComplete() {
-    pushPage(DeliveryCheckbox, {
-      subDelivery: props.subDelivery,
-    });
-  }
-
+  const highlightColor = useFormula(() =>
+    props.subDelivery.isCompleted
+      ? $theme.colors.hint
+      : props.subDelivery.isValid
+        ? undefined
+        : $theme.colors.warning,
+  );
   return (
-    <Column outlineSize={1 / 8}>
-      <Row alignTopLeft widthGrows>
-        <Stack width={1} height={1} overflowXSpills overflowYSpills>
-          <Show when={!props.subDelivery.isCompleted}>
-            <Box
-              bonusTouchArea
-              onClick={handleComplete}
-              width={1}
-              height={1}
-              outlineSize={1 / 8}
-              outlineColor={
-                props.subDelivery.isValid
-                  ? $theme.colors.primary
-                  : $theme.colors.warning
-              }
-              cornerRadius={checkboxCornerRadious}
-            />
-          </Show>
+    <Row alignTopLeft widthGrows>
+      <Box
+        /* We want the check box to be vertically centered with a single line of
+         * text. However, the text is not vertically centered in its bounding box.
+         * So we apply a slight offset here to vertically align the check box with
+         * the first line of the description text. */
+        padTop={0.045}
+      >
+        <Box
+          bonusTouchArea
+          onClick={() =>
+            props.subDelivery.isCompleted
+              ? pushPage(ConfirmSubDeliveryUncompletion, {
+                  subDelivery: props.subDelivery,
+                })
+              : pushPage(CompleteSubDeliveryDialog, {
+                  subDelivery: props.subDelivery,
+                })
+          }
+          width={1}
+          height={1}
+          outlineSize={1 / 8}
+          outlineColor={highlightColor.value ?? $theme.colors.primary}
+          cornerRadius={1 / 7}
+          fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+        >
           <Show when={props.subDelivery.isCompleted}>
-            <Box
-              bonusTouchArea
-              outlineSize={1 / 8}
-              width={1}
-              height={1}
-              outlineColor={$theme.colors.hint}
-              fill={$theme.colors.hint}
-              cornerRadius={checkboxCornerRadious}
-              onClick={handleUnComplete}
-            >
-              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-            </Box>
+            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
           </Show>
-          <Box width={1.5} height={1.5} />
-        </Stack>
-        <Box alignLeft>
-          <Txt
-            widthGrows
-            asTallAsParent
-            overflowXWraps
-            stroke={
-              !props.subDelivery.isCompleted && !props.subDelivery.isValid
-                ? $theme.colors.warning
-                : undefined
-            }
-          >
-            {props.subDelivery.title}
-          </Txt>
         </Box>
-        {/* <Box>
-          <Txt fill={mdColors.red}  alignRight widthGrows>
-            {tankName.value}
-          </Txt>
-        </Box> */}
-      </Row>
-    </Column>
+      </Box>
+      <Txt
+        widthGrows
+        asTallAsParent
+        overflowXWraps
+        alignTopLeft
+        stroke={highlightColor.value ?? $theme.colors.text}
+      >
+        {props.subDelivery.title}
+      </Txt>
+    </Row>
   );
 }
 
-function DeliveryCardActionButtons(props: {
-  show: boolean;
-  delivery: Delivery;
-}) {
+function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
   const isOpen = useProp(false);
 
-  function handleEdit() {
-    pushPage(DeliveryPage, {
-      delivery: props.delivery,
-    });
-  }
-
-  function handleDelete() {
-    pushPage(DeleteDialog, {
-      obj: props.delivery,
-      message: `Are you sure you want to permanently delete this delivery?`,
-    });
-  }
-
   return (
-    <Show when={props.show}>
-      <HiddenOptions
-        showIcons
-        isOpen={isOpen}
-        onDelete={() => {
-          handleDelete();
+    <HiddenOptions
+      showIcons
+      isOpen={isOpen}
+      onDelete={() => {
+        pushPage(DeleteDialog, {
+          obj: props.delivery,
+          message: `Are you sure you want to permanently delete this delivery?`,
+        });
+      }}
+    >
+      <HiddenOption
+        alignCenterLeft
+        padBetween={0.25}
+        onClick={() => {
+          isOpen.value = false;
+          pushPage(DeliveryPage, {
+            delivery: props.delivery,
+          });
         }}
-      >
-        <HiddenOption
-          alignCenterLeft
-          padBetween={0.25}
-          onClick={() => {
-            isOpen.value = false;
-            handleEdit();
-          }}
-          stroke={$theme.colors.text}
-          text={`Edit`}
-          icon={mdiPencil}
-        />
-        <Show when={canCallPhoneNumber(props.delivery.phoneNumber)}>
-          <HiddenOption
-            alignCenterLeft
-            padBetween={0.25}
-            onClick={() => {
-              isOpen.value = false;
-              if (canCallPhoneNumber(props.delivery.phoneNumber))
-                callPhoneNumber(props.delivery.phoneNumber);
-            }}
-            stroke={
-              canCallPhoneNumber(props.delivery.phoneNumber)
-                ? $theme.colors.text
-                : $theme.colors.hint
-            }
-            text={`Call`}
-            icon={mdiPhoneInTalk}
-          />
-        </Show>
-        <Show when={canMapToAddress(props.delivery.address)}>
-          <HiddenOption
-            alignCenterLeft
-            padBetween={0.25}
-            onClick={() => {
-              isOpen.value = false;
-              if (canMapToAddress(props.delivery.address))
-                mapToAddress(props.delivery.phoneNumber);
-            }}
-            stroke={
-              canMapToAddress(props.delivery.address)
-                ? $theme.colors.text
-                : $theme.colors.hint
-            }
-            text={`Map`}
-            icon={mdiMapMarker}
-          />
-        </Show>
-      </HiddenOptions>
-    </Show>
+        stroke={$theme.colors.text}
+        text={`Edit`}
+        icon={mdiPencil}
+      />
+    </HiddenOptions>
   );
 }

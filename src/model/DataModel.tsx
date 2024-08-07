@@ -1,5 +1,13 @@
 import { prop, initializeMufasa, formula } from "mufasa";
-import { useProp, doWatch, exists, doNow, useFormula, useRoot, FloatSort } from "miwi";
+import {
+  useProp,
+  doWatch,
+  exists,
+  doNow,
+  useFormula,
+  useRoot,
+  FloatSort,
+} from "miwi";
 import { autoSavingProp, devLog } from "@/utils";
 import { createRoot, untrack } from "solid-js";
 import { capacitorPersister } from "mufasa/capacitor";
@@ -64,7 +72,7 @@ export const store = miapStore({
   products: {
     premium: {
       ios: "pro.monthly.07.16.2024",
-      android: "",
+      android: "pro.monthly.07.16.2024",
     },
   },
   devLog: devLog,
@@ -85,7 +93,8 @@ export class FuelType extends mfs.Doc(`FuelType`) {
   rate = prop([Number, null], null);
   createdPosix = prop(Number);
   _sortPos = prop([Number, null]);
-  sortPos = formula(() => {
+  sortPos = formula(
+    () => {
       if (!exists(this._sortPos)) {
         this._sortPos = untrack(() => this.createdPosix);
       }
@@ -105,7 +114,7 @@ export class FuelType extends mfs.Doc(`FuelType`) {
   static isValid(fuelType: Partial<FuelType> | null | undefined) {
     return (
       exists(fuelType) &&
-      exists(fuelType.name) &&  
+      exists(fuelType.name) &&
       fuelType.name.trim() !== `` &&
       exists(fuelType.rate) &&
       fuelType.rate > 0

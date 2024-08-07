@@ -10,6 +10,9 @@ import {
 import { Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt } from "miwi";
 import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
+import { listClients } from "@/AppData";
+import { Client } from "@/Clients/Client";
+import Fuse from "fuse.js";
 
 export function DeliveryFields(props: {
   delivery: Pick<
@@ -23,19 +26,43 @@ export function DeliveryFields(props: {
     | "notes"
   >;
 }) {
-   function clientIsValid() { 
+  function clientIsValid() { 
     if(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted){
-      return true;
+      return false;
     }
-    return false;
+    return true;
    }
+
+  function isClientNameAlreadyUsed() {
+    const allClients = listClients(Client.getAllDocs(), true);
+    const allClientNames = allClients.map((client) => client.name.toLowerCase());
+
+    const options = {
+      keys: [props.delivery.title.toLowerCase()],
+      threshold: 0.2, //TODO - check if this is the best value
+    };
+
+    const fuse = new Fuse(allClientNames, options);
+    const result = fuse.search(props.delivery.title.toLowerCase());
+
+    return (result.length > 0) ? true : false;
+  }
+
+  function showErrorMessages() {
+    if(!clientIsValid()) return "Client was deleted.";
+
+    if(props.delivery.selectedClient === ONE_TIME && isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+
+    return "";
+  }
+
   return (
     <Column>
       <Row>
         <Icon
           iconPath={mdiAccount}
           stroke={
-            clientIsValid() 
+            !clientIsValid() 
             ? mdColors.orange 
             : exists(props.delivery.selectedClient !== NONE_SELECTED)
               ? mdColors.black
@@ -105,10 +132,10 @@ export function DeliveryFields(props: {
         keyboard={"text"}
         overflowXWraps
       />
-      <Show when={clientIsValid()}>
+      <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>
           <Txt alignLeft stroke={$theme.colors.warning}>
-            This client was deleted.
+            {showErrorMessages()}
           </Txt>
         </Box>
       </Show>
