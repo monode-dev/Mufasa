@@ -20,6 +20,8 @@ import {
   useProp,
   Selector,
   Slider,
+  TabButtons,
+  TabView,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -198,7 +200,8 @@ export default function Calculator() {
     <Body asWideAsParent padBetween={0.5}>
       <Txt h2>Tank Details</Txt>
       <Card widthGrows>
-        <Row widthGrows spaceBetween>
+        {/*<Row widthGrows spaceBetween>
+          {/*
           <Button
             pill
             outlined={selectedTab.value !== tabs.delivery}
@@ -220,7 +223,15 @@ export default function Calculator() {
           >
             Dimensions
           </Button>
-        </Row>
+          */}
+          <Box stroke={$theme.colors.primary} spaceEvenly>          
+            <TabButtons         
+              selectedTab={selectedTab}
+              labels={["Delivery", "Tank", "Dimensions"]}
+            />
+          </Box>
+
+        {/*</Row>*/}
         <Show when={selectedTab.value === tabs.delivery}>
           <Column>
             {/* --Delivery-- */}
