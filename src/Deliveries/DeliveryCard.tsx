@@ -1,10 +1,4 @@
-import {
-  mdiPencil,
-  mdiCheck,
-  mdiMapMarker,
-  mdiPhoneInTalk,
-  mdiArrowUpLeft,
-} from "@mdi/js";
+import { mdiPencil, mdiCheck, mdiArrowUpLeft } from "@mdi/js";
 import {
   Box,
   Card,
@@ -17,49 +11,17 @@ import {
   useProp,
   useFormula,
   mdColors,
-  doWatch,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
-import { CallAndMapButtons } from "@/Clients/CallAndMapToButtons";
-import {
-  callPhoneNumber,
-  canCallPhoneNumber,
-  canMapToAddress,
-  mapToAddress,
-} from "@/AppData";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
-import {CallAndMapToIcons} from "@/Clients/CallAndMapToIcons";
+import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
-  const shouldShowCompleteDate = useFormula(() => props.delivery.isCompleted);
-  const optionsButtonNextToCompleteDate = useFormula(
-    () => shouldShowCompleteDate.value,
-  );
-  const shouldShowNotes = useFormula(
-    () =>
-      exists(props.delivery.notes) && props.delivery.notes.trim().length > 0,
-  );
-  const optionsButtonNextToNotes = useFormula(
-    () =>
-      !optionsButtonNextToCompleteDate.value && shouldShowNotes.value && false,
-  );
-  const optionsButtonNextToClient = useFormula(
-    () =>
-      !optionsButtonNextToCompleteDate.value && !optionsButtonNextToNotes.value,
-  );
-
-  doWatch(() => {
-    props.delivery.sortedSubDeliveries;
-    console.log(
-      `subDeliveries updated: ${Date.now() - (window as any).startTime}`,
-    );
-  });
-  const noFocus = useProp(false);
   return (
     <Card
       alignTopLeft
@@ -73,15 +35,12 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       }
     >
       {/* Time */}
-      <Show when={shouldShowCompleteDate.value}>
+      <Show when={props.delivery.isCompleted}>
         <Row>
           <Txt singleLine widthGrows>
             {formatPosixTime(props.delivery.completedTimePosix!)}
           </Txt>
-          <DeliveryCardOptionButtons
-            show={optionsButtonNextToCompleteDate.value}
-            delivery={props.delivery}
-          />
+          <DeliveryCardOptionButtons delivery={props.delivery} />
         </Row>
       </Show>
 
@@ -96,21 +55,15 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           {props.delivery.title}
         </Txt>
 
-        <Show when={!props.delivery.isCompleted}>
-          <Box />
-          <CallAndMapToIcons
-            phoneNumber={props.delivery.phoneNumber}
-            address={props.delivery.address}
-          />
-        </Show>
-        <DeliveryCardOptionButtons
-          show={optionsButtonNextToClient.value}
-          delivery={props.delivery}
+        <CallAndMapToIcons
+          phoneNumber={props.delivery.phoneNumber}
+          address={props.delivery.address}
         />
+        <Show when={!props.delivery.isCompleted}>
+          <DeliveryCardOptionButtons delivery={props.delivery} />
+        </Show>
       </Row>
-      <Txt widthGrows>
-        "{props.delivery._client?.notes}"
-      </Txt>
+      <Txt widthGrows>"{props.delivery._client?.notes}"</Txt>
 
       {/* Sub-Deliveries */}
       <For
@@ -150,16 +103,14 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Txt>
 
       {/* Notes */}
-      <Show when={shouldShowNotes.value}>
-        <Row>
-          <Txt widthGrows alignBottomLeft singleLine>
-            {`Notes: ${props.delivery.notes.trim()}`}
-          </Txt>
-          <DeliveryCardOptionButtons
-            show={optionsButtonNextToNotes.value}
-            delivery={props.delivery}
-          />
-        </Row>
+      <Show
+        when={
+          exists(props.delivery.notes) && props.delivery.notes.trim().length > 0
+        }
+      >
+        <Txt widthGrows alignBottomLeft singleLine>
+          {`Notes: ${props.delivery.notes.trim()}`}
+        </Txt>
       </Show>
     </Card>
   );
@@ -218,46 +169,33 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   );
 }
 
-function DeliveryCardOptionButtons(props: {
-  show: boolean;
-  delivery: Delivery;
-}) {
+function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
   const isOpen = useProp(false);
 
-  function handleEdit() {
-    pushPage(DeliveryPage, {
-      delivery: props.delivery,
-    });
-  }
-
-  function handleDelete() {
-    pushPage(DeleteDialog, {
-      obj: props.delivery,
-      message: `Are you sure you want to permanently delete this delivery?`,
-    });
-  }
-
   return (
-    <Show when={props.show}>
-      <HiddenOptions
-        showIcons
-        isOpen={isOpen}
-        onDelete={() => {
-          handleDelete();
+    <HiddenOptions
+      showIcons
+      isOpen={isOpen}
+      onDelete={() => {
+        pushPage(DeleteDialog, {
+          obj: props.delivery,
+          message: `Are you sure you want to permanently delete this delivery?`,
+        });
+      }}
+    >
+      <HiddenOption
+        alignCenterLeft
+        padBetween={0.25}
+        onClick={() => {
+          isOpen.value = false;
+          pushPage(DeliveryPage, {
+            delivery: props.delivery,
+          });
         }}
-      >
-        <HiddenOption
-          alignCenterLeft
-          padBetween={0.25}
-          onClick={() => {
-            isOpen.value = false;
-            handleEdit();
-          }}
-          stroke={$theme.colors.text}
-          text={`Edit`}
-          icon={mdiPencil}
-        />
-      </HiddenOptions>
-    </Show>
+        stroke={$theme.colors.text}
+        text={`Edit`}
+        icon={mdiPencil}
+      />
+    </HiddenOptions>
   );
 }
