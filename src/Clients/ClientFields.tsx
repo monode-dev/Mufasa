@@ -14,7 +14,7 @@ import { createSignal, Show } from "solid-js";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
-  client: Prop<Client>;
+  client?: Prop<Client>;
   additionalPhoneNumberName?: Prop<string>;
   additionalPhoneNumber?: Prop<string>;
   additionalPhoneNumberName1?: Prop<string>;
@@ -34,12 +34,12 @@ export function ClientFields(props: {
 }) {
 
   const addPhoneNumber = () => {
-    props.client.value.addPhoneNumber();
-    console.log("Add phone number", props.client.value.sortedAdditionalPhoneNumbers);
+    props.client?.value.addPhoneNumber();
+    console.log("Add phone number", props.client?.value.sortedAdditionalPhoneNumbers);
   };
   const deletePhoneNumber = (num: ClientPhoneNumber) => {
-    props.client.value.sortedAdditionalPhoneNumbers.find((phoneNumber) => phoneNumber === num)?.deleteDoc();
-    console.log("Delete phone number", props.client.value.sortedAdditionalPhoneNumbers);
+    props.client?.value.sortedAdditionalPhoneNumbers.find((phoneNumber) => phoneNumber === num)?.deleteDoc();
+    console.log("Delete phone number", props.client?.value.sortedAdditionalPhoneNumbers);
   };
   return (
     <>
@@ -71,7 +71,7 @@ export function ClientFields(props: {
         keyboard="tel"
         enterKeyHint={props.create && props.address.value.trim().length > 0 ? `next` : `done`}
       />
-      <Show when={props.client.value.sortedAdditionalPhoneNumbers[0]}>
+      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[0]}>
         <Row>
           <Field
             hintText={"Name"}
@@ -88,13 +88,13 @@ export function ClientFields(props: {
             keyboard="tel"
           />
           <Icon
-          iconPath={mdiAlphaX}
-          scale={1.5}
-          onClick={() => deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[0])}
+            iconPath={mdiAlphaX}
+            scale={1.5}
+            onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[0] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[0])}
           />
         </Row>
       </Show>
-      <Show when={props.client.value.sortedAdditionalPhoneNumbers[1]}>
+      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[1]}>
         <Row>
           <Field
             hintText={"Name"}
@@ -111,13 +111,13 @@ export function ClientFields(props: {
             keyboard="tel"
           />
           <Icon
-          iconPath={mdiAlphaX}
-          scale={1.25}
-          onClick={() => deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[1])}
+            iconPath={mdiAlphaX}
+            scale={1.25}
+            onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[1] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[1])}
           />
         </Row>
       </Show>
-      <Show when={props.client.value.sortedAdditionalPhoneNumbers[2]}>
+      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[2]}>
         <Row>
           <Field
             hintText={"Name"}
@@ -136,11 +136,11 @@ export function ClientFields(props: {
           <Icon
           iconPath={mdiAlphaX}
           scale={1.25}
-          onClick={() => deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[2])}
+          onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[2] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[2])}
           />
         </Row>
       </Show>
-      <Show when={props.client.value.sortedAdditionalPhoneNumbers[3]}>
+      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[3]}>
         <Row>
           <Field
             hintText={"Name"}
@@ -157,13 +157,13 @@ export function ClientFields(props: {
             keyboard="tel"
           />
           <Icon
-          iconPath={mdiAlphaX}
-          scale={1.25}
-          onClick={() => deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[3])}
+            iconPath={mdiAlphaX}
+            scale={1.25}
+            onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[3] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[3])}
           />
         </Row>
       </Show>
-      <Show when={props.client.value.sortedAdditionalPhoneNumbers[4]}>
+      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[4]}>
         <Row>
           <Field
             hintText={"Name"}
@@ -182,7 +182,7 @@ export function ClientFields(props: {
           <Icon
           iconPath={mdiAlphaX}
           scale={1.25}
-          onClick={() => deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[5])}
+          onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[5] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[5])}
           />
         </Row>
       </Show>
