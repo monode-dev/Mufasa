@@ -51,7 +51,7 @@ export function DeliveryFields(props: {
   function showErrorMessages() {
     if(!clientIsValid()) return "Client was deleted.";
 
-    if(isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+    if(props.delivery.selectedClient === ONE_TIME && isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
 
     return "";
   }

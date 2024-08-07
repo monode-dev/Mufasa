@@ -7,24 +7,14 @@ import {
   mdiPlus,
   mdiTextBox,
 } from "@mdi/js";
-import { Box, Field, Icon, Prop, Row, Txt, useProp } from "miwi";
+import { Box, Field, Icon, Prop, Row, Txt, useFormula, useProp } from "miwi";
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
-import { createSignal, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
   client?: Prop<Client>;
-  additionalPhoneNumberName?: Prop<string>;
-  additionalPhoneNumber?: Prop<string>;
-  additionalPhoneNumberName1?: Prop<string>;
-  additionalPhoneNumber1?: Prop<string>;
-  additionalPhoneNumberName2?: Prop<string>;
-  additionalPhoneNumber2?: Prop<string>;
-  additionalPhoneNumberName3?: Prop<string>;
-  additionalPhoneNumber3?: Prop<string>;
-  additionalPhoneNumberName4?: Prop<string>;
-  additionalPhoneNumber4?: Prop<string>;
   name: Prop<string>;
   clientId: Prop<string>;
   phoneNumber: Prop<string>;
@@ -35,11 +25,9 @@ export function ClientFields(props: {
 
   const addPhoneNumber = () => {
     props.client?.value.addPhoneNumber();
-    console.log("Add phone number", props.client?.value.sortedAdditionalPhoneNumbers);
   };
   const deletePhoneNumber = (num: ClientPhoneNumber) => {
     props.client?.value.sortedAdditionalPhoneNumbers.find((phoneNumber) => phoneNumber === num)?.deleteDoc();
-    console.log("Delete phone number", props.client?.value.sortedAdditionalPhoneNumbers);
   };
   return (
     <>
@@ -71,18 +59,25 @@ export function ClientFields(props: {
         keyboard="tel"
         enterKeyHint={props.create && props.address.value.trim().length > 0 ? `next` : `done`}
       />
-      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[0]}>
+      <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
+       {(phoneNumber) => ( 
         <Row>
           <Field
             hintText={"Name"}
-            value={props.additionalPhoneNumberName}
+            value={useFormula(
+              () => phoneNumber.name ?? '',
+              (v) => (phoneNumber.name = v),
+            )}
             underlined
             capitalize={`words`}
             keyboard={"text"}
           />
           <Field
             hintText={"Phone Number"}
-            value={props.additionalPhoneNumber}
+            value={useFormula(
+              () => phoneNumber.number ?? '',
+              (v) => (phoneNumber.number = v),
+            )}
             underlined
             formatInput={formatPhoneNumber}
             keyboard="tel"
@@ -90,113 +85,25 @@ export function ClientFields(props: {
           <Icon
             iconPath={mdiAlphaX}
             scale={1.5}
-            onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[0] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[0])}
+            onClick={() => deletePhoneNumber(phoneNumber)}
           />
         </Row>
-      </Show>
-      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[1]}>
-        <Row>
-          <Field
-            hintText={"Name"}
-            value={props.additionalPhoneNumberName1}
-            underlined
-            capitalize={`words`}
-            keyboard={"text"}
-          />
-          <Field
-            hintText={"Phone Number"}
-            value={props.additionalPhoneNumber1}
-            underlined
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-          />
+      )}
+      </For>
+      
+      <Show when={props.client}>
+        <Box 
+          onClick={addPhoneNumber}
+        >
+          <Row>
           <Icon
-            iconPath={mdiAlphaX}
-            scale={1.25}
-            onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[1] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[1])}
-          />
-        </Row>
+              iconPath={mdiPlus}
+              scale={1.25}
+            />
+            <Txt>Add Phone Number</Txt>
+          </Row>
+        </Box>
       </Show>
-      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[2]}>
-        <Row>
-          <Field
-            hintText={"Name"}
-            value={props.additionalPhoneNumberName2}
-            underlined
-            capitalize={`words`}
-            keyboard={"text"}
-          />
-          <Field
-            hintText={"Phone Number"}
-            value={props.additionalPhoneNumber2}
-            underlined
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-          />
-          <Icon
-          iconPath={mdiAlphaX}
-          scale={1.25}
-          onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[2] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[2])}
-          />
-        </Row>
-      </Show>
-      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[3]}>
-        <Row>
-          <Field
-            hintText={"Name"}
-            value={props.additionalPhoneNumberName3}
-            underlined
-            capitalize={`words`}
-            keyboard={"text"}
-          />
-          <Field
-            hintText={"Phone Number"}
-            value={props.additionalPhoneNumber3}
-            underlined
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-          />
-          <Icon
-            iconPath={mdiAlphaX}
-            scale={1.25}
-            onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[3] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[3])}
-          />
-        </Row>
-      </Show>
-      <Show when={props.client?.value.sortedAdditionalPhoneNumbers[4]}>
-        <Row>
-          <Field
-            hintText={"Name"}
-            value={props.additionalPhoneNumberName4}
-            underlined
-            capitalize={`words`}
-            keyboard={"text"}
-          />
-          <Field
-            hintText={"Phone Number"}
-            value={props.additionalPhoneNumber4}
-            underlined
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-          />
-          <Icon
-          iconPath={mdiAlphaX}
-          scale={1.25}
-          onClick={() => props.client?.value.sortedAdditionalPhoneNumbers[5] && deletePhoneNumber(props.client.value.sortedAdditionalPhoneNumbers[5])}
-          />
-        </Row>
-      </Show>
-      <Box 
-        onClick={addPhoneNumber}
-      >
-        <Row>
-        <Icon
-            iconPath={mdiPlus}
-            scale={1.25}
-          />
-          <Txt>Add Phone Number</Txt>
-        </Row>
-      </Box>
       <Field
         hintText={`Address`}
         multiline
