@@ -1,16 +1,24 @@
 import {
   mdiAccount,
-  mdiAlphaX,
   mdiIdentifier,
   mdiMapMarker,
   mdiPhone,
   mdiPlus,
   mdiTextBox,
+  mdiTrashCanOutline,
 } from "@mdi/js";
-import { Box, Field, Icon, Prop, Row, Txt, useFormula, useProp } from "miwi";
+import {
+  Box,
+  Field,
+  Icon,
+  Prop,
+  Row,
+  Txt,
+  useFormula,
+} from "miwi";
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
-import { createSignal, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
@@ -22,12 +30,13 @@ export function ClientFields(props: {
   notes: Prop<string>;
   create?: boolean;
 }) {
-
   const addPhoneNumber = () => {
     props.client?.value.addPhoneNumber();
   };
   const deletePhoneNumber = (num: ClientPhoneNumber) => {
-    props.client?.value.sortedAdditionalPhoneNumbers.find((phoneNumber) => phoneNumber === num)?.deleteDoc();
+    props.client?.value.sortedAdditionalPhoneNumbers
+      .find((phoneNumber) => phoneNumber === num)
+      ?.deleteDoc();
   };
   return (
     <>
@@ -39,7 +48,11 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={props.create && props.clientId.value.trim().length > 0 ? `next` : `done`}
+        enterKeyHint={
+          props.create && props.clientId.value.trim().length > 0
+            ? `next`
+            : `done`
+        }
       />
       <Field
         hintText={`Client ID`}
@@ -48,7 +61,11 @@ export function ClientFields(props: {
         underlined
         formatInput={formatIdNumber}
         keyboard={"numeric"}
-        enterKeyHint={props.create && props.phoneNumber.value.trim().length > 0 ? `next` : `done`}
+        enterKeyHint={
+          props.create && props.phoneNumber.value.trim().length > 0
+            ? `next`
+            : `done`
+        }
       />
       <Field
         hintText={`Phone`}
@@ -57,50 +74,56 @@ export function ClientFields(props: {
         underlined
         formatInput={formatPhoneNumber}
         keyboard="tel"
-        enterKeyHint={props.create && props.address.value.trim().length > 0 ? `next` : `done`}
+        enterKeyHint={
+          props.create && props.address.value.trim().length > 0
+            ? `next`
+            : `done`
+        }
       />
       <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
-       {(phoneNumber) => ( 
-        <Row>
-          <Field
-            hintText={"Name"}
-            value={useFormula(
-              () => phoneNumber.name ?? '',
-              (v) => (phoneNumber.name = v),
-            )}
-            underlined
-            capitalize={`words`}
-            keyboard={"text"}
-          />
-          <Field
-            hintText={"Phone Number"}
-            value={useFormula(
-              () => phoneNumber.number ?? '',
-              (v) => (phoneNumber.number = v),
-            )}
-            underlined
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-          />
-          <Icon
-            iconPath={mdiAlphaX}
-            scale={1.5}
-            onClick={() => deletePhoneNumber(phoneNumber)}
-          />
-        </Row>
-      )}
-      </For>
-      
-      <Show when={props.client}>
-        <Box 
-          onClick={addPhoneNumber}
-        >
+        {(phoneNumber) => (
           <Row>
-          <Icon
+            <Box width={0.2} />
+            <Field
+              hintText={"Name"}
+              value={useFormula(
+                () => phoneNumber.name ?? "",
+                (v) => (phoneNumber.name = v),
+              )}
+              underlined
+              capitalize={`words`}
+              keyboard={"text"}
+            />
+            <Field
+              hintText={"Phone Number"}
+              value={useFormula(
+                () => phoneNumber.number ?? "",
+                (v) => (phoneNumber.number = v),
+              )}
+              underlined
+              formatInput={formatPhoneNumber}
+              keyboard="tel"
+            />
+            <Icon
+              // iconPath={mdiPhoneRemove}
+              stroke={$theme.colors.error}
+              iconPath={mdiTrashCanOutline}
+              scale={1.1}
+              onClick={() => deletePhoneNumber(phoneNumber)}
+            />
+          </Row>
+        )}
+      </For>
+
+      <Show when={props.client}>
+        <Box onClick={addPhoneNumber}>
+          <Row>
+            <Icon
+              stroke={$theme.colors.primary}
               iconPath={mdiPlus}
               scale={1.25}
             />
-            <Txt>Add Phone Number</Txt>
+            <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
           </Row>
         </Box>
       </Show>
@@ -112,7 +135,9 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={props.create && props.notes.value.trim().length > 0 ? `next` : `done`}
+        enterKeyHint={
+          props.create && props.notes.value.trim().length > 0 ? `next` : `done`
+        }
       />
       <Field
         hintText={`Notes`}
