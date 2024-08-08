@@ -73,38 +73,40 @@ export function ClientFields(props: {
             : `done`
         }
       />
+      
       <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
-
        {(phoneNumber) => ( 
-        <Row>
-          <Field
-            hintText={`Name`}
-            value={useFormula(
-              () => phoneNumber.name ?? '',
-              (v) => (phoneNumber.name = v),
-            )}
-            underlined
-            capitalize={`words`}
-            keyboard={"text"}
-            width={5}
-          />
-          <Field
-            hintText={`Number`}
-            value={useFormula(
-              () => phoneNumber.number ?? '',
-              (v) => (phoneNumber.number = v),
-            )}
-            underlined
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-          />
-          <Icon
-            stroke={$theme.colors.error}
-            iconPath={mdiTrashCanOutline}
-            scale={1.5}
-            onClick={() => deletePhoneNumber(phoneNumber)}
-          />
-        </Row>
+        <Box padLeft={1.2}>
+          <Row>
+              <Field
+                hintText={`Name`}
+                value={useFormula(
+                  () => phoneNumber.name ?? '',
+                  (v) => (phoneNumber.name = v),
+                )}
+                underlined
+                capitalize={`words`}
+                keyboard={"text"}
+                width={4.8}
+              />
+            <Field
+              hintText={`Number`}
+              value={useFormula(
+                () => phoneNumber.number ?? '',
+                (v) => (phoneNumber.number = v),
+              )}
+              underlined
+              formatInput={formatPhoneNumber}
+              keyboard="tel"
+            />
+            <Icon
+              stroke={$theme.colors.error}
+              iconPath={mdiTrashCanOutline}
+              scale={1.3}
+              onClick={() => deletePhoneNumber(phoneNumber)}
+            />
+          </Row>
+        </Box>
       )}
       </For>
       <Show when={props.client}>
