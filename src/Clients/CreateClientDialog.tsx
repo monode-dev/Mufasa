@@ -41,8 +41,19 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
+  const newClient1 = Client.create({
+    name: "",
+    clientId: "",
+    phoneNumber: "",
+    address: "",
+    notes: "",
+  });
 
   function closePopUp() {
+
+    newClient1.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    newClient1.deleteDoc();
+  
     popPage();
   }
 
@@ -122,13 +133,21 @@ function CreateClientDialog(props: {
       notes: notes.value,
     });
     props.onCreate?.(newClient);
+    newClient1.sortedAdditionalPhoneNumbers.forEach((num) => {
+      newClient.addPhoneNumber();
+      newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
+      newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].number = num.number;
+    });
+    newClient1.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    newClient1.deleteDoc();
   }
 
   return (
-    <Page onClick={popPage} fill="#00000099">
+    <Page onClick={closePopUp} fill="#00000099">
       <Card preventClickPropagation width={`75%`} shadowSize={0}>
         <Txt h1>Create Client</Txt>
         <ClientFields
+          client={useProp(newClient1)}
           firstFieldHasFocus={useProp(true)}
           name={name}
           clientId={clientId}
