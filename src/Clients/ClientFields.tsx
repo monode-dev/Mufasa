@@ -7,15 +7,8 @@ import {
   mdiTextBox,
   mdiTrashCanOutline,
 } from "@mdi/js";
-import {
-  Box,
-  Field,
-  Icon,
-  Prop,
-  Row,
-  Txt,
-  useFormula,
-} from "miwi";
+import { Box, Field, Icon, Prop, Row, Txt, useFormula } from "miwi";
+
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
 import { For, Show } from "solid-js";
@@ -81,40 +74,39 @@ export function ClientFields(props: {
         }
       />
       <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
-        {(phoneNumber) => (
-          <Row>
-            <Box width={0.2} />
-            <Field
-              hintText={"Name"}
-              value={useFormula(
-                () => phoneNumber.name ?? "",
-                (v) => (phoneNumber.name = v),
-              )}
-              underlined
-              capitalize={`words`}
-              keyboard={"text"}
-            />
-            <Field
-              hintText={"Phone Number"}
-              value={useFormula(
-                () => phoneNumber.number ?? "",
-                (v) => (phoneNumber.number = v),
-              )}
-              underlined
-              formatInput={formatPhoneNumber}
-              keyboard="tel"
-            />
-            <Icon
-              // iconPath={mdiPhoneRemove}
-              stroke={$theme.colors.error}
-              iconPath={mdiTrashCanOutline}
-              scale={1.1}
-              onClick={() => deletePhoneNumber(phoneNumber)}
-            />
-          </Row>
-        )}
-      </For>
 
+       {(phoneNumber) => ( 
+        <Row>
+          <Field
+            hintText={`Name`}
+            value={useFormula(
+              () => phoneNumber.name ?? '',
+              (v) => (phoneNumber.name = v),
+            )}
+            underlined
+            capitalize={`words`}
+            keyboard={"text"}
+            width={5}
+          />
+          <Field
+            hintText={`Number`}
+            value={useFormula(
+              () => phoneNumber.number ?? '',
+              (v) => (phoneNumber.number = v),
+            )}
+            underlined
+            formatInput={formatPhoneNumber}
+            keyboard="tel"
+          />
+          <Icon
+            stroke={$theme.colors.error}
+            iconPath={mdiTrashCanOutline}
+            scale={1.5}
+            onClick={() => deletePhoneNumber(phoneNumber)}
+          />
+        </Row>
+      )}
+      </For>
       <Show when={props.client}>
         <Box onClick={addPhoneNumber}>
           <Row>
