@@ -11,6 +11,7 @@ export type TankShapeId =
   | `verticalCylinder`
   | `horizontalEllipse`
   | `truckBedTank`;
+// | `diamondTank`;
 export type TankDimension =
   | `length`
   | `depth`
@@ -21,6 +22,11 @@ export type TankDimension =
   | `wideHeight`
   | `fullDepth`
   | `diameter`;
+// | `squareSide`
+// | `rectangularSide`;
+//   The equation in the picture only works with rectangular prism tanks when
+//   two of the six sides of the rectangular prism are perfect squares,
+//   and the other four sides are rectangles. Therefore there are only two dimensions.
 export type TankGeometry = {
   [Key in TankDimension | `shape`]: Tank[Key];
 };
@@ -36,6 +42,7 @@ export function createReactiveTankGeometry(): TankGeometry {
     wideHeight: null,
     fullHeight: null,
     diameter: null,
+    // side: null
   });
 }
 export type TankShapeDetails = {
@@ -278,6 +285,40 @@ const _tankShapes: {
       return (volumeInLowerPart + volumeInUpperPart) / CUBIC_INCHES_PER_GALLON;
     },
   },
+  //  diamondTank: {
+  //   nameLong: `Diamond Tank`,
+  //   nameShort: `Diamond`,
+  //   dimensions: [`squareSide`, `rectangularSide`], 
+  //   calcFilledVolume(tank, stickedInches) {
+  //     for (const dimension of [`squareSide`, `rectangularSide`] as const) {
+  //       if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+  //         return undefined;
+  //       }
+  //     }
+  //     if (!exists(stickedInches)) return undefined;
+
+  //     const squareSide = tank?.squareSide!;
+  //     const rectangularSide = tank?.rectangularSide!;
+  //     const h = stickedInches;
+  //     const halfDiagonal = Math.sqrt(squareSide ** 2 + squareSide ** 2) / 2;
+
+  //     if (h < halfDiagonal) {
+  //       return (h ** 2 * rectangularSide) / CUBIC_INCHES_PER_GALLON;
+  //     } else {
+  //       return ((squareSide * squareSide * rectangularSide) / CUBIC_INCHES_PER_GALLON) - (((Math.sqrt(squareSide ** 2 + squareSide ** 2) - h) * rectangularSide) / CUBIC_INCHES_PER_GALLON);
+  //     }
+  //   },
+  //   calcTotalVolume(tank) {
+  //     for (const dimension of [`squareSide`, `rectangularSide`] as const) {
+  //       if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+  //         return undefined;
+  //       }
+  //     }
+  //     const squareSide = tank?.squareSide!;
+  //     const rectangularSide = tank?.rectangularSide!;
+  //     return (squareSide * squareSide * rectangularSide) / CUBIC_INCHES_PER_GALLON;
+  //   },
+  // },
 };
 export const TANK_SHAPE_IDS: readonly TankShapeId[] = Object.keys(
   _tankShapes,
