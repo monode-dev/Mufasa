@@ -6,11 +6,12 @@ import {
   mdiPhone,
   mdiPlus,
   mdiTextBox,
+  mdiTrashCanOutline,
 } from "@mdi/js";
-import { Box, Field, Icon, Prop, Row, Txt, useFormula, useProp } from "miwi";
+import { Box, Field, Icon, Prop, Row, Txt, useFormula } from "miwi";
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
-import { createSignal, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
@@ -63,7 +64,7 @@ export function ClientFields(props: {
        {(phoneNumber) => ( 
         <Row>
           <Field
-            hintText={"Name"}
+            hintText={`Name`}
             value={useFormula(
               () => phoneNumber.name ?? '',
               (v) => (phoneNumber.name = v),
@@ -71,9 +72,10 @@ export function ClientFields(props: {
             underlined
             capitalize={`words`}
             keyboard={"text"}
+            width={5}
           />
           <Field
-            hintText={"Phone Number"}
+            hintText={`Number`}
             value={useFormula(
               () => phoneNumber.number ?? '',
               (v) => (phoneNumber.number = v),
@@ -83,7 +85,8 @@ export function ClientFields(props: {
             keyboard="tel"
           />
           <Icon
-            iconPath={mdiAlphaX}
+            stroke={$theme.colors.error}
+            iconPath={mdiTrashCanOutline}
             scale={1.5}
             onClick={() => deletePhoneNumber(phoneNumber)}
           />
