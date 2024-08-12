@@ -41,19 +41,14 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
-  const newClient1 = Client.create({
+  const tempClient = Client.create({
     name: "",
     clientId: "",
-    phoneNumber: "",
-    address: "",
-    notes: "",
   });
 
   function closePopUp() {
-
-    newClient1.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
-    newClient1.deleteDoc();
-  
+    tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    tempClient.deleteDoc();
     popPage();
   }
 
@@ -124,7 +119,7 @@ function CreateClientDialog(props: {
       showErrors();
       return;
     }
-    closePopUp();
+    popPage(); //Using popPage here because closePopUp() will delete the tempClient.
     const newClient = Client.create({
       name: name.value,
       clientId: clientId.value,
@@ -133,13 +128,14 @@ function CreateClientDialog(props: {
       notes: notes.value,
     });
     props.onCreate?.(newClient);
-    newClient1.sortedAdditionalPhoneNumbers.forEach((num) => {
+
+    tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
       newClient.addPhoneNumber();
       newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
       newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].number = num.number;
     });
-    newClient1.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
-    newClient1.deleteDoc();
+    tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    tempClient.deleteDoc();
   }
 
   return (
@@ -147,7 +143,7 @@ function CreateClientDialog(props: {
       <Card preventClickPropagation width={`75%`} shadowSize={0}>
         <Txt h1>Create Client</Txt>
         <ClientFields
-          client={useProp(newClient1)}
+          client={useProp(tempClient)}
           firstFieldHasFocus={useProp(true)}
           name={name}
           clientId={clientId}
