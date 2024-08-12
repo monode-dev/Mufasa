@@ -74,7 +74,6 @@ export function ClientFields(props: {
         }
       />
       <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
-
        {(phoneNumber) => ( 
         <Row>
           <Field
