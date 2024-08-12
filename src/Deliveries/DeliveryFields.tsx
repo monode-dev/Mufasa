@@ -7,7 +7,7 @@ import {
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import { Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt } from "miwi";
+import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop} from "miwi";
 import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
 import { listClients } from "@/AppData";
@@ -15,6 +15,7 @@ import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
 
 export function DeliveryFields(props: {
+  create?: boolean;
   delivery: Pick<
     Delivery,
     | "address"
@@ -56,6 +57,26 @@ export function DeliveryFields(props: {
     return "";
   }
 
+  function propGt0(prop: Prop<string>) {
+    return prop.value.trim().length > 0;
+  }
+
+  const one_name = useFormula(
+            () => props.delivery.title,
+            (v) => (props.delivery.title = v),
+          );
+  const one_phone = useFormula(
+            () => props.delivery.phoneNumber,
+            (v) => (props.delivery.phoneNumber = v),
+          );
+  const one_address = useFormula(
+            () => props.delivery.address,
+            (v) => (props.delivery.address = v),
+          );
+  const one_note = useFormula(
+          () => props.delivery.notes,
+          (v) => (props.delivery.notes = v),
+        );
   return (
     <Column>
       <Row>
@@ -84,38 +105,44 @@ export function DeliveryFields(props: {
           underlined
           hintText={`Client Name`}
           iconPath={mdiLabel}
-          value={useFormula(
-            () => props.delivery.title,
-            (v) => (props.delivery.title = v),
-          )}
+          value={one_name}
           widthGrows
           capitalize={"words"}
           keyboard={"text"}
+          enterKeyHint={
+            props.create && propGt0(one_phone)
+              ? `next`
+              : `done`
+          }
         />
         <Field
           underlined
           hintText={`Phone`}
           iconPath={mdiPhone}
-          value={useFormula(
-            () => props.delivery.phoneNumber,
-            (v) => (props.delivery.phoneNumber = v),
-          )}
+          value={one_phone}
           widthGrows
           formatInput={formatPhoneNumber}
           keyboard="tel"
+          enterKeyHint={
+            props.create && propGt0(one_address)
+              ? `next`
+              : `done`
+          }
         />
         <Field
           multiline
           underlined
           hintText={`Address`}
           iconPath={mdiMapMarker}
-          value={useFormula(
-            () => props.delivery.address,
-            (v) => (props.delivery.address = v),
-          )}
+          value={one_address}
           widthGrows
           capitalize={`words`}
           keyboard={"text"}
+          enterKeyHint={
+            props.create && propGt0(one_note)
+              ? `next`
+              : `done`
+          }
         />
       </Show>
       <Field
@@ -123,14 +150,12 @@ export function DeliveryFields(props: {
         underlined
         hintText={`Delivery Notes`}
         iconPath={mdiTextBox}
-        value={useFormula(
-          () => props.delivery.notes,
-          (v) => (props.delivery.notes = v),
-        )}
+        value={one_note}
         asWideAsParent
         capitalize={`sentences`}
         keyboard={"text"}
         overflowXWraps
+        enterKeyHint={`done`}
       />
       <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>

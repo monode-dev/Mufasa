@@ -16,12 +16,12 @@ import { For, Show } from "solid-js";
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
   client?: Prop<Client>;
+  address: Prop<string>;
   name: Prop<string>;
   clientId: Prop<string>;
   phoneNumber: Prop<string>;
-  address: Prop<string>;
-  notes: Prop<string>;
   create?: boolean;
+  notes: Prop<string>;
 }) {
   const addPhoneNumber = () => {
     props.client?.value.addPhoneNumber();
@@ -31,6 +31,11 @@ export function ClientFields(props: {
       .find((phoneNumber) => phoneNumber === num)
       ?.deleteDoc();
   };
+
+  function propGt0(prop: Prop<string>) {
+    return prop.value.trim().length > 0;
+  }
+
   return (
     <>
       <Field
@@ -42,7 +47,7 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={
-          props.create && props.clientId.value.trim().length > 0
+          props.create && propGt0(props.clientId)
             ? `next`
             : `done`
         }
@@ -55,7 +60,7 @@ export function ClientFields(props: {
         formatInput={formatIdNumber}
         keyboard={"numeric"}
         enterKeyHint={
-          props.create && props.phoneNumber.value.trim().length > 0
+          props.create && propGt0(props.phoneNumber)
             ? `next`
             : `done`
         }
@@ -68,7 +73,7 @@ export function ClientFields(props: {
         formatInput={formatPhoneNumber}
         keyboard="tel"
         enterKeyHint={
-          props.create && props.address.value.trim().length > 0
+          props.create && propGt0(props.address)
             ? `next`
             : `done`
         }
@@ -130,7 +135,7 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={
-          props.create && props.notes.value.trim().length > 0 ? `next` : `done`
+          props.create && propGt0(props.notes) ? `next` : `done`
         }
       />
       <Field
