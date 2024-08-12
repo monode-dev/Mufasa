@@ -16,6 +16,7 @@ import { Show } from "solid-js";
 import { Client } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import Fuse from "fuse.js";
+import { LoadCSVDialog } from "./LoadCSVDialog";
 
 export const openCreateClientDialog = (props: {
   initName?: string;

@@ -5,6 +5,7 @@ import { mdiMagnify, mdiPlus } from "@mdi/js";
 import ClientSearchBar from "./ClientSearchBar";
 import ClientPage from "./ClientPage";
 import { openCreateClientDialog } from "./CreateClientDialog";
+import { LoadCSVDialog } from "./LoadCSVDialog";
 
 export default function ClientActionBar(props: {
   filterString: Prop<string>;
@@ -43,6 +44,11 @@ export default function ClientActionBar(props: {
             onClick={() => openCreateClientDialog({
               onCreate: (newClient) => pushPage(ClientPage, { client: newClient }),
             })}
+          />
+          <OutlinedActionButton
+            action={"Add from CSV"}
+            iconPath={mdiPlus}
+            onClick={()=>pushPage(LoadCSVDialog, undefined)}
           />
         </Show>
 
