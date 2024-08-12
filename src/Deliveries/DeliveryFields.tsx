@@ -62,19 +62,19 @@ export function DeliveryFields(props: {
   }
 
   const one_name = useFormula(
-            () => props.delivery.title,
+            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.title : ``,
             (v) => (props.delivery.title = v),
           );
   const one_phone = useFormula(
-            () => props.delivery.phoneNumber,
+            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.phoneNumber : ``,
             (v) => (props.delivery.phoneNumber = v),
           );
   const one_address = useFormula(
-            () => props.delivery.address,
+            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.address : ``,
             (v) => (props.delivery.address = v),
           );
   const one_note = useFormula(
-          () => props.delivery.notes,
+          () => props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
           (v) => (props.delivery.notes = v),
         );
   return (

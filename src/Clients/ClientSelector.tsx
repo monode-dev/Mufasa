@@ -28,8 +28,11 @@ export default function ClientSelector(props: {
 }) {
   const dropDownIsOpen = useProp(false);
   function selectOption(newClient: CLIENT_TYPE) {
+    console.log(`Selecting option: `, newClient);
     props.value.value = newClient;
+    console.log(`Selected option: `, props.value.value);
     dropDownIsOpen.value = false;
+    console.log(`Declaring DropDown is NOT open! `);
   }
   const filterString = useProp(``);
   const filteredClients = useFormula(() => {
@@ -52,7 +55,7 @@ export default function ClientSelector(props: {
       noneLabel="Select Client"
       modalIsOpenSig={dropDownIsOpen}
       getLabelForData={(data: CLIENT_TYPE) => {
-        // console.log(`data: `, data);
+        console.log(`get label for data: `, data);
         if (!exists(data)) return null;
         if (data === ONE_TIME) return `One Time`;
         if (!exists(data.docId)) return null;
@@ -83,7 +86,9 @@ export default function ClientSelector(props: {
             {/* One Time */}
             <Txt
               onClick={() => {
+                console.log(`Clicked One Time`);
                 selectOption(ONE_TIME);
+                console.log(`Selected One Time`);
               }}
               widthGrows
               padBetween={0.125}
