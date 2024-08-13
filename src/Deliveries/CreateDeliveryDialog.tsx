@@ -96,7 +96,7 @@ function CreateDeliveryDialog(props: {
           : selectedClient.value,
       _manualTitle: title.value,
       _manualPhoneNumber: phoneNumber.value,
-      address: explicitAddress.value,
+      _manualClientAddress: explicitAddress.value,
       notes: notes.value,
       sortPosition: Date.now(),
       creationTimePosix: Date.now(),
@@ -108,7 +108,7 @@ function CreateDeliveryDialog(props: {
     <Page onClick={popPage} fill="#00000099">
       <Card preventClickPropagation width={`75%`} shadowSize={2}>
         <Txt h1>Create Delivery</Txt>
-        <DeliveryFields delivery={deliveryProps} />
+        <DeliveryFields delivery={deliveryProps}/>
         <Show when={warningMessage.value}>
           <Txt widthGrows alignLeft stroke={$theme.colors.warning}>
             {warningMessage.value}
