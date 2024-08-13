@@ -27,7 +27,6 @@ export function SimpleDocEntry(
   );
   const isEmpty = useFormula(() => name.value.trim() === ``);
   const isEditing = useProp(false);
-  const tempName = useProp(``);
   return (
     <Row widthGrows onClick={props.onClick} height={1} overflowYSpills>
       <Show
@@ -40,7 +39,7 @@ export function SimpleDocEntry(
               alignCenterLeft
               stroke={isEmpty.value ? theme.palette.warning : undefined}
             >
-              {isEmpty.value ? props.unnamedText ?? `Unnamed!` : name.value}
+              {isEmpty.value ? (props.unnamedText ?? `Unnamed!`) : name.value}
             </Txt>
             <HiddenOptions>
               <Show when={props.renamable}>
@@ -64,8 +63,8 @@ export function SimpleDocEntry(
           widthGrows
           alignCenterLeft
           value={name}
-          tempValue={tempName}
           hasFocus={isEditing}
+          onlyWriteOnBlur
         />
         <Icon
           iconPath={mdiCheck}

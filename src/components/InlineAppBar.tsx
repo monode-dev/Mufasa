@@ -15,7 +15,8 @@ import {
   pushPage,
   getMyPageIndex,
   theme,
-  Align, Button,
+  Align,
+  Button,
 } from "miwi";
 import { mdiArrowLeft, mdiCogOutline } from "@mdi/js";
 import { JSXElement, Show, onMount } from "solid-js";
@@ -46,7 +47,6 @@ export function InlineEditableAppBar(props: {
   const isEditing = useProp(false);
   let nameFieldWasBlurredThisFrame = 0;
   const isEmpty = useFormula(() => props.name.value.trim() === ``);
-  const tempName = useProp(``);
   return (
     <InlineAppBar
       fill={props.fill}
@@ -84,7 +84,7 @@ export function InlineEditableAppBar(props: {
                 });
               }}
               value={props.name}
-              tempValue={tempName}
+              onlyWriteOnBlur
             />
           </Show>
           {/* <Box padAroundY={defaultAppBarScale * 0.1}>
@@ -162,10 +162,15 @@ export function InlineAppBar(
           overflowXSpills
         >
           <Show when={showBackButton.value}>
-            <Button pill width={iconSize + .5} height={iconSize + .5}
-                    fill={$theme.colors.pageBackground}
-                    outlineSize={0} outlineColor={$theme.colors.pageBackground}
-                    onClick={popPage} />
+            <Button
+              pill
+              width={iconSize + 0.5}
+              height={iconSize + 0.5}
+              fill={$theme.colors.pageBackground}
+              outlineSize={0}
+              outlineColor={$theme.colors.pageBackground}
+              onClick={popPage}
+            />
             <Icon iconPath={mdiArrowLeft} scale={iconSize} />
           </Show>
         </Stack>
@@ -185,7 +190,7 @@ export function InlineAppBar(
               height={defaultAppBarScale * 1.25}
               stroke={isEmpty.value ? theme.palette.warning : undefined}
             >
-              {isEmpty.value ? props.emptyWarning ?? `Unnamed!` : props.name}
+              {isEmpty.value ? (props.emptyWarning ?? `Unnamed!`) : props.name}
             </Txt>
           ) : (
             props.name
