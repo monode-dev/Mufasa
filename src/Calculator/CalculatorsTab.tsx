@@ -21,7 +21,6 @@ import {
   Selector,
   Slider,
   TabButtons,
-  TabView,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -363,7 +362,8 @@ export default function Calculator() {
                     This sub delivery is not for the selected client.
                   </Txt>
                 </Show>
-                <Show when={!selectedSubDelivery.value?.isValid && !(selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient)}>
+                <Show when={!selectedSubDelivery.value?.isValid
+                  && selectedSubDelivery.value?.delivery.selectedClient == selectedDelivery.value?.selectedClient}>
                   <Txt stroke={$theme.colors.warning} widthGrows>
                     The selected sub delivery is not valid.
                   </Txt>
@@ -390,6 +390,7 @@ export default function Calculator() {
         {/* DIMENSIONS TAB */}
         <Show when={selectedTab.value === tabs.dimensions}>
           <TankFields
+            create
             tankGeometry={tankGeometry.value!}
             warningMessage={TankFields_warning}
           />
@@ -407,7 +408,7 @@ export default function Calculator() {
           stroke={fillOutline(currentFillPercent.value)}
         >
           <NumField
-            valueSig={stickedInches}
+            value={stickedInches}
             underlined
             hint="in."
             negativesAreAllowed={false}

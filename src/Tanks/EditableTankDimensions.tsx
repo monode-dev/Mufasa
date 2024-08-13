@@ -118,7 +118,7 @@ export default function EditableTankDimensions(
             <Row widthGrows>
               <Txt>{getDimensionLabel(dimensions.value[0]) + `:`}</Txt>
               <NumField
-                valueSig={useFormula(
+                value={useFormula(
                   () => tankDimValue(0),
                   (val) => (props.tank[dimensions.value[0]] = val),
                 )}
@@ -133,7 +133,7 @@ export default function EditableTankDimensions(
             <Row widthGrows>
               <Txt>{getDimensionLabel(dimensions.value[1]) + `:`}</Txt>
               <NumField
-                valueSig={useFormula(
+                value={useFormula(
                   () => tankDimValue(1),
                   (val) => (props.tank[dimensions.value[1]] = val),
                 )}
@@ -151,7 +151,7 @@ export default function EditableTankDimensions(
               <Row widthGrows>
                 <Txt>{getDimensionLabel(dimensions.value[2]) + `:`}</Txt>
                 <NumField
-                  valueSig={useFormula(
+                  value={useFormula(
                     () => tankDimValue(2),
                     (val) => (props.tank[dimensions.value[2]] = val),
                   )}
@@ -166,7 +166,7 @@ export default function EditableTankDimensions(
               <Row widthGrows>
                 <Txt>{getDimensionLabel(dimensions.value[3]) + `:`}</Txt>
                 <NumField
-                  valueSig={useFormula(
+                  value={useFormula(
                     () => tankDimValue(3),
                     (val) => (props.tank[dimensions.value[3]] = val),
                   )}
@@ -185,7 +185,7 @@ export default function EditableTankDimensions(
               <Row widthGrows>
                 <Txt>{getDimensionLabel(dimensions.value[4]) + `:`}</Txt>
                 <NumField
-                  valueSig={useFormula(
+                  value={useFormula(
                     () => tankDimValue(4),
                     (val) => (props.tank[dimensions.value[4]] = val),
                   )}
@@ -200,7 +200,7 @@ export default function EditableTankDimensions(
               <Row widthGrows>
                 <Txt>{getDimensionLabel(dimensions.value[5]) + `:`}</Txt>
                 <NumField
-                  valueSig={useFormula(
+                  value={useFormula(
                     () => tankDimValue(5),
                     (val) => (props.tank[dimensions.value[5]] = val),
                   )}

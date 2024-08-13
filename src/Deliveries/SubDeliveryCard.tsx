@@ -170,7 +170,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
             <Show when={props.subDelivery.shouldShowFuelRateField}>
               <Label label="Rate">
                 <NumField
-                  valueSig={useFormula(
+                  value={useFormula(
                     () => props.subDelivery.explicitRate,
                     (v) => (props.subDelivery.explicitRate = v),
                   )}
@@ -188,7 +188,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
               }
             >
               <NumField
-                valueSig={useFormula(
+                value={useFormula(
                   () => props.subDelivery.gallons,
                   (v) => (props.subDelivery.gallons = v),
                 )}
