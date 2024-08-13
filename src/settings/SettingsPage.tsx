@@ -352,7 +352,14 @@ export function SettingsPage() {
                     each={FuelType.sortedFuelTypes}
                     fallback={<Txt hint>Tap + to add Fuel Types.</Txt>}
                   >
-                    {(fuelTypes) => <FuelTypeEntry fuelType={fuelTypes} />}
+                    {
+                      (fuelType, index) => {
+                        const next = index() + 1;
+                        const nextFuelType = next < FuelType.sortedFuelTypes.length
+                          ? FuelType.sortedFuelTypes[next]
+                          : undefined;
+                        return <FuelTypeEntry fuelType={fuelType} nextFuelType={nextFuelType}/>;
+                      }}
                   </For>
                 </SortableColumn>
               </Match>
