@@ -96,7 +96,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly mayEditAddressAndPhone = formula(() =>
     Delivery.getMayEditAddressAndPhone(this.selectedClient),
   );
-  readonly address = formula(
+  address = formula(
     () =>
       this.selectedClient === ONE_TIME
         ? this._manualClientAddress
