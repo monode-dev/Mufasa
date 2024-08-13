@@ -134,23 +134,15 @@ export function SettingsPage() {
         </Show>
       }
     >
+      <Box widthGrows height={`env(safe-area-inset-top)`} />
       <Stack asTallAsParent asWideAsParent>
+        {/*  Page Body */}
         <SimpleBody>
-          <Row>
-            <Txt padAroundY={1} h2>
-              Account
-            </Txt>
-            {/* <Box alignRight>
-              <Icon
-                iconPath={mdiInformationVariantCircleOutline}
-                scale={1.5}
-                onClick={() => pushPage(InfoCard, { info: `` })}
-              />
-            </Box> */}
-          </Row>
-
           {/* SECTION: Account Options */}
           <Show when={mfs.user.isSignedIn}>
+            <Txt padTop={1} h2 widthGrows alignCenter>
+              Account
+            </Txt>
             <Row padBetween={0.5}>
               <Txt
                 singleLine
@@ -436,11 +428,14 @@ export function SettingsPage() {
             </Show>
           </Column>
         </SimpleBody>
-        <Box padAround={1} alignTopLeft asWideAsParent asTallAsParent>
+
+        {/* Back Button */}
+        <Box padAround={0.75} alignTopLeft widthGrows heightGrows>
           <Button
             pill
-            width={iconSize + 0.5}
-            height={iconSize + 0.5}
+            width={iconSize + 1}
+            height={iconSize + 1}
+            cornerRadius={`100%`}
             fill={$theme.colors.pageBackground}
             outlineSize={0}
             outlineColor={$theme.colors.pageBackground}
