@@ -74,8 +74,11 @@ export default function TankFields(props: {
     }
   });
 
-  function toNum(size: number | null | undefined): number {
-    return !exists(size) ? 0 : size;
+  function nextIsValid(index: () => number) {
+    const nextIndex = index().valueOf() + 1;
+    return dimensions.value.length > nextIndex
+      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) > 0
+      : false;
   }
 
   return (
@@ -98,11 +101,6 @@ export default function TankFields(props: {
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
         {(dim, index) => {
-          let nextIndex = index().valueOf() + 1;
-          let next =
-            dimensions.value.length > nextIndex
-              ? props.tankGeometry[dimensions.value[nextIndex]]
-              : undefined;
           return (
             <Label label={getDimensionLabel(dim)}>
               <NumField
@@ -114,12 +112,11 @@ export default function TankFields(props: {
                 )}
                 underlined
                 stroke={mdColors.black}
-                // TODO: enterKeyHint does not exist on NumField
-                // enterKeyHint={
-                //   props.create && exists(next) && next > 0
-                //     ? `next`
-                //     : `done`
-                // }
+                enterKeyHint={
+                  props.create && nextIsValid(index)
+                    ? `next`
+                    : `done`
+                }
               />
             </Label>
           );
