@@ -37,7 +37,6 @@ export function StartOrJoinTeamPage() {
             </Txt>
             <Field
               value={oneTimeInviteCode}
-              tempValue={oneTimeInviteCode}
               hintText="Invite Code"
               underlined
             />
