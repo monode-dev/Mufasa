@@ -14,7 +14,10 @@ import {
   strokeTexture,
   theme,
   SortableColumn,
-  FloatSort, Stack, Button, popPage,
+  FloatSort,
+  Stack,
+  Button,
+  popPage,
 } from "miwi";
 import { InlineAppBar } from "@/components/InlineAppBar";
 import { pagePadding, SimplePage } from "@/components/SimplePage";
@@ -32,7 +35,8 @@ import { inviteTeamMember, memberLimit } from "@/model/Team";
 import { Capacitor } from "@capacitor/core";
 import {
   mdiAccountCogOutline,
-  mdiAccountMultiplePlusOutline, mdiArrowLeft,
+  mdiAccountMultiplePlusOutline,
+  mdiArrowLeft,
   mdiClose,
   mdiDotsVertical,
   mdiInformationVariantCircleOutline,
@@ -103,7 +107,7 @@ export function SettingsPage() {
   const showInviteMember = useFormula(
     () => isOwner.value && premiumEnabled.value,
   );
-  
+
   const iconSize = 1.25;
   return (
     <SimplePage
@@ -130,92 +134,85 @@ export function SettingsPage() {
         </Show>
       }
     >
-      <Stack
-        asTallAsParent
-        asWideAsParent
-        
-      >
+      <Stack asTallAsParent asWideAsParent>
         <SimpleBody>
           <Row>
-            <Txt h2>Account</Txt>
-            <Box alignRight>
+            <Txt padAroundY={1} h2>
+              Account
+            </Txt>
+            {/* <Box alignRight>
               <Icon
                 iconPath={mdiInformationVariantCircleOutline}
                 scale={1.5}
                 onClick={() => pushPage(InfoCard, { info: `` })}
               />
-            </Box>
+            </Box> */}
           </Row>
-          <Box
-            minWidth={10}
-            maxWidth={25}
-            padTop={0}
-            padAround={pagePadding}
-            padBetween={1}
-            heightShrinks
-          >
-            {/* SECTION: Account Options */}
-            <Show when={mfs.user.isSignedIn}>
-              <Row padBetween={0.5}>
-                <Txt
+
+          {/* SECTION: Account Options */}
+          <Show when={mfs.user.isSignedIn}>
+            <Row padBetween={0.5}>
+              <Txt
+                singleLine
+                widthGrows
+                alignCenterLeft
+                stroke={
+                  emailIsValid(mfs.user.email) ? undefined : theme.palette.hint
+                }
+              >
+                {emailIsValid(mfs.user.email)
+                  ? mfs.user.email
+                  : `Unknown Email!`}
+              </Txt>
+              <HiddenOptions
+                scale={1.125}
+                icon={
+                  mfs.user.workspace?.isOwner
+                    ? mdiAccountCogOutline
+                    : mdiAccountCogOutline
+                }
+              >
+                <HiddenOption
+                  text={`Sign Out`}
                   singleLine
-                  widthGrows
-                  alignCenterLeft
-                  stroke={
-                    emailIsValid(mfs.user.email) ? undefined : theme.palette.hint
-                  }
-                >
-                  {emailIsValid(mfs.user.email) ? mfs.user.email : `Unknown Email!`}
-                </Txt>
-                <HiddenOptions
-                  scale={1.125}
-                  icon={
-                    mfs.user.workspace?.isOwner
-                      ? mdiAccountCogOutline
-                      : mdiAccountCogOutline
-                  }
-                >
+                  onClick={() => mfs.user.signOut?.()}
+                />
+                <HiddenOption
+                  text={`Terms of Use`}
+                  singleLine
+                  onClick={openTermsOfUse}
+                />
+                <HiddenOption
+                  text={`Privacy Policy`}
+                  singleLine
+                  onClick={() => pushPage(PrivacyPolicyPage, {})}
+                />
+                <Show when={!isOwner.value}>
                   <HiddenOption
-                    text={`Sign Out`}
-                    singleLine
-                    onClick={() => mfs.user.signOut?.()}
-                  />
-                  <HiddenOption
-                    text={`Terms of Use`}
-                    singleLine
-                    onClick={openTermsOfUse}
-                  />
-                  <HiddenOption
-                    text={`Privacy Policy`}
-                    singleLine
-                    onClick={() => pushPage(PrivacyPolicyPage, {})}
-                  />
-                  <Show when={!isOwner.value}>
-                    <HiddenOption
-                      text={`Leave Team`}
-                      singleLine
-                      stroke={theme.palette.error}
-                      onClick={() =>
-                        pushPage(ConfirmationPopUp, {
-                          text: `Are you sure you want to leave this team?`,
-                          yesText: `Leave`,
-                          onYes: () => {
-                            mfs.user.workspace?.leaveWorkspace?.();
-                          },
-                        })
-                      }
-                    />
-                  </Show>
-                  <HiddenOption
-                    text={`Delete Account`}
+                    text={`Leave Team`}
                     singleLine
                     stroke={theme.palette.error}
-                    onClick={deleteAccount}
+                    onClick={() =>
+                      pushPage(ConfirmationPopUp, {
+                        text: `Are you sure you want to leave this team?`,
+                        yesText: `Leave`,
+                        onYes: () => {
+                          mfs.user.workspace?.leaveWorkspace?.();
+                        },
+                      })
+                    }
                   />
-                </HiddenOptions>
-              </Row>
-            </Show>
-          </Box>
+                </Show>
+                <HiddenOption
+                  text={`Delete Account`}
+                  singleLine
+                  stroke={theme.palette.error}
+                  onClick={deleteAccount}
+                />
+              </HiddenOptions>
+            </Row>
+          </Show>
+
           {/* SECTION: Team Members */}
           <Show when={mfs.user.workspace?.isOwner}>
             <Box height={0} />
@@ -291,7 +288,7 @@ export function SettingsPage() {
               )}
             </For>
           </Show>
-  
+
           {/* SECTION: Subscription */}
           <Show when={isOwner.value}>
             <Show
@@ -314,7 +311,7 @@ export function SettingsPage() {
               <></>
             </Show>
           </Show>
-  
+
           {/* SECTION: Fuel Types */}
           <>
             <Row padTop={1} widthGrows align={$Align.spaceBetween}>
@@ -369,13 +366,17 @@ export function SettingsPage() {
               </Match>
             </Switch>
           </>
-  
+
           {/* SECTION: Developer Logs */}
           <Show when={developerModeEnabled.value}>
             <Box />
             <Column padBetween={1 / 4}>
               <Row>
-                <Icon iconPath={mdiClose} stroke={`transparent`} scale={1.125} />
+                <Icon
+                  iconPath={mdiClose}
+                  stroke={`transparent`}
+                  scale={1.125}
+                />
                 <Txt h2 singleLine widthGrows alignCenter>
                   Dev Logs
                 </Txt>
@@ -406,10 +407,10 @@ export function SettingsPage() {
               </Box>
             </Column>
           </Show>
-  
+
           {/* NOTE: Putting this in the column throws off rendering when this box has no height. */}
           <Box heightGrows />
-  
+
           {/* SECTION: Footer */}
           <Column padBetween={0.25}>
             <Txt
@@ -435,15 +436,22 @@ export function SettingsPage() {
             </Show>
           </Column>
         </SimpleBody>
-        <Box alignTopLeft asWideAsParent asTallAsParent>
-            <Button pill width={iconSize + .5} height={iconSize + .5}
-                    fill={$theme.colors.pageBackground}
-                    outlineSize={0} outlineColor={$theme.colors.pageBackground}
-                    onClick={popPage}>
-              <Icon iconPath={mdiArrowLeft} scale={iconSize}
-                    stroke={$theme.colors.text}
-              />
-            </Button>
+        <Box padAround={1} alignTopLeft asWideAsParent asTallAsParent>
+          <Button
+            pill
+            width={iconSize + 0.5}
+            height={iconSize + 0.5}
+            fill={$theme.colors.pageBackground}
+            outlineSize={0}
+            outlineColor={$theme.colors.pageBackground}
+            onClick={popPage}
+          >
+            <Icon
+              iconPath={mdiArrowLeft}
+              scale={iconSize}
+              stroke={$theme.colors.text}
+            />
+          </Button>
         </Box>
       </Stack>
     </SimplePage>
