@@ -1,4 +1,4 @@
-import { isClientValid } from "@/AppData";
+import { isClientValid, listClients } from "@/AppData";
 import {
   Button,
   Card,
@@ -15,6 +15,7 @@ import { ClientFields } from "./ClientFields";
 import { Show } from "solid-js";
 import { Client } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
+import Fuse from "fuse.js";
 
 export const openCreateClientDialog = (props: {
   initName?: string;
@@ -40,9 +41,45 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
+  const tempClient = Client.create({
+    name: "",
+    clientId: "",
+  });
 
   function closePopUp() {
+    tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    tempClient.deleteDoc();
     popPage();
+  }
+
+
+  function isClientNameAlreadyUsed() {
+    const allClients = listClients(Client.getAllDocs(), true);
+    const allClientNames = allClients.map((client) => client.name.toLowerCase());
+
+    const options = {
+      keys: [name.value.toLowerCase()],
+      threshold: 0.2, //TODO - check if this is the best value
+    };
+
+    const fuse = new Fuse(allClientNames, options);
+    const result = fuse.search(name.value.toLowerCase());
+
+    return (result.length > 0) ? true : false;
+  }
+
+  function isClientIdAlreadyUsed() {
+    const allClients = listClients(Client.getAllDocs(), true);
+    const allClientIds = allClients.map((client) => client.clientId);
+    let result = false;
+
+    allClientIds.forEach((id) => {
+      if(id === clientId.value && clientId.value !== "") {
+        result = true;
+      }
+    });
+
+    return result;
   }
 
   const clientInitFromFields = useFormula(() => {
@@ -63,6 +100,16 @@ function CreateClientDialog(props: {
     () => !clientIsValid.value && show_errors.value,
   );
 
+  function showErrorMessages() {
+    if(live_error_msg.value) return "Name or Client ID is needed";
+
+    if(isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+
+    if(isClientIdAlreadyUsed()) return "Client ID is already in use.";
+
+    return "";
+  }
+
   function showErrors() {
     show_errors.value = true;
   }
@@ -72,7 +119,7 @@ function CreateClientDialog(props: {
       showErrors();
       return;
     }
-    closePopUp();
+    popPage(); //Using popPage here because closePopUp() will delete the tempClient.
     const newClient = Client.create({
       name: name.value,
       clientId: clientId.value,
@@ -81,13 +128,22 @@ function CreateClientDialog(props: {
       notes: notes.value,
     });
     props.onCreate?.(newClient);
+
+    tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
+      newClient.addPhoneNumber();
+      newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
+      newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].number = num.number;
+    });
+    tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    tempClient.deleteDoc();
   }
 
   return (
-    <Page onClick={popPage} fill="#00000099">
+    <Page onClick={closePopUp} fill="#00000099">
       <Card preventClickPropagation width={`75%`} shadowSize={0}>
         <Txt h1>Create Client</Txt>
         <ClientFields
+          client={useProp(tempClient)}
           firstFieldHasFocus={useProp(true)}
           name={name}
           clientId={clientId}
@@ -95,8 +151,8 @@ function CreateClientDialog(props: {
           address={address}
           notes={notes}
         />
-        <Show when={live_error_msg.value}>
-          <Txt stroke={$theme.colors.warning}>Name or Client ID is needed</Txt>
+        <Show when={showErrorMessages() != ""}>
+          <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
         </Show>
         <Row widthGrows align={$Align.spaceEvenly}>
           <Button outlined onClick={closePopUp}>

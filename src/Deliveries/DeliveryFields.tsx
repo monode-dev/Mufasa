@@ -7,11 +7,15 @@ import {
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import { Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt } from "miwi";
+import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop} from "miwi";
 import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
+import { listClients } from "@/AppData";
+import { Client } from "@/Clients/Client";
+import Fuse from "fuse.js";
 
 export function DeliveryFields(props: {
+  create?: boolean;
   delivery: Pick<
     Delivery,
     | "address"
@@ -23,19 +27,60 @@ export function DeliveryFields(props: {
     | "notes"
   >;
 }) {
-   function clientIsValid() { 
-    if(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted){
-      return true;
-    }
-    return false;
+  function clientIsValid() { 
+    return !(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted);
    }
+
+  function isClientNameAlreadyUsed() {
+    const allClients = listClients(Client.getAllDocs(), true);
+    const allClientNames = allClients.map((client) => client.name.toLowerCase());
+
+    const options = {
+      keys: [props.delivery.title.toLowerCase()],
+      threshold: 0.2, //TODO - check if this is the best value
+    };
+
+    const fuse = new Fuse(allClientNames, options);
+    const result = fuse.search(props.delivery.title.toLowerCase());
+
+    return (result.length > 0);
+  }
+
+  function showErrorMessages() {
+    if(!clientIsValid()) return "Client was deleted.";
+
+    if(props.delivery.selectedClient === ONE_TIME && isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+
+    return "";
+  }
+
+  function propGt0(prop: Prop<string>) {
+    return prop.value.trim().length > 0;
+  }
+
+  const one_name = useFormula(
+            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.title : ``,
+            (v) => (props.delivery.title = v),
+          );
+  const one_phone = useFormula(
+            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.phoneNumber : ``,
+            (v) => (props.delivery.phoneNumber = v),
+          );
+  const one_address = useFormula(
+            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.address : ``,
+            (v) => (props.delivery.address = v),
+          );
+  const one_note = useFormula(
+          () => props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
+          (v) => (props.delivery.notes = v),
+        );
   return (
     <Column>
       <Row>
         <Icon
           iconPath={mdiAccount}
           stroke={
-            clientIsValid() 
+            !clientIsValid() 
             ? mdColors.orange 
             : exists(props.delivery.selectedClient !== NONE_SELECTED)
               ? mdColors.black
@@ -57,38 +102,44 @@ export function DeliveryFields(props: {
           underlined
           hintText={`Client Name`}
           iconPath={mdiLabel}
-          value={useFormula(
-            () => props.delivery.title,
-            (v) => (props.delivery.title = v),
-          )}
+          value={one_name}
           widthGrows
           capitalize={"words"}
           keyboard={"text"}
+          enterKeyHint={
+            props.create && propGt0(one_phone)
+              ? `next`
+              : `done`
+          }
         />
         <Field
           underlined
           hintText={`Phone`}
           iconPath={mdiPhone}
-          value={useFormula(
-            () => props.delivery.phoneNumber,
-            (v) => (props.delivery.phoneNumber = v),
-          )}
+          value={one_phone}
           widthGrows
           formatInput={formatPhoneNumber}
           keyboard="tel"
+          enterKeyHint={
+            props.create && propGt0(one_address)
+              ? `next`
+              : `done`
+          }
         />
         <Field
           multiline
           underlined
           hintText={`Address`}
           iconPath={mdiMapMarker}
-          value={useFormula(
-            () => props.delivery.address,
-            (v) => (props.delivery.address = v),
-          )}
+          value={one_address}
           widthGrows
           capitalize={`words`}
           keyboard={"text"}
+          enterKeyHint={
+            props.create && propGt0(one_note)
+              ? `next`
+              : `done`
+          }
         />
       </Show>
       <Field
@@ -96,19 +147,17 @@ export function DeliveryFields(props: {
         underlined
         hintText={`Delivery Notes`}
         iconPath={mdiTextBox}
-        value={useFormula(
-          () => props.delivery.notes,
-          (v) => (props.delivery.notes = v),
-        )}
+        value={one_note}
         asWideAsParent
         capitalize={`sentences`}
         keyboard={"text"}
         overflowXWraps
+        enterKeyHint={`done`}
       />
-      <Show when={clientIsValid()}>
+      <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>
           <Txt alignLeft stroke={$theme.colors.warning}>
-            This client was deleted.
+            {showErrorMessages()}
           </Txt>
         </Box>
       </Show>

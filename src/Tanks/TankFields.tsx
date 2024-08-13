@@ -21,6 +21,7 @@ const _dimensionHintText = `in.`;
 
 // Tank Fields
 export default function TankFields(props: {
+  create?: boolean;
   tankGeometry: TankGeometry;
   oneDimPerRow?: boolean;
   warningMessage?: Prop<string | null>;
@@ -45,29 +46,21 @@ export default function TankFields(props: {
 
     switch(shapeId) {
       case "truckBedTank":
-        if (props.tankGeometry.topDepth! >= props.tankGeometry.fullDepth!) {
+        if (props.tankGeometry.topDepth && props.tankGeometry.fullDepth && props.tankGeometry.topDepth >= props.tankGeometry.fullDepth) {
           warning.value = "Top Depth must be less than Full Depth.";
           return;
         } else if (
-          props.tankGeometry.wideHeight! >= props.tankGeometry.fullHeight!
+          props.tankGeometry.wideHeight && props.tankGeometry.fullHeight && props.tankGeometry.wideHeight >= props.tankGeometry.fullHeight
         ) {
           warning.value = "Wide Height must be less than Full Height.";
           return;
         }
         break;
       case "oval":
-        if(props.tankGeometry.squareHeight! >= props.tankGeometry.fullHeight!) {
+        if(props.tankGeometry.squareHeight && props.tankGeometry.fullHeight && props.tankGeometry.squareHeight >= props.tankGeometry.fullHeight) {
           warning.value = "Rect. Height must be less than Full Height.";
           return;
         }
-    }
-
-    for (const dimension of dimensions.value) {
-      const size = props.tankGeometry[dimension];
-      if (toNum(size) <= 0) {
-        warning.value = `All dimensions must be greater than zero.`;
-        return;
-      }
     }
   });
 
@@ -94,20 +87,30 @@ export default function TankFields(props: {
       </Box>
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
-        {(dimension) => (
-          <Label label={getDimensionLabel(dimension)}>
-            <NumField
-              negativesAreAllowed={false}
-              hint={_dimensionHintText}
-              valueSig={useFormula(
-                () => props.tankGeometry[dimension],
-                (val) => (props.tankGeometry[dimension] = val),
-              )}
-              underlined
-              stroke={mdColors.black}
-            />
-          </Label>
-        )}
+        {(dim, index) => {
+          let nextIndex = index().valueOf() + 1;
+          let next = dimensions.value.length > nextIndex ? props.tankGeometry[dimensions.value[nextIndex]] : undefined;
+          return (
+            <Label label={getDimensionLabel(dim)}>
+              <NumField
+                negativesAreAllowed={false}
+                hint={_dimensionHintText}
+                valueSig={useFormula(
+                  () => props.tankGeometry[dim],
+                  (val) => (props.tankGeometry[dim] = val),
+                )}
+                underlined
+                stroke={mdColors.black}
+                // TODO: enterKeyHint does not exist on NumField
+                // enterKeyHint={
+                //   props.create && exists(next) && next > 0
+                //     ? `next`
+                //     : `done`
+                // }
+              />
+            </Label>
+          );
+        }}
       </For>
     </>
   );
