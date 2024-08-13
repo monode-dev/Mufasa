@@ -74,10 +74,11 @@ export default function TankFields(props: {
     }
   });
 
-  function nextIsValid(index: () => number) {
+  function nextNeedsData(index: () => number) {
     const nextIndex = index().valueOf() + 1;
     return dimensions.value.length > nextIndex
-      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) > 0
+      // if the next dimension is not set or is 0, we need data
+      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
       : false;
   }
 
@@ -113,7 +114,7 @@ export default function TankFields(props: {
                 underlined
                 stroke={mdColors.black}
                 enterKeyHint={
-                  props.create && nextIsValid(index)
+                  props.create && nextNeedsData(index)
                     ? `next`
                     : `done`
                 }
