@@ -98,7 +98,7 @@ export function InlineEditableAppBar(props: {
                     nameFieldWasBlurredThisFrame--;
                   });
                 }}
-                valueSig={props.title}
+                value={props.title}
               />
             </Box> */}
         </Row>

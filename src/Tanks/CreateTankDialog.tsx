@@ -56,7 +56,6 @@ function CreateTankDialog(props: {
         return "Please select a fuel type.";
       }
     }
-    return;
   });
 
   const computedTank = useFormula(
@@ -67,8 +66,8 @@ function CreateTankDialog(props: {
         notes: notes.value,
         sortPos: FloatSort.getNewEndPos({
           list: props.client.tanks ?? [],
-          getPos: (tank) => tank.sortPos!,
-          getUid: (tank) => tank.docId!,
+          getPos: (tank) => tank.sortPos,
+          getUid: (tank) => tank.docId,
         }),
       }) satisfies Partial<Tank>,
   );
@@ -108,7 +107,6 @@ function CreateTankDialog(props: {
     if (exists(TankFields_warning.value) && show_errors.value) {
       return TankFields_warning.value;
     }
-    return;
   });
 
   return (
@@ -132,6 +130,7 @@ function CreateTankDialog(props: {
         </Row>
         {/* Shape Selector conditionally renders Tank Fields */}
         <TankFields
+          create
           tankGeometry={tankGeometry}
           oneDimPerRow
           warningMessage={TankFields_warning}

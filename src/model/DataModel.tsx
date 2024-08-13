@@ -25,6 +25,13 @@ export const mfs = initializeMufasa({
   cloudPersister: cloudPersister,
 });
 
+const workspace = mfs.user?.workspace;
+if (exists(workspace) && workspace.haveJoined) {
+  workspace.id;
+  workspace.otherMembers;
+  workspace.workspaceEntitlements;
+}
+
 // SECTION: Purchases
 export const premiumEnabled = createRoot(() =>
   useFormula(
