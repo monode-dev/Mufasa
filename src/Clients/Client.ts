@@ -4,6 +4,7 @@ import { Tank } from "@/Tanks/Tank";
 import { FloatSort } from "miwi";
 import { prop, list, formula } from "mufasa";
 
+
 export class Client extends mfs.Doc(`Client`) {
   static readonly limit = createLimitTrackers({
     free: 10,
@@ -62,7 +63,7 @@ export class ClientPhoneNumber extends mfs.Doc(`ClientPhoneNumber`) {
   sortPosition = prop(Number);
   onDelete() {
     //this.deleteDoc();
-    //super.onDelete();  
+    //super.onDelete();
     //this.client?.additionalPhoneNumbers.remove(this);
   }
 }
