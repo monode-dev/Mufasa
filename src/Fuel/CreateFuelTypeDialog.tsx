@@ -86,7 +86,7 @@ function CreateFuelTypeDialog(props: {
           <NumField
             negativesAreAllowed={false}
             underlined
-            valueSig={rate}
+            value={rate}
             hint="$/gal."
           />
         </Label>
