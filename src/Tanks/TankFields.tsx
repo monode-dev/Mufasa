@@ -21,6 +21,7 @@ const _dimensionHintText = `in.`;
 
 // Tank Fields
 export default function TankFields(props: {
+  create?: boolean;
   tankGeometry: TankGeometry;
   oneDimPerRow?: boolean;
   warningMessage?: Prop<string | null>;
@@ -61,15 +62,6 @@ export default function TankFields(props: {
           return;
         }
     }
-    /*
-    for (const dimension of dimensions.value) {
-      const size = props.tankGeometry[dimension];
-      if (toNum(size) <= 0) {
-        warning.value = `All dimensions must be greater than zero.`;
-        return;
-      }
-    }
-    */
   });
 
   function toNum(size: number | null | undefined): number {
@@ -95,20 +87,30 @@ export default function TankFields(props: {
       </Box>
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
-        {(dimension) => (
-          <Label label={getDimensionLabel(dimension)}>
-            <NumField
-              negativesAreAllowed={false}
-              hint={_dimensionHintText}
-              valueSig={useFormula(
-                () => props.tankGeometry[dimension],
-                (val) => (props.tankGeometry[dimension] = val),
-              )}
-              underlined
-              stroke={mdColors.black}
-            />
-          </Label>
-        )}
+        {(dim, index) => {
+          let nextIndex = index().valueOf() + 1;
+          let next = dimensions.value.length > nextIndex ? props.tankGeometry[dimensions.value[nextIndex]] : undefined;
+          return (
+            <Label label={getDimensionLabel(dim)}>
+              <NumField
+                negativesAreAllowed={false}
+                hint={_dimensionHintText}
+                valueSig={useFormula(
+                  () => props.tankGeometry[dim],
+                  (val) => (props.tankGeometry[dim] = val),
+                )}
+                underlined
+                stroke={mdColors.black}
+                // TODO: enterKeyHint does not exist on NumField
+                // enterKeyHint={
+                //   props.create && exists(next) && next > 0
+                //     ? `next`
+                //     : `done`
+                // }
+              />
+            </Label>
+          );
+        }}
       </For>
     </>
   );
