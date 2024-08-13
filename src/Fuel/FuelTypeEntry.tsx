@@ -4,12 +4,12 @@ import {
   NumField,
   Row,
   pushPage,
-  useFormula,
+  useFormula, exists,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
 import { HiddenOptions } from "@/components/HiddenOptions";
 
-export default function FuelTypeEntry(props: { fuelType: FuelType; create?: boolean; }) {
+export default function FuelTypeEntry(props: { fuelType: FuelType; nextFuelType: FuelType | undefined; }) {
   function deletePressed() {
     pushPage(DeleteDialog, {
       obj: props.fuelType,
@@ -28,8 +28,19 @@ export default function FuelTypeEntry(props: { fuelType: FuelType; create?: bool
         )}
         underlined
         hintText="Unnamed"
+        enterKeyHint={
+          (props.fuelType.rate ?? 0) <= 0
+            ? `next`
+            : `done`
+      }
       />
       <NumField
+        enterKeyHint={
+          exists(props.nextFuelType)
+          && (props.nextFuelType.name ?? ``).trim().length > 0
+            ? `next`
+            : `done`
+        }
         negativesAreAllowed={false}
         underlined
         value={useFormula(
