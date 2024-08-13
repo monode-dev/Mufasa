@@ -65,10 +65,10 @@ function CreateDeliveryDialog(props: {
     set phoneNumber(v) {
       phoneNumber.value = v;
     },
-    get explicitAddress() {
+    get address() {
       return explicitAddress.value;
     },
-    set explicitAddress(v) {
+    set address(v) {
       explicitAddress.value = v;
     },
     get notes() {
@@ -96,7 +96,7 @@ function CreateDeliveryDialog(props: {
           : selectedClient.value,
       _manualTitle: title.value,
       _manualPhoneNumber: phoneNumber.value,
-      address: explicitAddress.value,
+      _manualClientAddress: explicitAddress.value,
       notes: notes.value,
       sortPosition: Date.now(),
       creationTimePosix: Date.now(),
