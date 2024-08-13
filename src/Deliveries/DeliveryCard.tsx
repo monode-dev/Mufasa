@@ -102,7 +102,16 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       >
         <Row stroke={$theme.colors.hint} alignTopLeft padBetween={0.25}>
           <Icon iconPath={mdiArrowUpLeft} scale={1.75} />
-          <Txt>Tap here to complete the delivery.</Txt>
+          <Txt>Tap the </Txt>
+          <Box
+            bonusTouchArea
+            width={1}
+            height={1}
+            outlineSize={1 / 8}
+            outlineColor={$theme.colors.hint}
+            cornerRadius={1 / 7}
+          ></Box>
+          <Txt>to complete the delivery.</Txt>
         </Row>
       </Show>
 
