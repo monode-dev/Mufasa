@@ -57,7 +57,7 @@ export default function CompletedSubDeliveryFields(props: {
       {/** Rate */}
       <Label label="Rate" hint={rateShouldBeGrey.value}>
         <NumField
-          valueSig={props.rateSig}
+          value={props.rateSig}
           // hasFocus={rateHasFocus}
           underlined
           hint="Rate"
@@ -67,7 +67,7 @@ export default function CompletedSubDeliveryFields(props: {
       {/** Gallons */}
       <Label label="Gallons" hint={gallonsShouldBeGrey.value}>
         <NumField
-          valueSig={props.gallonsSig}
+          value={props.gallonsSig}
           // hasFocus={gallonsHasFocus}
           underlined
           hint="Est. gal."

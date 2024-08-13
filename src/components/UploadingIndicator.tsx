@@ -12,14 +12,14 @@ function pulse(config?: { pulseMs?: number; max?: number; min?: number }) {
   const pulseMs = config?.pulseMs ?? 1000;
   const maxValue = config?.max ?? 1;
   const minValue = config?.min ?? 0;
-  const valueSig = useProp((maxValue + minValue) / 2);
+  const value = useProp((maxValue + minValue) / 2);
   const interval = setInterval(() => {
     const timePercent = (Date.now() % pulseMs) / pulseMs;
     const valuePercent = (Math.sin(timePercent * Math.PI * 2) + 1) / 2;
-    valueSig.value = valuePercent * (maxValue - minValue) + minValue;
+    value.value = valuePercent * (maxValue - minValue) + minValue;
   }, frameDuration);
   onCleanup(() => clearInterval(interval));
-  return valueSig;
+  return value;
 }
 
 export function UploadingIndicator() {
