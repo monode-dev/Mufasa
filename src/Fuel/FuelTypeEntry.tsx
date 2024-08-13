@@ -35,7 +35,7 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
       <NumField
         negativesAreAllowed={false}
         underlined
-        valueSig={useFormula(
+        value={useFormula(
           () => props.fuelType.rate,
           (v) => (props.fuelType.rate = v),
         )}
