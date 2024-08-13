@@ -28,10 +28,7 @@ export function DeliveryFields(props: {
   >;
 }) {
   function clientIsValid() { 
-    if(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted){
-      return false;
-    }
-    return true;
+    return !(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted);
    }
 
   function isClientNameAlreadyUsed() {
@@ -46,7 +43,7 @@ export function DeliveryFields(props: {
     const fuse = new Fuse(allClientNames, options);
     const result = fuse.search(props.delivery.title.toLowerCase());
 
-    return (result.length > 0) ? true : false;
+    return (result.length > 0);
   }
 
   function showErrorMessages() {
