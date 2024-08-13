@@ -56,7 +56,7 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
         />
       </Label>
       <Column padBetween={0.5}>
-        <TankFields tankGeometry={props.tank} />
+        <TankFields create tankGeometry={props.tank} />
         <Label label={`Notes`}>
           <Field
             hintText={`Add Notes`}
