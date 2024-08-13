@@ -35,7 +35,7 @@ export default function TankFields(props: {
   doWatch(() => {
     const warning = props.warningMessage;
     // no reason to process this if nobody wants the message
-    if(!exists(warning)) return;
+    if (!exists(warning)) return;
 
     const shapeId = props.tankGeometry.shape;
     warning.value = null;
@@ -44,28 +44,41 @@ export default function TankFields(props: {
       return;
     }
 
-    switch(shapeId) {
+    switch (shapeId) {
       case "truckBedTank":
-        if (props.tankGeometry.topDepth && props.tankGeometry.fullDepth && props.tankGeometry.topDepth >= props.tankGeometry.fullDepth) {
+        if (
+          props.tankGeometry.topDepth &&
+          props.tankGeometry.fullDepth &&
+          props.tankGeometry.topDepth >= props.tankGeometry.fullDepth
+        ) {
           warning.value = "Top Depth must be less than Full Depth.";
           return;
         } else if (
-          props.tankGeometry.wideHeight && props.tankGeometry.fullHeight && props.tankGeometry.wideHeight >= props.tankGeometry.fullHeight
+          props.tankGeometry.wideHeight &&
+          props.tankGeometry.fullHeight &&
+          props.tankGeometry.wideHeight >= props.tankGeometry.fullHeight
         ) {
           warning.value = "Wide Height must be less than Full Height.";
           return;
         }
         break;
       case "oval":
-        if(props.tankGeometry.squareHeight && props.tankGeometry.fullHeight && props.tankGeometry.squareHeight >= props.tankGeometry.fullHeight) {
+        if (
+          props.tankGeometry.squareHeight &&
+          props.tankGeometry.fullHeight &&
+          props.tankGeometry.squareHeight >= props.tankGeometry.fullHeight
+        ) {
           warning.value = "Rect. Height must be less than Full Height.";
           return;
         }
     }
   });
 
-  function toNum(size: number | null | undefined): number {
-    return !exists(size) ? 0 : size;
+  function nextIsValid(index: () => number) {
+    const nextIndex = index().valueOf() + 1;
+    return dimensions.value.length > nextIndex
+      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) > 0
+      : false;
   }
 
   return (
@@ -77,7 +90,7 @@ export default function TankFields(props: {
               // is crashing with props.tankGeometry.shape ?? null
               // so...
               const tg = props.tankGeometry;
-              if(exists(tg)) if(exists(tg.shape)) return tg.shape
+              if (exists(tg)) if (exists(tg.shape)) return tg.shape;
               return null;
             },
             (newValue) => (props.tankGeometry.shape = newValue),
@@ -88,25 +101,22 @@ export default function TankFields(props: {
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
         {(dim, index) => {
-          let nextIndex = index().valueOf() + 1;
-          let next = dimensions.value.length > nextIndex ? props.tankGeometry[dimensions.value[nextIndex]] : undefined;
           return (
             <Label label={getDimensionLabel(dim)}>
               <NumField
                 negativesAreAllowed={false}
                 hint={_dimensionHintText}
-                valueSig={useFormula(
+                value={useFormula(
                   () => props.tankGeometry[dim],
                   (val) => (props.tankGeometry[dim] = val),
                 )}
                 underlined
                 stroke={mdColors.black}
-                // TODO: enterKeyHint does not exist on NumField
-                // enterKeyHint={
-                //   props.create && exists(next) && next > 0
-                //     ? `next`
-                //     : `done`
-                // }
+                enterKeyHint={
+                  props.create && nextIsValid(index)
+                    ? `next`
+                    : `done`
+                }
               />
             </Label>
           );

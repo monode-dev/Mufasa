@@ -46,11 +46,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={
-          props.create && propGt0(props.clientId)
-            ? `next`
-            : `done`
-        }
+        enterKeyHint={props.create && propGt0(props.clientId) ? `next` : `done`}
       />
       <Field
         hintText={`Client ID`}
@@ -60,9 +56,7 @@ export function ClientFields(props: {
         formatInput={formatIdNumber}
         keyboard={"numeric"}
         enterKeyHint={
-          props.create && propGt0(props.phoneNumber)
-            ? `next`
-            : `done`
+          props.create && propGt0(props.phoneNumber) ? `next` : `done`
         }
       />
       <Field
@@ -72,21 +66,17 @@ export function ClientFields(props: {
         underlined
         formatInput={formatPhoneNumber}
         keyboard="tel"
-        enterKeyHint={
-          props.create && propGt0(props.address)
-            ? `next`
-            : `done`
-        }
+        enterKeyHint={props.create && propGt0(props.address) ? `next` : `done`}
       />
-      
+
       <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
-       {(phoneNumber) => ( 
-        <Box padLeft={1.2}>
-          <Row>
+        {(phoneNumber) => (
+          <Box padLeft={1.2}>
+            <Row>
               <Field
                 hintText={`Name`}
                 value={useFormula(
-                  () => phoneNumber.name ?? '',
+                  () => phoneNumber.name ?? "",
                   (v) => (phoneNumber.name = v),
                 )}
                 underlined
@@ -94,37 +84,35 @@ export function ClientFields(props: {
                 keyboard={"text"}
                 width={4.8}
               />
-            <Field
-              hintText={`Number`}
-              value={useFormula(
-                () => phoneNumber.number ?? '',
-                (v) => (phoneNumber.number = v),
-              )}
-              underlined
-              formatInput={formatPhoneNumber}
-              keyboard="tel"
-            />
-            <Icon
-              stroke={$theme.colors.error}
-              iconPath={mdiTrashCanOutline}
-              scale={1.3}
-              onClick={() => deletePhoneNumber(phoneNumber)}
-            />
-          </Row>
-        </Box>
-      )}
+              <Field
+                hintText={`Number`}
+                value={useFormula(
+                  () => phoneNumber.number ?? "",
+                  (v) => (phoneNumber.number = v),
+                )}
+                underlined
+                formatInput={formatPhoneNumber}
+                keyboard="tel"
+              />
+              <Icon
+                stroke={$theme.colors.error}
+                iconPath={mdiTrashCanOutline}
+                scale={1.3}
+                onClick={() => deletePhoneNumber(phoneNumber)}
+              />
+            </Row>
+          </Box>
+        )}
       </For>
       <Show when={props.client}>
-        <Box onClick={addPhoneNumber}>
-          <Row>
-            <Icon
-              stroke={$theme.colors.primary}
-              iconPath={mdiPlus}
-              scale={1.25}
-            />
-            <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
-          </Row>
-        </Box>
+        <Row onClick={addPhoneNumber} padBetween={0.25}>
+          <Icon
+            stroke={$theme.colors.primary}
+            iconPath={mdiPlus}
+            scale={1.25}
+          />
+          <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
+        </Row>
       </Show>
       <Field
         hintText={`Address`}
@@ -134,9 +122,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={
-          props.create && propGt0(props.notes) ? `next` : `done`
-        }
+        enterKeyHint={props.create && propGt0(props.notes) ? `next` : `done`}
       />
       <Field
         hintText={`Notes`}
