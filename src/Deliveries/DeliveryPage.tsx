@@ -23,6 +23,7 @@ import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
 import { HiddenOptions } from "@/components/HiddenOptions";
+import { SimplePage } from "@/components/SimplePage";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
@@ -48,7 +49,7 @@ export function DeliveryPage(props: { delivery: Delivery }) {
   });
 
   return (
-    <Page>
+    <SimplePage>
       <AppBar>
         <Txt h2>Edit Delivery</Txt>
       </AppBar>
@@ -119,6 +120,6 @@ export function DeliveryPage(props: { delivery: Delivery }) {
           </For>
         </Show>
       </Body>
-    </Page>
+    </SimplePage>
   );
 }
