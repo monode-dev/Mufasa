@@ -30,6 +30,7 @@ import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 import { HiddenOptions } from "@/components/HiddenOptions";
+import { SimplePage } from "@/components/SimplePage";
 
 export default function ClientPage(props: { client: Client }) {
   createEffect(() => {
@@ -63,7 +64,7 @@ export default function ClientPage(props: { client: Client }) {
 
 
   return (
-    <Page>
+    <SimplePage>
       <AppBar
         shadowSize={1.25}
         right={
@@ -177,6 +178,6 @@ export default function ClientPage(props: { client: Client }) {
           </For>
         </Column>
       </Body>
-    </Page>
+    </SimplePage>
   );
 }
