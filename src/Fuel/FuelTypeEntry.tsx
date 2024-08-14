@@ -8,10 +8,9 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
+  exists,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
-// import { HiddenOptions } from "@/components/HiddenOptions";
-import { Flag } from "mufasa/dist/Utils";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -35,16 +34,12 @@ export default function FuelTypeEntry(props: {
         )}
         underlined
         hintText="Unnamed"
-        enterKeyHint={
-          (props.fuelType.rate ?? 0) <= 0
-            ? `next`
-            : `done`
-      }
+        enterKeyHint={(props.fuelType.rate ?? 0) <= 0 ? `next` : `done`}
       />
       <NumField
         enterKeyHint={
-          exists(props.nextFuelType)
-          && (props.nextFuelType.name ?? ``).trim().length > 0
+          exists(props.nextFuelType) &&
+          (props.nextFuelType.name ?? ``).trim().length > 0
             ? `next`
             : `done`
         }

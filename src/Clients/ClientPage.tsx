@@ -7,7 +7,6 @@ import {
   Column,
   FloatSort,
   Icon,
-  Page,
   Row,
   SortableColumn,
   Txt,
