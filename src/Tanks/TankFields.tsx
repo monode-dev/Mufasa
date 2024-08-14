@@ -100,7 +100,7 @@ export default function TankFields(props: {
             <NumField
               negativesAreAllowed={false}
               hint={_dimensionHintText}
-              valueSig={useFormula(
+              value={useFormula(
                 () => props.tankGeometry[dimension],
                 (val) => (props.tankGeometry[dimension] = val),
               )}

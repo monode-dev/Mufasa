@@ -407,7 +407,7 @@ export default function Calculator() {
           stroke={fillOutline(currentFillPercent.value)}
         >
           <NumField
-            valueSig={stickedInches}
+            value={stickedInches}
             underlined
             hint="in."
             negativesAreAllowed={false}
