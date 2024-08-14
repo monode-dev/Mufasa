@@ -62,7 +62,7 @@ export default function ClientSelector(props: {
         return getClientLabel(data) ?? `Unnamed Client`;
       }}
       filterString={filterString}
-      isWide
+      // isWide
       noOptionsText={`No Clients`}
       cancelOptions={{
         stroke: theme.palette.hint,
@@ -90,12 +90,12 @@ export default function ClientSelector(props: {
           <Show when={props.showOneTimeOption}>
             {/* One Time */}
             <Txt
+              widthGrows
               onClick={() => {
                 console.log(`Clicked One Time`);
                 selectOption(ONE_TIME);
                 console.log(`Selected One Time`);
               }}
-              widthGrows
               padBetween={0.125}
               stroke={theme.palette.primary}
             >
