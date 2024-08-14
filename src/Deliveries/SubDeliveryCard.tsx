@@ -126,8 +126,7 @@ export default function SubDeliveryCard(props: {
                       handleComplete();
                     }}
                     stroke={$theme.colors.primary}
-                    text={`
-    }Complete`}
+                    text={`Complete`}
                     icon={mdiCheck}
                   />
                 </HiddenOptions>
@@ -169,8 +168,7 @@ export default function SubDeliveryCard(props: {
             </Show>
 
             {/* One Time Fuel Type Fields */}
-            <Show when={props.subDelivery.showFuelNameAndRate}>
-            <Show when={props.subDelivery.shouldShowFuelNameField && !props.subDelivery.shouldShowTankSelector}>
+            <Show when={props.subDelivery.showFuelNameAndRate && props.subDelivery.shouldShowFuelSelector}>
               <Label label="Name">
                 <Field
                   value={useFormula(
