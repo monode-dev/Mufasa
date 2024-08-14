@@ -138,7 +138,7 @@ export function DailyTotalsCard() {
           Fuel Delivered: {totalGallons.value} gal.
         </Txt>
         <Txt widthGrows={3} alignLeft>
-          Today's sales: ${totalSales.value}
+          Today's Sales: ${totalSales.value}
         </Txt>
       </Column>
     </Card>
