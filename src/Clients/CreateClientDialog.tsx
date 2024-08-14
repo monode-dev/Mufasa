@@ -41,14 +41,14 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
-  const tempClient = Client.create({
-    name: "",
-    clientId: "",
-  });
+  // const tempClient = Client.create({
+  //   name: "",
+  //   clientId: "",
+  // });
 
   function closePopUp() {
-    tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
-    tempClient.deleteDoc();
+    // tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    // tempClient.deleteDoc();
     popPage();
   }
 
@@ -129,13 +129,13 @@ function CreateClientDialog(props: {
     });
     props.onCreate?.(newClient);
 
-    tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
-      newClient.addPhoneNumber();
-      newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
-      newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].number = num.number;
-    });
-    tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
-    tempClient.deleteDoc();
+    // tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
+    //   newClient.addPhoneNumber();
+    //   newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
+    //   newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].number = num.number;
+    // });
+    // tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
+    // tempClient.deleteDoc();
   }
 
   return (
@@ -143,7 +143,7 @@ function CreateClientDialog(props: {
       <Card preventClickPropagation width={`75%`} shadowSize={0}>
         <Txt h1>Create Client</Txt>
         <ClientFields
-          client={useProp(tempClient)}
+          //client={useProp(tempClient)}
           firstFieldHasFocus={useProp(true)}
           name={name}
           clientId={clientId}

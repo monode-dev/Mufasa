@@ -93,10 +93,10 @@ export default function ClientPage(props: { client: Client }) {
         </Row>
         <Card>
           <ClientFields
-            client={useFormula(
-              () => props.client ?? "",
-              (val) => (props.client = val),
-            )}
+            // client={useFormula(
+            //   () => props.client ?? '',
+            //   (val) => (props.client = val),
+            // )}
             name={useFormula(
               () => props.client.name ?? ``,
               (val) => (props.client.name = val),
