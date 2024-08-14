@@ -12,6 +12,7 @@ import {
   exists,
   useFormula,
   Selector,
+  theme,
 } from "miwi";
 import { For, Show } from "solid-js";
 import { mdiFuel, mdiPlus } from "@mdi/js";
@@ -60,7 +61,7 @@ export function FuelTypeSelector(props: {
   }
   const noneLabel = `Select Fuel`;
   function getLabelForData(data: SelectedFuelType | null) {
-    return data == ONE_TIME ? oneTimeLabel : data?.name ?? null;
+    return data == ONE_TIME ? oneTimeLabel : (data?.name ?? null);
   }
 
   return (
@@ -94,9 +95,13 @@ export function FuelTypeSelector(props: {
         <Selector
           value={props.fuelType.value ?? null}
           noneLabel="Select Fuel"
-          modalIsOpenSig={isOpen}
+          isOpen={isOpen}
           getLabelForData={getLabelForData}
           isWide={props.isWide}
+          noOptionsText={"No Fuels"}
+          cancelOptions={{
+            stroke: theme.palette.hint,
+          }}
         >
           <Show when={props.showNewOption}>
             <Row
@@ -104,9 +109,11 @@ export function FuelTypeSelector(props: {
               padBetween={0.125}
               alignCenterLeft
               stroke={$theme.colors.primary}
-              onClick={() => openCreateFuelTypeDialog({
-                onCreate: (newObject: any) => selectOption(newObject),
-              })}
+              onClick={() =>
+                openCreateFuelTypeDialog({
+                  onCreate: (newObject: any) => selectOption(newObject),
+                })
+              }
             >
               <Txt>New </Txt>
               <Icon iconPath={mdiPlus} />
