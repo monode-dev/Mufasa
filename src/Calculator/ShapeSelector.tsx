@@ -7,6 +7,7 @@ import {
   Selector,
   Icon,
   pushPage,
+  theme,
 } from "miwi";
 import { TANK_SHAPE_IDS, TankShapeId, getTankShape } from "./ShapeUtils";
 import { For } from "solid-js";
@@ -21,16 +22,35 @@ export default function ShapeSelector(
 ) {
   const dropDownIsOpen = useProp(false);
   return (
-    <Label label={props.label} padBetween={0.75}>
+    <Label label={props.label}>
       <Selector
         value={props.value.value}
-        modalIsOpenSig={dropDownIsOpen}
+        isOpen={dropDownIsOpen}
         noneLabel="Select Shape"
         getLabelForData={(shapeId: TankShapeId | null) => {
           if (!exists(shapeId)) return null;
           const tankShape = getTankShape(shapeId);
           return tankShape.nameLong;
         }}
+        noOptionsText={"No Shapes"}
+        cancelOptions={{
+          icon: undefined,
+          stroke: theme.palette.hint,
+        }}
+        actionButtons={
+          <Icon
+            iconPath={mdiHelpCircleOutline}
+            onClick={() => {
+              pushPage(InfoCard, {
+                entriesToOpen: [
+                  "Tank",
+                  "Shape",
+                  getTankShape(props.value.value)?.nameLong ?? "",
+                ],
+              });
+            }}
+          />
+        }
       >
         <For each={TANK_SHAPE_IDS} fallback={<Txt>Loading...</Txt>}>
           {(shapeId) => (
@@ -48,18 +68,6 @@ export default function ShapeSelector(
           )}
         </For>
       </Selector>
-      <Icon
-        iconPath={mdiHelpCircleOutline}
-        onClick={() => {
-          pushPage(InfoCard, {
-            entriesToOpen: [
-              "Tank",
-              "Shape",
-              getTankShape(props.value.value)?.nameLong ?? "",
-            ],
-          });
-        }}
-      />
     </Label>
   );
 }

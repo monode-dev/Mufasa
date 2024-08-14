@@ -11,11 +11,13 @@ import {
   Field,
   Column,
   exists,
+  HiddenOptions,
+  DeleteOption,
+  theme,
 } from "miwi";
 import TankFields from "./TankFields";
 import { Client } from "@/Clients/Client";
 import { Tank } from "./Tank";
-import { HiddenOptions } from "@/components/HiddenOptions";
 
 export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
   return (
@@ -33,14 +35,19 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
           })}
         </Txt>
         <HiddenOptions
-          showIcons
-          onDelete={() =>
-            pushPage(DeleteDialog, {
-              obj: props.tank,
-              message: `Are you sure you want to delete this tank?`,
-            })
-          }
-        />
+          cancelOptions={{
+            stroke: theme.palette.hint,
+          }}
+        >
+          <DeleteOption
+            onClick={() =>
+              pushPage(DeleteDialog, {
+                obj: props.tank,
+                message: `Are you sure you want to delete this tank?`,
+              })
+            }
+          />
+        </HiddenOptions>
       </Row>
       <Label
         label={`Fuel`}

@@ -1,18 +1,31 @@
-import {formatPosixTime, ONE_TIME} from "@/utils";
-import {Card, exists, Field, Label, NumField, pushPage, Row, Txt, useFormula, useProp,} from "miwi";
-import {Show} from "solid-js";
+import { formatPosixTime, ONE_TIME } from "@/utils";
+import {
+  Card,
+  Field,
+  Label,
+  Row,
+  Txt,
+  pushPage,
+  NumField,
+  useProp,
+  exists,
+  useFormula,
+  HiddenOption,
+  HiddenOptions,
+  DeleteOption,
+  theme,
+} from "miwi";
+import { Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
 import {FuelTypeSelector} from "@/Fuel/FuelTypeSelector";
 import {SubDelivery} from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
-import {mdiCheck, mdiUndo} from "@mdi/js";
-import {Client} from "@/Clients/Client";
-import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
-import {ConfirmSubDeliveryUncompletion} from "./ConfirmSubDeliveryUncompletion";
-import {Flag} from "mufasa/dist/Utils";
-import {OptionalPropFlag} from "mufasa/dist/Doc";
+import { mdiCheck, mdiUndo } from "@mdi/js";
+import { Client } from "@/Clients/Client";
+// import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
+import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -113,22 +126,20 @@ export default function SubDeliveryCard(props: {
                   />
                 </Label>
                 <HiddenOptions
-                  showIcons
-                  onDelete={handleDeleteRequest}
-                  isOpen={isOpen}
+                  cancelOptions={{
+                    stroke: theme.palette.hint,
+                  }}
                 >
                   <HiddenOption
                     scale={scale}
                     alignCenterLeft
                     padBetween={0.25}
-                    onClick={() => {
-                      isOpen.value = false;
-                      handleComplete();
-                    }}
+                    onClick={handleComplete}
                     stroke={$theme.colors.primary}
                     text={`Complete`}
                     icon={mdiCheck}
                   />
+                  <DeleteOption onClick={handleDeleteRequest} />
                 </HiddenOptions>
               </Row>
             </Show>
@@ -146,22 +157,20 @@ export default function SubDeliveryCard(props: {
                 </Label>
                 <Show when={!props.subDelivery.shouldShowTankSelector}>
                   <HiddenOptions
-                    showIcons
-                    onDelete={handleDeleteRequest}
-                    isOpen={isOpen}
+                    cancelOptions={{
+                      stroke: theme.palette.hint,
+                    }}
                   >
                     <HiddenOption
                       scale={scale}
                       alignCenterLeft
                       padBetween={0.25}
-                      onClick={() => {
-                        isOpen.value = false;
-                        handleComplete();
-                      }}
+                      onClick={handleComplete}
                       stroke={$theme.colors.primary}
                       text={`Complete`}
                       icon={mdiCheck}
                     />
+                    <DeleteOption onClick={handleDeleteRequest} />
                   </HiddenOptions>
                 </Show>
               </Row>
@@ -241,8 +250,9 @@ export default function SubDeliveryCard(props: {
               : "Unknown Date"}
           </Txt>
           <HiddenOptions
-            showIcons
-            onDelete={handleDeleteOfCompletedSubDelivery}
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
           >
             <HiddenOption
               stroke={$theme.colors.warning}
@@ -250,6 +260,7 @@ export default function SubDeliveryCard(props: {
               icon={mdiUndo}
               onClick={handleUnComplete}
             />
+            <DeleteOption onClick={handleDeleteOfCompletedSubDelivery} />
           </HiddenOptions>
         </Row>
         {/* NOTE propToSig is interfering with turning the text in the card gray when subDelivery is completed */}
