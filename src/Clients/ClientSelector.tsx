@@ -10,6 +10,7 @@ import {
   useFormula,
   exists,
   useProp,
+  theme,
 } from "miwi";
 import { For, Show } from "solid-js";
 import { mdiPlus } from "@mdi/js";
@@ -23,7 +24,6 @@ type CLIENT_TYPE = Client | typeof ONE_TIME | null | undefined;
 export default function ClientSelector(props: {
   value: Prop<CLIENT_TYPE>;
   showNewOption?: boolean;
-  showCancelOption?: boolean;
   showOneTimeOption?: boolean;
 }) {
   const dropDownIsOpen = useProp(false);
@@ -53,7 +53,7 @@ export default function ClientSelector(props: {
     <Selector
       value={props.value.value}
       noneLabel="Select Client"
-      modalIsOpenSig={dropDownIsOpen}
+      isOpen={dropDownIsOpen}
       getLabelForData={(data: CLIENT_TYPE) => {
         console.log(`get label for data: `, data);
         if (!exists(data)) return null;
@@ -61,18 +61,23 @@ export default function ClientSelector(props: {
         if (!exists(data.docId)) return null;
         return getClientLabel(data) ?? `Unnamed Client`;
       }}
-      filterStringSig={filterString}
-      showCancelOptionForFilter={props.showCancelOption ?? false}
+      filterString={filterString}
       isWide
+      noOptionsText={`No Clients`}
+      cancelOptions={{
+        stroke: theme.palette.hint,
+      }}
     >
       {!clientsAreFiltered.value && (
         <>
           <Show when={props.showNewOption}>
             {/* New Client */}
             <Row
-              onClick={() => openCreateClientDialog({
-                onCreate: (newObject) => selectOption(newObject),
-              })}
+              onClick={() =>
+                openCreateClientDialog({
+                  onCreate: (newObject) => selectOption(newObject),
+                })
+              }
               widthGrows
               padBetween={0.125}
               align={$Align.centerLeft}
@@ -92,20 +97,25 @@ export default function ClientSelector(props: {
               }}
               widthGrows
               padBetween={0.125}
-              stroke={`green`}
+              stroke={theme.palette.primary}
             >
               One Time
             </Txt>
           </Show>
           {/* Divider */}
           <Show when={props.showNewOption || props.showOneTimeOption}>
-            <Box widthGrows height={0.125} fill={`grey`} padBetween={0.125} />
+            <Box
+              widthGrows
+              height={0.125}
+              fill={theme.palette.hint}
+              padBetween={0.125}
+            />
           </Show>
         </>
       )}
       {/* Clients */}
       <Show when={filteredClients.value.length === 0}>
-        <Txt     
+        <Txt
           onClick={() => {
             dropDownIsOpen.value = false;
           }}
