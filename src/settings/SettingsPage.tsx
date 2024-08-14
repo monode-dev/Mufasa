@@ -18,9 +18,10 @@ import {
   Stack,
   Button,
   popPage,
+  HiddenOption,
+  HiddenOptions,
 } from "miwi";
-import { InlineAppBar } from "@/components/InlineAppBar";
-import { pagePadding, SimplePage } from "@/components/SimplePage";
+import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
 import { For, Show } from "solid-js";
@@ -34,19 +35,16 @@ import {
 import { inviteTeamMember, memberLimit } from "@/model/Team";
 import { Capacitor } from "@capacitor/core";
 import {
-  mdiAccountCogOutline,
   mdiAccountMultiplePlusOutline,
   mdiArrowLeft,
   mdiClose,
   mdiDotsVertical,
-  mdiInformationVariantCircleOutline,
   mdiPlus,
 } from "@mdi/js";
 import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
 import { PrivacyPolicyPage } from "./PrivacyPolicyPage";
 import { FloatingActionButton } from "@/components/Floating";
 import { autoSavingProp, devLogs } from "@/utils";
-import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { SimpleDocEntry } from "@/components/SimpleDocEntry";
 import { SubscribePrompt, withLimitConfirmation } from "@/model/LimitUi";
 import { exportData } from "./ExportData";
@@ -54,7 +52,6 @@ import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 import { Match, Switch } from "solid-js/web";
-import { InfoCard } from "@/components/InfoCard";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -157,12 +154,10 @@ export function SettingsPage() {
                   : `Unknown Email!`}
               </Txt>
               <HiddenOptions
-                scale={1.125}
-                icon={
-                  mfs.user.workspace?.isOwner
-                    ? mdiAccountCogOutline
-                    : mdiAccountCogOutline
-                }
+                cancelOptions={{
+                  icon: undefined,
+                  stroke: theme.palette.hint,
+                }}
               >
                 <HiddenOption
                   text={`Sign Out`}
@@ -215,7 +210,12 @@ export function SettingsPage() {
                 iconPath={mdiDotsVertical}
               />
               <Txt h2>Team</Txt>
-              <HiddenOptions scale={1.125}>
+              <HiddenOptions
+                scale={1.125}
+                cancelOptions={{
+                  stroke: theme.palette.hint,
+                }}
+              >
                 <HiddenOption
                   scale={1}
                   text={`Export Data`}

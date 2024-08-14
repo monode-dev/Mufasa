@@ -89,7 +89,6 @@ export function DeliveryFields(props: {
         />
         <ClientSelector
           showNewOption
-          showCancelOption
           showOneTimeOption
           value={useFormula(
             () => props.delivery.selectedClient,
