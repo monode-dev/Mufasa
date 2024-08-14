@@ -1,7 +1,18 @@
-import { Field, Icon, Prop, Row, Txt, theme, useFormula, useProp } from "miwi";
-import { HiddenOption, HiddenOptions } from "./HiddenOptions";
+import {
+  Field,
+  Icon,
+  Prop,
+  Row,
+  Txt,
+  theme,
+  useFormula,
+  useProp,
+  HiddenOption,
+  HiddenOptions,
+  DeleteOption,
+} from "miwi";
 import { Show } from "solid-js";
-import { mdiCheck } from "@mdi/js";
+import { mdiCheck, mdiPencil } from "@mdi/js";
 
 export function SimpleDocEntry(
   props: {
@@ -41,20 +52,21 @@ export function SimpleDocEntry(
             >
               {isEmpty.value ? (props.unnamedText ?? `Unnamed!`) : name.value}
             </Txt>
-            <HiddenOptions>
+            <HiddenOptions
+              cancelOptions={{
+                stroke: theme.palette.hint,
+              }}
+            >
               <Show when={props.renamable}>
                 <HiddenOption
+                  icon={mdiPencil}
                   text={`Rename`}
                   onClick={() => {
                     isEditing.value = true;
                   }}
                 />
               </Show>
-              <HiddenOption
-                text={props.deleteText ?? `Delete`}
-                stroke={theme.palette.error}
-                onClick={props.onDelete}
-              />
+              <DeleteOption text={props.deleteText} onClick={props.onDelete} />
             </HiddenOptions>
           </>
         }
