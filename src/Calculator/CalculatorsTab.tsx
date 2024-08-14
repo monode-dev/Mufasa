@@ -21,6 +21,7 @@ import {
   Selector,
   Slider,
   TabButtons,
+  theme,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -47,7 +48,7 @@ export default function Calculator() {
   const selectedDelivery = useProp<Delivery | null>(null);
   const deliverySelectorIsOpen = useProp(false);
   const selectedSubDelivery = useProp<SubDelivery | null>(null);
-  
+
   // combined 3 doWatch into one to avoid a possible infinite loop
   doWatch(() => {
     if (
@@ -64,7 +65,7 @@ export default function Calculator() {
       selectedDelivery.value = null;
       stickedInches.value = null;
     }
-    
+
     // When the delivery changes unselect the subDelivery.
     if (
       selectedSubDelivery.value?.delivery.docId !==
@@ -74,7 +75,7 @@ export default function Calculator() {
       stickedInches.value = null;
     }
   });
-  
+
   const subDeliverySelectorIsOpen = useProp(false);
   function getSubDeliveryName(subDelivery: SubDelivery | null) {
     return subDelivery?.title ?? null;
@@ -223,24 +224,34 @@ export default function Calculator() {
             Dimensions
           </Button>
           */}
-          <Box stroke={$theme.colors.primary} spaceEvenly>          
-            <TabButtons         
-              selectedTab={selectedTab}
-              labels={["Delivery", "Tank", "Dimensions"]}
-            />
-          </Box>
+        <Box stroke={$theme.colors.primary} spaceEvenly>
+          <TabButtons
+            selectedTab={selectedTab}
+            labels={["Delivery", "Tank", "Dimensions"]}
+          />
+        </Box>
 
         {/*</Row>*/}
         <Show when={selectedTab.value === tabs.delivery}>
           <Column>
             {/* --Delivery-- */}
-            <Label label="Delivery" stroke={!selectedDelivery.value?.isValid && selectedDelivery.value ? $theme.colors.warning : undefined}>
+            <Label
+              label="Delivery"
+              stroke={
+                !selectedDelivery.value?.isValid && selectedDelivery.value
+                  ? $theme.colors.warning
+                  : undefined
+              }
+            >
               <Selector
                 value={selectedDelivery.value}
-                modalIsOpenSig={deliverySelectorIsOpen}
+                isOpen={deliverySelectorIsOpen}
                 noneLabel={"Select Delivery"}
                 getLabelForData={(delivery) => delivery?.title ?? null}
-                emptyListText={"No Upcoming Deliveries"}
+                noOptionsText={"No Upcoming Deliveries"}
+                cancelOptions={{
+                  stroke: theme.palette.hint,
+                }}
                 stroke={$theme.colors.text}
               >
                 {/* Selector does not allow invalid deliveries */}
@@ -269,14 +280,32 @@ export default function Calculator() {
             </Label>
 
             {/* --Sub Delivery-- */}
-            <Show when={exists(selectedDelivery.value) && selectedDelivery.value?.isValid}>
-              <Label label="Tank" stroke={!selectedSubDelivery.value?.isValid && selectedSubDelivery.value && selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient ? $theme.colors.warning : undefined}>
+            <Show
+              when={
+                exists(selectedDelivery.value) &&
+                selectedDelivery.value?.isValid
+              }
+            >
+              <Label
+                label="Tank"
+                stroke={
+                  !selectedSubDelivery.value?.isValid &&
+                  selectedSubDelivery.value &&
+                  selectedSubDelivery.value?.delivery.selectedClient !=
+                    selectedDelivery.value?.selectedClient
+                    ? $theme.colors.warning
+                    : undefined
+                }
+              >
                 <Selector
                   value={selectedSubDelivery.value}
-                  modalIsOpenSig={subDeliverySelectorIsOpen}
+                  isOpen={subDeliverySelectorIsOpen}
                   noneLabel={"Select Tank"}
                   getLabelForData={getSubDeliveryName}
-                  emptyListText={"No Clients"}
+                  noOptionsText={"No Tanks"}
+                  cancelOptions={{
+                    stroke: theme.palette.hint,
+                  }}
                   stroke={$theme.colors.text}
                 >
                   <Show
@@ -357,21 +386,33 @@ export default function Calculator() {
                 </Box>      
               </Show> */}
               <Show when={selectedSubDelivery.value}>
-                <Show when={selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient}>
+                <Show
+                  when={
+                    selectedSubDelivery.value?.delivery.selectedClient !=
+                    selectedDelivery.value?.selectedClient
+                  }
+                >
                   <Txt stroke={$theme.colors.warning} widthGrows>
                     This sub delivery is not for the selected client.
                   </Txt>
                 </Show>
-                <Show when={!selectedSubDelivery.value?.isValid
-                  && selectedSubDelivery.value?.delivery.selectedClient == selectedDelivery.value?.selectedClient}>
+                <Show
+                  when={
+                    !selectedSubDelivery.value?.isValid &&
+                    selectedSubDelivery.value?.delivery.selectedClient ==
+                      selectedDelivery.value?.selectedClient
+                  }
+                >
                   <Txt stroke={$theme.colors.warning} widthGrows>
                     The selected sub delivery is not valid.
                   </Txt>
                 </Show>
               </Show>
-            </Show> 
+            </Show>
           </Column>
-          <Show when={!selectedDelivery.value?.isValid && selectedDelivery.value}>
+          <Show
+            when={!selectedDelivery.value?.isValid && selectedDelivery.value}
+          >
             <Txt stroke={$theme.colors.warning} widthGrows>
               This delivery is invalid.
             </Txt>

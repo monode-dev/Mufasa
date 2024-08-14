@@ -11,13 +11,16 @@ import {
   useProp,
   useFormula,
   mdColors,
+  HiddenOption,
+  HiddenOptions,
+  DeleteOption,
+  theme,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
-import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 
@@ -192,27 +195,29 @@ function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
 
   return (
     <HiddenOptions
-      showIcons
-      isOpen={isOpen}
-      onDelete={() => {
-        pushPage(DeleteDialog, {
-          obj: props.delivery,
-          message: `Are you sure you want to permanently delete this delivery?`,
-        });
+      cancelOptions={{
+        stroke: theme.palette.hint,
       }}
     >
       <HiddenOption
         alignCenterLeft
         padBetween={0.25}
-        onClick={() => {
-          isOpen.value = false;
+        onClick={() =>
           pushPage(DeliveryPage, {
             delivery: props.delivery,
-          });
-        }}
+          })
+        }
         stroke={$theme.colors.text}
         text={`Edit`}
         icon={mdiPencil}
+      />
+      <DeleteOption
+        onClick={() =>
+          pushPage(DeleteDialog, {
+            obj: props.delivery,
+            message: `Are you sure you want to permanently delete this delivery?`,
+          })
+        }
       />
     </HiddenOptions>
   );
