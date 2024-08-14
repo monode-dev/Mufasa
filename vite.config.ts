@@ -47,6 +47,7 @@ export default defineConfig((configEnv) => {
         }
         return result;
       })(),
+      dedupe: ["solid-js"],
     },
   };
 });

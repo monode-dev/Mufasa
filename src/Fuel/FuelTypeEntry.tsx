@@ -4,10 +4,14 @@ import {
   NumField,
   Row,
   pushPage,
-  useFormula, exists,
+  useFormula,
+  HiddenOptions,
+  DeleteOption,
+  theme,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
-import { HiddenOptions } from "@/components/HiddenOptions";
+// import { HiddenOptions } from "@/components/HiddenOptions";
+import { Flag } from "mufasa/dist/Utils";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -57,7 +61,13 @@ export default function FuelTypeEntry(props: {
          * this in future if it looks too weird. */
         width={5}
       />
-      <HiddenOptions showIcons onDelete={deletePressed} />
+      <HiddenOptions
+        cancelOptions={{
+          stroke: theme.palette.hint,
+        }}
+      >
+        <DeleteOption onClick={deletePressed} />
+      </HiddenOptions>
     </Row>
   );
 }

@@ -18,6 +18,9 @@ import {
   useNav,
   exists,
   Card,
+  HiddenOptions,
+  DeleteOption,
+  theme,
 } from "miwi";
 import { mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
@@ -29,7 +32,6 @@ import { Delivery } from "@/Deliveries/Delivery";
 import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
-import { HiddenOptions } from "@/components/HiddenOptions";
 import { SimplePage } from "@/components/SimplePage";
 
 export default function ClientPage(props: { client: Client }) {
@@ -62,7 +64,6 @@ export default function ClientPage(props: { client: Client }) {
     });
   }
 
-
   return (
     <SimplePage>
       <AppBar
@@ -83,12 +84,18 @@ export default function ClientPage(props: { client: Client }) {
         <Row widthGrows alignX={$Align.spaceBetween} alignY={$Align.start}>
           <Icon iconPath={mdiDotsVertical} stroke={mdColors.transparent} />
           <Txt h2>Client Info</Txt>
-          <HiddenOptions showIcons onDelete={deletePressed} />
+          <HiddenOptions
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
+          >
+            <DeleteOption onClick={deletePressed} />
+          </HiddenOptions>
         </Row>
         <Card>
           <ClientFields
             client={useFormula(
-              () => props.client ?? '',
+              () => props.client ?? "",
               (val) => (props.client = val),
             )}
             name={useFormula(
