@@ -7,7 +7,7 @@ import {
   mdiTextBox,
   mdiTrashCanOutline,
 } from "@mdi/js";
-import { Box, Field, Icon, Prop, Row, Txt, useFormula } from "miwi";
+import {Box, EnterKeyHint, Field, Icon, Prop, Row, Txt, useFormula} from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
@@ -32,8 +32,10 @@ export function ClientFields(props: {
   //     ?.deleteDoc();
   // };
 
-  function propGt0(prop: Prop<string>) {
-    return prop.value.trim().length > 0;
+  function enterKey(prop: Prop<string>): EnterKeyHint {
+     const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
+    console.log("key: ", key);
+    return key;
   }
 
   return (
@@ -46,7 +48,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={props.create && propGt0(props.clientId) ? `next` : `done`}
+        enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
       />
       <Field
         hintText={`Client ID`}
@@ -55,9 +57,7 @@ export function ClientFields(props: {
         underlined
         formatInput={formatIdNumber}
         keyboard={"numeric"}
-        enterKeyHint={
-          props.create && propGt0(props.phoneNumber) ? `next` : `done`
-        }
+        enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
       />
       <Field
         hintText={`Phone`}
@@ -66,7 +66,7 @@ export function ClientFields(props: {
         underlined
         formatInput={formatPhoneNumber}
         keyboard="tel"
-        enterKeyHint={props.create && propGt0(props.address) ? `next` : `done`}
+        enterKeyHint={ useFormula(() => enterKey(props.address)).value }
       />
 
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
@@ -122,7 +122,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={props.create && propGt0(props.notes) ? `next` : `done`}
+        enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
       />
       <Field
         hintText={`Notes`}

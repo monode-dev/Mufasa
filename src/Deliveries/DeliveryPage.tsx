@@ -105,9 +105,9 @@ export function DeliveryPage(props: { delivery: Delivery }) {
               <For each={props.delivery.sortedSubDeliveries}>
                 {(subDelivery, index) => {
                   const next = index() + 1;
-                  const nextSubDelivery = next < props.delivery.sortedSubDeliveries.length
+                  const nextSubDelivery = useFormula(() => next < props.delivery.sortedSubDeliveries.length
                     ? props.delivery.sortedSubDeliveries[next]
-                    : undefined;
+                    : undefined);
                   return <SubDeliveryCard subDelivery={subDelivery} nextSubDelivery={nextSubDelivery} />;
                 }}
               </For>

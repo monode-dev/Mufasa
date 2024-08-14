@@ -7,7 +7,7 @@ import {
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop} from "miwi";
+import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop, EnterKeyHint} from "miwi";
 import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
 import { listClients } from "@/AppData";
@@ -54,8 +54,10 @@ export function DeliveryFields(props: {
     return "";
   }
 
-  function propGt0(prop: Prop<string>) {
-    return prop.value.trim().length > 0;
+  function enterKey(prop: Prop<string>): EnterKeyHint {
+     const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
+    console.log("key: ", key);
+    return key;
   }
 
   const one_name = useFormula(
@@ -105,11 +107,7 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={"words"}
           keyboard={"text"}
-          enterKeyHint={
-            props.create && propGt0(one_phone)
-              ? `next`
-              : `done`
-          }
+          enterKeyHint={ useFormula(() => enterKey(one_phone)).value }
         />
         <Field
           underlined
@@ -119,11 +117,7 @@ export function DeliveryFields(props: {
           widthGrows
           formatInput={formatPhoneNumber}
           keyboard="tel"
-          enterKeyHint={
-            props.create && propGt0(one_address)
-              ? `next`
-              : `done`
-          }
+          enterKeyHint={ useFormula(() => enterKey(one_address)).value }
         />
         <Field
           multiline
@@ -134,11 +128,7 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={`words`}
           keyboard={"text"}
-          enterKeyHint={
-            props.create && propGt0(one_note)
-              ? `next`
-              : `done`
-          }
+          enterKeyHint={ useFormula(() => enterKey(one_note)).value }
         />
       </Show>
       <Field
