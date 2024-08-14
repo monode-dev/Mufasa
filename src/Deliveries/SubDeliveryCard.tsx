@@ -153,7 +153,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
             </Show>
 
             {/* One Time Fuel Type Fields */}
-            <Show when={props.subDelivery.shouldShowFuelNameField}>
+            <Show when={props.subDelivery.shouldShowFuelNameField && !props.subDelivery.shouldShowTankSelector}>
               <Label label="Name">
                 <Field
                   value={useFormula(
