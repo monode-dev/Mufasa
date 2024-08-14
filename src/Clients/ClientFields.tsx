@@ -15,7 +15,7 @@ import { For, Show } from "solid-js";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
-  client?: Prop<Client>;
+  //client?: Prop<Client>;
   address: Prop<string>;
   name: Prop<string>;
   clientId: Prop<string>;
@@ -23,14 +23,14 @@ export function ClientFields(props: {
   create?: boolean;
   notes: Prop<string>;
 }) {
-  const addPhoneNumber = () => {
-    props.client?.value.addPhoneNumber();
-  };
-  const deletePhoneNumber = (num: ClientPhoneNumber) => {
-    props.client?.value.sortedAdditionalPhoneNumbers
-      .find((phoneNumber) => phoneNumber === num)
-      ?.deleteDoc();
-  };
+  // const addPhoneNumber = () => {
+  //   props.client?.value.addPhoneNumber();
+  // };
+  // const deletePhoneNumber = (num: ClientPhoneNumber) => {
+  //   props.client?.value.sortedAdditionalPhoneNumbers
+  //     .find((phoneNumber) => phoneNumber === num)
+  //     ?.deleteDoc();
+  // };
 
   function propGt0(prop: Prop<string>) {
     return prop.value.trim().length > 0;
@@ -69,7 +69,7 @@ export function ClientFields(props: {
         enterKeyHint={props.create && propGt0(props.address) ? `next` : `done`}
       />
 
-      <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
+      {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
         {(phoneNumber) => (
           <Box padLeft={1.2}>
             <Row>
@@ -113,7 +113,7 @@ export function ClientFields(props: {
           />
           <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
         </Row>
-      </Show>
+      </Show> */}
       <Field
         hintText={`Address`}
         multiline
