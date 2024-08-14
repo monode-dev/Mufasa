@@ -19,8 +19,7 @@ import {
   Button,
   popPage,
 } from "miwi";
-import { InlineAppBar } from "@/components/InlineAppBar";
-import { pagePadding, SimplePage } from "@/components/SimplePage";
+import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
 import { For, Show } from "solid-js";
@@ -39,7 +38,6 @@ import {
   mdiArrowLeft,
   mdiClose,
   mdiDotsVertical,
-  mdiInformationVariantCircleOutline,
   mdiPlus,
 } from "@mdi/js";
 import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
@@ -54,7 +52,6 @@ import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 import { Match, Switch } from "solid-js/web";
-import { InfoCard } from "@/components/InfoCard";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -289,9 +286,7 @@ export function SettingsPage() {
                 <Show
                   when={isSubscribing.value}
                   fallback={
-                    <>
-                      <SubscribePrompt />
-                    </>
+                    <SubscribePrompt/>
                   }
                 >
                   <Txt hint widthGrows alignCenterLeft>

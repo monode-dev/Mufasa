@@ -9,7 +9,10 @@ import {
 import { FuelType } from "@/model/DataModel";
 import { HiddenOptions } from "@/components/HiddenOptions";
 
-export default function FuelTypeEntry(props: { fuelType: FuelType; nextFuelType: FuelType | undefined; }) {
+export default function FuelTypeEntry(props: {
+  fuelType: FuelType;
+  nextFuelType: FuelType | undefined;
+}) {
   function deletePressed() {
     pushPage(DeleteDialog, {
       obj: props.fuelType,

@@ -1,29 +1,23 @@
-import { formatPosixTime, ONE_TIME } from "@/utils";
-import {
-  Card,
-  Field,
-  Label,
-  Row,
-  Txt,
-  pushPage,
-  NumField,
-  useProp,
-  exists,
-  useFormula,
-} from "miwi";
-import { Show } from "solid-js";
+import {formatPosixTime, ONE_TIME} from "@/utils";
+import {Card, exists, Field, Label, NumField, pushPage, Row, Txt, useFormula, useProp,} from "miwi";
+import {Show} from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
-import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
-import { SubDelivery } from "./Delivery";
+import {FuelTypeSelector} from "@/Fuel/FuelTypeSelector";
+import {SubDelivery} from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
-import { mdiCheck, mdiUndo } from "@mdi/js";
-import { Client } from "@/Clients/Client";
-import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
-import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
+import {mdiCheck, mdiUndo} from "@mdi/js";
+import {Client} from "@/Clients/Client";
+import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
+import {ConfirmSubDeliveryUncompletion} from "./ConfirmSubDeliveryUncompletion";
+import {Flag} from "mufasa/dist/Utils";
+import {OptionalPropFlag} from "mufasa/dist/Doc";
 
-export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
+export default function SubDeliveryCard(props: {
+  subDelivery: SubDelivery;
+  nextSubDelivery: SubDelivery | undefined;
+}) {
   function handleComplete() {
     pushPage(CompleteSubDeliveryDialog, {
       subDelivery: props.subDelivery,
@@ -71,6 +65,27 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
     });
   }
 
+  function midEnterHint(
+    num: (number & Flag<typeof OptionalPropFlag>) | (null & Flag<typeof OptionalPropFlag>
+      ) | number | null): "next" | "done" {
+    return (num ?? 0) <= 0 ? `next` : `done`;
+  }
+
+  function lastEnterHint(): `next` | `done` {
+    const sub = props.nextSubDelivery;
+    let ret: `next` | `done` = `done`;
+
+    if (exists(sub)) {
+      if (sub.showFuelNameAndRate) {
+        if ((sub.explicitFuelName ?? ``).trim().length <= 0)
+          ret = `next`
+      } else if ((sub.gallons ?? 0) <= 0)
+        ret = `next`
+    }
+
+    return ret;
+  }
+
   return (
     <Card
       widthGrows
@@ -111,7 +126,8 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                       handleComplete();
                     }}
                     stroke={$theme.colors.primary}
-                    text={`Complete`}
+                    text={`
+    }Complete`}
                     icon={mdiCheck}
                   />
                 </HiddenOptions>
@@ -153,7 +169,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
             </Show>
 
             {/* One Time Fuel Type Fields */}
-            <Show when={props.subDelivery.shouldShowFuelNameField}>
+            <Show when={props.subDelivery.showFuelNameAndRate}>
               <Label label="Name">
                 <Field
                   value={useFormula(
@@ -164,10 +180,9 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   hintText="Fuel Name"
                   capitalize={`words`}
                   keyboard={"text"}
+                  enterKeyHint = { midEnterHint( props.subDelivery.explicitRate )}
                 />
               </Label>
-            </Show>
-            <Show when={props.subDelivery.shouldShowFuelRateField}>
               <Label label="Rate">
                 <NumField
                   value={useFormula(
@@ -176,6 +191,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                   )}
                   underlined
                   hint="Rate"
+                  enterKeyHint = { midEnterHint( props.subDelivery.gallons ) }
                 />
               </Label>
             </Show>
@@ -197,6 +213,7 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                 }
                 underlined
                 hint="Est. gal."
+                enterKeyHint={ lastEnterHint() }
               />
             </Label>
             <Show
