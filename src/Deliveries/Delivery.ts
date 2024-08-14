@@ -166,7 +166,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
-      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.income, 0),
+      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0),
       2,
     ),
   );
@@ -293,9 +293,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     this.selectedFuel === ONE_TIME ? null : (this.selectedFuel as FuelType),
   );
 
-  readonly showFuelNameAndRate = formula(
-    () => this.selectedFuel === ONE_TIME,
-  );
+  readonly showFuelNameAndRate = formula(() => this.selectedFuel === ONE_TIME);
 
   // Fuel Name
   explicitFuelName: string = formula(
@@ -350,8 +348,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   // Gallons
   gallons = prop([Number, null], null);
 
-  // Income
-  readonly income = formula(() => {
+  // Sales
+  readonly sales = formula(() => {
     return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0);
   });
 

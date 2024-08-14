@@ -77,10 +77,10 @@ export function DailyTotalsCard() {
       0,
     ),
   );
-  const totalIncome = useFormula(() =>
+  const totalSales = useFormula(() =>
     formatNumWithCommas(
       completedSubDeliveriesSince3am.value.reduce(
-        (total, sub) => total + sub.income,
+        (total, sub) => total + sub.sales,
         0,
       ),
       0,
@@ -138,7 +138,7 @@ export function DailyTotalsCard() {
           Fuel Delivered: {totalGallons.value} gal.
         </Txt>
         <Txt widthGrows={3} alignLeft>
-          Today's Income: ${totalIncome.value}
+          Today's Sales: ${totalSales.value}
         </Txt>
       </Column>
     </Card>
