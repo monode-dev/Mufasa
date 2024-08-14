@@ -8,7 +8,7 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
-  exists,
+  exists, EnterKeyHint,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
 
@@ -34,14 +34,26 @@ export default function FuelTypeEntry(props: {
         )}
         underlined
         hintText="Unnamed"
-        enterKeyHint={(props.fuelType.rate ?? 0) <= 0 ? `next` : `done`}
+        enterKeyHint={
+        useFormula(() => {
+          const key: EnterKeyHint = (props.fuelType.rate ?? 0) <= 0
+            ? `next`
+            : `done`;
+          console.log("key: ", key);
+          return key;
+        }).value
+      }
       />
       <NumField
         enterKeyHint={
-          exists(props.nextFuelType) &&
-          (props.nextFuelType.name ?? ``).trim().length > 0
-            ? `next`
-            : `done`
+          useFormula(() => {
+            const key: EnterKeyHint = exists(props.nextFuelType) &&
+              (props.nextFuelType.name ?? ``).trim().length == 0
+                ? `next`
+                : `done`;
+            console.log("key: ", key);
+            return key;
+          }).value
         }
         negativesAreAllowed={false}
         underlined
