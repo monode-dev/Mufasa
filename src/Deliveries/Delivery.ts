@@ -293,10 +293,11 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     this.selectedFuel === ONE_TIME ? null : (this.selectedFuel as FuelType),
   );
 
-  // Fuel Name
-  readonly shouldShowFuelNameField = formula(
+  readonly showFuelNameAndRate = formula(
     () => this.selectedFuel === ONE_TIME,
   );
+
+  // Fuel Name
   explicitFuelName: string = formula(
     () => this.fuelName ?? ``,
     (value) => {
@@ -305,15 +306,13 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
 
   // Rate
-  readonly shouldShowFuelRateField = formula(
-    () => this.selectedFuel === ONE_TIME,
-  );
   explicitRate: number | null = formula(
     () => this.rate ?? null,
     (value) => {
       this.rate = value;
     },
   );
+
   readonly fuelSpecs = formula(() => {
     if (this.isCompleted) {
       // Use the explicit value
