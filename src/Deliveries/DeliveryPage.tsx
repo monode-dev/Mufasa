@@ -7,7 +7,6 @@ import {
   Column,
   FloatSort,
   Icon,
-  Page,
   Row,
   SortableColumn,
   Txt,
@@ -16,7 +15,7 @@ import {
   pushPage,
   exists,
 } from "miwi";
-import { For, Show, onMount } from "solid-js";
+import { For, Show } from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
 import DeleteDialog from "@/components/DeleteDialog";
 import { Delivery } from "./Delivery";
@@ -42,12 +41,6 @@ export function DeliveryPage(props: { delivery: Delivery }) {
       message: `Are you sure you want to permanently delete this delivery?`,
     });
   }
-  onMount(() => {
-    // requestAnimationFrame(() => {
-    // logTime("DeliveryPage onRender");
-    // });
-  });
-
   return (
     <SimplePage>
       <AppBar>
@@ -99,13 +92,19 @@ export function DeliveryPage(props: { delivery: Delivery }) {
                   sortedList: props.delivery.sortedSubDeliveries,
                   fromIndex: sortProps.from,
                   toIndex: sortProps.to,
-                  getPos: (delivery) => delivery.sortPosition!,
+                  getPos: (delivery) => delivery.sortPosition,
                   setPos: (delivery, pos) => (delivery.sortPosition = pos),
                 })
               }
             >
               <For each={props.delivery.sortedSubDeliveries}>
-                {(subDelivery) => <SubDeliveryCard subDelivery={subDelivery} />}
+                {(subDelivery, index) => {
+                  const next = index() + 1;
+                  const nextSubDelivery = next < props.delivery.sortedSubDeliveries.length
+                    ? props.delivery.sortedSubDeliveries[next]
+                    : undefined;
+                  return <SubDeliveryCard subDelivery={subDelivery} nextSubDelivery={nextSubDelivery} />;
+                }}
               </For>
             </SortableColumn>
           </Show>
