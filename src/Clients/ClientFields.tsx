@@ -46,6 +46,7 @@ export function ClientFields(props: {
             ? `next`
             : `done`
         }
+        onlyWriteOnBlur
       />
       <Field
         hintText={`Client ID`}
@@ -59,6 +60,7 @@ export function ClientFields(props: {
             ? `next`
             : `done`
         }
+        onlyWriteOnBlur
       />
       <Field
         hintText={`Phone`}
@@ -72,6 +74,7 @@ export function ClientFields(props: {
             ? `next`
             : `done`
         }
+        onlyWriteOnBlur
       />
       <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
        {(phoneNumber) => ( 
@@ -86,6 +89,7 @@ export function ClientFields(props: {
             capitalize={`words`}
             keyboard={"text"}
             width={5}
+            onlyWriteOnBlur
           />
           <Field
             hintText={`Number`}
@@ -96,6 +100,7 @@ export function ClientFields(props: {
             underlined
             formatInput={formatPhoneNumber}
             keyboard="tel"
+            onlyWriteOnBlur
           />
           <Icon
             stroke={$theme.colors.error}
@@ -129,6 +134,7 @@ export function ClientFields(props: {
         enterKeyHint={
           props.create && props.notes.value.trim().length > 0 ? `next` : `done`
         }
+        onlyWriteOnBlur
       />
       <Field
         hintText={`Notes`}
@@ -139,6 +145,7 @@ export function ClientFields(props: {
         capitalize={`sentences`}
         keyboard={"text"}
         enterKeyHint={`done`}
+        onlyWriteOnBlur
       />
     </>
   );

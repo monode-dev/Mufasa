@@ -84,7 +84,7 @@ export function InlineEditableAppBar(props: {
                 });
               }}
               value={props.name}
-              tempValue={tempName}
+              onlyWriteOnBlur
             />
           </Show>
           {/* <Box padAroundY={defaultAppBarScale * 0.1}>
@@ -98,7 +98,7 @@ export function InlineEditableAppBar(props: {
                     nameFieldWasBlurredThisFrame--;
                   });
                 }}
-                valueSig={props.title}
+                value={props.title}
               />
             </Box> */}
         </Row>

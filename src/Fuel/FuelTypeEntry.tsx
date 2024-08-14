@@ -1,7 +1,6 @@
 import DeleteDialog from "@/components/DeleteDialog";
 import {
   Field,
-  HiddenDelete,
   NumField,
   Row,
   pushPage,
@@ -31,11 +30,12 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
         )}
         underlined
         hintText="Unnamed"
+        onlyWriteOnBlur
       />
       <NumField
         negativesAreAllowed={false}
         underlined
-        valueSig={useFormula(
+        value={useFormula(
           () => props.fuelType.rate,
           (v) => (props.fuelType.rate = v),
         )}
@@ -45,6 +45,7 @@ export default function FuelTypeEntry(props: { fuelType: FuelType }) {
          * rate. All the rest of the space can be given to the name. Maybe we'll change
          * this in future if it looks too weird. */
         width={5}
+        onlyWriteOnBlur
       />
       <HiddenOptions showIcons onDelete={deletePressed} />
     </Row>
