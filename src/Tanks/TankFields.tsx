@@ -1,6 +1,6 @@
 import {
   Box,
-  doWatch,
+  doWatch, EnterKeyHint,
   exists,
   Label,
   mdColors,
@@ -74,12 +74,16 @@ export default function TankFields(props: {
     }
   });
 
-  function nextNeedsData(index: () => number) {
+  function enterKey(index: () => number): EnterKeyHint {
+    if(!props.create) return `done`;
     const nextIndex = index().valueOf() + 1;
-    return dimensions.value.length > nextIndex
+    const needsData = dimensions.value.length > nextIndex
       // if the next dimension is not set or is 0, we need data
       ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
       : false;
+    const key: EnterKeyHint = needsData ? `next` : `done`;
+    console.log("key: ", key);
+    return key;
   }
 
   return (
@@ -113,11 +117,7 @@ export default function TankFields(props: {
                 )}
                 underlined
                 stroke={mdColors.black}
-                enterKeyHint={
-                  props.create && nextNeedsData(index)
-                    ? `next`
-                    : `done`
-                }
+                enterKeyHint={ useFormula(() => enterKey(index)).value }
               />
             </Label>
           );

@@ -13,7 +13,7 @@ import {
   HiddenOption,
   HiddenOptions,
   DeleteOption,
-  theme,
+  theme, EnterKeyHint, Prop,
 } from "miwi";
 import { Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
@@ -26,10 +26,12 @@ import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 // import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
+import {Flag} from "mufasa/dist/Utils";
+import {OptionalPropFlag} from "mufasa/dist/Doc";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
-  nextSubDelivery: SubDelivery | undefined;
+  nextSubDelivery: Prop<SubDelivery | undefined>;
 }) {
   function handleComplete() {
     pushPage(CompleteSubDeliveryDialog, {
@@ -80,23 +82,24 @@ export default function SubDeliveryCard(props: {
 
   function midEnterHint(
     num: (number & Flag<typeof OptionalPropFlag>) | (null & Flag<typeof OptionalPropFlag>
-      ) | number | null): "next" | "done" {
-    return (num ?? 0) <= 0 ? `next` : `done`;
+      ) | number | null): EnterKeyHint {
+    const key = (num ?? 0) <= 0 ? `next` : `done`;
+    console.log("key: ", key);
+    return key;
   }
 
-  function lastEnterHint(): `next` | `done` {
-    const sub = props.nextSubDelivery;
-    let ret: `next` | `done` = `done`;
-
-    if (exists(sub)) {
-      if (sub.showFuelNameAndRate) {
-        if ((sub.explicitFuelName ?? ``).trim().length <= 0)
-          ret = `next`
-      } else if ((sub.gallons ?? 0) <= 0)
-        ret = `next`
+  function lastEnterHint(sub: Prop<SubDelivery | undefined>): EnterKeyHint {
+    const s = sub.value;
+    let key: EnterKeyHint = `done`;
+    if (exists(s)) {
+      if (s._isOneTimeFuel) {
+        if ((s.fuelName ?? ``).trim().length == 0)
+          key = `next`
+      } else if ((s.gallons ?? 0) <= 0)
+        key = `next`
     }
-
-    return ret;
+    console.log("key: ", key);
+    return key;
   }
 
   return (
@@ -188,7 +191,7 @@ export default function SubDeliveryCard(props: {
                   hintText="Fuel Name"
                   capitalize={`words`}
                   keyboard={"text"}
-                  enterKeyHint = { midEnterHint( props.subDelivery.explicitRate )}
+                  enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.explicitRate )).value }
                 />
               </Label>
               <Label label="Rate">
@@ -199,7 +202,7 @@ export default function SubDeliveryCard(props: {
                   )}
                   underlined
                   hint="Rate"
-                  enterKeyHint = { midEnterHint( props.subDelivery.gallons ) }
+                  enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.gallons )).value }
                 />
               </Label>
             </Show>
@@ -221,7 +224,7 @@ export default function SubDeliveryCard(props: {
                 }
                 underlined
                 hint="Est. gal."
-                enterKeyHint={ lastEnterHint() }
+                enterKeyHint={ useFormula(() => lastEnterHint(props.nextSubDelivery)).value }
               />
             </Label>
             <Show

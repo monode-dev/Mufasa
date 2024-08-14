@@ -150,6 +150,7 @@ function CreateClientDialog(props: {
           phoneNumber={phoneNumber}
           address={address}
           notes={notes}
+          create
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
