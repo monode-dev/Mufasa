@@ -18,6 +18,8 @@ import {
   Stack,
   Button,
   popPage,
+  HiddenOption,
+  HiddenOptions,
 } from "miwi";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
@@ -33,7 +35,6 @@ import {
 import { inviteTeamMember, memberLimit } from "@/model/Team";
 import { Capacitor } from "@capacitor/core";
 import {
-  mdiAccountCogOutline,
   mdiAccountMultiplePlusOutline,
   mdiArrowLeft,
   mdiClose,
@@ -44,7 +45,6 @@ import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
 import { PrivacyPolicyPage } from "./PrivacyPolicyPage";
 import { FloatingActionButton } from "@/components/Floating";
 import { autoSavingProp, devLogs } from "@/utils";
-import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { SimpleDocEntry } from "@/components/SimpleDocEntry";
 import { SubscribePrompt, withLimitConfirmation } from "@/model/LimitUi";
 import { exportData } from "./ExportData";
@@ -154,12 +154,10 @@ export function SettingsPage() {
                   : `Unknown Email!`}
               </Txt>
               <HiddenOptions
-                scale={1.125}
-                icon={
-                  mfs.user.workspace?.isOwner
-                    ? mdiAccountCogOutline
-                    : mdiAccountCogOutline
-                }
+                cancelOptions={{
+                  icon: undefined,
+                  stroke: theme.palette.hint,
+                }}
               >
                 <HiddenOption
                   text={`Sign Out`}
@@ -212,7 +210,12 @@ export function SettingsPage() {
                 iconPath={mdiDotsVertical}
               />
               <Txt h2>Team</Txt>
-              <HiddenOptions scale={1.125}>
+              <HiddenOptions
+                scale={1.125}
+                cancelOptions={{
+                  stroke: theme.palette.hint,
+                }}
+              >
                 <HiddenOption
                   scale={1}
                   text={`Export Data`}

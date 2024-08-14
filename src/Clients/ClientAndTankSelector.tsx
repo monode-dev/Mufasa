@@ -37,7 +37,6 @@ export function ClientAndTankSelector(
           value={props.client}
           showOneTimeOption={false}
           showNewOption={true}
-          showCancelOption={true}
         />
       </Label>
       {/* TODO: Show special text when there are no tanks to pick from.*/}

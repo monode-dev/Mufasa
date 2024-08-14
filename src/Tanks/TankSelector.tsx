@@ -12,6 +12,7 @@ import {
   mdColors,
   useProp,
   exists,
+  theme,
 } from "miwi";
 import { For, Show } from "solid-js";
 import { openCreateTankDialog } from "./CreateTankDialog";
@@ -52,11 +53,15 @@ export default function TankSelector(
     <Selector
       value={value.value}
       noneLabel={"Select Tank"}
-      modalIsOpenSig={dropDownIsOpen}
+      isOpen={dropDownIsOpen}
       getLabelForData={(data: TankType) => {
         if (!exists(data)) return null;
         if (data == JUST_FUEL) return justFuelLabel;
         return data.getLabel();
+      }}
+      noOptionsText={"No Tanks"}
+      cancelOptions={{
+        stroke: theme.palette.hint,
       }}
     >
       {/* New Tank Type */}
