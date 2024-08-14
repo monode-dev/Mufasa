@@ -1,12 +1,21 @@
-import {Row, Txt, pushPage, useProp, mdColors} from "miwi";
+import {
+  Row,
+  Txt,
+  pushPage,
+  useProp,
+  mdColors,
+  HiddenOption,
+  HiddenOptions,
+  DeleteOption,
+  theme,
+} from "miwi";
 import DeleteDialog from "../components/DeleteDialog";
 import { isClientValid, getClientLabel } from "@/AppData";
 import ClientPage from "./ClientPage";
 import { Client } from "./Client";
-import {HiddenOption, HiddenOptions} from "@/components/HiddenOptions";
 import { mdiTankerTruck } from "@mdi/js";
-import {openCreateClientDialog} from "@/Deliveries/CreateDeliveryDialog";
-import {DeliveryPage} from "@/Deliveries/DeliveryPage";
+import { openCreateClientDialog } from "@/Deliveries/CreateDeliveryDialog";
+import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 export default function ClientEntery(props: { client: Client }) {
   function deletePressed() {
@@ -43,18 +52,25 @@ export default function ClientEntery(props: { client: Client }) {
       >
         {getClientLabel(props.client)}
       </Txt>
-      <HiddenOptions showIcons onDelete={deletePressed} >
+      <HiddenOptions
+        cancelOptions={{
+          stroke: theme.palette.hint,
+        }}
+      >
         <HiddenOption
           text={`Delivery`}
           icon={mdiTankerTruck}
-            onClick={() => openCreateClientDialog({
+          onClick={() =>
+            openCreateClientDialog({
               onCreate: (delivery) => {
                 console.log(`Created Delivery:`, delivery);
                 pushPage(DeliveryPage, { delivery });
               },
               setClient: props.client,
-            })}
+            })
+          }
         />
+        <DeleteOption onClick={deletePressed} />
       </HiddenOptions>
     </Row>
   );

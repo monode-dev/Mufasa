@@ -7,7 +7,7 @@ import {
   Column,
   FloatSort,
   Icon,
-  Page,
+  HiddenOptions,
   Row,
   SortableColumn,
   Txt,
@@ -15,6 +15,8 @@ import {
   mdColors,
   pushPage,
   exists,
+  DeleteOption,
+  theme,
 } from "miwi";
 import { For, Show, onMount } from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
@@ -22,7 +24,6 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
-import { HiddenOptions } from "@/components/HiddenOptions";
 import { SimplePage } from "@/components/SimplePage";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
@@ -61,10 +62,13 @@ export function DeliveryPage(props: { delivery: Delivery }) {
             Client
           </Txt>
           <HiddenOptions
-            showIcons
-            onDelete={handleDeleteRequest}
             scale={1.125}
-          />
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
+          >
+            <DeleteOption onClick={handleDeleteRequest} />
+          </HiddenOptions>
         </Row>
         {/* Client Card */}
         <Card pad={1} widthGrows>
