@@ -348,7 +348,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   // Gallons
   gallons = prop([Number, null], null);
 
-  // sales
+  // Sales
   readonly sales = formula(() => {
     return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0);
   });
