@@ -11,6 +11,7 @@ import {
   useProp,
   useFormula,
   mdColors,
+  roundToString,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -20,6 +21,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
+import { getTankShape } from "@/Calculator/ShapeUtils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   return (
@@ -143,47 +145,57 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
         : $theme.colors.warning,
   );
   return (
-    <Row alignTopLeft widthGrows>
-      <Box
-        /* We want the check box to be vertically centered with a single line of
-         * text. However, the text is not vertically centered in its bounding box.
-         * So we apply a slight offset here to vertically align the check box with
-         * the first line of the description text. */
-        padTop={0.045}
-      >
+    <>
+      <Show when={props.subDelivery.isCompleted}>
+        <Txt>
+          {props.subDelivery.selectedKnownTank?.fuelType?.name}: 
+          {props.subDelivery.stickedInchesBeforeFilling}" -{">"} {props.subDelivery.stickedInchesAfterFilling}", 
+          {roundToString(getTankShape(props.subDelivery.selectedKnownTank?.shape)?.calcTotalVolume(props.subDelivery.selectedKnownTank)?? 0, 0)} 
+          {" "}gal. -{">"} {props.subDelivery.gallons} gal.
+        </Txt>
+      </Show>
+      <Row alignTopLeft widthGrows>
         <Box
-          bonusTouchArea
-          onClick={() =>
-            props.subDelivery.isCompleted
-              ? pushPage(ConfirmSubDeliveryUncompletion, {
-                  subDelivery: props.subDelivery,
-                })
-              : pushPage(CompleteSubDeliveryDialog, {
-                  subDelivery: props.subDelivery,
-                })
-          }
-          width={1}
-          height={1}
-          outlineSize={1 / 8}
-          outlineColor={highlightColor.value ?? $theme.colors.primary}
-          cornerRadius={1 / 7}
-          fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+          /* We want the check box to be vertically centered with a single line of
+          * text. However, the text is not vertically centered in its bounding box.
+          * So we apply a slight offset here to vertically align the check box with
+          * the first line of the description text. */
+          padTop={0.045}
         >
-          <Show when={props.subDelivery.isCompleted}>
-            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-          </Show>
+          <Box
+            bonusTouchArea
+            onClick={() =>
+              props.subDelivery.isCompleted
+                ? pushPage(ConfirmSubDeliveryUncompletion, {
+                    subDelivery: props.subDelivery,
+                  })
+                : pushPage(CompleteSubDeliveryDialog, {
+                    subDelivery: props.subDelivery,
+                  })
+            }
+            width={1}
+            height={1}
+            outlineSize={1 / 8}
+            outlineColor={highlightColor.value ?? $theme.colors.primary}
+            cornerRadius={1 / 7}
+            fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+          >
+            <Show when={props.subDelivery.isCompleted}>
+              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
+            </Show>
+          </Box>
         </Box>
-      </Box>
-      <Txt
-        widthGrows
-        asTallAsParent
-        overflowXWraps
-        alignTopLeft
-        stroke={highlightColor.value ?? $theme.colors.text}
-      >
-        {props.subDelivery.title}
-      </Txt>
-    </Row>
+        <Txt
+          widthGrows
+          asTallAsParent
+          overflowXWraps
+          alignTopLeft
+          stroke={highlightColor.value ?? $theme.colors.text}
+        >
+          {props.subDelivery.title}
+        </Txt>
+      </Row>
+    </>  
   );
 }
 
