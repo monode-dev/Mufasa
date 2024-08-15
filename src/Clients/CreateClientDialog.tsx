@@ -42,6 +42,7 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
+  const offsetRate = useProp(``);
   const tempClient = Client.create({
     name: "",
     clientId: "",
@@ -90,6 +91,7 @@ function CreateClientDialog(props: {
       phoneNumber: phoneNumber.value,
       address: address.value,
       notes: notes.value,
+      offsetRate: offsetRate.value,
     };
   });
   const clientIsValid = useFormula(() => {
@@ -127,6 +129,7 @@ function CreateClientDialog(props: {
       phoneNumber: phoneNumber.value,
       address: address.value,
       notes: notes.value,
+      offsetRate: offsetRate.value,
     });
     props.onCreate?.(newClient);
 
@@ -151,6 +154,7 @@ function CreateClientDialog(props: {
           phoneNumber={phoneNumber}
           address={address}
           notes={notes}
+          offsetRate={offsetRate}
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>

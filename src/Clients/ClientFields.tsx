@@ -1,6 +1,7 @@
 import {
   mdiAccount,
   mdiIdentifier,
+  mdiLockPercent,
   mdiMapMarker,
   mdiPhone,
   mdiPlus,
@@ -21,6 +22,7 @@ export function ClientFields(props: {
   phoneNumber: Prop<string>;
   address: Prop<string>;
   notes: Prop<string>;
+  offsetRate: Prop<string>;
   create?: boolean;
 }) {
   const addPhoneNumber = () => {
@@ -144,6 +146,16 @@ export function ClientFields(props: {
         underlined
         capitalize={`sentences`}
         keyboard={"text"}
+        enterKeyHint={`done`}
+        onlyWriteOnBlur
+      />
+      <Field
+        hintText={`Offset Rate`}
+        iconPath={mdiLockPercent}
+        value={props.offsetRate}
+        underlined
+        formatInput={(val) => ({ input: val, caret: val.length })}
+        keyboard={"numeric"}
         enterKeyHint={`done`}
         onlyWriteOnBlur
       />
