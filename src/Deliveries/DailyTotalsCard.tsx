@@ -42,19 +42,20 @@ export function DailyTotalsCard() {
       ),
     );
   });
-  const deliveredPerFuel = useFormula(() => {
-    const deliveredPerFuel = new Map<string, number>();
-    completedSubDeliveriesSince3am.value.forEach((sub) => {
-      const fuelName = sub.fuelSpecs?.name;
-      if (!exists(fuelName)) return;
-      if (!deliveredPerFuel.has(fuelName)) deliveredPerFuel.set(fuelName, 0);
-      deliveredPerFuel.set(
-        fuelName,
-        deliveredPerFuel.get(fuelName)! + (sub.gallons ?? 0),
-      );
-    });
-    return deliveredPerFuel;
-  });
+
+  // const deliveredPerFuel = useFormula(() => {
+  //   const deliveredPerFuel = new Map<string, number>();
+  //   completedSubDeliveriesSince3am.value.forEach((sub) => {
+  //     const fuelName = sub.fuelSpecs?.name;
+  //     if (!exists(fuelName)) return;
+  //     if (!deliveredPerFuel.has(fuelName)) deliveredPerFuel.set(fuelName, 0);
+  //     deliveredPerFuel.set(
+  //       fuelName,
+  //       deliveredPerFuel.get(fuelName)! + (sub.gallons ?? 0),
+  //     );
+  //   });
+  //   return deliveredPerFuel;
+  // });
 
   const upcomingAndDeliveredFuel = useFormula(() => {
     const upcomingAndDeliveredFuel = new Map<string, number>();
@@ -81,22 +82,15 @@ export function DailyTotalsCard() {
     return upcomingAndDeliveredFuel;
   });
 
-  // const fuelTotals = useFormula(() => {
-  //   const fuelTotals = new Map<
-  //     FuelType,
-  //     {
-  //       left: number;
-  //       dailyTotal: number;
-  //     }
-  //   >();
-  //   upcomingSubDeliveries.value.forEach((sub) => {
-  //     const fuelName = sub.fuelSpecs?.name;
-  //     if (!exists(fuelName)) return;
-  //     if (!fuelTotals.has(fuelName))
-  //       fuelTotals.set(fuelName, { left: 0, dailyTotal: 0 });
-  //     fuelTotals.get(fuelName)!.left += sub.gallons ?? 0;
-  //   });
-  // });
+  function totalToDeliverForGivenFuelType(fueltype: FuelType) {
+    return upcomingSubDeliveries.value.reduce((total, sub) => {
+      if (sub.fuelSpecs?.name === fueltype.name) {
+        total += sub.gallons ?? 0;
+      }
+      return total;
+    }, 0);
+  }
+
   const totalGallons = useFormula(() =>
     formatNumWithCommas(
       completedSubDeliveriesSince3am.value.reduce(
@@ -124,12 +118,10 @@ export function DailyTotalsCard() {
 
   function ToggleTotals() {
     shouldShowTotals() === false ? setShouldShowTotals(true) : setShouldShowTotals(false) 
-    
   }
 
   return (
     <Card widthGrows padBetween={0.75}>
-
       <Show when={shouldShowTotals()}> 
         <For
           each={Array.from(upcomingAndDeliveredFuel.value.entries())}
@@ -145,7 +137,6 @@ export function DailyTotalsCard() {
                     "vertical-align": `top`,
                   }}
                 >
-                {/*Find the fuel type using the given fuel name.*/}
                 <Field underlined widthGrows minWidth={3} value={useFormula(
                   () => findFuelType(fuelName)?.amountOfFuel!,
                   (v) => {
@@ -159,9 +150,8 @@ export function DailyTotalsCard() {
                 />
                 </div>{" "}
                 gal. in truck at start. Delivered {deliveredGallons} gal. About 
-                {(Number(findFuelType(fuelName)?.amountOfFuel) - deliveredGallons) 
-                <= 0 ? 0 : (Number(findFuelType(fuelName)?.amountOfFuel) - deliveredGallons)} 
-                gal. left to deliver.
+                {totalToDeliverForGivenFuelType(findFuelType(fuelName)!)} 
+                {" "} gal. left to deliver.
               </span>
             </Txt>
           )}
