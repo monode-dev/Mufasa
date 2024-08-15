@@ -350,7 +350,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Sales
   readonly sales = formula(() => {
-    return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0);
+    return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0) * (Number(this.delivery?.selectedClientDoc?.offsetRate) <= 0 ? 1 : Number(this.delivery?.selectedClientDoc?.offsetRate));
   });
 
   // Full Title

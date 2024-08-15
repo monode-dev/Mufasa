@@ -47,6 +47,7 @@ export class Client extends mfs.Doc(`Client`) {
 
   address = prop(String, ``);
   notes = prop(String, ``);
+  offsetRate = prop(String, ``);
   readonly tanks = list(Tank, `mx_parent`);
   onDelete() {
     this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
