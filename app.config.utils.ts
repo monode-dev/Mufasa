@@ -84,6 +84,7 @@ export const doFullCapacitorRebuild = async <
       execSync(`npx cap sync ${config.platform}`);
     });
   });
+  return;
 
   const setAndroidSdkVersion = doNow(() => {
     if (config.platform === Platform.ios) return;
@@ -139,7 +140,7 @@ export const doFullCapacitorRebuild = async <
   // Set the screen orientation
   const applyScreenOrientation = doNow(() => {
     if (config.platform === Platform.android) {
-      const androidManifestPath = `./dist/android/App/src/main/AndroidManifest.xml`;
+      const androidManifestPath = `./dist/android/app/src/main/AndroidManifest.xml`;
       // Get AndroidManifest.xml
       const androidManifest = xmljs.xml2js(
         fs.readFileSync(androidManifestPath).toString(),
@@ -221,7 +222,7 @@ export const doFullCapacitorRebuild = async <
   // Codemagic versioning
   const codemagicVersioning = doNow(() => {
     if (config.platform === Platform.android) {
-      const buildGradlePath = `./dist/android/App/build.gradle`;
+      const buildGradlePath = `./dist/android/app/build.gradle`;
       // Get build.gradle
       const buildGradleLines = fs
         .readFileSync(buildGradlePath)
@@ -359,7 +360,7 @@ export const doFullCapacitorRebuild = async <
   const applyCameraPermissions = doNow(() => {
     if (config.camera === undefined) return;
     if (config.platform === Platform.android) {
-      const androidManifestPath = `./dist/android/App/src/main/AndroidManifest.xml`;
+      const androidManifestPath = `./dist/android/app/src/main/AndroidManifest.xml`;
       // Get AndroidManifest.xml
       const androidManifest = xmljs.xml2js(
         fs.readFileSync(androidManifestPath).toString(),
@@ -488,7 +489,7 @@ export const doFullCapacitorRebuild = async <
 
     if (config.platform === Platform.android) {
       fs.writeFileSync(
-        `./dist/android/App/src/main/res/drawable/custom_splash.xml`,
+        `./dist/android/app/src/main/res/drawable/custom_splash.xml`,
         `<?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
@@ -497,7 +498,7 @@ export const doFullCapacitorRebuild = async <
 </layer-list>`,
       );
       // Update styles.xml
-      const stylesPath = `./dist/android/App/src/main/res/values/styles.xml`;
+      const stylesPath = `./dist/android/app/src/main/res/values/styles.xml`;
       const styles = xmljs.xml2js(fs.readFileSync(stylesPath).toString());
       const resourcesList = styles.elements?.[0].elements ?? [];
       resourcesList.splice(
