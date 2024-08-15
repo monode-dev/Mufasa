@@ -156,15 +156,16 @@ export function DailyTotalsCard() {
             </Txt>
           )}
         </For>
-        
       </Show>
-        <Icon 
-          iconPath={shouldShowTotals() ? mdiArrowUpCircleOutline : mdiArrowDownCircleOutline} 
-          scale={1.5} 
-          onClick={() => {
-            ToggleTotals();
-          }}
-        />
+      <Icon 
+        stroke={$theme.colors.primary}
+        iconPath={shouldShowTotals() ? mdiArrowUpCircleOutline : mdiArrowDownCircleOutline} 
+        scale={2} 
+        onClick={() => {
+          ToggleTotals();
+        }}
+      />
+
       <Box widthGrows height={0.125} fill={$theme.colors.text}/>
       {/* <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
         <Txt bold alignCenter>

@@ -197,7 +197,42 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
                 }
                 underlined
                 hint="Est. gal."
-                onlyWriteOnBlur
+              />
+            </Label>
+            <Label
+              label="Sticked Inches Before"
+              stroke={
+                props.subDelivery.stickedInchesBeforeFilling ? undefined : $theme.colors.warning
+              }
+            >
+              <NumField
+                value={useFormula(
+                  () => props.subDelivery.stickedInchesBeforeFilling,
+                  (v) => (props.subDelivery.stickedInchesBeforeFilling = v),
+                )}
+                hintColor={
+                  props.subDelivery.stickedInchesBeforeFilling ? undefined : $theme.colors.warning
+                }
+                underlined
+                hint='in.'
+              />
+            </Label>
+            <Label
+              label="Sticked Inches After"
+              stroke={
+                props.subDelivery.stickedInchesAfterFilling ? undefined : $theme.colors.warning
+              }
+            >
+              <NumField
+                value={useFormula(
+                  () => props.subDelivery.stickedInchesAfterFilling,
+                  (v) => (props.subDelivery.stickedInchesAfterFilling = v),
+                )}
+                hintColor={
+                  props.subDelivery.stickedInchesAfterFilling ? undefined : $theme.colors.warning
+                }
+                underlined
+                hint='in.'
               />
             </Label>
             <Show
@@ -250,6 +285,14 @@ export default function SubDeliveryCard(props: { subDelivery: SubDelivery }) {
           gallonsSig={useFormula(
             () => props.subDelivery.gallons,
             (v) => (props.subDelivery.gallons = v),
+          )}
+          stickedInchesBeforeFillingSig={useFormula(
+            () => props.subDelivery.stickedInchesBeforeFilling,
+            (v) => (props.subDelivery.stickedInchesBeforeFilling = v),
+          )}
+          stickedInchesAfterFillingSig={useFormula(
+            () => props.subDelivery.stickedInchesAfterFilling,
+            (v) => (props.subDelivery.stickedInchesAfterFilling = v),
           )}
           allGrey={true}
         />
