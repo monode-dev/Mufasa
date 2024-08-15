@@ -36,13 +36,21 @@ export default function CompleteSubDeliveryDialog(props: {
   );
 
   const gallons = useProp<number | null>(props.subDelivery.gallons);
+
+  const stickedInchesBeforeFilling = useProp<number | null>(props.subDelivery.stickedInchesBeforeFilling);
+  const stickedInchesAfterFilling = useProp<number | null>(props.subDelivery.stickedInchesAfterFilling);
+
   const canComplete = useFormula(
     () =>
       fuelName.value.trim() !== `` &&
       exists(rate.value) &&
       rate.value >= 0 &&
       exists(gallons.value) &&
-      gallons.value >= 0,
+      gallons.value >= 0 &&
+      exists(stickedInchesBeforeFilling.value) &&
+      stickedInchesBeforeFilling.value >= 0 &&
+      exists(stickedInchesAfterFilling.value) &&
+      stickedInchesAfterFilling.value >= 0
   );
 
   function completeDelivery() {
@@ -51,6 +59,8 @@ export default function CompleteSubDeliveryDialog(props: {
       fuelName: fuelName.value,
       rate: rate.value!,
       gallons: gallons.value!,
+      stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
+      stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
     });
   }
 
@@ -84,6 +94,8 @@ export default function CompleteSubDeliveryDialog(props: {
           fuelNameSig={fuelName}
           rateSig={rate}
           gallonsSig={gallons}
+          stickedInchesBeforeFillingSig={stickedInchesBeforeFilling}
+          stickedInchesAfterFillingSig={stickedInchesAfterFilling}
         />
 
         {/* --Buttons-- */}
