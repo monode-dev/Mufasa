@@ -12,6 +12,7 @@ import {
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import { SubDelivery } from "./Delivery";
 import { JUST_FUEL, ONE_TIME } from "@/utils";
+import { FuelType } from "@/model/DataModel";
 
 // noinspection t
 export default function CompleteSubDeliveryDialog(props: {
@@ -54,6 +55,10 @@ export default function CompleteSubDeliveryDialog(props: {
   }
 
   function handleYes() {
+    // const fuelType = FuelType.sortedFuelTypes.find((fuelType) => fuelType.name === fuelName.value);
+    // if(fuelType) {
+    //   fuelType.amountOfFuel! = (Number(fuelType.amountOfFuel!) - gallons.value!).toString();
+    // }
     completeDelivery();
     popPage();
   }
