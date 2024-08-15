@@ -1,8 +1,9 @@
-import { Card, Txt, Column, useFormula, exists, Box, Row } from "miwi";
+import { Card, Txt, Column, useFormula, exists, Box, Row, Field, Icon } from "miwi";
 import { Delivery } from "./Delivery";
-import { formatNumWithCommas } from "@/utils";
-import { For, Show } from "solid-js";
+import { formatIdNumber, formatNumWithCommas } from "@/utils";
+import { createSignal, For, Show } from "solid-js";
 import { FuelType } from "@/model/DataModel";
+import { mdiArrowDownCircleOutline, mdiArrowLeftTop, mdiArrowUpCircleOutline, mdiGasStation } from "@mdi/js";
 
 export function DailyTotalsCard() {
   const upcomingSubDeliveries = useFormula(() => {
@@ -10,19 +11,21 @@ export function DailyTotalsCard() {
       delivery.sortedSubDeliveries.filter((sub) => !sub.isCompleted),
     );
   });
-  const leftPerFuel = useFormula(() => {
-    const leftPerFuel = new Map<string, number>();
-    upcomingSubDeliveries.value.forEach((sub) => {
-      const fuelName = sub.fuelSpecs?.name;
-      if (!exists(fuelName)) return;
-      if (!leftPerFuel.has(fuelName)) leftPerFuel.set(fuelName, 0);
-      leftPerFuel.set(
-        fuelName,
-        leftPerFuel.get(fuelName)! + (sub.gallons ?? 0),
-      );
-    });
-    return leftPerFuel;
-  });
+  
+  // const leftPerFuel = useFormula(() => {
+  //   const leftPerFuel = new Map<string, number>();
+  //   upcomingSubDeliveries.value.forEach((sub) => {
+  //     const fuelName = sub.fuelSpecs?.name;
+  //     if (!exists(fuelName)) return;
+  //     if (!leftPerFuel.has(fuelName)) leftPerFuel.set(fuelName, 0);
+  //     leftPerFuel.set(
+  //       fuelName,
+  //       leftPerFuel.get(fuelName)! + (sub.gallons ?? 0),
+  //     );
+  //   });
+  //   return leftPerFuel;
+  // });
+  
   const completedSubDeliveriesSince3am = useFormula(() => {
     const threeAm = new Date();
     if (threeAm.getHours() < 3) threeAm.setDate(threeAm.getDate() - 1);
@@ -52,6 +55,32 @@ export function DailyTotalsCard() {
     });
     return deliveredPerFuel;
   });
+
+  const upcomingAndDeliveredFuel = useFormula(() => {
+    const upcomingAndDeliveredFuel = new Map<string, number>();
+    completedSubDeliveriesSince3am.value.forEach((sub) => {
+      const fuelName = sub.fuelSpecs?.name;
+      if (!exists(fuelName)) return;
+      if (!upcomingAndDeliveredFuel.has(fuelName)) upcomingAndDeliveredFuel.set(fuelName, 0);
+      upcomingAndDeliveredFuel.set(
+        fuelName,
+        upcomingAndDeliveredFuel.get(fuelName)! + (sub.gallons ?? 0),
+      );
+    });
+
+    upcomingSubDeliveries.value.forEach((sub) => {
+      const fuelName = sub.fuelSpecs?.name;
+      if (!exists(fuelName)) return;
+      if (!upcomingAndDeliveredFuel.has(fuelName)) upcomingAndDeliveredFuel.set(fuelName, 0);
+      upcomingAndDeliveredFuel.set(
+        fuelName,
+        upcomingAndDeliveredFuel.get(fuelName)! + 0,
+      );
+    });
+
+    return upcomingAndDeliveredFuel;
+  });
+
   // const fuelTotals = useFormula(() => {
   //   const fuelTotals = new Map<
   //     FuelType,
@@ -87,32 +116,67 @@ export function DailyTotalsCard() {
     ),
   );
 
-  const uniqueSubDeliveries = completedSubDeliveriesSince3am.value;
+  function findFuelType(fuelName: string) {
+    return FuelType.sortedFuelTypes.find((fuel) => fuel.name === fuelName);
+  }
+
+  const [shouldShowTotals, setShouldShowTotals] = createSignal(false)
+
+  function ToggleTotals() {
+    shouldShowTotals() === false ? setShouldShowTotals(true) : setShouldShowTotals(false) 
+    
+  }
 
   return (
     <Card widthGrows padBetween={0.75}>
-      <Show when={Array.from(deliveredPerFuel.value.entries()).length > 0}>
-        <Txt bold alignCenter>
-          Delivered
-        </Txt>
+
+      <Show when={shouldShowTotals()}> 
         <For
-          each={Array.from(deliveredPerFuel.value.entries())}
+          each={Array.from(upcomingAndDeliveredFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
         >
-          {([fuelName, gallons]) => (
-            <Row>
-              <Txt widthGrows alignLeft singleLine>
-                {fuelName}
-              </Txt>
-              <Txt width={6} alignLeft singleLine>
-                gal: {gallons}
-              </Txt>
-            </Row>
+          {([fuelName, deliveredGallons]) => (
+            <Txt widthGrows alignTopLeft overflowXWraps>
+              <span>
+                {fuelName}:{" "}
+                <div
+                  style={{
+                    display: `inline-block`,
+                    "vertical-align": `top`,
+                  }}
+                >
+                {/*Find the fuel type using the given fuel name.*/}
+                <Field underlined widthGrows minWidth={3} value={useFormula(
+                  () => findFuelType(fuelName)?.amountOfFuel!,
+                  (v) => {
+                    const fuelType = findFuelType(fuelName);
+                    if (fuelType) {
+                      fuelType.amountOfFuel = v;
+                    }
+                  },
+                )}
+                formatInput={formatIdNumber}
+                />
+                </div>{" "}
+                gal. in truck at start. Delivered {deliveredGallons} gal. About 
+                {(Number(findFuelType(fuelName)?.amountOfFuel) - deliveredGallons) 
+                <= 0 ? 0 : (Number(findFuelType(fuelName)?.amountOfFuel) - deliveredGallons)} 
+                gal. left to deliver.
+              </span>
+            </Txt>
           )}
         </For>
-        <Box widthGrows height={0.125} fill={$theme.colors.text} />
+        
       </Show>
-      <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
+        <Icon 
+          iconPath={shouldShowTotals() ? mdiArrowUpCircleOutline : mdiArrowDownCircleOutline} 
+          scale={1.5} 
+          onClick={() => {
+            ToggleTotals();
+          }}
+        />
+      <Box widthGrows height={0.125} fill={$theme.colors.text}/>
+      {/* <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
         <Txt bold alignCenter>
           Upcoming
         </Txt>
@@ -132,7 +196,7 @@ export function DailyTotalsCard() {
           )}
         </For>
         <Box widthGrows height={0.125} fill={$theme.colors.text} />
-      </Show>
+      </Show> */}
       <Column>
         <Txt widthGrows={4} alignLeft>
           Fuel Delivered: {totalGallons.value} gal.
