@@ -242,12 +242,13 @@ export default function SubDeliveryCard(props: {
       >
         <Row
           widthGrows
-          alignCenterRight
+          // alignCenterRight
+          alignTopCenter
           stroke={
             props.subDelivery.isCompleted ? $theme.colors.hint : undefined
           }
         >
-          <Txt widthGrows alignCenterLeft height={1}>
+          <Txt widthGrows alignTopLeft>
             {exists(props.subDelivery.completedTimePosix)
               ? formatPosixTime(props.subDelivery.completedTimePosix)
               : "Unknown Date"}
