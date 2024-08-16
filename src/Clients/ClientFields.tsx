@@ -7,7 +7,7 @@ import {
   mdiTextBox,
   mdiTrashCanOutline,
 } from "@mdi/js";
-import {Box, EnterKeyHint, Field, Icon, Prop, Row, Txt, useFormula} from "miwi";
+import {Box, EnterKeyHint, Field, Icon, Prop, Row, Txt, useFormula, useProp} from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
@@ -38,6 +38,10 @@ export function ClientFields(props: {
     return key;
   }
 
+  const focusOnID = useProp(false);
+  const focusOnPhone = useProp(false);
+  const focusOnAddress = useProp(false);
+  const focusOnNotes = useProp(false);
   return (
     <>
       <Field
@@ -49,8 +53,10 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
+        onKeyPress={(e)=> e.key == enterKey() ? focusOnID.value = true : null}
       />
       <Field
+        hasFocus={focusOnID}
         hintText={`Client ID`}
         iconPath={mdiIdentifier}
         value={props.clientId}
@@ -58,8 +64,10 @@ export function ClientFields(props: {
         formatInput={formatIdNumber}
         keyboard={"numeric"}
         enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
+        onSubmit={()=>focusOnPhone.value = true}
       />
       <Field
+        hasFocus={focusOnPhone}
         hintText={`Phone`}
         iconPath={mdiPhone}
         value={props.phoneNumber}
@@ -67,6 +75,7 @@ export function ClientFields(props: {
         formatInput={formatPhoneNumber}
         keyboard="tel"
         enterKeyHint={ useFormula(() => enterKey(props.address)).value }
+        onSubmit={()=>focusOnAddress.value = true}
       />
 
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
@@ -115,6 +124,7 @@ export function ClientFields(props: {
         </Row>
       </Show> */}
       <Field
+        hasFocus={focusOnAddress}
         hintText={`Address`}
         multiline
         iconPath={mdiMapMarker}
@@ -123,8 +133,10 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
+        onSubmit={()=>focusOnNotes.value = true}
       />
       <Field
+        hasFocus={focusOnNotes}
         hintText={`Notes`}
         multiline
         iconPath={mdiTextBox}
@@ -132,7 +144,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`sentences`}
         keyboard={"text"}
-        enterKeyHint={`done`}
+        enterKeyHint={`enter`}
       />
     </>
   );
