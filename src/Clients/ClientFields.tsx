@@ -24,6 +24,19 @@ export function ClientFields(props: {
   notes: Prop<string>;
 }) {
   const firstFocus = props.firstFieldHasFocus ?? useProp(true);
+  const fieldRefs = useProp<Array<HTMLDivElement | null>>([]);
+  let currentIndex = 0;
+
+  function assignRef(el: HTMLDivElement | null) {
+    if (el) {
+      const index = ++currentIndex;
+      (el as any).index = index;
+      el.classList.add('field-component');
+      fieldRefs.value[index] = el;
+    }
+    return el;
+  }
+
   // const addPhoneNumber = () => {
   //   props.client?.value.addPhoneNumber();
   // };
@@ -35,7 +48,7 @@ export function ClientFields(props: {
 
   function enterKey(prop: Prop<string>): EnterKeyHint {
      const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
-    console.log("key: ", key);
+    // console.log("key: ", key);
     return key;
   }
 
@@ -44,17 +57,28 @@ export function ClientFields(props: {
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
 
-  const handleKeyDown = (event) => {
-    console.log("key event: ", event.key);
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
-      const form = event.target.form;
-      const index = Array.prototype.indexOf.call(form, event.target);
-      const nextField = form.elements[index + 1];
-      if (nextField) {
-        nextField.focus();
-        event.preventDefault(); // Prevent form submission
+      let target = event.target as HTMLElement;
+      while (target && !target.classList.contains('field-component')) {
+        target = target.parentElement as HTMLElement;
+      }
+      if (target) {
+        const index = (target as any).index;
+        console.log("change focus to next field: ", index);
+        if (index !== undefined && index < fieldRefs.value.length - 1) {
+          const nextField = fieldRefs.value[index + 1];
+          if (nextField) {
+            requestAnimationFrame(() => {
+              nextField.focus();
+              console.log("focus on: ", nextField);
+            });
+            event.preventDefault(); // Prevent form submission
+          }
+        }
       }
     }
+    console.log("key event: ", event.key);
   };
 
   onCleanup(() => {
@@ -66,6 +90,7 @@ export function ClientFields(props: {
   return (
     <>
       <Field
+        ref={assignRef}
         hasFocus={firstFocus}
         hintText={`Name`}
         iconPath={mdiAccount} //mdiDomain
@@ -76,6 +101,7 @@ export function ClientFields(props: {
         enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
       />
       <Field
+        ref={assignRef}
         hasFocus={focusOnID}
         hintText={`Client ID`}
         iconPath={mdiIdentifier}
@@ -86,6 +112,7 @@ export function ClientFields(props: {
         enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
       />
       <Field
+        ref={assignRef}
         hasFocus={focusOnPhone}
         hintText={`Phone`}
         iconPath={mdiPhone}
@@ -142,6 +169,7 @@ export function ClientFields(props: {
         </Row>
       </Show> */}
       <Field
+        ref={assignRef}
         hasFocus={focusOnAddress}
         hintText={`Address`}
         multiline
@@ -153,6 +181,7 @@ export function ClientFields(props: {
         enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
       />
       <Field
+        ref={assignRef}
         hasFocus={focusOnNotes}
         hintText={`Notes`}
         multiline
