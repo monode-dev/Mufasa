@@ -53,7 +53,7 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
-        onKeyPress={(e)=> e.key == enterKey() ? focusOnID.value = true : null}
+        onSubmit={()=>requestAnimationFrame(() => focusOnID.value = true)}
       />
       <Field
         hasFocus={focusOnID}
