@@ -11,7 +11,7 @@ import {Box, EnterKeyHint, Field, Icon, Prop, Row, Txt, useFormula, useProp} fro
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
-import { For, Show } from "solid-js";
+import {For, onCleanup, Show} from "solid-js";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
@@ -44,15 +44,24 @@ export function ClientFields(props: {
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
 
-  const handleKeyPress = (event) => {
-    console.log("key: ", event.key);
+  const handleKeyDown = (event) => {
+    console.log("key event: ", event.key);
     if (event.key === "Enter") {
       const form = event.target.form;
       const index = Array.prototype.indexOf.call(form, event.target);
-      form.elements[index + 1].focus();
-      event.preventDefault(); // Prevent form submission
+      const nextField = form.elements[index + 1];
+      if (nextField) {
+        nextField.focus();
+        event.preventDefault(); // Prevent form submission
+      }
     }
   };
+
+  onCleanup(() => {
+    document.removeEventListener("keydown", handleKeyDown);
+  });
+
+  document.addEventListener("keydown", handleKeyDown);
 
   return (
     <>
@@ -65,7 +74,6 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
-        onKeyDown={handleKeyPress}
       />
       <Field
         hasFocus={focusOnID}
@@ -76,11 +84,7 @@ export function ClientFields(props: {
         formatInput={formatIdNumber}
         keyboard={"numeric"}
         enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
-        onSubmit={()=> {
-          console.log("submit");
-          focusOnPhone.value = true
-        }
-      }/>
+      />
       <Field
         hasFocus={focusOnPhone}
         hintText={`Phone`}
@@ -90,7 +94,6 @@ export function ClientFields(props: {
         formatInput={formatPhoneNumber}
         keyboard="tel"
         enterKeyHint={ useFormula(() => enterKey(props.address)).value }
-        onSubmit={()=>focusOnAddress.value = true}
       />
 
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
@@ -148,7 +151,6 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
-        onSubmit={()=>focusOnNotes.value = true}
       />
       <Field
         hasFocus={focusOnNotes}
