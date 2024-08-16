@@ -23,6 +23,7 @@ export function ClientFields(props: {
   create?: boolean;
   notes: Prop<string>;
 }) {
+  const firstFocus = props.firstFieldHasFocus ?? useProp(true);
   // const addPhoneNumber = () => {
   //   props.client?.value.addPhoneNumber();
   // };
@@ -42,10 +43,21 @@ export function ClientFields(props: {
   const focusOnPhone = useProp(false);
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
+
+  const handleKeyPress = (event) => {
+    console.log("key: ", event.key);
+    if (event.key === "Enter") {
+      const form = event.target.form;
+      const index = Array.prototype.indexOf.call(form, event.target);
+      form.elements[index + 1].focus();
+      event.preventDefault(); // Prevent form submission
+    }
+  };
+
   return (
     <>
       <Field
-        hasFocus={props.firstFieldHasFocus}
+        hasFocus={firstFocus}
         hintText={`Name`}
         iconPath={mdiAccount} //mdiDomain
         value={props.name}
@@ -53,7 +65,7 @@ export function ClientFields(props: {
         capitalize={`words`}
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
-        onSubmit={()=>requestAnimationFrame(() => focusOnID.value = true)}
+        onKeyDown={handleKeyPress}
       />
       <Field
         hasFocus={focusOnID}
@@ -64,8 +76,11 @@ export function ClientFields(props: {
         formatInput={formatIdNumber}
         keyboard={"numeric"}
         enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
-        onSubmit={()=>focusOnPhone.value = true}
-      />
+        onSubmit={()=> {
+          console.log("submit");
+          focusOnPhone.value = true
+        }
+      }/>
       <Field
         hasFocus={focusOnPhone}
         hintText={`Phone`}
