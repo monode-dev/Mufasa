@@ -50,17 +50,18 @@ export default function ClientSelector(props: {
     <Selector
       value={props.value.value}
       noneLabel="Select Client"
-      modalIsOpenSig={dropDownIsOpen}
+      isOpen={dropDownIsOpen}
+      //modalIsOpenSig={dropDownIsOpen}
       getLabelForData={(data: CLIENT_TYPE) => {
-        // console.log(`data: `, data);
+        //console.log(`data: `, data);
         if (!exists(data)) return null;
         if (data === ONE_TIME) return `One Time`;
         if (!exists(data.docId)) return null;
         return getClientLabel(data) ?? `Unnamed Client`;
       }}
-      filterStringSig={filterString}
-      showCancelOptionForFilter={props.showCancelOption ?? false}
-      isWide
+      filterString={filterString}
+      //showCancelOptionForFilter={props.showCancelOption ?? false}
+      //isWide
     >
       {!clientsAreFiltered.value && (
         <>
