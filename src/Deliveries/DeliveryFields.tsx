@@ -4,15 +4,17 @@ import {
   mdiAccount,
   mdiLabel,
   mdiMapMarker,
+  mdiPencil,
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import { Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt } from "miwi";
+import { Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, pushPage } from "miwi";
 import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
 import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
+import ClientPage from "@/Clients/ClientPage";
 
 export function DeliveryFields(props: {
   delivery: Pick<
@@ -55,6 +57,11 @@ export function DeliveryFields(props: {
 
     return "";
   }
+  
+
+  function editIconShouldBeDisabled() {
+    return props.delivery.selectedClient === ONE_TIME || !clientIsValid() || props.delivery.selectedClient === NONE_SELECTED;
+  }
 
   return (
     <Column>
@@ -77,6 +84,15 @@ export function DeliveryFields(props: {
             () => props.delivery.selectedClient,
             (v) => (props.delivery.selectedClient = v),
           )}
+        />
+        <Icon
+        stroke={editIconShouldBeDisabled() ? $theme.colors.hint : undefined}
+        iconPath={mdiPencil}
+        onClick={() => {
+          if(props.delivery.selectedClient && props.delivery.selectedClient !== ONE_TIME){
+            pushPage(ClientPage, { client: props.delivery.selectedClient });
+          }
+        }}
         />
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
