@@ -22,6 +22,7 @@ import {
   Slider,
   TabButtons,
   TabView,
+  Icon,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -36,6 +37,8 @@ import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
+import { mdiPencil, mdiTagEdit } from "@mdi/js";
+import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -263,6 +266,17 @@ export default function Calculator() {
                   )}
                 </For>
               </Selector>
+              <Icon
+              stroke={selectedDelivery.value ? undefined : $theme.colors.hint}
+              iconPath={mdiPencil}
+              onClick={() => {
+                if(selectedDelivery.value){
+                  pushPage(DeliveryPage, {
+                    delivery: selectedDelivery.value,
+                  });
+                }
+              }}
+              />
             </Label>
 
             {/* --Sub Delivery-- */}
