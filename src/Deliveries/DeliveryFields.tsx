@@ -85,15 +85,17 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.selectedClient = v),
           )}
         />
-        <Icon
-        stroke={editIconShouldBeDisabled() ? $theme.colors.hint : undefined}
-        iconPath={mdiPencil}
-        onClick={() => {
-          if(props.delivery.selectedClient && props.delivery.selectedClient !== ONE_TIME){
-            pushPage(ClientPage, { client: props.delivery.selectedClient });
-          }
-        }}
-        />
+        <Show when={props.delivery.selectedClient !== ONE_TIME}>
+          <Icon
+          stroke={editIconShouldBeDisabled() ? $theme.colors.hint : undefined}
+          iconPath={mdiPencil}
+          onClick={() => {
+            if(props.delivery.selectedClient && props.delivery.selectedClient !== ONE_TIME){
+              pushPage(ClientPage, { client: props.delivery.selectedClient });
+            }
+          }}
+          />
+        </Show>
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
         <Field
