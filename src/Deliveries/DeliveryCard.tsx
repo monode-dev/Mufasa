@@ -38,7 +38,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
     >
       {/* Time */}
       <Show when={props.delivery.isCompleted}>
-        <Row>
+        <Row alignTopRight>
           <Txt singleLine widthGrows>
             {formatPosixTime(props.delivery.completedTimePosix!)}
           </Txt>
@@ -214,7 +214,6 @@ function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
       }}
     >
       <HiddenOption
-        alignCenterLeft
         padBetween={0.25}
         onClick={() => {
           isOpen.value = false;
