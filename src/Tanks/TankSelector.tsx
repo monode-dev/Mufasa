@@ -42,6 +42,7 @@ export default function TankSelector(
   }
 
   const tanks = useFormula(() => {
+    if (!props.client) return null;
     if (!exists(props.client.tanks)) return null;
     return listTanks(props.client.tanks, true);
   });
@@ -52,7 +53,8 @@ export default function TankSelector(
     <Selector
       value={value.value}
       noneLabel={"Select Tank"}
-      modalIsOpenSig={dropDownIsOpen}
+      isOpen={dropDownIsOpen}
+      //modalIsOpenSig={dropDownIsOpen}
       getLabelForData={(data: TankType) => {
         if (!exists(data)) return null;
         if (data == JUST_FUEL) return justFuelLabel;
