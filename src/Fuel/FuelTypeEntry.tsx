@@ -11,6 +11,8 @@ import {
   exists, EnterKeyHint,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
+import {onCleanup} from "solid-js";
+import {FieldKeyHandler} from "@/AppData";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -25,6 +27,10 @@ export default function FuelTypeEntry(props: {
     });
   }
 
+  onCleanup(() => {
+    document.removeEventListener("keydown", FieldKeyHandler);
+  });
+  document.addEventListener("keydown", FieldKeyHandler);
   return (
     <Row widthGrows padBetween={1} alignLeft>
       <Field

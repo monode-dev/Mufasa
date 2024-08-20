@@ -15,7 +15,7 @@ import {
   DeleteOption,
   theme, EnterKeyHint, Prop,
 } from "miwi";
-import { Show } from "solid-js";
+import {onCleanup, Show} from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
@@ -28,6 +28,7 @@ import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import {Flag} from "mufasa/dist/Utils";
 import {OptionalPropFlag} from "mufasa/dist/Doc";
+import {FieldKeyHandler} from "@/AppData";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -102,6 +103,10 @@ export default function SubDeliveryCard(props: {
     return key;
   }
 
+  onCleanup(() => {
+    document.removeEventListener("keydown", FieldKeyHandler);
+  });
+  document.addEventListener("keydown", FieldKeyHandler);
   return (
     <Card
       widthGrows
