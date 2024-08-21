@@ -12,7 +12,6 @@ import {
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
 import {onCleanup} from "solid-js";
-import {FieldKeyHandler} from "@/AppData";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;

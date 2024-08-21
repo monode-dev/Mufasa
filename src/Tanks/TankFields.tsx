@@ -2,8 +2,7 @@ import {
   Box,
   doWatch, EnterKeyHint,
   exists,
-  Label,
-  mdColors,
+  Label, mdColors,
   NumField,
   Prop,
   useFormula,
@@ -16,7 +15,7 @@ import {
 } from "@/Calculator/ShapeUtils";
 import {For, onCleanup} from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
-import {FieldKeyHandler} from "@/AppData";
+import {IndexedField, IndexedFieldKeyHandler, IndexedNumField} from "@/components/IndexedField";
 
 const _dimensionHintText = `in.`;
 
@@ -88,9 +87,13 @@ export default function TankFields(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", IndexedFieldKeyHandler);
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  document.addEventListener("keydown", IndexedFieldKeyHandler);
+
+  let fieldCounter = 0;
+  let fieldRefs:HTMLInputElement[] = [];
+
   return (
     <>
       <Box padBottom={0.25}>
@@ -113,17 +116,19 @@ export default function TankFields(props: {
         {(dim, index) => {
           return (
             <Label label={getDimensionLabel(dim)}>
-              <NumField
-                negativesAreAllowed={false}
-                hint={_dimensionHintText}
-                value={useFormula(
-                  () => props.tankGeometry[dim],
-                  (val) => (props.tankGeometry[dim] = val),
-                )}
-                underlined
-                stroke={mdColors.black}
-                enterKeyHint={ useFormula(() => enterKey(index)).value }
-              />
+              <IndexedNumField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+                <NumField
+                  negativesAreAllowed={false}
+                  hint={_dimensionHintText}
+                  value={useFormula(
+                    () => props.tankGeometry[dim],
+                    (val) => (props.tankGeometry[dim] = val),
+                  )}
+                  underlined
+                  stroke={mdColors.black}
+                  enterKeyHint={ useFormula(() => enterKey(index)).value }
+                />
+              </IndexedNumField>
             </Label>
           );
         }}
