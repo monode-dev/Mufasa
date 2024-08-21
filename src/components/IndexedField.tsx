@@ -56,12 +56,17 @@ export type NumFieldProps = SharedFieldProps & BoxProps & {
   heading?: boolean;
 };
 
-interface IndexedFieldProps
-  // extends Partial<FieldProps & NumFieldProps>
-{
+interface IndexedProps{
   static_counter: number;
   fieldRefs: HTMLDivElement[];
-  children: JSX.Element & { type: typeof Field | typeof NumField };
+}
+
+interface IndexedFieldProps extends IndexedProps {
+  children: any;//JSX.Element & typeof Field;
+}
+
+interface IndexedNumFieldProps extends IndexedProps {
+  children: any;//JSX.Element & { type: typeof NumField };
 }
 
 export function IndexedFieldKeyHandler(event: KeyboardEvent) {
@@ -87,7 +92,26 @@ export function IndexedFieldKeyHandler(event: KeyboardEvent) {
   }
 }
 
-export default function IndexedField(props: IndexedFieldProps) {
+export function IndexedField(props: IndexedFieldProps) {
+  let static_index_ref = useProp(-1);
+
+  function assignRef(el: HTMLDivElement | null, counter: number, fieldRefs: HTMLDivElement[]) {
+    if (el) {
+      static_index_ref.value = ++counter;
+      fieldRefs[static_index_ref.value] = el;
+    }
+    return el;
+  }
+
+  return (
+    <div ref={(el) => assignRef(el, props.static_counter, props.fieldRefs)}
+         data-index={static_index_ref.value}>
+      {props.children}
+    </div>
+  );
+}
+
+export function IndexedNumField(props: IndexedNumFieldProps) {
   let static_index_ref = useProp(-1);
 
   function assignRef(el: HTMLDivElement | null, counter: number, fieldRefs: HTMLDivElement[]) {
