@@ -82,7 +82,8 @@ export default function TankFields(props: {
       ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
       : false;
     const key: EnterKeyHint = needsData ? `next` : `done`;
-    console.log("key: ", key);
+    // 1 based not 0 based
+    enterHintRefs.value.set(index() + 1, key);
     return key;
   }
 
@@ -90,9 +91,11 @@ export default function TankFields(props: {
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
   return (
     <>
@@ -114,9 +117,10 @@ export default function TankFields(props: {
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
         {(dim, index) => {
+          const indexRef = useProp(index());
           return (
             <Label label={getDimensionLabel(dim)}>
-              <IndexedField count={fieldCounter} refs={fieldRefs}>
+              <IndexedField count={fieldCounter} refs={fieldRefs} indexRef={indexRef}>
                 <NumField
                   negativesAreAllowed={false}
                   hint={_dimensionHintText}

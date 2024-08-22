@@ -28,12 +28,14 @@ export default function FuelTypeEntry(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
 
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
   return (
     <Row widthGrows padBetween={1} alignLeft>
@@ -50,7 +52,7 @@ export default function FuelTypeEntry(props: {
             const key: EnterKeyHint = (props.fuelType.rate ?? 0) <= 0
               ? `next`
               : `done`;
-            console.log("key: ", key);
+
             return key;
           }).value
         }

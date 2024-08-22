@@ -108,6 +108,8 @@ export default function SubDeliveryCard(props: {
 
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
   return (
     <Card
@@ -202,7 +204,6 @@ export default function SubDeliveryCard(props: {
                 />
               </Label>
               <Label label="Rate">
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
                 <NumField
                   value={useFormula(
                     () => props.subDelivery.explicitRate,
@@ -212,7 +213,6 @@ export default function SubDeliveryCard(props: {
                   hint="Rate"
                   enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.gallons )).value }
                 />
-      </IndexedField>
               </Label>
             </Show>
 
@@ -223,7 +223,6 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
               <NumField
                 value={useFormula(
                   () => props.subDelivery.gallons,
@@ -236,7 +235,6 @@ export default function SubDeliveryCard(props: {
                 hint="Est. gal."
                 enterKeyHint={ useFormula(() => lastEnterHint(props.nextSubDelivery)).value }
               />
-      </IndexedField>
             </Label>
             <Show
               when={
