@@ -3,29 +3,19 @@ import {
   mdiIdentifier,
   mdiMapMarker,
   mdiPhone,
-  mdiPlus,
   mdiTextBox,
-  mdiTrashCanOutline,
 } from "@mdi/js";
 import {
-  Box,
-  BoxProps,
   EnterKeyHint,
-  Field, FieldCapitalization,
-  FieldInputType,
-  FormatFieldInput,
-  Icon, KeyboardType,
+  Field,
   Prop,
-  Row,
-  Txt,
   useFormula,
   useProp
 } from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
-import { Client, ClientPhoneNumber } from "./Client";
-import {Component, For, onCleanup, Show} from "solid-js";
-import {FieldKeyHandler} from "@/AppData";
+import { onCleanup, } from "solid-js";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
@@ -40,20 +30,8 @@ export function ClientFields(props: {
 
   const firstFocus = props.firstFieldHasFocus ?? useProp(true);
 
-  // const addPhoneNumber = () => {
-  //   props.client?.value.addPhoneNumber();
-  // };
-  // const deletePhoneNumber = (num: ClientPhoneNumber) => {
-  //   props.client?.value.sortedAdditionalPhoneNumbers
-  //     .find((phoneNumber) => phoneNumber === num)
-  //     ?.deleteDoc();
-  // };
-
-  const keyHintMap = new Map<string, EnterKeyHint>();
-
   function enterKey(nextprop: Prop<string>): EnterKeyHint {
     const key = props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
-    // keyHintMap.set(curprop.value, key);
     console.log("key: ", key);
     return key;
   }
@@ -64,12 +42,16 @@ export function ClientFields(props: {
   const focusOnNotes = useProp(false);
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", IndexedFieldKeyHandler);
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  document.addEventListener("keydown", IndexedFieldKeyHandler);
+
+  let fieldCounter = useProp(0);
+  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
 
   return (
     <>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
       <Field
         hasFocus={firstFocus}
         hintText={`Name`}
@@ -80,6 +62,8 @@ export function ClientFields(props: {
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.clientId )).value}
       />
+      </IndexedField>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
       <Field
         hasFocus={focusOnID}
         hintText={`Client ID`}
@@ -90,6 +74,8 @@ export function ClientFields(props: {
         keyboard={"numeric"}
         enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
       />
+      </IndexedField>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
       <Field
         hasFocus={focusOnPhone}
         hintText={`Phone`}
@@ -100,52 +86,8 @@ export function ClientFields(props: {
         keyboard="tel"
         enterKeyHint={ useFormula(() => enterKey(props.address)).value }
       />
-
-      {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
-        {(phoneNumber) => (
-          <Box padLeft={1.2}>
-            <Row>
-              <Field
-                hintText={`Name`}
-                value={useFormula(
-                  () => phoneNumber.name ?? "",
-                  (v) => (phoneNumber.name = v),
-                )}
-                underlined
-                capitalize={`words`}
-                keyboard={"text"}
-                width={4.8}
-              />
-              <Field
-                hintText={`Number`}
-                value={useFormula(
-                  () => phoneNumber.number ?? "",
-                  (v) => (phoneNumber.number = v),
-                )}
-                underlined
-                formatInput={formatPhoneNumber}
-                keyboard="tel"
-              />
-              <Icon
-                stroke={$theme.colors.error}
-                iconPath={mdiTrashCanOutline}
-                scale={1.3}
-                onClick={() => deletePhoneNumber(phoneNumber)}
-              />
-            </Row>
-          </Box>
-        )}
-      </For>
-      <Show when={props.client}>
-        <Row onClick={addPhoneNumber} padBetween={0.25}>
-          <Icon
-            stroke={$theme.colors.primary}
-            iconPath={mdiPlus}
-            scale={1.25}
-          />
-          <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
-        </Row>
-      </Show> */}
+      </IndexedField>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
       <Field
         hasFocus={focusOnAddress}
         hintText={`Address`}
@@ -157,6 +99,8 @@ export function ClientFields(props: {
         keyboard={"text"}
         enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
       />
+      </IndexedField>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
       <Field
         hasFocus={focusOnNotes}
         hintText={`Notes`}
@@ -168,6 +112,7 @@ export function ClientFields(props: {
         keyboard={"text"}
         enterKeyHint={`enter`}
       />
+      </IndexedField>
     </>
   );
 }
