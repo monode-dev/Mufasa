@@ -237,7 +237,7 @@ export default function Calculator() {
             <Label label="Delivery" stroke={!selectedDelivery.value?.isValid && selectedDelivery.value ? $theme.colors.warning : undefined}>
               <Selector
                 value={selectedDelivery.value}
-                modalIsOpenSig={deliverySelectorIsOpen}
+                isOpen={deliverySelectorIsOpen}
                 noneLabel={"Select Delivery"}
                 getLabelForData={(delivery) => delivery?.title ?? null}
                 emptyListText={"No Upcoming Deliveries"}
@@ -284,7 +284,7 @@ export default function Calculator() {
               <Label label="Tank" stroke={!selectedSubDelivery.value?.isValid && selectedSubDelivery.value && selectedSubDelivery.value?.delivery.selectedClient != selectedDelivery.value?.selectedClient ? $theme.colors.warning : undefined}>
                 <Selector
                   value={selectedSubDelivery.value}
-                  modalIsOpenSig={subDeliverySelectorIsOpen}
+                  isOpen={subDeliverySelectorIsOpen}
                   noneLabel={"Select Tank"}
                   getLabelForData={getSubDeliveryName}
                   emptyListText={"No Clients"}
