@@ -37,7 +37,7 @@ export default function FuelTypeEntry(props: {
 
   return (
     <Row widthGrows padBetween={1} alignLeft>
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <Field
           value={useFormula(
             () => props.fuelType.name ?? ``,
@@ -56,7 +56,7 @@ export default function FuelTypeEntry(props: {
         }
         />
       </IndexedField>
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <NumField
           enterKeyHint={
           useFormula(() => {

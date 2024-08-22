@@ -97,6 +97,9 @@ export function DeliveryFields(props: {
 
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+  const dexRef:Prop<number>[] = new Array(5);
 
   return (
     <Column>
@@ -121,7 +124,7 @@ export function DeliveryFields(props: {
         />
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <Field
           underlined
           hintText={`Client Name`}
@@ -133,7 +136,7 @@ export function DeliveryFields(props: {
           enterKeyHint={ useFormula(() => enterKey(one_phone)).value }
         />
       </IndexedField>
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <Field
           underlined
           hintText={`Phone`}
@@ -145,7 +148,7 @@ export function DeliveryFields(props: {
           enterKeyHint={ useFormula(() => enterKey(one_address)).value }
         />
       </IndexedField>
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <Field
           multiline
           underlined
@@ -159,7 +162,7 @@ export function DeliveryFields(props: {
         />
       </IndexedField>
       </Show>
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
       <Field
         multiline
         underlined
