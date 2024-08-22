@@ -86,13 +86,13 @@ export default function TankFields(props: {
     return key;
   }
 
-  onCleanup(() => {
-    document.removeEventListener("keydown", IndexedFieldKeyHandler);
-  });
-  document.addEventListener("keydown", IndexedFieldKeyHandler);
-
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+
+  onCleanup(() => {
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+  });
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
 
   return (
     <>
