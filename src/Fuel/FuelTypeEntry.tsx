@@ -12,7 +12,7 @@ import {
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
 import {onCleanup} from "solid-js";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
+import {FieldKeyHandler, IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -28,9 +28,9 @@ export default function FuelTypeEntry(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+    document.removeEventListener("keydown", (event) => FieldKeyHandler(event));
   });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  document.addEventListener("keydown", (event) => FieldKeyHandler(event));
 
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
@@ -39,7 +39,6 @@ export default function FuelTypeEntry(props: {
 
   return (
     <Row widthGrows padBetween={1} alignLeft>
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <Field
           value={useFormula(
             () => props.fuelType.name ?? ``,
@@ -57,8 +56,6 @@ export default function FuelTypeEntry(props: {
           }).value
         }
         />
-      </IndexedField>
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
         <NumField
           enterKeyHint={
           useFormula(() => {
@@ -83,7 +80,6 @@ export default function FuelTypeEntry(props: {
            * this in future if it looks too weird. */
           width={5}
         />
-      </IndexedField>
       <HiddenOptions
         cancelOptions={{
           stroke: theme.palette.hint,
