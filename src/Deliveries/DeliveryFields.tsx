@@ -7,12 +7,25 @@ import {
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop, EnterKeyHint} from "miwi";
-import {onCleanup, Show} from "solid-js";
+import {
+  Column,
+  Row,
+  Icon,
+  exists,
+  mdColors,
+  Field,
+  useFormula,
+  Box,
+  Txt,
+  Prop,
+  EnterKeyHint, useProp
+} from "miwi";
+import { onCleanup, Show } from "solid-js";
 import { Delivery } from "./Delivery";
-import {FieldKeyHandler, listClients} from "@/AppData";
+import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function DeliveryFields(props: {
   create?: boolean;
@@ -78,9 +91,13 @@ export function DeliveryFields(props: {
         );
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", IndexedFieldKeyHandler);
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  document.addEventListener("keydown", IndexedFieldKeyHandler);
+
+  let fieldCounter = useProp(0);
+  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+
   return (
     <Column>
       <Row>
@@ -104,6 +121,7 @@ export function DeliveryFields(props: {
         />
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
         <Field
           underlined
           hintText={`Client Name`}
@@ -114,6 +132,8 @@ export function DeliveryFields(props: {
           keyboard={"text"}
           enterKeyHint={ useFormula(() => enterKey(one_phone)).value }
         />
+      </IndexedField>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
         <Field
           underlined
           hintText={`Phone`}
@@ -124,6 +144,8 @@ export function DeliveryFields(props: {
           keyboard="tel"
           enterKeyHint={ useFormula(() => enterKey(one_address)).value }
         />
+      </IndexedField>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
         <Field
           multiline
           underlined
@@ -135,7 +157,9 @@ export function DeliveryFields(props: {
           keyboard={"text"}
           enterKeyHint={ useFormula(() => enterKey(one_note)).value }
         />
+      </IndexedField>
       </Show>
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
       <Field
         multiline
         underlined
@@ -148,6 +172,7 @@ export function DeliveryFields(props: {
         overflowXWraps
         enterKeyHint={`done`}
       />
+      </IndexedField>
       <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>
           <Txt alignLeft stroke={$theme.colors.warning}>

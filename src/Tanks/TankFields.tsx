@@ -5,7 +5,7 @@ import {
   Label, mdColors,
   NumField,
   Prop,
-  useFormula,
+  useFormula, useProp,
 } from "miwi";
 import {
   getDimensionLabel,
@@ -15,7 +15,7 @@ import {
 } from "@/Calculator/ShapeUtils";
 import {For, onCleanup} from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
-import {IndexedField, IndexedFieldKeyHandler, IndexedNumField} from "@/components/IndexedField";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 const _dimensionHintText = `in.`;
 
@@ -91,8 +91,8 @@ export default function TankFields(props: {
   });
   document.addEventListener("keydown", IndexedFieldKeyHandler);
 
-  let fieldCounter = 0;
-  let fieldRefs:HTMLInputElement[] = [];
+  let fieldCounter = useProp(0);
+  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
 
   return (
     <>
@@ -116,7 +116,7 @@ export default function TankFields(props: {
         {(dim, index) => {
           return (
             <Label label={getDimensionLabel(dim)}>
-              <IndexedNumField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+              <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
                 <NumField
                   negativesAreAllowed={false}
                   hint={_dimensionHintText}
@@ -128,7 +128,7 @@ export default function TankFields(props: {
                   stroke={mdColors.black}
                   enterKeyHint={ useFormula(() => enterKey(index)).value }
                 />
-              </IndexedNumField>
+              </IndexedField>
             </Label>
           );
         }}
