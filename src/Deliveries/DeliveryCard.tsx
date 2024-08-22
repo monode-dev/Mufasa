@@ -117,6 +117,24 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         </Row>
       </Show>
 
+      <Box widthGrows height={0.125} fill={$theme.colors.text} />
+
+      <Show when={props.delivery.sortedSubDeliveries}>
+        <For each={props.delivery.sortedSubDeliveries}>
+          {(subDelivery) => 
+            <Row>
+              <Txt>
+                {subDelivery.fuelName}
+              </Txt>
+              <Txt padAroundX={1.5}>
+              ${subDelivery.sales.toFixed(2)}
+              </Txt>
+
+            </Row>
+          }
+        </For>
+      </Show>
+
       {/* Total */}
       <Txt singleLine widthGrows bold>
         Total: ${props.delivery.totalMoney}
