@@ -1,9 +1,9 @@
 /**
- * This is a hack to get around a few issues.
+ * This is a hack to get around a few issues including:
  * Miwi Field Component is not bubbling up a number of events like onKey*, onBlur, onSubmit, onLoad* etc.
- * A final type should probably be in a Component like FieldGroup
- * that can wrap multiple Fields and NumFields as in case ClientFields.
- * There are a number of For loop variants that need the Group to be added one at a time as in case TankFields.
+ * A final type could probably be in a Component like FieldGroup
+ * that can handle wrapping multiple Fields and NumFields as in case ClientFields.
+ * There are a number of For loop variants that need the Group to be built one at a time as in case TankFields.
  * The code would likely be simpler if it were a feature of Miwi.
  */
 
@@ -15,9 +15,10 @@ import {
   FieldInputType,
   FormatFieldInput,
   KeyboardType, Overflow,
-  Prop, useFormula, useProp
+  Prop,
 } from "miwi";
 import {JSX} from "solid-js/jsx-runtime";
+import {children} from "solid-js";
 
 export type SharedFieldProps = BoxProps & {
   onlyWriteOnBlur?: boolean;
@@ -54,15 +55,14 @@ export type NumFieldProps = SharedFieldProps & {
   heading?: boolean;
 };
 
-interface IndexedProps extends SharedFieldProps{
-  static_counter: Prop<number>;
-  fieldRefs: Prop<Map<number,HTMLDivElement>>;
-}
-
 /** Use the handler in a global event listener to handle enter key presses.
  * The listener should only be active on the page that contains the indexed fields.
  */
-export function IndexedFieldKeyHandler(event: KeyboardEvent, fieldRefs: Prop<Map<number, HTMLDivElement>>) {
+export function IndexedFieldKeyHandler(
+  event: KeyboardEvent,
+  fieldRefs: Prop<Map<number, HTMLDivElement>>,
+  enterHintRefs: Prop<Map<number, EnterKeyHint>>
+) {
   if (event.key === "Enter") {
     const target = event.target as HTMLElement;
     const parent = target.closest("[data-index]") as HTMLElement;
@@ -74,6 +74,9 @@ export function IndexedFieldKeyHandler(event: KeyboardEvent, fieldRefs: Prop<Map
       // storing index starts at 1
       const lastIndex = fields.size;
       if (currentIndex > -1 && currentIndex < lastIndex) {
+        const enterHint = enterHintRefs.value.get(currentIndex);
+        if ((enterHint ?? 'done') == `done`) return;
+
         const nextElement = fields.get(currentIndex + 1);
         console.log("nextElement: ", nextElement);
         if (nextElement) {
@@ -90,31 +93,32 @@ export function IndexedFieldKeyHandler(event: KeyboardEvent, fieldRefs: Prop<Map
 
 // Hypothesis: type Field | NumField is causing an error because of the value type conflict
 // No clue why only type Field by itself is causing an error
-interface IndexedFieldProps extends IndexedProps {
+interface IndexedProps extends SharedFieldProps{
+  count: Prop<number>;
+  refs: Prop<Map<number,HTMLDivElement>>;
+  indexRef: Prop<number>;
   children: JSX.Element; // & { type: typeof Field | typeof NumField };
 }
 
 /**
  * Each tab-able Field or NumField should be wrapped in an IndexedField.
  */
-export function IndexedField(props: IndexedFieldProps) {
-  let static_index_ref = useProp(-1);
+export function IndexedField(props: IndexedProps) {
 
   function assignRef(el: HTMLDivElement | null, counter: Prop<number>, fieldRefs: Prop<Map<number,HTMLDivElement>>) {
     console.log("assignRef: ", el, counter);
     if (el) {
-      static_index_ref.value = ++counter.value;
-      fieldRefs.value.set(static_index_ref.value, el);
-      console.log("fieldRefs: ", fieldRefs);
+      const index = ++counter.value;
+      fieldRefs.value.set(index, el);
+      props.indexRef.value = index;
     }
     return el;
   }
 
   return (
     <Box
-      ref={(el) => assignRef(el, props.static_counter, props.fieldRefs)}
-      data-index={static_index_ref.value}
-      data-last={props.static_counter.value}
+      ref={(el) => assignRef(el, props.count, props.refs)}
+      data-index={props.indexRef.value}
       widthGrows
       // height={fieldHeight.value}
       stroke={$theme.colors.text}

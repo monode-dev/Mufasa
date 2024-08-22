@@ -202,7 +202,7 @@ export default function SubDeliveryCard(props: {
                 />
               </Label>
               <Label label="Rate">
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
                 <NumField
                   value={useFormula(
                     () => props.subDelivery.explicitRate,
@@ -223,7 +223,7 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
-      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs}>
               <NumField
                 value={useFormula(
                   () => props.subDelivery.gallons,
