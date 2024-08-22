@@ -59,66 +59,66 @@ export function ClientFields(props: {
     <>
       <IndexedField count={fieldCount} refs={fieldRefs} indexRef={nameIndex}
       >
-      <Field
-        hasFocus={firstFocus}
-        hintText={`Name`}
-        iconPath={mdiAccount} //mdiDomain
-        value={props.name}
-        underlined
-        capitalize={`words`}
-        keyboard={"text"}
-        enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
-      />
+        <Field
+          hasFocus={firstFocus}
+          hintText={`Name`}
+          iconPath={mdiAccount} //mdiDomain
+          value={props.name}
+          underlined
+          capitalize={`words`}
+          keyboard={"text"}
+          enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
+        />
       </IndexedField>
       <IndexedField count={fieldCount} refs={fieldRefs} indexRef={idIndex}>
-      <Field
-        hasFocus={focusOnID}
-        hintText={`Client ID`}
-        iconPath={mdiIdentifier}
-        value={props.clientId}
-        underlined
-        formatInput={formatIdNumber}
-        keyboard={"numeric"}
-        enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
-      />
+        <Field
+          hasFocus={focusOnID}
+          hintText={`Client ID`}
+          iconPath={mdiIdentifier}
+          value={props.clientId}
+          underlined
+          formatInput={formatIdNumber}
+          keyboard={"numeric"}
+          enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
+        />
       </IndexedField>
       <IndexedField count={fieldCount} refs={fieldRefs} indexRef={phoneIndex}>
-      <Field
-        hasFocus={focusOnPhone}
-        hintText={`Phone`}
-        iconPath={mdiPhone}
-        value={props.phoneNumber}
-        underlined
-        formatInput={formatPhoneNumber}
-        keyboard="tel"
-        enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
-      />
+        <Field
+          hasFocus={focusOnPhone}
+          hintText={`Phone`}
+          iconPath={mdiPhone}
+          value={props.phoneNumber}
+          underlined
+          formatInput={formatPhoneNumber}
+          keyboard="tel"
+          enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
+        />
       </IndexedField>
       <IndexedField count={fieldCount} refs={fieldRefs} indexRef={addressIndex}>
-      <Field
-        hasFocus={focusOnAddress}
-        hintText={`Address`}
-        multiline
-        iconPath={mdiMapMarker}
-        value={props.address}
-        underlined
-        capitalize={`words`}
-        keyboard={"text"}
-        enterKeyHint={ useFormula(() => enterKey(props.notes, addressIndex)).value }
-      />
+        <Field
+          hasFocus={focusOnAddress}
+          hintText={`Address`}
+          multiline
+          iconPath={mdiMapMarker}
+          value={props.address}
+          underlined
+          capitalize={`words`}
+          keyboard={"text"}
+          enterKeyHint={ useFormula(() => enterKey(props.notes, addressIndex)).value }
+        />
       </IndexedField>
       <IndexedField count={fieldCount} refs={fieldRefs} indexRef={notesIndex}>
-      <Field
-        hasFocus={focusOnNotes}
-        hintText={`Notes`}
-        multiline
-        iconPath={mdiTextBox}
-        value={props.notes}
-        underlined
-        capitalize={`sentences`}
-        keyboard={"text"}
-        enterKeyHint={`enter`}
-      />
+        <Field
+          hasFocus={focusOnNotes}
+          hintText={`Notes`}
+          multiline
+          iconPath={mdiTextBox}
+          value={props.notes}
+          underlined
+          capitalize={`sentences`}
+          keyboard={"text"}
+          enterKeyHint={`enter`}
+        />
       </IndexedField>
     </>
   );
