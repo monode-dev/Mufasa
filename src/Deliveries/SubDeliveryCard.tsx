@@ -24,11 +24,10 @@ import {SubDelivery} from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
-// import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import {Flag} from "mufasa/dist/Utils";
 import {OptionalPropFlag} from "mufasa/dist/Doc";
-import {FieldKeyHandler} from "@/AppData";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -56,7 +55,6 @@ export default function SubDeliveryCard(props: {
   }
 
   const scale = 1;
-  const isOpen = useProp(false);
 
   const selectedFuel = useFormula(
     () => props.subDelivery.selectedFuel,
@@ -104,9 +102,13 @@ export default function SubDeliveryCard(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", IndexedFieldKeyHandler);
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  document.addEventListener("keydown", IndexedFieldKeyHandler);
+
+  let fieldCounter = useProp(0);
+  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+
   return (
     <Card
       widthGrows
@@ -200,6 +202,7 @@ export default function SubDeliveryCard(props: {
                 />
               </Label>
               <Label label="Rate">
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
                 <NumField
                   value={useFormula(
                     () => props.subDelivery.explicitRate,
@@ -209,6 +212,7 @@ export default function SubDeliveryCard(props: {
                   hint="Rate"
                   enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.gallons )).value }
                 />
+      </IndexedField>
               </Label>
             </Show>
 
@@ -219,6 +223,7 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
+      <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
               <NumField
                 value={useFormula(
                   () => props.subDelivery.gallons,
@@ -231,6 +236,7 @@ export default function SubDeliveryCard(props: {
                 hint="Est. gal."
                 enterKeyHint={ useFormula(() => lastEnterHint(props.nextSubDelivery)).value }
               />
+      </IndexedField>
             </Label>
             <Show
               when={
