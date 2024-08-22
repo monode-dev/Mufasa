@@ -116,7 +116,7 @@ export default function TankFields(props: {
         {(dim, index) => {
           return (
             <Label label={getDimensionLabel(dim)}>
-              <IndexedField static_counter={fieldCounter} fieldRefs={fieldRefs}>
+              <IndexedField count={fieldCounter} refs={fieldRefs}>
                 <NumField
                   negativesAreAllowed={false}
                   hint={_dimensionHintText}
