@@ -27,7 +27,7 @@ import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import {Flag} from "mufasa/dist/Utils";
 import {OptionalPropFlag} from "mufasa/dist/Doc";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
+import {FieldKeyHandler, IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -102,9 +102,9 @@ export default function SubDeliveryCard(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+    document.removeEventListener("keydown", (event) => FieldKeyHandler(event));
   });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+  document.addEventListener("keydown", (event) => FieldKeyHandler(event));
 
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
