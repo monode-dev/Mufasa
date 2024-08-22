@@ -62,21 +62,19 @@ interface IndexedProps extends SharedFieldProps{
 /** Use the handler in a global event listener to handle enter key presses.
  * The listener should only be active on the page that contains the indexed fields.
  */
-export function IndexedFieldKeyHandler(event: KeyboardEvent) {
+export function IndexedFieldKeyHandler(event: KeyboardEvent, fieldRefs: Prop<Map<number, HTMLDivElement>>) {
   if (event.key === "Enter") {
     const target = event.target as HTMLElement;
     const parent = target.closest("[data-index]") as HTMLElement;
     const index = parent?.dataset.index;
-    const last = parent?.dataset.last;
-    const fields = parent?.dataset.fields;
-    console.log("index: ", index, "last: ", last, "fields: ", fields);
 
-    if (index !== undefined && last !== undefined && fields !== undefined) {
+    if (index !== undefined) {
+      const fields = fieldRefs.value;
       const currentIndex = parseInt(index, 10);
-      const lastIndex = parseInt(last, 10);
-      const fieldRefs = new Map<number, HTMLDivElement>(JSON.parse(fields));
+      // storing index starts at 1
+      const lastIndex = fields.size;
       if (currentIndex > -1 && currentIndex < lastIndex) {
-        const nextElement = fieldRefs.get(currentIndex + 1);
+        const nextElement = fields.get(currentIndex + 1);
         console.log("nextElement: ", nextElement);
         if (nextElement) {
           const nextField = nextElement.querySelector('input, select, textarea') as HTMLElement;
@@ -112,13 +110,11 @@ export function IndexedField(props: IndexedFieldProps) {
     return el;
   }
 
-  const fields = useFormula(() => JSON.stringify(Array.from(props.fieldRefs.value.entries())));
   return (
     <Box
       ref={(el) => assignRef(el, props.static_counter, props.fieldRefs)}
       data-index={static_index_ref.value}
       data-last={props.static_counter.value}
-      data-fields={fields.value}
       widthGrows
       // height={fieldHeight.value}
       stroke={$theme.colors.text}
