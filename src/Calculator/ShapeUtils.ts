@@ -374,7 +374,9 @@ export function calcGallonsToReachPercent(
 }
 
 function calcEllipseArea(depth: number, height: number): number {
-  return (Math.PI * height * depth) / 4;
+  // Use to be: return (Math.PI * height * depth) / 4;
+  // https://math.hmc.edu/funfacts/area-of-an-ellipse/
+  return (Math.PI * height * depth);
 }
 
 function calcEllipseSegmentArea(
