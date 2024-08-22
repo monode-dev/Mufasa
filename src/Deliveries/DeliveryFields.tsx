@@ -67,9 +67,9 @@ export function DeliveryFields(props: {
     return "";
   }
 
-  function enterKey(prop: Prop<string>): EnterKeyHint {
-     const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
-    console.log("key: ", key);
+  function enterKey(prop: Prop<string>, index:Prop<number>): EnterKeyHint {
+    const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
+    enterHintRefs.value.set(index.value, key);
     return key;
   }
 
@@ -91,15 +91,19 @@ export function DeliveryFields(props: {
         );
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs));
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
 
   let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
-  const dexRef:Prop<number>[] = new Array(5);
+
+  const nameIndex = useProp(1);
+  const phoneIndex = useProp(2);
+  const addressIndex = useProp(3);
+  const notesIndex = useProp(4);
 
   return (
     <Column>
@@ -124,7 +128,7 @@ export function DeliveryFields(props: {
         />
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs} indexRef={nameIndex}>
         <Field
           underlined
           hintText={`Client Name`}
@@ -133,10 +137,10 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={"words"}
           keyboard={"text"}
-          enterKeyHint={ useFormula(() => enterKey(one_phone)).value }
+          enterKeyHint={ useFormula(() => enterKey(one_phone, nameIndex)).value }
         />
       </IndexedField>
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs} indexRef={phoneIndex}>
         <Field
           underlined
           hintText={`Phone`}
@@ -145,10 +149,10 @@ export function DeliveryFields(props: {
           widthGrows
           formatInput={formatPhoneNumber}
           keyboard="tel"
-          enterKeyHint={ useFormula(() => enterKey(one_address)).value }
+          enterKeyHint={ useFormula(() => enterKey(one_address, phoneIndex)).value }
         />
       </IndexedField>
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs} indexRef={addressIndex}>
         <Field
           multiline
           underlined
@@ -158,11 +162,11 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={`words`}
           keyboard={"text"}
-          enterKeyHint={ useFormula(() => enterKey(one_note)).value }
+          enterKeyHint={ useFormula(() => enterKey(one_note, addressIndex)).value }
         />
       </IndexedField>
       </Show>
-      <IndexedField count={fieldCounter} refs={fieldRefs}>
+      <IndexedField count={fieldCounter} refs={fieldRefs} indexRef={notesIndex}>
       <Field
         multiline
         underlined
@@ -173,7 +177,7 @@ export function DeliveryFields(props: {
         capitalize={`sentences`}
         keyboard={"text"}
         overflowXWraps
-        enterKeyHint={`done`}
+        enterKeyHint={`enter`}
       />
       </IndexedField>
       <Show when={showErrorMessages() != ""}>
