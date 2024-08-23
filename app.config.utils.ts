@@ -84,7 +84,6 @@ export const doFullCapacitorRebuild = async <
       execSync(`npx cap sync ${config.platform}`);
     });
   });
-  return;
 
   const setAndroidSdkVersion = doNow(() => {
     if (config.platform === Platform.ios) return;
@@ -368,35 +367,33 @@ export const doFullCapacitorRebuild = async <
       // Apply camera permissions
       const shouldAddExport =
         (config.camera?.exportAccessExplanation ?? null) !== null;
-      androidManifest.elements?.[0].elements
-        ?.find((el) => el.name === `application`)
-        ?.elements?.push(
-          {
-            type: `element`,
-            name: `uses-permission`,
-            attributes: {
-              "android:name": `android.permission.READ_MEDIA_IMAGES`,
-            },
+      androidManifest.elements?.[0].elements?.push(
+        {
+          type: `element`,
+          name: `uses-permission`,
+          attributes: {
+            "android:name": `android.permission.READ_MEDIA_IMAGES`,
           },
-          ...(shouldAddExport
-            ? [
-                {
-                  type: `element`,
-                  name: `uses-permission`,
-                  attributes: {
-                    "android:name": `android.permission.READ_EXTERNAL_STORAGE`,
-                  },
+        },
+        ...(shouldAddExport
+          ? [
+              {
+                type: `element`,
+                name: `uses-permission`,
+                attributes: {
+                  "android:name": `android.permission.READ_EXTERNAL_STORAGE`,
                 },
-                {
-                  type: `element`,
-                  name: `uses-permission`,
-                  attributes: {
-                    "android:name": `android.permission.WRITE_EXTERNAL_STORAGE`,
-                  },
+              },
+              {
+                type: `element`,
+                name: `uses-permission`,
+                attributes: {
+                  "android:name": `android.permission.WRITE_EXTERNAL_STORAGE`,
                 },
-              ]
-            : []),
-        );
+              },
+            ]
+          : []),
+      );
       // Write AndroidManifest.xml
       fs.writeFileSync(
         androidManifestPath,
@@ -520,7 +517,7 @@ export const doFullCapacitorRebuild = async <
               type: `element`,
               name: `item`,
               attributes: {
-                name: `android:windowBackground`,
+                name: `android:background`,
               },
               elements: [
                 {
