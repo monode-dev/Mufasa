@@ -8,9 +8,9 @@ import {
   mdiTextBox,
 } from "@mdi/js";
 import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop, EnterKeyHint} from "miwi";
-import { Show } from "solid-js";
+import {onCleanup, Show} from "solid-js";
 import { Delivery } from "./Delivery";
-import { listClients } from "@/AppData";
+import {FieldKeyHandler, listClients} from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
 
@@ -76,6 +76,11 @@ export function DeliveryFields(props: {
           () => props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
           (v) => (props.delivery.notes = v),
         );
+
+  onCleanup(() => {
+    document.removeEventListener("keydown", FieldKeyHandler);
+  });
+  document.addEventListener("keydown", FieldKeyHandler);
   return (
     <Column>
       <Row>
