@@ -23,6 +23,7 @@ import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 import { getTankShape } from "@/Calculator/ShapeUtils";
+import { formatNumWithCommas } from "@/utils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
 
@@ -145,7 +146,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
                     {FuelName}
                   </Txt>
                   <Txt >
-                    ${totalSalesWorth.toFixed(2)}
+                    ${formatNumWithCommas(totalSalesWorth, 2)}
                   </Txt>
                 </Row>
               }
@@ -158,14 +159,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
             </Row>
           </Column>
       </Show>
-
-      {/* Total */}
-      {/* <Row>
-        <Txt bold>
-          Total:
-        </Txt>
-        <Txt padAroundX={2.5}>${props.delivery.totalMoney}</Txt>
-      </Row> */}
 
       {/* Notes */}
       <Show
