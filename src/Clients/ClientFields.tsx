@@ -7,11 +7,25 @@ import {
   mdiTextBox,
   mdiTrashCanOutline,
 } from "@mdi/js";
-import {Box, EnterKeyHint, Field, Icon, Prop, Row, Txt, useFormula} from "miwi";
+import {
+  Box,
+  BoxProps,
+  EnterKeyHint,
+  Field, FieldCapitalization,
+  FieldInputType,
+  FormatFieldInput,
+  Icon, KeyboardType,
+  Prop,
+  Row,
+  Txt,
+  useFormula,
+  useProp
+} from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
-import { For, Show } from "solid-js";
+import {Component, For, onCleanup, Show} from "solid-js";
+import {FieldKeyHandler} from "@/AppData";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
@@ -23,6 +37,9 @@ export function ClientFields(props: {
   create?: boolean;
   notes: Prop<string>;
 }) {
+
+  const firstFocus = props.firstFieldHasFocus ?? useProp(true);
+
   // const addPhoneNumber = () => {
   //   props.client?.value.addPhoneNumber();
   // };
@@ -32,25 +49,39 @@ export function ClientFields(props: {
   //     ?.deleteDoc();
   // };
 
-  function enterKey(prop: Prop<string>): EnterKeyHint {
-     const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
+  const keyHintMap = new Map<string, EnterKeyHint>();
+
+  function enterKey(nextprop: Prop<string>): EnterKeyHint {
+    const key = props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
+    // keyHintMap.set(curprop.value, key);
     console.log("key: ", key);
     return key;
   }
 
+  const focusOnID = useProp(false);
+  const focusOnPhone = useProp(false);
+  const focusOnAddress = useProp(false);
+  const focusOnNotes = useProp(false);
+
+  onCleanup(() => {
+    document.removeEventListener("keydown", FieldKeyHandler);
+  });
+  document.addEventListener("keydown", FieldKeyHandler);
+
   return (
     <>
       <Field
-        hasFocus={props.firstFieldHasFocus}
+        hasFocus={firstFocus}
         hintText={`Name`}
         iconPath={mdiAccount} //mdiDomain
         value={props.name}
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={ useFormula(() => enterKey(props.clientId)).value}
+        enterKeyHint={ useFormula(() => enterKey(props.clientId )).value}
       />
       <Field
+        hasFocus={focusOnID}
         hintText={`Client ID`}
         iconPath={mdiIdentifier}
         value={props.clientId}
@@ -60,6 +91,7 @@ export function ClientFields(props: {
         enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
       />
       <Field
+        hasFocus={focusOnPhone}
         hintText={`Phone`}
         iconPath={mdiPhone}
         value={props.phoneNumber}
@@ -115,6 +147,7 @@ export function ClientFields(props: {
         </Row>
       </Show> */}
       <Field
+        hasFocus={focusOnAddress}
         hintText={`Address`}
         multiline
         iconPath={mdiMapMarker}
@@ -125,6 +158,7 @@ export function ClientFields(props: {
         enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
       />
       <Field
+        hasFocus={focusOnNotes}
         hintText={`Notes`}
         multiline
         iconPath={mdiTextBox}
@@ -132,7 +166,7 @@ export function ClientFields(props: {
         underlined
         capitalize={`sentences`}
         keyboard={"text"}
-        enterKeyHint={`done`}
+        enterKeyHint={`enter`}
       />
     </>
   );
