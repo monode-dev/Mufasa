@@ -14,8 +14,9 @@ import {
   TankDimension,
   TankGeometry,
 } from "@/Calculator/ShapeUtils";
-import { For } from "solid-js";
+import {For, onCleanup} from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
+import {FieldKeyHandler} from "@/AppData";
 
 const _dimensionHintText = `in.`;
 
@@ -86,6 +87,10 @@ export default function TankFields(props: {
     return key;
   }
 
+  onCleanup(() => {
+    document.removeEventListener("keydown", FieldKeyHandler);
+  });
+  document.addEventListener("keydown", FieldKeyHandler);
   return (
     <>
       <Box padBottom={0.25}>
