@@ -11,12 +11,16 @@ import {
   exists, EnterKeyHint, useProp, Prop,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
-import {onCleanup} from "solid-js";
-import {FieldKeyHandler, IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
+import { onCleanup } from "solid-js";
+import {IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
   nextFuelType: FuelType | undefined;
+  fieldRefs: Prop<Map<number,HTMLDivElement>>;
+  // filled in enterKey() function
+  enterHintRefs: Prop<Map<number, EnterKeyHint>>;
+  subDeliveryIndex: Prop<number>;
 }) {
   function deletePressed() {
     pushPage(DeleteDialog, {
@@ -28,15 +32,14 @@ export default function FuelTypeEntry(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => FieldKeyHandler(event));
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
   });
-  document.addEventListener("keydown", (event) => FieldKeyHandler(event));
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
 
-  let fieldCounter = useProp(0);
-  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
-  // filled in enterKey() function
-  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
-
+  // zero based indexes will be combined with subDeliveryIndex
+  const indexName = 0;
+  const indexRate = 1;
+  const fields = 2;
   return (
     <Row widthGrows padBetween={1} alignLeft>
         <Field

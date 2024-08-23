@@ -19,7 +19,7 @@ import {
   Button,
   popPage,
   HiddenOption,
-  HiddenOptions,
+  HiddenOptions, Prop, EnterKeyHint,
 } from "miwi";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
@@ -106,6 +106,11 @@ export function SettingsPage() {
   );
 
   const iconSize = 1.25;
+
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function in FuelTypeEntry.tsx
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
   return (
     <SimplePage
       floating={
@@ -352,11 +357,13 @@ export function SettingsPage() {
                   >
                     {
                       (fuelType, index) => {
-                        const next = index() + 1;
+                        const dex = index();
+                        const next = dex + 1;
                         const nextFuelType = next < FuelType.sortedFuelTypes.length
                           ? FuelType.sortedFuelTypes[next]
                           : undefined;
-                        return <FuelTypeEntry fuelType={fuelType} nextFuelType={nextFuelType}/>;
+                        return <FuelTypeEntry fuelType={fuelType} nextFuelType={nextFuelType}
+                        enterHintRefs={enterHintRefs} fieldRefs={fieldRefs} subDeliveryIndex={useProp(dex)}/>;
                       }}
                   </For>
                 </SortableColumn>

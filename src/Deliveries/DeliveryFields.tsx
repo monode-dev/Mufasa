@@ -95,7 +95,7 @@ export function DeliveryFields(props: {
   });
   document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
 
-  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
