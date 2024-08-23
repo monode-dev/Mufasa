@@ -94,31 +94,30 @@ export function IndexedFieldKeyHandler(
 // Hypothesis: type Field | NumField is causing an error because of the value type conflict
 // No clue why only type Field by itself is causing an error
 interface IndexedProps extends SharedFieldProps{
-  count: Prop<number>;
   refs: Prop<Map<number,HTMLDivElement>>;
-  indexRef: Prop<number>;
+  index: Prop<number>;
   children: JSX.Element; // & { type: typeof Field | typeof NumField };
 }
 
 /**
  * Each tab-able Field or NumField should be wrapped in an IndexedField.
+ * Be sure to assign incremental indexes to each IndexedField or the enter key handler will not work.
+ * We want 1 based index for IndexedField to match tabIndex rules.
  */
 export function IndexedField(props: IndexedProps) {
 
-  function assignRef(el: HTMLDivElement | null, counter: Prop<number>, fieldRefs: Prop<Map<number,HTMLDivElement>>) {
-    console.log("assignRef: ", el, counter);
+  function assignRef(el: HTMLDivElement | null, fieldRefs: Prop<Map<number,HTMLDivElement>>) {
+    console.log("assignRef: ", el);
     if (el) {
-      const index = ++counter.value;
-      fieldRefs.value.set(index, el);
-      props.indexRef.value = index;
+      fieldRefs.value.set(props.index.value, el);
     }
     return el;
   }
 
   return (
     <Box
-      ref={(el) => assignRef(el, props.count, props.refs)}
-      data-index={props.indexRef.value}
+      ref={(el) => assignRef(el, props.refs)}
+      data-index={props.index.value}
       widthGrows
       // height={fieldHeight.value}
       stroke={$theme.colors.text}

@@ -87,7 +87,6 @@ export default function TankFields(props: {
     return key;
   }
 
-  let fieldCounter = useProp(0);
   let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
 
   onCleanup(() => {
@@ -117,10 +116,11 @@ export default function TankFields(props: {
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
         {(dim, index) => {
-          const indexRef = useProp(index());
+          // Index is 0 based, but we want 1 based for IndexedField to match tabIndex rules
+          const indexRef = useProp(index() + 1);
           return (
             <Label label={getDimensionLabel(dim)}>
-              <IndexedField count={fieldCounter} refs={fieldRefs} indexRef={indexRef}>
+              <IndexedField refs={fieldRefs} index={indexRef}>
                 <NumField
                   negativesAreAllowed={false}
                   hint={_dimensionHintText}
