@@ -87,12 +87,11 @@ export default function TankFields(props: {
     return key;
   }
 
-  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
-
   onCleanup(() => {
     document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
   document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 

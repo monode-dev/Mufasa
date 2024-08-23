@@ -93,7 +93,7 @@ export function IndexedFieldKeyHandler(
 
 // Hypothesis: type Field | NumField is causing an error because of the value type conflict
 // No clue why only type Field by itself is causing an error
-interface IndexedProps extends SharedFieldProps{
+export interface IndexedProps extends SharedFieldProps{
   refs: Prop<Map<number,HTMLDivElement>>;
   index: Prop<number>;
   children: JSX.Element; // & { type: typeof Field | typeof NumField };
@@ -135,30 +135,30 @@ export function IndexedField(props: IndexedProps) {
   );
 }
 
-
-export function FieldKeyHandler(event: KeyboardEvent) {
-  if (event.key === "Enter") {
-    const target = event.target as HTMLElement;
-    // enterKeyHint stuff is broken
-    // const field = event.target as unknown as KeyFieldProps;
-    // const enterKeyHint = field.enterKeyHint;
-    // if (enterKeyHint === 'done') return;
-    // if (enterKeyHint === 'next')
-    {
-      const form = document;
-      if (form) {
-        const focusableElements = Array.from(
-          form.querySelectorAll<HTMLElement>(
-            'input, select, textarea, button, [tabindex]:not([tabindex="-1"])'
-          )
-        ).filter(el => !el.hasAttribute('disabled'));
-        const index = focusableElements.indexOf(target);
-        if (index > -1 && index < focusableElements.length - 1) {
-          const nextElement = focusableElements[index + 1];
-          nextElement.focus();
-          event.preventDefault(); // Prevent form submission
-        }
-      }
-    }
-  }
-}
+//
+// export function FieldKeyHandler(event: KeyboardEvent) {
+//   if (event.key === "Enter") {
+//     const target = event.target as HTMLElement;
+//     // enterKeyHint stuff is broken
+//     // const field = event.target as unknown as KeyFieldProps;
+//     // const enterKeyHint = field.enterKeyHint;
+//     // if (enterKeyHint === 'done') return;
+//     // if (enterKeyHint === 'next')
+//     {
+//       const form = document;
+//       if (form) {
+//         const focusableElements = Array.from(
+//           form.querySelectorAll<HTMLElement>(
+//             'input, select, textarea, button, [tabindex]:not([tabindex="-1"])'
+//           )
+//         ).filter(el => !el.hasAttribute('disabled'));
+//         const index = focusableElements.indexOf(target);
+//         if (index > -1 && index < focusableElements.length - 1) {
+//           const nextElement = focusableElements[index + 1];
+//           nextElement.focus();
+//           event.preventDefault(); // Prevent form submission
+//         }
+//       }
+//     }
+//   }
+// }

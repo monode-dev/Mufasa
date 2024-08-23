@@ -16,7 +16,7 @@ import {
   pushPage,
   exists,
   DeleteOption,
-  theme,
+  theme, Prop, useProp, EnterKeyHint,
 } from "miwi";
 import { For, Show } from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
@@ -43,6 +43,11 @@ export function DeliveryPage(props: { delivery: Delivery }) {
       message: `Are you sure you want to permanently delete this delivery?`,
     });
   }
+
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function in SubDeliveryCard.tsx
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
   return (
     <SimplePage>
       <AppBar>
@@ -104,11 +109,13 @@ export function DeliveryPage(props: { delivery: Delivery }) {
             >
               <For each={props.delivery.sortedSubDeliveries}>
                 {(subDelivery, index) => {
-                  const next = index() + 1;
+                  const dex = index();
+                  const next = dex + 1;
                   const nextSubDelivery = useFormula(() => next < props.delivery.sortedSubDeliveries.length
                     ? props.delivery.sortedSubDeliveries[next]
                     : undefined);
-                  return <SubDeliveryCard subDelivery={subDelivery} nextSubDelivery={nextSubDelivery} />;
+                  return <SubDeliveryCard subDelivery={subDelivery} nextSubDelivery={nextSubDelivery}
+                  enterHintRefs={enterHintRefs} fieldRefs={fieldRefs} subDeliveryIndex={useProp(dex)}/>;
                 }}
               </For>
             </SortableColumn>

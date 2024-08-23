@@ -15,23 +15,27 @@ import {
   DeleteOption,
   theme, EnterKeyHint, Prop,
 } from "miwi";
-import {onCleanup, Show} from "solid-js";
+import { onCleanup, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
-import {FuelTypeSelector} from "@/Fuel/FuelTypeSelector";
-import {SubDelivery} from "./Delivery";
+import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
+import { SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import {Flag} from "mufasa/dist/Utils";
-import {OptionalPropFlag} from "mufasa/dist/Doc";
-import {FieldKeyHandler, IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
+import { OptionalPropFlag } from "mufasa/dist/Doc";
+import { IndexedFieldKeyHandler } from "@/components/IndexedField";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
   nextSubDelivery: Prop<SubDelivery | undefined>;
+  fieldRefs: Prop<Map<number,HTMLDivElement>>;
+  // filled in enterKey() function
+  enterHintRefs: Prop<Map<number, EnterKeyHint>>;
+  subDeliveryIndex: Prop<number>;
 }) {
   function handleComplete() {
     pushPage(CompleteSubDeliveryDialog, {
@@ -102,15 +106,15 @@ export default function SubDeliveryCard(props: {
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => FieldKeyHandler(event));
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
   });
-  document.addEventListener("keydown", (event) => FieldKeyHandler(event));
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
 
-  let fieldCounter = useProp(0);
-  let fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
-  // filled in enterKey() function
-  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
-
+  // zero based indexes will be combined with subDeliveryIndex
+  const indexName = 0;
+  const indexRate = 1;
+  const indexGallons = 2;
+  const fields = 3;
   return (
     <Card
       widthGrows
