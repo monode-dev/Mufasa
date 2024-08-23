@@ -166,7 +166,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
-      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0),
+      Math.ceil(this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0)* 100) / 100,
       2,
     ),
   );
@@ -356,7 +356,14 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Sales
   readonly sales = formula(() => {
-    return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0) * (Number(this.delivery?.selectedClientDoc?.offsetRate) <= 0 ? 1 : Number(this.delivery?.selectedClientDoc?.offsetRate));
+    return Math.ceil((
+      (this.fuelSpecs?.rate ?? 0) * 
+      (this.gallons ?? 0) * 
+      (Number(this.delivery?.selectedClientDoc?.offsetRate) <= 0 ? 
+        1 : 
+        Number(this.delivery?.selectedClientDoc?.offsetRate)
+      )) * 100
+    ) / 100;
   });
 
   // Full Title
