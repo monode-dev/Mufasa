@@ -145,7 +145,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
                   <Txt singleLine width={5} alignLeft>
                     {FuelName}
                   </Txt>
-                  <Txt >
+                  <Txt widthGrows>
                     ${formatNumWithCommas(totalSalesWorth, 2)}
                   </Txt>
                 </Row>
@@ -155,7 +155,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
               <Txt bold alignLeft width={5}>
                 Total:
               </Txt>
-              <Txt>${props.delivery.totalMoney}</Txt>
+              <Txt widthGrows>${props.delivery.totalMoney}</Txt>
             </Row>
           </Column>
       </Show>
