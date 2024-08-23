@@ -12,6 +12,7 @@ import {
   useFormula,
   mdColors,
   roundToString,
+  Column,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -24,6 +25,22 @@ import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 import { getTankShape } from "@/Calculator/ShapeUtils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
+
+  const totalPerFuelType = useFormula(() => {
+    const totalPerFuelType = new Map<string, number>();
+    props.delivery.sortedSubDeliveries.forEach((sub) => {
+      const fuelName = sub.fuelSpecs?.name;
+      if (!exists(fuelName)) return;
+      if (!totalPerFuelType.has(fuelName))
+        totalPerFuelType.set(fuelName, 0);
+      totalPerFuelType.set(
+          fuelName,
+          totalPerFuelType.get(fuelName)! + (sub.sales ?? 0),
+      );
+    });
+    return totalPerFuelType;
+  });
+
   return (
     <Card
       alignTopLeft
@@ -120,25 +137,35 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       <Box widthGrows height={0.125} fill={$theme.colors.text} />
 
       <Show when={props.delivery.sortedSubDeliveries}>
-        <For each={props.delivery.sortedSubDeliveries}>
-          {(subDelivery) => 
+          <Column>
+            <For each={Array.from(totalPerFuelType.value.entries())}>
+              {([FuelName, totalSalesWorth]) => 
+                <Row>
+                  <Txt singleLine width={5} alignLeft>
+                    {FuelName}
+                  </Txt>
+                  <Txt >
+                    ${totalSalesWorth.toFixed(2)}
+                  </Txt>
+                </Row>
+              }
+            </For>
             <Row>
-              <Txt>
-                {subDelivery.fuelName}
+              <Txt bold alignLeft width={5}>
+                Total:
               </Txt>
-              <Txt padAroundX={1.5}>
-              ${subDelivery.sales.toFixed(2)}
-              </Txt>
-
+              <Txt>${props.delivery.totalMoney}</Txt>
             </Row>
-          }
-        </For>
+          </Column>
       </Show>
 
       {/* Total */}
-      <Txt singleLine widthGrows bold>
-        Total: ${props.delivery.totalMoney}
-      </Txt>
+      {/* <Row>
+        <Txt bold>
+          Total:
+        </Txt>
+        <Txt padAroundX={2.5}>${props.delivery.totalMoney}</Txt>
+      </Row> */}
 
       {/* Notes */}
       <Show
