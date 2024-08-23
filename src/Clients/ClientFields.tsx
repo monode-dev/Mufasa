@@ -45,8 +45,6 @@ export function ClientFields(props: {
     document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
   document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
-
-  const fieldCount = useProp(0);
   const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
@@ -57,7 +55,7 @@ export function ClientFields(props: {
   const notesIndex = useProp(5);
   return (
     <>
-      <IndexedField count={fieldCount} refs={fieldRefs} indexRef={nameIndex}
+      <IndexedField refs={fieldRefs} index={nameIndex}
       >
         <Field
           hasFocus={firstFocus}
@@ -70,7 +68,7 @@ export function ClientFields(props: {
           enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
         />
       </IndexedField>
-      <IndexedField count={fieldCount} refs={fieldRefs} indexRef={idIndex}>
+      <IndexedField refs={fieldRefs} index={idIndex}>
         <Field
           hasFocus={focusOnID}
           hintText={`Client ID`}
@@ -82,7 +80,7 @@ export function ClientFields(props: {
           enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
         />
       </IndexedField>
-      <IndexedField count={fieldCount} refs={fieldRefs} indexRef={phoneIndex}>
+      <IndexedField refs={fieldRefs} index={phoneIndex}>
         <Field
           hasFocus={focusOnPhone}
           hintText={`Phone`}
@@ -94,7 +92,7 @@ export function ClientFields(props: {
           enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
         />
       </IndexedField>
-      <IndexedField count={fieldCount} refs={fieldRefs} indexRef={addressIndex}>
+      <IndexedField refs={fieldRefs} index={addressIndex}>
         <Field
           hasFocus={focusOnAddress}
           hintText={`Address`}
@@ -104,10 +102,10 @@ export function ClientFields(props: {
           underlined
           capitalize={`words`}
           keyboard={"text"}
-          enterKeyHint={ useFormula(() => enterKey(props.notes, addressIndex)).value }
+          enterKeyHint={ `enter` }
         />
       </IndexedField>
-      <IndexedField count={fieldCount} refs={fieldRefs} indexRef={notesIndex}>
+      <IndexedField refs={fieldRefs} index={notesIndex}>
         <Field
           hasFocus={focusOnNotes}
           hintText={`Notes`}
@@ -117,7 +115,7 @@ export function ClientFields(props: {
           underlined
           capitalize={`sentences`}
           keyboard={"text"}
-          enterKeyHint={`enter`}
+          enterKeyHint={ `enter` }
         />
       </IndexedField>
     </>

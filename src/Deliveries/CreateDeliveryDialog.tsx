@@ -108,7 +108,7 @@ function CreateDeliveryDialog(props: {
     <Page onClick={popPage} fill="#00000099">
       <Card preventClickPropagation width={`75%`} shadowSize={2}>
         <Txt h1>Create Delivery</Txt>
-        <DeliveryFields delivery={deliveryProps}/>
+        <DeliveryFields delivery={deliveryProps} create />
         <Show when={warningMessage.value}>
           <Txt widthGrows alignLeft stroke={$theme.colors.warning}>
             {warningMessage.value}
