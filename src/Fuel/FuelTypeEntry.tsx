@@ -49,6 +49,7 @@ export default function FuelTypeEntry(props: {
           return key;
         }).value
       }
+        onlyWriteOnBlur
       />
       <NumField
         enterKeyHint={
@@ -73,6 +74,7 @@ export default function FuelTypeEntry(props: {
          * rate. All the rest of the space can be given to the name. Maybe we'll change
          * this in future if it looks too weird. */
         width={5}
+        onlyWriteOnBlur
       />
       <HiddenOptions
         cancelOptions={{
