@@ -97,6 +97,7 @@ export class FuelType extends mfs.Doc(`FuelType`) {
     getCount: () => FuelType.sortedFuelTypes.length,
   });
   name = prop([String, null], null);
+  amountOfFuel = prop([String, null], null);
   rate = prop([Number, null], null);
   createdPosix = prop(Number);
   _sortPos = prop([Number, null]);

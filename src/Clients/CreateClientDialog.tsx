@@ -16,6 +16,7 @@ import { Show } from "solid-js";
 import { Client } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import Fuse from "fuse.js";
+import { LoadCSVDialog } from "./LoadCSVDialog";
 
 export const openCreateClientDialog = (props: {
   initName?: string;
@@ -41,10 +42,11 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
-  // const tempClient = Client.create({
-  //   name: "",
-  //   clientId: "",
-  // });
+  const offsetRate = useProp(``);
+  const tempClient = Client.create({
+    name: "",
+    clientId: "",
+  });
 
   function closePopUp() {
     // tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
@@ -89,6 +91,7 @@ function CreateClientDialog(props: {
       phoneNumber: phoneNumber.value,
       address: address.value,
       notes: notes.value,
+      offsetRate: offsetRate.value,
     };
   });
   const clientIsValid = useFormula(() => {
@@ -126,6 +129,7 @@ function CreateClientDialog(props: {
       phoneNumber: phoneNumber.value,
       address: address.value,
       notes: notes.value,
+      offsetRate: offsetRate.value,
     });
     props.onCreate?.(newClient);
 
@@ -151,6 +155,7 @@ function CreateClientDialog(props: {
           address={address}
           notes={notes}
           create
+          offsetRate={offsetRate}
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>

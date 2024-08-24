@@ -4,15 +4,30 @@ import {
   mdiAccount,
   mdiLabel,
   mdiMapMarker,
+  mdiPencil,
   mdiPhone,
   mdiTextBox,
 } from "@mdi/js";
-import {Column, Row, Icon, exists, mdColors, Field, useFormula, Box, Txt, Prop, EnterKeyHint} from "miwi";
-import {onCleanup, Show} from "solid-js";
+import {
+  Column,
+  Row,
+  Icon,
+  exists,
+  mdColors,
+  Field,
+  useFormula,
+  Box,
+  Txt,
+  pushPage,
+  EnterKeyHint,
+  Prop,
+} from "miwi";
+import { onCleanup, Show } from "solid-js";
 import { Delivery } from "./Delivery";
-import {FieldKeyHandler, listClients} from "@/AppData";
+import { FieldKeyHandler, listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
+import ClientPage from "@/Clients/ClientPage";
 
 export function DeliveryFields(props: {
   create?: boolean;
@@ -27,13 +42,18 @@ export function DeliveryFields(props: {
     | "notes"
   >;
 }) {
-  function clientIsValid() { 
-    return !(props.delivery.selectedClient != "oneTime" && props.delivery.selectedClient?.isDeleted);
-   }
+  function clientIsValid() {
+    return !(
+      props.delivery.selectedClient != "oneTime" &&
+      props.delivery.selectedClient?.isDeleted
+    );
+  }
 
   function isClientNameAlreadyUsed() {
     const allClients = listClients(Client.getAllDocs(), true);
-    const allClientNames = allClients.map((client) => client.name.toLowerCase());
+    const allClientNames = allClients.map((client) =>
+      client.name.toLowerCase(),
+    );
 
     const options = {
       keys: [props.delivery.title.toLowerCase()],
@@ -43,39 +63,54 @@ export function DeliveryFields(props: {
     const fuse = new Fuse(allClientNames, options);
     const result = fuse.search(props.delivery.title.toLowerCase());
 
-    return (result.length > 0);
+    return result.length > 0;
   }
 
   function showErrorMessages() {
-    if(!clientIsValid()) return "Client was deleted.";
+    if (!clientIsValid()) return "Client was deleted.";
 
-    if(props.delivery.selectedClient === ONE_TIME && isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+    if (props.delivery.selectedClient === ONE_TIME && isClientNameAlreadyUsed())
+      return "There is already another client with a similar name.";
 
     return "";
   }
 
+  function editIconShouldBeDisabled() {
+    return (
+      props.delivery.selectedClient === ONE_TIME ||
+      !clientIsValid() ||
+      props.delivery.selectedClient === NONE_SELECTED
+    );
+  }
+
   function enterKey(prop: Prop<string>): EnterKeyHint {
-     const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
+    const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
     console.log("key: ", key);
     return key;
   }
 
   const one_name = useFormula(
-            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.title : ``,
-            (v) => (props.delivery.title = v),
-          );
+    () =>
+      props.delivery.selectedClient === ONE_TIME ? props.delivery.title : ``,
+    (v) => (props.delivery.title = v),
+  );
   const one_phone = useFormula(
-            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.phoneNumber : ``,
-            (v) => (props.delivery.phoneNumber = v),
-          );
+    () =>
+      props.delivery.selectedClient === ONE_TIME
+        ? props.delivery.phoneNumber
+        : ``,
+    (v) => (props.delivery.phoneNumber = v),
+  );
   const one_address = useFormula(
-            () => props.delivery.selectedClient === ONE_TIME ? props.delivery.address : ``,
-            (v) => (props.delivery.address = v),
-          );
+    () =>
+      props.delivery.selectedClient === ONE_TIME ? props.delivery.address : ``,
+    (v) => (props.delivery.address = v),
+  );
   const one_note = useFormula(
-          () => props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
-          (v) => (props.delivery.notes = v),
-        );
+    () =>
+      props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
+    (v) => (props.delivery.notes = v),
+  );
 
   onCleanup(() => {
     document.removeEventListener("keydown", FieldKeyHandler);
@@ -87,11 +122,11 @@ export function DeliveryFields(props: {
         <Icon
           iconPath={mdiAccount}
           stroke={
-            !clientIsValid() 
-            ? mdColors.orange 
-            : exists(props.delivery.selectedClient !== NONE_SELECTED)
-              ? mdColors.black
-              : mdColors.grey
+            !clientIsValid()
+              ? mdColors.orange
+              : exists(props.delivery.selectedClient !== NONE_SELECTED)
+                ? mdColors.black
+                : mdColors.grey
           }
         />
         <ClientSelector
@@ -102,6 +137,20 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.selectedClient = v),
           )}
         />
+        <Show when={props.delivery.selectedClient !== ONE_TIME}>
+          <Icon
+            stroke={editIconShouldBeDisabled() ? $theme.colors.hint : undefined}
+            iconPath={mdiPencil}
+            onClick={() => {
+              if (
+                props.delivery.selectedClient &&
+                props.delivery.selectedClient !== ONE_TIME
+              ) {
+                pushPage(ClientPage, { client: props.delivery.selectedClient });
+              }
+            }}
+          />
+        </Show>
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
         <Field
@@ -112,7 +161,7 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={"words"}
           keyboard={"text"}
-          enterKeyHint={ useFormula(() => enterKey(one_phone)).value }
+          enterKeyHint={useFormula(() => enterKey(one_phone)).value}
         />
         <Field
           underlined
@@ -122,7 +171,7 @@ export function DeliveryFields(props: {
           widthGrows
           formatInput={formatPhoneNumber}
           keyboard="tel"
-          enterKeyHint={ useFormula(() => enterKey(one_address)).value }
+          enterKeyHint={useFormula(() => enterKey(one_address)).value}
         />
         <Field
           multiline
@@ -133,7 +182,7 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={`words`}
           keyboard={"text"}
-          enterKeyHint={ useFormula(() => enterKey(one_note)).value }
+          enterKeyHint={useFormula(() => enterKey(one_note)).value}
         />
       </Show>
       <Field

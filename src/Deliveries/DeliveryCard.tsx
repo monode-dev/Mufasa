@@ -15,6 +15,8 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
+  roundToString,
+  Column,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -23,8 +25,26 @@ import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
+import { getTankShape } from "@/Calculator/ShapeUtils";
+import { formatNumWithCommas } from "@/utils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
+
+  const totalPerFuelType = useFormula(() => {
+    const totalPerFuelType = new Map<string, number>();
+    props.delivery.sortedSubDeliveries.forEach((sub) => {
+      const fuelName = sub.fuelSpecs?.name;
+      if (!exists(fuelName)) return;
+      if (!totalPerFuelType.has(fuelName))
+        totalPerFuelType.set(fuelName, 0);
+      totalPerFuelType.set(
+          fuelName,
+          totalPerFuelType.get(fuelName)! + (sub.sales ?? 0),
+      );
+    });
+    return totalPerFuelType;
+  });
+
   return (
     <Card
       alignTopLeft
@@ -39,7 +59,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
     >
       {/* Time */}
       <Show when={props.delivery.isCompleted}>
-        <Row>
+        <Row alignTopRight>
           <Txt singleLine widthGrows>
             {formatPosixTime(props.delivery.completedTimePosix!)}
           </Txt>
@@ -118,10 +138,30 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         </Row>
       </Show>
 
-      {/* Total */}
-      <Txt singleLine widthGrows bold>
-        Total: ${props.delivery.totalMoney}
-      </Txt>
+      <Box widthGrows height={0.125} fill={$theme.colors.text} />
+
+      <Show when={props.delivery.sortedSubDeliveries}>
+          <Column>
+            <For each={Array.from(totalPerFuelType.value.entries())}>
+              {([FuelName, totalSalesWorth]) => 
+                <Row>
+                  <Txt singleLine width={5} alignLeft>
+                    {FuelName}
+                  </Txt>
+                  <Txt widthGrows>
+                    ${formatNumWithCommas(totalSalesWorth, 2)}
+                  </Txt>
+                </Row>
+              }
+            </For>
+            <Row>
+              <Txt bold alignLeft width={5}>
+                Total:
+              </Txt>
+              <Txt widthGrows>${props.delivery.totalMoney}</Txt>
+            </Row>
+          </Column>
+      </Show>
 
       {/* Notes */}
       <Show
@@ -146,47 +186,57 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
         : $theme.colors.warning,
   );
   return (
-    <Row alignTopLeft widthGrows>
-      <Box
-        /* We want the check box to be vertically centered with a single line of
-         * text. However, the text is not vertically centered in its bounding box.
-         * So we apply a slight offset here to vertically align the check box with
-         * the first line of the description text. */
-        padTop={0.045}
-      >
+    <>
+      <Show when={props.subDelivery.isCompleted}>
+        <Txt>
+          {props.subDelivery.selectedKnownTank?.fuelType?.name}: 
+          {props.subDelivery.stickedInchesBeforeFilling}" -{">"} {props.subDelivery.stickedInchesAfterFilling}", 
+          {roundToString(getTankShape(props.subDelivery.selectedKnownTank?.shape)?.calcTotalVolume(props.subDelivery.selectedKnownTank)?? 0, 0)} 
+          {" "}gal. -{">"} {props.subDelivery.gallons} gal.
+        </Txt>
+      </Show>
+      <Row alignTopLeft widthGrows>
         <Box
-          bonusTouchArea
-          onClick={() =>
-            props.subDelivery.isCompleted
-              ? pushPage(ConfirmSubDeliveryUncompletion, {
-                  subDelivery: props.subDelivery,
-                })
-              : pushPage(CompleteSubDeliveryDialog, {
-                  subDelivery: props.subDelivery,
-                })
-          }
-          width={1}
-          height={1}
-          outlineSize={1 / 8}
-          outlineColor={highlightColor.value ?? $theme.colors.primary}
-          cornerRadius={1 / 7}
-          fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+          /* We want the check box to be vertically centered with a single line of
+          * text. However, the text is not vertically centered in its bounding box.
+          * So we apply a slight offset here to vertically align the check box with
+          * the first line of the description text. */
+          padTop={0.045}
         >
-          <Show when={props.subDelivery.isCompleted}>
-            <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
-          </Show>
+          <Box
+            bonusTouchArea
+            onClick={() =>
+              props.subDelivery.isCompleted
+                ? pushPage(ConfirmSubDeliveryUncompletion, {
+                    subDelivery: props.subDelivery,
+                  })
+                : pushPage(CompleteSubDeliveryDialog, {
+                    subDelivery: props.subDelivery,
+                  })
+            }
+            width={1}
+            height={1}
+            outlineSize={1 / 8}
+            outlineColor={highlightColor.value ?? $theme.colors.primary}
+            cornerRadius={1 / 7}
+            fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+          >
+            <Show when={props.subDelivery.isCompleted}>
+              <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
+            </Show>
+          </Box>
         </Box>
-      </Box>
-      <Txt
-        widthGrows
-        asTallAsParent
-        overflowXWraps
-        alignTopLeft
-        stroke={highlightColor.value ?? $theme.colors.text}
-      >
-        {props.subDelivery.title}
-      </Txt>
-    </Row>
+        <Txt
+          widthGrows
+          asTallAsParent
+          overflowXWraps
+          alignTopLeft
+          stroke={highlightColor.value ?? $theme.colors.text}
+        >
+          {props.subDelivery.title}
+        </Txt>
+      </Row>
+    </>  
   );
 }
 
@@ -200,7 +250,6 @@ function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
       }}
     >
       <HiddenOption
-        alignCenterLeft
         padBetween={0.25}
         onClick={() =>
           pushPage(DeliveryPage, {

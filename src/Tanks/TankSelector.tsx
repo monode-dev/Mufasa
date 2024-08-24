@@ -43,6 +43,7 @@ export default function TankSelector(
   }
 
   const tanks = useFormula(() => {
+    if (!props.client) return null;
     if (!exists(props.client.tanks)) return null;
     return listTanks(props.client.tanks, true);
   });

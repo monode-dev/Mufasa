@@ -73,6 +73,7 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
               () => props.tank.notes ?? ``,
               (val) => (props.tank.notes = val),
             )}
+            onlyWriteOnBlur
           />
         </Label>
       </Column>

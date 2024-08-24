@@ -118,6 +118,10 @@ export default function ClientPage(props: { client: Client }) {
               () => props.client.notes ?? ``,
               (val) => (props.client.notes = val),
             )}
+            offsetRate={useFormula(
+              () => props.client.offsetRate ?? 0,
+              (val) => (props.client.offsetRate = val),
+            )}
           />
           <CallAndMapButtons
             phoneNumber={props.client.phoneNumber}
