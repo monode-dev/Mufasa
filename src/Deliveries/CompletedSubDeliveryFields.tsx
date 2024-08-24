@@ -19,6 +19,8 @@ export default function CompletedSubDeliveryFields(props: {
   fuelNameSig: Prop<string | null | undefined>;
   rateSig: Prop<number | null | undefined>;
   gallonsSig: Prop<number | null | undefined>;
+  stickedInchesBeforeFillingSig: Prop<number | null | undefined>;
+  stickedInchesAfterFillingSig: Prop<number | null | undefined>;
   allGrey?: boolean;
 }) {
   const fuelHasFocus = useProp(false);
@@ -32,6 +34,16 @@ export default function CompletedSubDeliveryFields(props: {
   const gallonsHasFocus = useProp(false);
   const gallonsShouldBeGrey = useFormula(
     () => props.allGrey && !gallonsHasFocus.value,
+  );
+
+  const stickedInchesBeforeFillingHasFocus = useProp(false);
+  const stickedInchesBeforeFillingShouldBeGrey = useFormula(
+    () => props.allGrey && !stickedInchesBeforeFillingHasFocus.value,
+  );
+
+  const stickedInchesAfterFillingHasFocus = useProp(false);
+  const stickedInchesAfterFillingShouldBeGrey = useFormula(
+    () => props.allGrey && !stickedInchesAfterFillingHasFocus.value,
   );
 
   props.fuelNameSig;
@@ -72,6 +84,26 @@ export default function CompletedSubDeliveryFields(props: {
           underlined
           hint="Est. gal."
           stroke={gallonsShouldBeGrey.value ? mdColors.grey : undefined}
+        />
+      </Label>
+      {/** Sticked Inches Before Filling */}
+      <Label label="Sticked Inches Before" hint={stickedInchesBeforeFillingShouldBeGrey.value}>
+        <NumField
+          value={props.stickedInchesBeforeFillingSig}
+          // hasFocus={gallonsHasFocus}
+          underlined
+          hint='in.'
+          stroke={stickedInchesBeforeFillingShouldBeGrey.value ? mdColors.grey : undefined}
+        />
+      </Label>
+      {/** Sticked Inches After Filling */}
+      <Label label="Sticked Inches After" hint={stickedInchesAfterFillingShouldBeGrey.value}>
+        <NumField
+          value={props.stickedInchesAfterFillingSig}
+          // hasFocus={gallonsHasFocus}
+          underlined
+          hint='in.'
+          stroke={stickedInchesAfterFillingShouldBeGrey.value ? mdColors.grey : undefined}
         />
       </Label>
     </>

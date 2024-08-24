@@ -1,6 +1,7 @@
 import {
   mdiAccount,
   mdiIdentifier,
+  mdiLockPercent,
   mdiMapMarker,
   mdiPhone,
   mdiPlus,
@@ -11,21 +12,23 @@ import {
   Box,
   BoxProps,
   EnterKeyHint,
-  Field, FieldCapitalization,
+  Field,
+  FieldCapitalization,
   FieldInputType,
   FormatFieldInput,
-  Icon, KeyboardType,
+  Icon,
+  KeyboardType,
   Prop,
   Row,
   Txt,
   useFormula,
-  useProp
+  useProp,
 } from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber } from "./Client";
-import {Component, For, onCleanup, Show} from "solid-js";
-import {FieldKeyHandler} from "@/AppData";
+import { Component, For, onCleanup, Show } from "solid-js";
+import { FieldKeyHandler } from "@/AppData";
 
 export function ClientFields(props: {
   firstFieldHasFocus?: Prop<boolean>;
@@ -34,10 +37,10 @@ export function ClientFields(props: {
   name: Prop<string>;
   clientId: Prop<string>;
   phoneNumber: Prop<string>;
+  offsetRate: Prop<string>;
   create?: boolean;
   notes: Prop<string>;
 }) {
-
   const firstFocus = props.firstFieldHasFocus ?? useProp(true);
 
   // const addPhoneNumber = () => {
@@ -52,7 +55,8 @@ export function ClientFields(props: {
   const keyHintMap = new Map<string, EnterKeyHint>();
 
   function enterKey(nextprop: Prop<string>): EnterKeyHint {
-    const key = props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
+    const key =
+      props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
     // keyHintMap.set(curprop.value, key);
     console.log("key: ", key);
     return key;
@@ -78,7 +82,8 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={ useFormula(() => enterKey(props.clientId )).value}
+        enterKeyHint={useFormula(() => enterKey(props.clientId)).value}
+        onlyWriteOnBlur
       />
       <Field
         hasFocus={focusOnID}
@@ -88,7 +93,8 @@ export function ClientFields(props: {
         underlined
         formatInput={formatIdNumber}
         keyboard={"numeric"}
-        enterKeyHint={ useFormula(() => enterKey(props.phoneNumber)).value }
+        enterKeyHint={useFormula(() => enterKey(props.phoneNumber)).value}
+        onlyWriteOnBlur
       />
       <Field
         hasFocus={focusOnPhone}
@@ -98,7 +104,7 @@ export function ClientFields(props: {
         underlined
         formatInput={formatPhoneNumber}
         keyboard="tel"
-        enterKeyHint={ useFormula(() => enterKey(props.address)).value }
+        enterKeyHint={useFormula(() => enterKey(props.address)).value}
       />
 
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
@@ -155,7 +161,8 @@ export function ClientFields(props: {
         underlined
         capitalize={`words`}
         keyboard={"text"}
-        enterKeyHint={ useFormula(() => enterKey(props.notes)).value }
+        enterKeyHint={useFormula(() => enterKey(props.notes)).value}
+        onlyWriteOnBlur
       />
       <Field
         hasFocus={focusOnNotes}
@@ -167,6 +174,17 @@ export function ClientFields(props: {
         capitalize={`sentences`}
         keyboard={"text"}
         enterKeyHint={`enter`}
+        onlyWriteOnBlur
+      />
+      <Field
+        hintText={`Offset Rate`}
+        iconPath={mdiLockPercent}
+        value={props.offsetRate}
+        underlined
+        formatInput={(val) => ({ input: val, caret: val.length })}
+        keyboard={"numeric"}
+        enterKeyHint={`done`}
+        onlyWriteOnBlur
       />
     </>
   );

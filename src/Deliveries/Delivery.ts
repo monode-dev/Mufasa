@@ -166,7 +166,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
-      this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0),
+      Math.ceil(this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0)* 100) / 100,
       2,
     ),
   );
@@ -348,9 +348,22 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   // Gallons
   gallons = prop([Number, null], null);
 
+  //Sticked Inches Before Filling
+  stickedInchesBeforeFilling = prop([Number, null], null);
+
+  //sticked Inches After Filling
+  stickedInchesAfterFilling = prop([Number, null], null);
+
   // Sales
   readonly sales = formula(() => {
-    return (this.fuelSpecs?.rate ?? 0) * (this.gallons ?? 0);
+    return Math.ceil((
+      (this.fuelSpecs?.rate ?? 0) * 
+      (this.gallons ?? 0) * 
+      (Number(this.delivery?.selectedClientDoc?.offsetRate) <= 0 ? 
+        1 : 
+        Number(this.delivery?.selectedClientDoc?.offsetRate)
+      )) * 100
+    ) / 100;
   });
 
   // Full Title
@@ -391,10 +404,12 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   static get numSubDeliveriesCompleted() {
     return SubDelivery._numSubDeliveriesCompleted.value;
   }
-  complete(props: { fuelName: string; rate: number; gallons: number }) {
+  complete(props: { fuelName: string; rate: number; gallons: number; stickedInchesBeforeFilling: number; stickedInchesAfterFilling: number}) {
     this.explicitFuelName = props.fuelName;
     this.explicitRate = props.rate;
     this.gallons = props.gallons;
+    this.stickedInchesBeforeFilling = props.stickedInchesBeforeFilling;
+    this.stickedInchesAfterFilling = props.stickedInchesAfterFilling;
     this.completedTimePosix = Date.now();
     SubDelivery._numSubDeliveriesCompleted.value += 1;
   }

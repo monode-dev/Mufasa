@@ -22,6 +22,8 @@ import {
   Slider,
   TabButtons,
   theme,
+  TabView,
+  Icon,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -36,6 +38,8 @@ import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
+import { mdiPencil, mdiTagEdit } from "@mdi/js";
+import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -56,14 +60,12 @@ export default function Calculator() {
       selectedSubDelivery.value?.isDeleted
     ) {
       selectedSubDelivery.value = null;
-      stickedInches.value = null;
     }
     if (
       selectedDelivery.value?.isCompleted ||
       selectedDelivery.value?.isDeleted
     ) {
       selectedDelivery.value = null;
-      stickedInches.value = null;
     }
 
     // When the delivery changes unselect the subDelivery.
@@ -72,7 +74,6 @@ export default function Calculator() {
       selectedDelivery.value?.docId
     ) {
       selectedSubDelivery.value = null;
-      stickedInches.value = null;
     }
   });
 
@@ -93,7 +94,6 @@ export default function Calculator() {
         ? selectedTank.value
         : explicitTankGeometry,
   );
-  const stickedInches = useProp(null) as Prop<number | null>;
   const desiredFill = useProp(0.9);
   const totalGallons = useFormula(() =>
     getTankShape(tankGeometry.value?.shape)?.calcTotalVolume(
@@ -111,7 +111,7 @@ export default function Calculator() {
     !showWarning.value
       ? getTankShape(tankGeometry.value?.shape)?.calcFilledVolume(
           tankGeometry.value,
-          stickedInches.value,
+          selectedSubDelivery.value?.stickedInchesBeforeFilling,
         )
       : undefined,
   );
@@ -127,7 +127,7 @@ export default function Calculator() {
   const gallonsToReachDesiredFill = useFormula(() =>
     calcGallonsToReachPercent(
       tankGeometry.value,
-      stickedInches.value,
+      selectedSubDelivery.value?.stickedInchesBeforeFilling,
       desiredFill.value,
     ),
   );
@@ -146,7 +146,7 @@ export default function Calculator() {
       if (
         selectedSubDelivery.value.gallons &&
         selectedSubDelivery.value.explicitRate &&
-        selectedSubDelivery.value.fuelName
+        selectedSubDelivery.value.fuelName 
       ) {
         return;
       }
@@ -190,7 +190,7 @@ export default function Calculator() {
 
   function fillOutline(val: number | undefined) {
     if (!exists(val) || isNaN(val))
-      if ((stickedInches.value ?? 0) > 0) return $theme.colors.error;
+      if ((selectedSubDelivery.value?.stickedInchesBeforeFilling ?? 0) > 0) return $theme.colors.error;
       else return undefined;
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
@@ -277,6 +277,17 @@ export default function Calculator() {
                   )}
                 </For>
               </Selector>
+              <Icon
+              stroke={selectedDelivery.value ? undefined : $theme.colors.hint}
+              iconPath={mdiPencil}
+              onClick={() => {
+                if(selectedDelivery.value){
+                  pushPage(DeliveryPage, {
+                    delivery: selectedDelivery.value,
+                  });
+                }
+              }}
+              />
             </Label>
 
             {/* --Sub Delivery-- */}
@@ -449,7 +460,10 @@ export default function Calculator() {
           stroke={fillOutline(currentFillPercent.value)}
         >
           <NumField
-            value={stickedInches}
+            value={useFormula(
+              () => selectedSubDelivery.value?.stickedInchesBeforeFilling,
+              (v) => { if(selectedSubDelivery.value)selectedSubDelivery.value.stickedInchesBeforeFilling = v!; },
+            )}
             underlined
             hint="in."
             negativesAreAllowed={false}

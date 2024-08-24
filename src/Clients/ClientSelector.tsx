@@ -54,8 +54,9 @@ export default function ClientSelector(props: {
       value={props.value.value}
       noneLabel="Select Client"
       isOpen={dropDownIsOpen}
+      //modalIsOpenSig={dropDownIsOpen}
       getLabelForData={(data: CLIENT_TYPE) => {
-        console.log(`get label for data: `, data);
+        //console.log(`data: `, data);
         if (!exists(data)) return null;
         if (data === ONE_TIME) return `One Time`;
         if (!exists(data.docId)) return null;
