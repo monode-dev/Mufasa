@@ -177,7 +177,7 @@ export function ClientFields(props: {
       />
       <Field
         hasFocus={focusOnNotes}
-        hintText={`Notes`}
+        hintText={`Notes, Gate Code, Key Tag`}
         multiline
         iconPath={mdiTextBox}
         value={props.notes}
