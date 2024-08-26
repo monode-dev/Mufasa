@@ -55,8 +55,7 @@ export function ClientFields(props: {
   const notesIndex = useProp(5);
   return (
     <>
-      <IndexedField refs={fieldRefs} index={nameIndex}
-      >
+      <IndexedField refs={fieldRefs} index={nameIndex}>
         <Field
           hasFocus={firstFocus}
           hintText={`Name`}
