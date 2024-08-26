@@ -1,4 +1,4 @@
-import { prop, initializeMufasa, formula } from "mufasa";
+import { prop, initializeMufasa, formula, Persistance } from "mufasa";
 import {
   useProp,
   doWatch,
@@ -97,7 +97,9 @@ export class FuelType extends mfs.Doc(`FuelType`) {
     getCount: () => FuelType.sortedFuelTypes.length,
   });
   name = prop([String, null], null);
-  amountOfFuel = prop([String, null], null);
+  fuelInTruck = prop([Number, null], null, {
+    persistance: Persistance.local,
+  });
   rate = prop([Number, null], null);
   createdPosix = prop(Number);
   _sortPos = prop([Number, null]);

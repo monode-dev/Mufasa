@@ -22,14 +22,13 @@ export const openCreateClientDialog = (props: {
   initName?: string;
   initClientId?: string;
   onCreate?: (client: Client) => string | undefined | void;
-}) => 
+}) =>
   withLimitConfirmation({
     count: Client.limit.count,
     limit: Client.limit.max,
     labelSingular: `Client`,
     labelPlural: `Clients`,
-    action: () =>
-      pushPage(CreateClientDialog, props),
+    action: () => pushPage(CreateClientDialog, props),
   });
 
 function CreateClientDialog(props: {
@@ -42,7 +41,7 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
-  const offsetRate = useProp(``);
+  const rateOffset = useProp<number | null>(null);
   const tempClient = Client.create({
     name: "",
     clientId: "",
@@ -54,10 +53,11 @@ function CreateClientDialog(props: {
     popPage();
   }
 
-
   function isClientNameAlreadyUsed() {
     const allClients = listClients(Client.getAllDocs(), true);
-    const allClientNames = allClients.map((client) => client.name.toLowerCase());
+    const allClientNames = allClients.map((client) =>
+      client.name.toLowerCase(),
+    );
 
     const options = {
       keys: [name.value.toLowerCase()],
@@ -67,7 +67,7 @@ function CreateClientDialog(props: {
     const fuse = new Fuse(allClientNames, options);
     const result = fuse.search(name.value.toLowerCase());
 
-    return (result.length > 0) ? true : false;
+    return result.length > 0 ? true : false;
   }
 
   function isClientIdAlreadyUsed() {
@@ -76,7 +76,7 @@ function CreateClientDialog(props: {
     let result = false;
 
     allClientIds.forEach((id) => {
-      if(id === clientId.value && clientId.value !== "") {
+      if (id === clientId.value && clientId.value !== "") {
         result = true;
       }
     });
@@ -91,7 +91,7 @@ function CreateClientDialog(props: {
       phoneNumber: phoneNumber.value,
       address: address.value,
       notes: notes.value,
-      offsetRate: offsetRate.value,
+      rateOffset: rateOffset.value,
     };
   });
   const clientIsValid = useFormula(() => {
@@ -104,11 +104,12 @@ function CreateClientDialog(props: {
   );
 
   function showErrorMessages() {
-    if(live_error_msg.value) return "Name or Client ID is needed";
+    if (live_error_msg.value) return "Name or Client ID is needed";
 
-    if(isClientNameAlreadyUsed()) return "There is already another client with a similar name.";
+    if (isClientNameAlreadyUsed())
+      return "There is already another client with a similar name.";
 
-    if(isClientIdAlreadyUsed()) return "Client ID is already in use.";
+    if (isClientIdAlreadyUsed()) return "Client ID is already in use.";
 
     return "";
   }
@@ -129,7 +130,7 @@ function CreateClientDialog(props: {
       phoneNumber: phoneNumber.value,
       address: address.value,
       notes: notes.value,
-      offsetRate: offsetRate.value,
+      rateOffset: rateOffset.value,
     });
     props.onCreate?.(newClient);
 
@@ -155,7 +156,7 @@ function CreateClientDialog(props: {
           address={address}
           notes={notes}
           create
-          offsetRate={offsetRate}
+          rateOffset={rateOffset}
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>

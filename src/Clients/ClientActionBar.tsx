@@ -41,15 +41,18 @@ export default function ClientActionBar(props: {
           <OutlinedActionButton
             action={"New"}
             iconPath={mdiPlus}
-            onClick={() => openCreateClientDialog({
-              onCreate: (newClient) => pushPage(ClientPage, { client: newClient }),
-            })}
+            onClick={() =>
+              openCreateClientDialog({
+                onCreate: (newClient) =>
+                  pushPage(ClientPage, { client: newClient }),
+              })
+            }
           />
-          <OutlinedActionButton
+          {/* <OutlinedActionButton
             action={"Add from CSV"}
             iconPath={mdiPlus}
             onClick={()=>pushPage(LoadCSVDialog, undefined)}
-          />
+          /> */}
         </Show>
 
         <Show when={props.isSearching.value}>

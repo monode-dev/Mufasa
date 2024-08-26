@@ -6,18 +6,12 @@ import {
   useFormula,
   mdColors,
   useProp,
-  Box,
-  exists,
-  Icon,
-  Row,
-  SIZE_SHRINKS,
-  Txt,
 } from "miwi";
-import { Switch, Match } from "solid-js";
 
 export default function CompletedSubDeliveryFields(props: {
   fuelNameSig: Prop<string | null | undefined>;
   rateSig: Prop<number | null | undefined>;
+  rateOffset: Prop<number | null | undefined>;
   gallonsSig: Prop<number | null | undefined>;
   stickedInchesBeforeFillingSig: Prop<number | null | undefined>;
   stickedInchesAfterFillingSig: Prop<number | null | undefined>;
@@ -31,16 +25,18 @@ export default function CompletedSubDeliveryFields(props: {
   const rateShouldBeGrey = useFormula(
     () => props.allGrey && !rateHasFocus.value,
   );
+  const rateOffsetHasFocus = useProp(false);
+  const rateOffsetShouldBeGrey = useFormula(
+    () => props.allGrey && !rateOffsetHasFocus.value,
+  );
   const gallonsHasFocus = useProp(false);
   const gallonsShouldBeGrey = useFormula(
     () => props.allGrey && !gallonsHasFocus.value,
   );
-
   const stickedInchesBeforeFillingHasFocus = useProp(false);
   const stickedInchesBeforeFillingShouldBeGrey = useFormula(
     () => props.allGrey && !stickedInchesBeforeFillingHasFocus.value,
   );
-
   const stickedInchesAfterFillingHasFocus = useProp(false);
   const stickedInchesAfterFillingShouldBeGrey = useFormula(
     () => props.allGrey && !stickedInchesAfterFillingHasFocus.value,
@@ -76,6 +72,16 @@ export default function CompletedSubDeliveryFields(props: {
           stroke={rateShouldBeGrey.value ? mdColors.grey : undefined}
         />
       </Label>
+      {/** Rate Offset */}
+      <Label label="Rate Offset" hint={rateOffsetShouldBeGrey.value}>
+        <NumField
+          value={props.rateOffset}
+          // hasFocus={rateHasFocus}
+          underlined
+          hint="$0.00 / gal."
+          stroke={rateOffsetShouldBeGrey.value ? mdColors.grey : undefined}
+        />
+      </Label>
       {/** Gallons */}
       <Label label="Gallons" hint={gallonsShouldBeGrey.value}>
         <NumField
@@ -87,25 +93,39 @@ export default function CompletedSubDeliveryFields(props: {
         />
       </Label>
       {/** Sticked Inches Before Filling */}
-      <Label label="Sticked Inches Before" hint={stickedInchesBeforeFillingShouldBeGrey.value}>
+      {/* <Label
+        label="Sticked Inches Before"
+        hint={stickedInchesBeforeFillingShouldBeGrey.value}
+      >
         <NumField
           value={props.stickedInchesBeforeFillingSig}
           // hasFocus={gallonsHasFocus}
           underlined
-          hint='in.'
-          stroke={stickedInchesBeforeFillingShouldBeGrey.value ? mdColors.grey : undefined}
+          hint="in."
+          stroke={
+            stickedInchesBeforeFillingShouldBeGrey.value
+              ? mdColors.grey
+              : undefined
+          }
         />
-      </Label>
+      </Label> */}
       {/** Sticked Inches After Filling */}
-      <Label label="Sticked Inches After" hint={stickedInchesAfterFillingShouldBeGrey.value}>
+      {/* <Label
+        label="Sticked Inches After"
+        hint={stickedInchesAfterFillingShouldBeGrey.value}
+      >
         <NumField
           value={props.stickedInchesAfterFillingSig}
           // hasFocus={gallonsHasFocus}
           underlined
-          hint='in.'
-          stroke={stickedInchesAfterFillingShouldBeGrey.value ? mdColors.grey : undefined}
+          hint="in."
+          stroke={
+            stickedInchesAfterFillingShouldBeGrey.value
+              ? mdColors.grey
+              : undefined
+          }
         />
-      </Label>
+      </Label> */}
     </>
   );
 }

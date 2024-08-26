@@ -22,7 +22,6 @@ import {
   Slider,
   TabButtons,
   theme,
-  TabView,
   Icon,
 } from "miwi";
 import { For, Show } from "solid-js";
@@ -38,7 +37,7 @@ import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
-import { mdiPencil, mdiTagEdit } from "@mdi/js";
+import { mdiPencil } from "@mdi/js";
 import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 const maxSafe = 90.0001;
@@ -142,23 +141,9 @@ export default function Calculator() {
   });
   function completeDelivery() {
     if (!exists(selectedSubDelivery.value)) return;
-    if (!selectedSubDelivery.value.isValid) {
-      if (
-        selectedSubDelivery.value.gallons &&
-        selectedSubDelivery.value.explicitRate &&
-        selectedSubDelivery.value.fuelName 
-      ) {
-        return;
-      }
-    }
-    if (!exists(gallonsToReachDesiredFill.value)) {
-      console.log("157");
-      return;
-    }
-    if (gallonsToReachDesiredFill.value <= 0) {
-      console.log("158");
-      return;
-    }
+    if (!selectedSubDelivery.value.isValid) return;
+    if (!exists(gallonsToReachDesiredFill.value)) return;
+    if (gallonsToReachDesiredFill.value <= 0) return;
     pushPage(CompleteSubDeliveryDialog, {
       subDelivery: selectedSubDelivery.value,
     });
@@ -190,7 +175,8 @@ export default function Calculator() {
 
   function fillOutline(val: number | undefined) {
     if (!exists(val) || isNaN(val))
-      if ((selectedSubDelivery.value?.stickedInchesBeforeFilling ?? 0) > 0) return $theme.colors.error;
+      if ((selectedSubDelivery.value?.stickedInchesBeforeFilling ?? 0) > 0)
+        return $theme.colors.error;
       else return undefined;
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
@@ -278,15 +264,15 @@ export default function Calculator() {
                 </For>
               </Selector>
               <Icon
-              stroke={selectedDelivery.value ? undefined : $theme.colors.hint}
-              iconPath={mdiPencil}
-              onClick={() => {
-                if(selectedDelivery.value){
-                  pushPage(DeliveryPage, {
-                    delivery: selectedDelivery.value,
-                  });
-                }
-              }}
+                stroke={selectedDelivery.value ? undefined : $theme.colors.hint}
+                iconPath={mdiPencil}
+                onClick={() => {
+                  if (selectedDelivery.value) {
+                    pushPage(DeliveryPage, {
+                      delivery: selectedDelivery.value,
+                    });
+                  }
+                }}
               />
             </Label>
 
@@ -462,7 +448,10 @@ export default function Calculator() {
           <NumField
             value={useFormula(
               () => selectedSubDelivery.value?.stickedInchesBeforeFilling,
-              (v) => { if(selectedSubDelivery.value)selectedSubDelivery.value.stickedInchesBeforeFilling = v!; },
+              (v) => {
+                if (selectedSubDelivery.value)
+                  selectedSubDelivery.value.stickedInchesBeforeFilling = v!;
+              },
             )}
             underlined
             hint="in."

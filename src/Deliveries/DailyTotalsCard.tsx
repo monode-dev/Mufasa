@@ -5,20 +5,20 @@ import {
   useFormula,
   exists,
   Box,
-  Row,
   Field,
-  Icon,
+  NumField,
+  Row,
 } from "miwi";
 import { Delivery } from "./Delivery";
 import { formatIdNumber, formatNumWithCommas } from "@/utils";
-import { createSignal, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { FuelType } from "@/model/DataModel";
-import {
-  mdiArrowDownCircleOutline,
-  mdiArrowLeftTop,
-  mdiArrowUpCircleOutline,
-  mdiGasStation,
-} from "@mdi/js";
+// import {
+//   mdiArrowDownCircleOutline,
+//   mdiArrowLeftTop,
+//   mdiArrowUpCircleOutline,
+//   mdiGasStation,
+// } from "@mdi/js";
 
 export function DailyTotalsCard() {
   const upcomingSubDeliveries = useFormula(() => {
@@ -99,15 +99,6 @@ export function DailyTotalsCard() {
     return upcomingAndDeliveredFuel;
   });
 
-  function totalToDeliverForGivenFuelType(fueltype: FuelType) {
-    return upcomingSubDeliveries.value.reduce((total, sub) => {
-      if (sub.fuelSpecs?.name === fueltype.name) {
-        total += sub.gallons ?? 0;
-      }
-      return total;
-    }, 0);
-  }
-
   const totalGallons = useFormula(() =>
     formatNumWithCommas(
       completedSubDeliveriesSince3am.value.reduce(
@@ -131,56 +122,74 @@ export function DailyTotalsCard() {
     return FuelType.sortedFuelTypes.find((fuel) => fuel.name === fuelName);
   }
 
-  const [shouldShowTotals, setShouldShowTotals] = createSignal(true);
+  // const [shouldShowTotals, setShouldShowTotals] = createSignal(true);
 
-  function ToggleTotals() {
-    shouldShowTotals() === false
-      ? setShouldShowTotals(true)
-      : setShouldShowTotals(false);
-  }
+  // function ToggleTotals() {
+  //   shouldShowTotals() === false
+  //     ? setShouldShowTotals(true)
+  //     : setShouldShowTotals(false);
+  // }
 
   return (
     <Card widthGrows padBetween={0.75}>
-      <Show when={shouldShowTotals()}>
+      <Show when={true /* shouldShowTotals() */}>
         <For
           each={Array.from(upcomingAndDeliveredFuel.value.entries())}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
         >
           {([fuelName, deliveredGallons]) => (
-            <Txt widthGrows alignTopLeft overflowXWraps>
-              <span>
-                {fuelName}:{" "}
-                <div
-                  style={{
-                    display: `inline-block`,
-                    "vertical-align": `top`,
-                  }}
-                >
-                  <Field
-                    underlined
-                    widthGrows
-                    minWidth={3}
-                    value={useFormula(
-                      () => findFuelType(fuelName)?.amountOfFuel!,
-                      (v) => {
-                        const fuelType = findFuelType(fuelName);
-                        if (fuelType) {
-                          fuelType.amountOfFuel = v;
-                        }
-                      },
-                    )}
-                    formatInput={formatIdNumber}
-                  />
-                </div>{" "}
-                gal. in truck at start. Delivered{" "}{deliveredGallons}{" "}gal. About
-                {" "}{totalToDeliverForGivenFuelType(findFuelType(fuelName)!)}{" "}gal.
-                left to deliver.
-              </span>
-            </Txt>
+            <Row padBetween={1 / 4} alignTopLeft>
+              <Txt singleLine>{`${fuelName}:`}</Txt>
+              <Txt widthGrows alignTopLeft overflowXWraps>
+                <span>
+                  <div
+                    style={{
+                      display: `inline-block`,
+                      "vertical-align": `top`,
+                    }}
+                  >
+                    <NumField
+                      hint={`Enter`}
+                      widthGrows
+                      minWidth={3}
+                      value={useFormula(
+                        () => findFuelType(fuelName)?.fuelInTruck,
+                        (v) => {
+                          const fuelType = findFuelType(fuelName);
+                          if (!exists(fuelType)) return;
+                          fuelType.fuelInTruck = v ?? null;
+                        },
+                      )}
+                    />
+                  </div>{" "}
+                  gal. in truck at start. Delivered{" "}
+                  {formatNumWithCommas(deliveredGallons, 0)} gal. About{" "}
+                  {formatNumWithCommas(
+                    Math.max(
+                      (findFuelType(fuelName)?.fuelInTruck ?? 0) -
+                        deliveredGallons,
+                      0,
+                    ),
+                    0,
+                  )}{" "}
+                  gal. left in truck and{" "}
+                  {formatNumWithCommas(
+                    upcomingSubDeliveries.value
+                      .filter(
+                        (sub) =>
+                          sub.fuelSpecs?.name === findFuelType(fuelName)!.name,
+                      )
+                      .reduce((total, sub) => total + (sub.gallons ?? 0), 0),
+                    0,
+                  )}{" "}
+                  gal. to deliver.
+                </span>
+              </Txt>
+            </Row>
           )}
         </For>
       </Show>
-      <Icon
+      {/* <Icon
         stroke={$theme.colors.primary}
         iconPath={
           shouldShowTotals()
@@ -191,7 +200,7 @@ export function DailyTotalsCard() {
         onClick={() => {
           ToggleTotals();
         }}
-      />
+      /> */}
 
       <Box widthGrows height={0.125} fill={$theme.colors.text} />
       {/* <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
