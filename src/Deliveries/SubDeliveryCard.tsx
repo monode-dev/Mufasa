@@ -248,7 +248,7 @@ export default function SubDeliveryCard(props: {
                 })}
               />
             </Label>
-            <Label
+            {/* <Label
               label="Sticked Inches Before"
               stroke={
                 props.subDelivery.stickedInchesBeforeFilling
@@ -291,7 +291,7 @@ export default function SubDeliveryCard(props: {
                 underlined
                 hint="in."
               />
-            </Label>
+            </Label> */}
             <Show
               when={
                 exists(props.subDelivery.subInvalidError) &&
