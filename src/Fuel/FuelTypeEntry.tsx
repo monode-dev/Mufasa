@@ -8,11 +8,11 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
-  exists, EnterKeyHint, useProp, Prop,
+  exists, EnterKeyHint, Prop,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
 import { onCleanup } from "solid-js";
-import {IndexedFieldKeyHandler} from "@/components/IndexedField";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -37,11 +37,17 @@ export default function FuelTypeEntry(props: {
   document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
 
   // zero based indexes will be combined with subDeliveryIndex
-  const indexName = 0;
-  const indexRate = 1;
   const fields = 2;
+  const baseIndex= useFormula(() => 1 + props.subDeliveryIndex.value * fields);
+  const nameIndex = useFormula(() => baseIndex.value);
+  const rateIndex = useFormula(() => 1 + baseIndex.value);
+  // one based index
   return (
     <Row widthGrows padBetween={1} alignLeft>
+      <IndexedField
+        refs={props.fieldRefs}
+        index={nameIndex}
+      >
         <Field
           value={useFormula(
             () => props.fuelType.name ?? ``,
@@ -54,11 +60,16 @@ export default function FuelTypeEntry(props: {
             const key: EnterKeyHint = (props.fuelType.rate ?? 0) <= 0
               ? `next`
               : `done`;
-
+            props.enterHintRefs.value.set(nameIndex.value, key);
             return key;
           }).value
         }
         />
+      </IndexedField>
+      <IndexedField
+        refs={props.fieldRefs}
+        index={rateIndex}
+      >
         <NumField
           enterKeyHint={
           useFormula(() => {
@@ -66,7 +77,7 @@ export default function FuelTypeEntry(props: {
               (props.nextFuelType.name ?? ``).trim().length == 0
                 ? `next`
                 : `done`;
-            console.log("key: ", key);
+            props.enterHintRefs.value.set(rateIndex.value, key);
             return key;
             }).value
           }
@@ -83,6 +94,7 @@ export default function FuelTypeEntry(props: {
            * this in future if it looks too weird. */
           width={5}
         />
+      </IndexedField>
       <HiddenOptions
         cancelOptions={{
           stroke: theme.palette.hint,

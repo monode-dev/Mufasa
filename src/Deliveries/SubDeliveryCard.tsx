@@ -7,7 +7,6 @@ import {
   Txt,
   pushPage,
   NumField,
-  useProp,
   exists,
   useFormula,
   HiddenOption,
