@@ -138,7 +138,7 @@ function CreateTankDialog(props: {
         {/* Notes */}
         <Field
           value={notes}
-          hintText="Notes"
+          hintText="Notes, Combination, Key Tag"
           iconPath={mdiLabel}
           underlined
           multiline
