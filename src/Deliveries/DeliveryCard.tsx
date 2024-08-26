@@ -29,17 +29,15 @@ import { getTankShape } from "@/Calculator/ShapeUtils";
 import { formatNumWithCommas } from "@/utils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
-
+  // TODO: Make this based off of fuel id not fuel name
   const totalPerFuelType = useFormula(() => {
     const totalPerFuelType = new Map<string, number>();
     props.delivery.sortedSubDeliveries.forEach((sub) => {
       const fuelName = sub.fuelSpecs?.name;
       if (!exists(fuelName)) return;
-      if (!totalPerFuelType.has(fuelName))
-        totalPerFuelType.set(fuelName, 0);
       totalPerFuelType.set(
-          fuelName,
-          totalPerFuelType.get(fuelName)! + (sub.sales ?? 0),
+        fuelName,
+        (totalPerFuelType.get(fuelName) ?? 0) + (sub.sales ?? 0),
       );
     });
     return totalPerFuelType;
@@ -141,26 +139,24 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       <Box widthGrows height={0.125} fill={$theme.colors.text} />
 
       <Show when={props.delivery.sortedSubDeliveries}>
-          <Column>
-            <For each={Array.from(totalPerFuelType.value.entries())}>
-              {([FuelName, totalSalesWorth]) => 
-                <Row>
-                  <Txt singleLine width={5} alignLeft>
-                    {FuelName}
-                  </Txt>
-                  <Txt widthGrows>
-                    ${formatNumWithCommas(totalSalesWorth, 2)}
-                  </Txt>
-                </Row>
-              }
-            </For>
-            <Row>
-              <Txt bold alignLeft width={5}>
-                Total:
-              </Txt>
-              <Txt widthGrows>${props.delivery.totalMoney}</Txt>
-            </Row>
-          </Column>
+        <Column>
+          <For each={Array.from(totalPerFuelType.value.entries())}>
+            {([FuelName, totalSalesWorth]) => (
+              <Row>
+                <Txt singleLine width={5} alignLeft>
+                  {FuelName}
+                </Txt>
+                <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
+              </Row>
+            )}
+          </For>
+          <Row>
+            <Txt bold alignLeft width={5}>
+              Total:
+            </Txt>
+            <Txt widthGrows>${props.delivery.totalMoney}</Txt>
+          </Row>
+        </Column>
       </Show>
 
       {/* Notes */}
@@ -187,20 +183,26 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   );
   return (
     <>
-      <Show when={props.subDelivery.isCompleted}>
+      {/* <Show when={props.subDelivery.isCompleted}>
         <Txt>
-          {props.subDelivery.selectedKnownTank?.fuelType?.name}: 
-          {props.subDelivery.stickedInchesBeforeFilling}" -{">"} {props.subDelivery.stickedInchesAfterFilling}", 
-          {roundToString(getTankShape(props.subDelivery.selectedKnownTank?.shape)?.calcTotalVolume(props.subDelivery.selectedKnownTank)?? 0, 0)} 
-          {" "}gal. -{">"} {props.subDelivery.gallons} gal.
+          {props.subDelivery.selectedKnownTank?.fuelType?.name}:
+          {props.subDelivery.stickedInchesBeforeFilling}" -{">"}{" "}
+          {props.subDelivery.stickedInchesAfterFilling}",
+          {roundToString(
+            getTankShape(
+              props.subDelivery.selectedKnownTank?.shape,
+            )?.calcTotalVolume(props.subDelivery.selectedKnownTank) ?? 0,
+            0,
+          )}{" "}
+          gal. -{">"} {props.subDelivery.gallons} gal.
         </Txt>
-      </Show>
+      </Show> */}
       <Row alignTopLeft widthGrows>
         <Box
           /* We want the check box to be vertically centered with a single line of
-          * text. However, the text is not vertically centered in its bounding box.
-          * So we apply a slight offset here to vertically align the check box with
-          * the first line of the description text. */
+           * text. However, the text is not vertically centered in its bounding box.
+           * So we apply a slight offset here to vertically align the check box with
+           * the first line of the description text. */
           padTop={0.045}
         >
           <Box
@@ -219,7 +221,9 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
             outlineSize={1 / 8}
             outlineColor={highlightColor.value ?? $theme.colors.primary}
             cornerRadius={1 / 7}
-            fill={props.subDelivery.isCompleted ? $theme.colors.hint : undefined}
+            fill={
+              props.subDelivery.isCompleted ? $theme.colors.hint : undefined
+            }
           >
             <Show when={props.subDelivery.isCompleted}>
               <Icon iconPath={mdiCheck} scale={0.8} stroke={mdColors.white} />
@@ -236,7 +240,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           {props.subDelivery.title}
         </Txt>
       </Row>
-    </>  
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import {
   mdiMapMarker,
   mdiPhone,
   mdiPlus,
+  mdiPlusMinusVariant,
   mdiTextBox,
   mdiTrashCanOutline,
 } from "@mdi/js";
@@ -18,6 +19,7 @@ import {
   FormatFieldInput,
   Icon,
   KeyboardType,
+  NumField,
   Prop,
   Row,
   Txt,
@@ -37,7 +39,7 @@ export function ClientFields(props: {
   name: Prop<string>;
   clientId: Prop<string>;
   phoneNumber: Prop<string>;
-  offsetRate: Prop<string>;
+  rateOffset: Prop<number | null>;
   create?: boolean;
   notes: Prop<string>;
 }) {
@@ -164,6 +166,15 @@ export function ClientFields(props: {
         enterKeyHint={useFormula(() => enterKey(props.notes)).value}
         onlyWriteOnBlur
       />
+      <NumField
+        hint={`$0.00 / gal.`}
+        icon={mdiPlusMinusVariant}
+        value={props.rateOffset}
+        underlined
+        keyboard={"numeric"}
+        enterKeyHint={`done`}
+        onlyWriteOnBlur
+      />
       <Field
         hasFocus={focusOnNotes}
         hintText={`Notes`}
@@ -174,16 +185,6 @@ export function ClientFields(props: {
         capitalize={`sentences`}
         keyboard={"text"}
         enterKeyHint={`enter`}
-        onlyWriteOnBlur
-      />
-      <Field
-        hintText={`Offset Rate`}
-        iconPath={mdiLockPercent}
-        value={props.offsetRate}
-        underlined
-        formatInput={(val) => ({ input: val, caret: val.length })}
-        keyboard={"numeric"}
-        enterKeyHint={`done`}
         onlyWriteOnBlur
       />
     </>

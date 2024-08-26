@@ -6,6 +6,7 @@ import {
   mdiMapMarker,
   mdiPencil,
   mdiPhone,
+  mdiPlusMinusVariant,
   mdiTextBox,
 } from "@mdi/js";
 import {
@@ -21,6 +22,7 @@ import {
   pushPage,
   EnterKeyHint,
   Prop,
+  NumField,
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
 import { Delivery } from "./Delivery";
@@ -40,6 +42,7 @@ export function DeliveryFields(props: {
     | "mayEditAddressAndPhone"
     | "selectedClient"
     | "notes"
+    | "_manualRateOffset"
   >;
 }) {
   function clientIsValid() {
@@ -105,6 +108,13 @@ export function DeliveryFields(props: {
     () =>
       props.delivery.selectedClient === ONE_TIME ? props.delivery.address : ``,
     (v) => (props.delivery.address = v),
+  );
+  const one_rateOffset = useFormula(
+    () =>
+      props.delivery.selectedClient === ONE_TIME
+        ? props.delivery._manualRateOffset
+        : 0,
+    (v) => (props.delivery._manualRateOffset = v),
   );
   const one_note = useFormula(
     () =>
@@ -183,6 +193,15 @@ export function DeliveryFields(props: {
           capitalize={`words`}
           keyboard={"text"}
           enterKeyHint={useFormula(() => enterKey(one_note)).value}
+        />
+        <NumField
+          hint={`$0.00 / gal.`}
+          icon={mdiPlusMinusVariant}
+          value={one_rateOffset}
+          underlined
+          keyboard={"numeric"}
+          enterKeyHint={`done`}
+          onlyWriteOnBlur
         />
       </Show>
       <Field
