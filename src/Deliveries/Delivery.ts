@@ -121,6 +121,16 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     key: `clientPhoneNumber`,
   });
 
+  // Rate Offset
+  _manualRateOffset = prop([Number, null], null);
+  rateOffsetFromClient: number | null = formula(() =>
+    this.selectedClient === ONE_TIME
+      ? this._manualRateOffset
+      : this.selectedClient === NONE_SELECTED
+        ? null
+        : this.selectedClient?.rateOffset,
+  );
+
   // Notes
   notes = prop(String, ``);
 
@@ -166,7 +176,9 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
-      Math.ceil(this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0)* 100) / 100,
+      Math.ceil(
+        this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0) * 100,
+      ) / 100,
       2,
     ),
   );
@@ -213,11 +225,15 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     getPremiumEnabled: () => premiumEnabled.value,
     getCount: () => Delivery.getAllDocs().length,
   });
+
+  // Delivery
   mx_parent = prop(Delivery);
-  _isOneTimeFuel = prop(Boolean, false);
-  _fuelType = prop([FuelType, null], null);
-  fuelName = prop(String, ``);
-  rate = prop([Number, null], null);
+  readonly delivery = formula(() => {
+    // We have to do this cast otherwise this prop is flagged as required
+    return this.mx_parent as Delivery;
+  });
+
+  // Sort Position
   _sortPosition = prop([Number, null], null);
 
   // Tank
@@ -263,6 +279,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
 
   // Fuel
+  _isOneTimeFuel = prop(Boolean, false);
+  _fuelType = prop([FuelType, null], null);
   readonly shouldShowFuelSelector = formula(
     () => this.selectedTank === JUST_FUEL,
   );
@@ -292,54 +310,71 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   computedFuelType: FuelType | null = formula(() =>
     this.selectedFuel === ONE_TIME ? null : (this.selectedFuel as FuelType),
   );
-
   readonly showFuelNameAndRate = formula(() => this.selectedFuel === ONE_TIME);
-
   // Fuel Name
+  _fuelName = prop(String, ``, {
+    key: `fuelName`,
+  });
   explicitFuelName: string = formula(
-    () => this.fuelName ?? ``,
+    () => this._fuelName ?? ``,
     (value) => {
-      this.fuelName = value;
+      this._fuelName = value;
     },
   );
-
   // Rate
+  _rate = prop([Number, null], null, {
+    key: `rate`,
+  });
   explicitRate: number | null = formula(
-    () => this.rate ?? null,
+    () => this._rate ?? null,
     (value) => {
-      this.rate = value;
+      this._rate = value;
     },
   );
-
+  explicitRateOffset = prop([Number, null], null);
   readonly fuelSpecs = formula(() => {
+    // Only apply rate offset if there is a selected client, and the user has not manually typed a rate.
+    const rateOffsetFromClient = this.delivery?.rateOffsetFromClient ?? 0;
     if (this.isCompleted) {
       // Use the explicit value
       return {
         name: this.explicitFuelName,
-        rate: this.explicitRate,
+        rate: (this.explicitRate ?? 0) + (this.explicitRateOffset ?? 0),
+        preOffsetRate: this.explicitRate,
+        rateOffset: this.explicitRateOffset,
       };
     } else if (exists(this.selectedKnownTank)) {
       // Infer from Tank info
       return {
         name: this.selectedKnownTank.fuelType?.name ?? null,
-        rate: this.selectedKnownTank.fuelType?.rate ?? null,
+        rate:
+          (this.selectedKnownTank.fuelType?.rate ?? 0) +
+          (rateOffsetFromClient ?? 0),
+        preOffsetRate: this.selectedKnownTank.fuelType?.rate ?? null,
+        rateOffset: rateOffsetFromClient,
       };
     } else {
       // Infer from selected Fuel
       if (this.selectedFuel === ONE_TIME) {
         return {
           name: this.explicitFuelName,
-          rate: this.explicitRate,
+          rate: (this.explicitRate ?? 0) + (this.explicitRateOffset ?? 0),
+          preOffsetRate: this.explicitRate,
+          rateOffset: this.explicitRateOffset,
         };
       } else if (this.selectedFuel instanceof FuelType) {
         return {
           name: this.selectedFuel.name ?? null,
-          rate: this.selectedFuel.rate ?? null,
+          rate: (this.selectedFuel.rate ?? 0) + (rateOffsetFromClient ?? 0),
+          preOffsetRate: this.selectedFuel.rate ?? null,
+          rateOffset: rateOffsetFromClient,
         };
       } else {
         return {
           name: null,
-          rate: null,
+          rate: 0,
+          preOffsetRate: null,
+          rateOffset: null,
         };
       }
     }
@@ -355,16 +390,9 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   stickedInchesAfterFilling = prop([Number, null], null);
 
   // Sales
-  readonly sales = formula(() => {
-    return Math.ceil((
-      (this.fuelSpecs?.rate ?? 0) * 
-      (this.gallons ?? 0) * 
-      (Number(this.delivery?.selectedClientDoc?.offsetRate) <= 0 ? 
-        1 : 
-        Number(this.delivery?.selectedClientDoc?.offsetRate)
-      )) * 100
-    ) / 100;
-  });
+  readonly sales = formula(
+    () => (this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0),
+  );
 
   // Full Title
   readonly title = formula(() => {
@@ -404,12 +432,18 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   static get numSubDeliveriesCompleted() {
     return SubDelivery._numSubDeliveriesCompleted.value;
   }
-  complete(props: { fuelName: string; rate: number; gallons: number; stickedInchesBeforeFilling: number; stickedInchesAfterFilling: number}) {
+  complete(props: {
+    fuelName: string;
+    rate: number;
+    gallons: number;
+    // stickedInchesBeforeFilling: number;
+    // stickedInchesAfterFilling: number;
+  }) {
     this.explicitFuelName = props.fuelName;
     this.explicitRate = props.rate;
     this.gallons = props.gallons;
-    this.stickedInchesBeforeFilling = props.stickedInchesBeforeFilling;
-    this.stickedInchesAfterFilling = props.stickedInchesAfterFilling;
+    // this.stickedInchesBeforeFilling = props.stickedInchesBeforeFilling;
+    // this.stickedInchesAfterFilling = props.stickedInchesAfterFilling;
     this.completedTimePosix = Date.now();
     SubDelivery._numSubDeliveriesCompleted.value += 1;
   }
@@ -482,10 +516,5 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
     // We need Gallons error message to go last because it is the last field.
     return nonGallonsErrorMessage ?? gallonsErrorMessage;
-  });
-
-  readonly delivery = formula(() => {
-    // We have to do this cast otherwise this prop is flagged as required
-    return this.mx_parent as Delivery;
   });
 }

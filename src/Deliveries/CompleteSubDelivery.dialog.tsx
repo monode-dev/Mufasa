@@ -11,56 +11,48 @@ import {
 } from "miwi";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import { SubDelivery } from "./Delivery";
-import { JUST_FUEL, ONE_TIME } from "@/utils";
-import { FuelType } from "@/model/DataModel";
 
 // noinspection t
 export default function CompleteSubDeliveryDialog(props: {
   subDelivery: SubDelivery;
 }) {
-  const fuelName = useProp<string>(
-    props.subDelivery.selectedTank === JUST_FUEL ||
-      !props.subDelivery.shouldShowTankSelector
-      ? props.subDelivery.selectedFuel === ONE_TIME
-        ? props.subDelivery.explicitFuelName ?? ``
-        : props.subDelivery.selectedFuel?.name ?? ``
-      : props.subDelivery.selectedTank?.fuelType?.name ?? ``,
+  const fuelName = useProp<string>(props.subDelivery.fuelSpecs?.name ?? ``);
+  const preOffsetRate = useProp<number | null>(
+    props.subDelivery.fuelSpecs?.preOffsetRate ?? null,
   );
-  const rate = useProp<number | null>(
-    props.subDelivery.selectedTank === JUST_FUEL ||
-      !props.subDelivery.shouldShowTankSelector
-      ? props.subDelivery.selectedFuel === ONE_TIME
-        ? props.subDelivery.explicitRate ?? null
-        : props.subDelivery.selectedFuel?.rate ?? null
-      : props.subDelivery.selectedTank?.fuelType?.rate ?? null,
+  const rateOffset = useProp<number | null>(
+    props.subDelivery.fuelSpecs?.rateOffset ?? null,
   );
-
   const gallons = useProp<number | null>(props.subDelivery.gallons);
 
-  const stickedInchesBeforeFilling = useProp<number | null>(props.subDelivery.stickedInchesBeforeFilling);
-  const stickedInchesAfterFilling = useProp<number | null>(props.subDelivery.stickedInchesAfterFilling);
+  const stickedInchesBeforeFilling = useProp<number | null>(
+    props.subDelivery.stickedInchesBeforeFilling,
+  );
+  const stickedInchesAfterFilling = useProp<number | null>(
+    props.subDelivery.stickedInchesAfterFilling,
+  );
 
   const canComplete = useFormula(
     () =>
       fuelName.value.trim() !== `` &&
-      exists(rate.value) &&
-      rate.value >= 0 &&
+      exists(preOffsetRate.value) &&
+      preOffsetRate.value >= 0 &&
       exists(gallons.value) &&
-      gallons.value >= 0 &&
-      exists(stickedInchesBeforeFilling.value) &&
-      stickedInchesBeforeFilling.value >= 0 &&
-      exists(stickedInchesAfterFilling.value) &&
-      stickedInchesAfterFilling.value >= 0
+      gallons.value >= 0,
+    // exists(stickedInchesBeforeFilling.value) &&
+    // stickedInchesBeforeFilling.value >= 0 &&
+    // exists(stickedInchesAfterFilling.value) &&
+    // stickedInchesAfterFilling.value >= 0,
   );
 
   function completeDelivery() {
     if (!canComplete.value) return;
     props.subDelivery.complete({
       fuelName: fuelName.value,
-      rate: rate.value!,
+      rate: preOffsetRate.value!,
       gallons: gallons.value!,
-      stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
-      stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
+      // stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
+      // stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
     });
   }
 
@@ -92,7 +84,8 @@ export default function CompleteSubDeliveryDialog(props: {
         {/* --Fields-- */}
         <CompletedSubDeliveryFields
           fuelNameSig={fuelName}
-          rateSig={rate}
+          rateSig={preOffsetRate}
+          rateOffset={rateOffset}
           gallonsSig={gallons}
           stickedInchesBeforeFillingSig={stickedInchesBeforeFilling}
           stickedInchesAfterFillingSig={stickedInchesAfterFilling}

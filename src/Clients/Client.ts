@@ -4,7 +4,6 @@ import { Tank } from "@/Tanks/Tank";
 import { FloatSort } from "miwi";
 import { prop, list, formula } from "mufasa";
 
-
 export class Client extends mfs.Doc(`Client`) {
   static readonly limit = createLimitTrackers({
     free: 10,
@@ -48,7 +47,7 @@ export class Client extends mfs.Doc(`Client`) {
 
   address = prop(String, ``);
   notes = prop(String, ``);
-  offsetRate = prop(String, ``);
+  rateOffset = prop([Number, null], null);
   readonly tanks = list(Tank, `mx_parent`);
   onDelete() {
     this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());

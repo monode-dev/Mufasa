@@ -13,22 +13,25 @@ import {
   HiddenOption,
   HiddenOptions,
   DeleteOption,
-  theme, EnterKeyHint, Prop,
+  theme,
+  EnterKeyHint,
+  Prop,
+  doNow,
 } from "miwi";
-import {onCleanup, Show} from "solid-js";
+import { onCleanup, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
-import {FuelTypeSelector} from "@/Fuel/FuelTypeSelector";
-import {SubDelivery} from "./Delivery";
+import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
+import { SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 // import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
-import {Flag} from "mufasa/dist/Utils";
-import {OptionalPropFlag} from "mufasa/dist/Doc";
-import {FieldKeyHandler} from "@/AppData";
+import { Flag } from "mufasa/dist/Utils";
+import { OptionalPropFlag } from "mufasa/dist/Doc";
+import { FieldKeyHandler } from "@/AppData";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -82,23 +85,13 @@ export default function SubDeliveryCard(props: {
   }
 
   function midEnterHint(
-    num: (number & Flag<typeof OptionalPropFlag>) | (null & Flag<typeof OptionalPropFlag>
-      ) | number | null): EnterKeyHint {
+    num:
+      | (number & Flag<typeof OptionalPropFlag>)
+      | (null & Flag<typeof OptionalPropFlag>)
+      | number
+      | null,
+  ): EnterKeyHint {
     const key = (num ?? 0) <= 0 ? `next` : `done`;
-    console.log("key: ", key);
-    return key;
-  }
-
-  function lastEnterHint(sub: Prop<SubDelivery | undefined>): EnterKeyHint {
-    const s = sub.value;
-    let key: EnterKeyHint = `done`;
-    if (exists(s)) {
-      if (s._isOneTimeFuel) {
-        if ((s.fuelName ?? ``).trim().length == 0)
-          key = `next`
-      } else if ((s.gallons ?? 0) <= 0)
-        key = `next`
-    }
     console.log("key: ", key);
     return key;
   }
@@ -185,7 +178,12 @@ export default function SubDeliveryCard(props: {
             </Show>
 
             {/* One Time Fuel Type Fields */}
-            <Show when={props.subDelivery.showFuelNameAndRate && props.subDelivery.shouldShowFuelSelector}>
+            <Show
+              when={
+                props.subDelivery.showFuelNameAndRate &&
+                props.subDelivery.shouldShowFuelSelector
+              }
+            >
               <Label label="Name">
                 <Field
                   value={useFormula(
@@ -196,7 +194,11 @@ export default function SubDeliveryCard(props: {
                   hintText="Fuel Name"
                   capitalize={`words`}
                   keyboard={"text"}
-                  enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.explicitRate )).value }
+                  enterKeyHint={
+                    useFormula(() =>
+                      midEnterHint(props.subDelivery.explicitRate),
+                    ).value
+                  }
                   onlyWriteOnBlur
                 />
               </Label>
@@ -208,7 +210,10 @@ export default function SubDeliveryCard(props: {
                   )}
                   underlined
                   hint="Rate"
-                  enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.gallons )).value }
+                  enterKeyHint={
+                    useFormula(() => midEnterHint(props.subDelivery.gallons))
+                      .value
+                  }
                   onlyWriteOnBlur
                 />
               </Label>
@@ -231,13 +236,24 @@ export default function SubDeliveryCard(props: {
                 }
                 underlined
                 hint="Est. gal."
-                enterKeyHint={ useFormula(() => lastEnterHint(props.nextSubDelivery)).value }
+                enterKeyHint={doNow(() => {
+                  const sub = props.nextSubDelivery.value;
+                  return sub?.selectedFuel === ONE_TIME
+                    ? (sub.fuelSpecs.name ?? ``).trim().length == 0
+                      ? `next`
+                      : `done`
+                    : (sub?.gallons ?? 0) === 0
+                      ? `next`
+                      : `done`;
+                })}
               />
             </Label>
             <Label
               label="Sticked Inches Before"
               stroke={
-                props.subDelivery.stickedInchesBeforeFilling ? undefined : $theme.colors.warning
+                props.subDelivery.stickedInchesBeforeFilling
+                  ? undefined
+                  : $theme.colors.warning
               }
             >
               <NumField
@@ -246,16 +262,20 @@ export default function SubDeliveryCard(props: {
                   (v) => (props.subDelivery.stickedInchesBeforeFilling = v),
                 )}
                 hintColor={
-                  props.subDelivery.stickedInchesBeforeFilling ? undefined : $theme.colors.warning
+                  props.subDelivery.stickedInchesBeforeFilling
+                    ? undefined
+                    : $theme.colors.warning
                 }
                 underlined
-                hint='in.'
+                hint="in."
               />
             </Label>
             <Label
               label="Sticked Inches After"
               stroke={
-                props.subDelivery.stickedInchesAfterFilling ? undefined : $theme.colors.warning
+                props.subDelivery.stickedInchesAfterFilling
+                  ? undefined
+                  : $theme.colors.warning
               }
             >
               <NumField
@@ -264,10 +284,12 @@ export default function SubDeliveryCard(props: {
                   (v) => (props.subDelivery.stickedInchesAfterFilling = v),
                 )}
                 hintColor={
-                  props.subDelivery.stickedInchesAfterFilling ? undefined : $theme.colors.warning
+                  props.subDelivery.stickedInchesAfterFilling
+                    ? undefined
+                    : $theme.colors.warning
                 }
                 underlined
-                hint='in.'
+                hint="in."
               />
             </Label>
             <Show
@@ -319,6 +341,10 @@ export default function SubDeliveryCard(props: {
           rateSig={useFormula(
             () => props.subDelivery.explicitRate,
             (v) => (props.subDelivery.explicitRate = v),
+          )}
+          rateOffset={useFormula(
+            () => props.subDelivery.explicitRateOffset,
+            (v) => (props.subDelivery.explicitRateOffset = v),
           )}
           gallonsSig={useFormula(
             () => props.subDelivery.gallons,
