@@ -26,7 +26,7 @@ import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import {Flag} from "mufasa/dist/Utils";
 import { OptionalPropFlag } from "mufasa/dist/Doc";
-import { IndexedFieldKeyHandler } from "@/components/IndexedField";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -110,10 +110,11 @@ export default function SubDeliveryCard(props: {
   document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
 
   // zero based indexes will be combined with subDeliveryIndex
-  const indexName = 0;
-  const indexRate = 1;
-  const indexGallons = 2;
   const fields = 3;
+  const baseIndex= useFormula(() => 1 + props.subDeliveryIndex.value * fields);
+  const nameIndex = useFormula(() => baseIndex.value);
+  const rateIndex = useFormula(() => 1 + baseIndex.value);
+  const gallonsIndex = useFormula(() => 2 + baseIndex.value);
   return (
     <Card
       widthGrows
@@ -194,28 +195,46 @@ export default function SubDeliveryCard(props: {
             {/* One Time Fuel Type Fields */}
             <Show when={props.subDelivery.showFuelNameAndRate && props.subDelivery.shouldShowFuelSelector}>
               <Label label="Name">
-                <Field
-                  value={useFormula(
-                    () => props.subDelivery.explicitFuelName,
-                    (v) => (props.subDelivery.explicitFuelName = v),
-                  )}
-                  underlined
-                  hintText="Fuel Name"
-                  capitalize={`words`}
-                  keyboard={"text"}
-                  enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.explicitRate )).value }
-                />
+                <IndexedField
+                  refs={props.fieldRefs}
+                  index={nameIndex}
+                >
+                  <Field
+                    value={useFormula(
+                      () => props.subDelivery.explicitFuelName,
+                      (v) => (props.subDelivery.explicitFuelName = v),
+                    )}
+                    underlined
+                    hintText="Fuel Name"
+                    capitalize={`words`}
+                    keyboard={"text"}
+                    enterKeyHint = { useFormula(() => {
+                      const key: EnterKeyHint =  midEnterHint(props.subDelivery.explicitRate);
+                      props.enterHintRefs.value.set(nameIndex.value, key);
+                      return key;
+                    }).value }
+                  />
+                </IndexedField>
               </Label>
               <Label label="Rate">
-                <NumField
-                  value={useFormula(
-                    () => props.subDelivery.explicitRate,
-                    (v) => (props.subDelivery.explicitRate = v),
-                  )}
-                  underlined
-                  hint="Rate"
-                  enterKeyHint = { useFormula(() => midEnterHint( props.subDelivery.gallons )).value }
-                />
+                <IndexedField
+                  refs={props.fieldRefs}
+                  index={rateIndex}
+                >
+                  <NumField
+                    value={useFormula(
+                      () => props.subDelivery.explicitRate,
+                      (v) => (props.subDelivery.explicitRate = v),
+                    )}
+                    underlined
+                    hint="Rate"
+                    enterKeyHint = { useFormula(() => {
+                      const key: EnterKeyHint =  midEnterHint(props.subDelivery.explicitRate);
+                      props.enterHintRefs.value.set(rateIndex.value, key);
+                      return key;
+                    }).value }
+                  />
+                </IndexedField>
               </Label>
             </Show>
 
@@ -226,18 +245,28 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
-              <NumField
-                value={useFormula(
-                  () => props.subDelivery.gallons,
-                  (v) => (props.subDelivery.gallons = v),
-                )}
-                hintColor={
-                  props.subDelivery.gallons ? undefined : $theme.colors.warning
-                }
-                underlined
-                hint="Est. gal."
-                enterKeyHint={ useFormula(() => lastEnterHint(props.nextSubDelivery)).value }
-              />
+              <IndexedField
+                refs={props.fieldRefs}
+                index={gallonsIndex}
+              >
+                <NumField
+                  value={useFormula(
+                    () => props.subDelivery.gallons,
+                    (v) => (props.subDelivery.gallons = v),
+                  )}
+                  hintColor={
+                    props.subDelivery.gallons ? undefined : $theme.colors.warning
+                  }
+                  underlined
+                  hint="Est. gal."
+                  enterKeyHint={
+                  useFormula(() => {
+                    const key: EnterKeyHint = lastEnterHint(props.nextSubDelivery);
+                    props.enterHintRefs.value.set(gallonsIndex.value, key);
+                    return key
+                  }).value}
+                />
+              </IndexedField>
             </Label>
             <Show
               when={
