@@ -139,9 +139,9 @@ function CreateClientDialog(props: {
       rateOffset: rateOffset.value,
       shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
+      weekday: weekday.value,
     });
-    props.onCreate?.(newClient);
-    newClient.weekday = weekday.value;  
+    props.onCreate?.(newClient);  
     // tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
     //   newClient.addPhoneNumber();
     //   newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
