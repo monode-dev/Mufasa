@@ -18,13 +18,14 @@ import {
   DeleteOption,
   theme, Prop, useProp, EnterKeyHint,
 } from "miwi";
-import { For, Show } from "solid-js";
+import {For, onCleanup, Show} from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
 import DeleteDialog from "@/components/DeleteDialog";
 import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
 import { SimplePage } from "@/components/SimplePage";
+import {IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
@@ -47,7 +48,12 @@ export function DeliveryPage(props: { delivery: Delivery }) {
   const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function in SubDeliveryCard.tsx
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
-
+  // filled in LastEnterHint function
+  const nextOverride: Prop<Map<number, Prop<number>>> = useProp(new Map());
+  onCleanup(() => {
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs, nextOverride));
+  });
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs, nextOverride));
   return (
     <SimplePage>
       <AppBar>
@@ -114,8 +120,12 @@ export function DeliveryPage(props: { delivery: Delivery }) {
                   const nextSubDelivery = useFormula(() => next < props.delivery.sortedSubDeliveries.length
                     ? props.delivery.sortedSubDeliveries[next]
                     : undefined);
-                  return <SubDeliveryCard subDelivery={subDelivery} nextSubDelivery={nextSubDelivery}
-                  enterHintRefs={enterHintRefs} fieldRefs={fieldRefs} subDeliveryIndex={useProp(dex)}/>;
+                  return <SubDeliveryCard
+                    subDelivery={subDelivery} nextSubDelivery={nextSubDelivery}
+                    enterHintRefs={enterHintRefs} fieldRefs={fieldRefs}
+                    subDeliveryIndex={useProp(dex)} nextOverride={nextOverride}
+                    noKeyHandler
+                  />;
                 }}
               </For>
             </SortableColumn>
