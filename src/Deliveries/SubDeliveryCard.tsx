@@ -35,6 +35,8 @@ export default function SubDeliveryCard(props: {
   // filled in enterKey() function
   enterHintRefs: Prop<Map<number, EnterKeyHint>>;
   subDeliveryIndex: Prop<number>;
+  nextOverride: Prop<Map<number, Prop<number>>>;
+  noKeyHandler?: boolean;
 }) {
   function handleComplete() {
     pushPage(CompleteSubDeliveryDialog, {
@@ -90,31 +92,41 @@ export default function SubDeliveryCard(props: {
     return key;
   }
 
-  function lastEnterHint(sub: Prop<SubDelivery | undefined>): EnterKeyHint {
-    const s = sub.value;
-    let key: EnterKeyHint = `done`;
-    if (exists(s)) {
-      if (s._isOneTimeFuel) {
-        if ((s.fuelName ?? ``).trim().length == 0)
-          key = `next`
-      } else if ((s.gallons ?? 0) <= 0)
-        key = `next`
-    }
-    console.log("key: ", key);
-    return key;
-  }
-
   onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs, props.nextOverride));
   });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
+  if(!props.noKeyHandler)
+    document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs, props.nextOverride));
 
-  // zero based indexes will be combined with subDeliveryIndex
+  // local zero based indexes are shifted by subDeliveryIndex then converted to 1 based indexes
   const fields = 3;
   const baseIndex= useFormula(() => 1 + props.subDeliveryIndex.value * fields);
   const nameIndex = useFormula(() => baseIndex.value);
   const rateIndex = useFormula(() => 1 + baseIndex.value);
   const gallonsIndex = useFormula(() => 2 + baseIndex.value);
+  const overrideNext = useFormula(() =>{
+    const next = baseIndex.value + fields + 2;
+      console.log("next: ", next);
+      return next;
+  }
+  );
+  function lastEnterHint(sub: Prop<SubDelivery | undefined>, index: Prop<number>): EnterKeyHint {
+    const s = sub.value;
+    let key: EnterKeyHint = `done`;
+    if (exists(s)) {
+      if (s._isOneTimeFuel) {
+        props.nextOverride.value.delete(index.value);
+        if ((s.fuelName ?? ``).trim().length == 0)
+          key = `next`
+      } else if ((s.gallons ?? 0) <= 0){
+        key = `next`
+        props.nextOverride.value.set(index.value, overrideNext);
+      }
+    }
+    console.log("key: ", key);
+    return key;
+  }
+
   return (
     <Card
       widthGrows
@@ -261,7 +273,7 @@ export default function SubDeliveryCard(props: {
                   hint="Est. gal."
                   enterKeyHint={
                   useFormula(() => {
-                    const key: EnterKeyHint = lastEnterHint(props.nextSubDelivery);
+                    const key: EnterKeyHint = lastEnterHint(props.nextSubDelivery, gallonsIndex);
                     props.enterHintRefs.value.set(gallonsIndex.value, key);
                     return key
                   }).value}
