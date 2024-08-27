@@ -48,7 +48,7 @@ export class Client extends mfs.Doc(`Client`) {
   address = prop(String, ``);
   notes = prop(String, ``);
   rateOffset = prop([Number, null], null);
-  weekday = prop(WeekDays.none);
+  weekday = prop([String, null], WeekDays.none) as ReturnType<typeof prop<[StringConstructor, null], WeekDays>> & WeekDays;
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
   shouldScheduleDeliveriesForThisClient = prop(Boolean);
   readonly tanks = list(Tank, `mx_parent`);
