@@ -460,14 +460,11 @@ export default function Calculator() {
         </Label>
 
         {/* SECTION  Complete Delivery ActionText */}
-        <Show when={selectedTab.value === tabs.delivery}>
+        <Show when={selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value }>
           <Txt
             widthGrows
-            stroke={deliveryCanBeCompleted.value &&
-              selectedTab.value === tabs.delivery
-                ? mdColors.green
-                : mdColors.grey}
-            alignCenter
+            stroke={mdColors.green}
+            
             onClick={() => {
               selectedTab.value = tabs.delivery;
               completeDelivery();
