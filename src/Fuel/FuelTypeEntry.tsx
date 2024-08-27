@@ -11,8 +11,7 @@ import {
   exists, EnterKeyHint, Prop,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
-import { onCleanup } from "solid-js";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
+import {IndexedField} from "@/components/IndexedField";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -30,11 +29,6 @@ export default function FuelTypeEntry(props: {
       }"? Associated tanks will have their fuel type set to "None".`,
     });
   }
-
-  onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
-  });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs));
 
   // zero based indexes will be combined with subDeliveryIndex
   const fields = 2;
