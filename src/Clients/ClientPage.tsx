@@ -134,6 +134,10 @@ export default function ClientPage(props: { client: Client }) {
               () => props.client.weekday,
               (val) => (props.client.weekday = val),
             )}
+            scheduledDeliveryStartDate={useFormula(
+              () => props.client.scheduledDeliveryStartDate,
+              (val) => (props.client.scheduledDeliveryStartDate = val),
+            )}
           />
           <CallAndMapButtons
             phoneNumber={props.client.phoneNumber}
