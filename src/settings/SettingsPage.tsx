@@ -24,7 +24,7 @@ import {
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
-import { For, Show } from "solid-js";
+import {For, onCleanup, Show} from "solid-js";
 import {
   premiumEnabled,
   isSubscribing,
@@ -52,6 +52,7 @@ import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 import { Match, Switch } from "solid-js/web";
+import {IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -110,6 +111,11 @@ export function SettingsPage() {
   const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function in FuelTypeEntry.tsx
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
+  onCleanup(() => {
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  });
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
 
   return (
     <SimplePage
