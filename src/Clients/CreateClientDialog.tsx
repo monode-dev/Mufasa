@@ -13,7 +13,7 @@ import {
 } from "miwi";
 import { ClientFields } from "./ClientFields";
 import { Show } from "solid-js";
-import { Client } from "./Client";
+import { Client, WeekDays } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import Fuse from "fuse.js";
 import { LoadCSVDialog } from "./LoadCSVDialog";
@@ -41,11 +41,14 @@ function CreateClientDialog(props: {
   const phoneNumber = useProp(``);
   const address = useProp(``);
   const notes = useProp(``);
+  const weeksBetweenScheduledDeliveries = useProp<number | null>(null);
+  const weekday = useProp(WeekDays.none);
   const rateOffset = useProp<number | null>(null);
-  const tempClient = Client.create({
-    name: "",
-    clientId: "",
-  });
+  const shouldScheduleDeliveriesForThisClient = useProp(false);
+  // const tempClient = Client.create({
+  //   name: "",
+  //   clientId: "",
+  // });
 
   function closePopUp() {
     // tempClient.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
@@ -92,6 +95,9 @@ function CreateClientDialog(props: {
       address: address.value,
       notes: notes.value,
       rateOffset: rateOffset.value,
+      shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
+      weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
+      weekday: weekday.value,
     };
   });
   const clientIsValid = useFormula(() => {
@@ -131,6 +137,9 @@ function CreateClientDialog(props: {
       address: address.value,
       notes: notes.value,
       rateOffset: rateOffset.value,
+      shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
+      weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
+      weekday: weekday.value,
     });
     props.onCreate?.(newClient);
 
@@ -157,6 +166,9 @@ function CreateClientDialog(props: {
           notes={notes}
           create
           rateOffset={rateOffset}
+          shouldScheduleDeliveriesForThisClient={shouldScheduleDeliveriesForThisClient}
+          weeksBetweenScheduledDeliveries={weeksBetweenScheduledDeliveries}
+          weekday={weekday}
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
