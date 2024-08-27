@@ -43,6 +43,7 @@ function CreateClientDialog(props: {
   const notes = useProp(``);
   const weeksBetweenScheduledDeliveries = useProp<number | null>(null);
   const weekday = useProp(WeekDays.none);
+  const scheduledDeliveryStartDate = useProp<number | null>(null);
   const rateOffset = useProp<number | null>(null);
   const shouldScheduleDeliveriesForThisClient = useProp(false);
   // const tempClient = Client.create({
@@ -98,6 +99,7 @@ function CreateClientDialog(props: {
       shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
+      scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
     };
   });
   const clientIsValid = useFormula(() => {
@@ -140,6 +142,7 @@ function CreateClientDialog(props: {
       shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
+      scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
     });
     props.onCreate?.(newClient);  
     // tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
@@ -168,6 +171,7 @@ function CreateClientDialog(props: {
           shouldScheduleDeliveriesForThisClient={shouldScheduleDeliveriesForThisClient}
           weeksBetweenScheduledDeliveries={weeksBetweenScheduledDeliveries}
           weekday={weekday}
+          scheduledDeliveryStartDate={scheduledDeliveryStartDate}
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
