@@ -1,35 +1,22 @@
 import {
   mdiAccount,
   mdiIdentifier,
-  mdiLockPercent,
   mdiMapMarker,
   mdiPhone,
-  mdiPlus,
   mdiPlusMinusVariant,
   mdiTextBox,
-  mdiTrashCanOutline,
 } from "@mdi/js";
 import {
-  Box,
-  BoxProps,
   EnterKeyHint,
   Field,
-  FieldCapitalization,
-  FieldInputType,
-  FormatFieldInput,
-  Icon,
-  KeyboardType,
   NumField,
   Prop,
-  Row,
-  Txt,
   useFormula,
   useProp,
 } from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
-import { Client, ClientPhoneNumber } from "./Client";
-import { Component, For, onCleanup, Show } from "solid-js";
+import { onCleanup } from "solid-js";
 import { FieldKeyHandler } from "@/AppData";
 
 export function ClientFields(props: {
@@ -174,6 +161,7 @@ export function ClientFields(props: {
         keyboard={"numeric"}
         enterKeyHint={`done`}
         onlyWriteOnBlur
+        negativesAreAllowed
       />
       <Field
         hasFocus={focusOnNotes}
