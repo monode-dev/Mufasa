@@ -50,6 +50,7 @@ export class Client extends mfs.Doc(`Client`) {
   rateOffset = prop([Number, null], null);
   weekday = prop([String, null], WeekDays.none) as ReturnType<typeof prop<[StringConstructor, null], WeekDays>> & WeekDays;
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
+  scheduledDeliveryStartDate = prop([Number, null], null);
   shouldScheduleDeliveriesForThisClient = prop(Boolean);
   readonly tanks = list(Tank, `mx_parent`);
   onDelete() {
@@ -74,7 +75,7 @@ export class ClientPhoneNumber extends mfs.Doc(`ClientPhoneNumber`) {
 export type WeekDays = (typeof WeekDays)[keyof typeof WeekDays]
 export const WeekDays = {
   monday: `Monday`,
-  tuesday: `Tesday`,
+  tuesday: `Tuesday`,
   wednesday: `Wednesday`,
   thursday: `Thursday`,
   friday: `Friday`,
