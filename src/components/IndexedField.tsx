@@ -61,7 +61,8 @@ export type NumFieldProps = SharedFieldProps & {
 export function IndexedFieldKeyHandler(
   event: KeyboardEvent,
   fieldRefs: Prop<Map<number, HTMLDivElement>>,
-  enterHintRefs: Prop<Map<number, EnterKeyHint>>
+  enterHintRefs: Prop<Map<number, EnterKeyHint>>,
+  nextOverride?: Prop<Map<number, Prop<number>>>
 ) {
   if (event.key === "Enter") {
     const target = event.target as HTMLElement;
@@ -72,19 +73,20 @@ export function IndexedFieldKeyHandler(
       const fields = fieldRefs.value;
       const currentIndex = parseInt(index, 10);
       // storing index starts at 1
-      const lastIndex = fields.size;
-      if (currentIndex > -1 && currentIndex < lastIndex) {
-        const enterHint = enterHintRefs.value.get(currentIndex);
-        if ((enterHint ?? 'done') == `done`) return;
-
-        const nextElement = fields.get(currentIndex + 1);
-        console.log("nextElement: ", nextElement);
-        if (nextElement) {
-          const nextField = nextElement.querySelector('input, select, textarea') as HTMLElement;
-          if (nextField) {
-            nextField.focus();
-            event.preventDefault(); // Prevent form submission
-          }
+      const enterHint = enterHintRefs.value.get(currentIndex);
+      if ((enterHint ?? 'done') == `done`) return;
+      const nextIndex =
+        nextOverride?.value.get(currentIndex)?.value
+        ?? currentIndex + 1;
+      console.log("=====================");
+      console.log("nextIndex: ", nextIndex);
+      const nextElement = fields.get(nextIndex);
+      console.log("nextElement: ", nextElement?.dataset.index);
+      if (nextElement) {
+        const nextField = nextElement.querySelector('input, select, textarea') as HTMLElement;
+        if (nextField) {
+          nextField.focus();
+          event.preventDefault(); // Prevent form submission
         }
       }
     }
