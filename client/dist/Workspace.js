@@ -140,7 +140,10 @@ function createWorkspaceInterface(config) {
             userMetadata.value = savedMetadata.data;
             console.log(`workspace savedMetadata.loadedFromLocalStorage(${JSON.stringify(savedMetadata.data, null, 2)})`);
         });
-        const disposeOnSnapshot = workspaceIntegration.onUserMetadata(async (newMetadata) => {
+        const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
+        /* TODO: When the app is offline newMetadata is null, and overwrites the savedMetadata. newMetadata
+         * should not be null in this case. */
+        async (newMetadata) => {
             // Wait for userMetadata to get set up.
             await savedMetadata.loadedFromLocalStorage;
             console.log(`workspaceIntegration.onUserMetadata(${JSON.stringify(newMetadata, null, 2)})`);

@@ -224,6 +224,7 @@ export function firebaseWorkspace(config) {
             let disposeSnapShot = () => { };
             const startOnSnapshot = () => {
                 disposeSnapShot = onSnapshot(doc(config.userMetadataCollection, config.uid), (snapshot) => {
+                    console.log(`User Metadata is from cache: ${snapshot.metadata.fromCache}`);
                     const metadata = snapshot.data();
                     handle(metadata ?? null);
                 }, (error) => {

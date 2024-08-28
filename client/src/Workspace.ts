@@ -284,6 +284,8 @@ function createWorkspaceInterface(config: {
       );
     });
     const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
+      /* TODO: When the app is offline newMetadata is null, and overwrites the savedMetadata. newMetadata
+       * should not be null in this case. */
       async (newMetadata) => {
         // Wait for userMetadata to get set up.
         await savedMetadata.loadedFromLocalStorage;
