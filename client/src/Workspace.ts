@@ -279,6 +279,9 @@ function createWorkspaceInterface(config: {
       .load(PendingAsJson as SavedUserMetadata);
     savedMetadata.loadedFromLocalStorage.then(() => {
       userMetadata.value = savedMetadata.data as any;
+      console.log(
+        `workspace savedMetadata.loadedFromLocalStorage(${JSON.stringify(savedMetadata.data, null, 2)})`,
+      );
     });
     const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
       async (newMetadata) => {
