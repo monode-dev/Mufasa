@@ -190,21 +190,21 @@ export function initializeAuth<T extends SignInFuncs>(config: {
         uid.value === undefined
           ? UserStates.pending
           : uid.value === null
-          ? UserStates.signedOut
-          : emailVerified.value
-          ? UserStates.createSignedInInst(
-              {
-                uid: uid.value,
-                email: email.value,
-                emailVerified: emailVerified.value,
-              },
-              onDispose,
-            )
-          : UserStates.createSignedInButNotVerifiedInst({
-              uid: uid.value,
-              email: email.value,
-              emailVerified: emailVerified.value,
-            }),
+            ? UserStates.signedOut
+            : emailVerified.value
+              ? UserStates.createSignedInInst(
+                  {
+                    uid: uid.value,
+                    email: email.value,
+                    emailVerified: emailVerified.value,
+                  },
+                  onDispose,
+                )
+              : UserStates.createSignedInButNotVerifiedInst({
+                  uid: uid.value,
+                  email: email.value,
+                  emailVerified: emailVerified.value,
+                }),
       ),
     ) as any;
   });
@@ -262,6 +262,7 @@ function createWorkspaceInterface(config: {
   const isJoiningWorkspace = useProp(false);
   const isLeavingWorkspace = useProp(false);
   const isDeletingWorkspace = useProp(false);
+  console.log(`createWorkspaceInterface(${JSON.stringify(config, null, 2)})`);
 
   type PendingAsJson = typeof PendingAsJson;
   const PendingAsJson = null;
@@ -280,7 +281,10 @@ function createWorkspaceInterface(config: {
       userMetadata.value = savedMetadata.data as any;
     });
     const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
-      (newMetadata) => {
+      async (newMetadata) => {
+        // Wait for userMetadata to get set up.
+        await savedMetadata.loadedFromLocalStorage;
+        console.log(`workspaceIntegration.onUserMetadata called!`);
         savedMetadata.batchUpdate((data) => {
           const newMetadataValue =
             exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
@@ -473,7 +477,9 @@ function createWorkspaceInterface(config: {
     userMetadata.value === PendingAsJson
       ? WorkspaceStates.pending
       : userMetadata.value === NoneAsJson
-      ? WorkspaceStates.none
-      : WorkspaceStates.createJoinedInst(userMetadata.value /**, onCleanup */),
+        ? WorkspaceStates.none
+        : WorkspaceStates.createJoinedInst(
+            userMetadata.value /**, onCleanup */,
+          ),
   );
 }
