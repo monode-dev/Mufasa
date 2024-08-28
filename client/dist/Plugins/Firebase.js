@@ -224,7 +224,14 @@ export function firebaseWorkspace(config) {
             let disposeSnapShot = () => { };
             const startOnSnapshot = () => {
                 disposeSnapShot = onSnapshot(doc(config.userMetadataCollection, config.uid), (snapshot) => {
-                    console.log(`User Metadata is from cache: ${snapshot.metadata.fromCache}`);
+                    /* If the app starts up offline, onSnapshot sends `undefined` data, even though it hasn't
+                     * actually pinged the server. This is overwriting our locally saved copy. Firestore shouldn't
+                     * send any updates until it has actually checked with the server. We can tell the difference
+                     * between these two `undefined`s by checking snapshot.metadata.fromCache. Firestore caching
+                     * should be disabled, so if it is from the cache it is not from the server and should be
+                     * discarded. */
+                    if (snapshot.metadata.fromCache)
+                        return;
                     const metadata = snapshot.data();
                     handle(metadata ?? null);
                 }, (error) => {
