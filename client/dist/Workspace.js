@@ -142,7 +142,7 @@ function createWorkspaceInterface(config) {
         const disposeOnSnapshot = workspaceIntegration.onUserMetadata(async (newMetadata) => {
             // Wait for userMetadata to get set up.
             await savedMetadata.loadedFromLocalStorage;
-            console.log(`workspaceIntegration.onUserMetadata called!`);
+            console.log(`workspaceIntegration.onUserMetadata(${JSON.stringify(newMetadata, null, 2)})`);
             savedMetadata.batchUpdate((data) => {
                 const newMetadataValue = exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
                     ? {
