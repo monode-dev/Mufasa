@@ -73,7 +73,7 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       };
     },
   );
-  const user = initializeAuth<{}>({
+  const mfsAuth = initializeAuth<{}>({
     stage: stage,
     sessionPersister: mfsConfig.sessionPersister,
     directoryPersister:
@@ -83,21 +83,9 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   const storeBank = initializeStoreBank({
     stage: stage,
     devicePersister: mfsConfig.devicePersister,
-    workspaceSignature: doNow(async () => {
-      while (user.value.isPending || user.value.workspace?.isPending) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-      return mfsConfig.sessionPersister.useRoot(() =>
-        mfsConfig.sessionPersister.useFormula(() =>
-          isValid(user.value.uid) && isValid(user.value.workspace?.id)
-            ? {
-                userId: user.value.uid,
-                workspaceId: user.value.workspace.id,
-              }
-            : null,
-        ),
-      );
-    }),
+    workspaceCacheId: mfsConfig.sessionPersister.useRoot(() =>
+      mfsConfig.sessionPersister.useFormula(() => mfsAuth.workspaceCacheId),
+    ),
   });
   const docSetup = initializeDocClass({
     storeBank: storeBank,
@@ -115,7 +103,7 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   return {
     Doc: docSetup.Doc,
     get user(): User<C> {
-      return user.value;
+      return mfsAuth.user;
     },
     File: fileSetup.File,
     get isUploadingToCloud() {

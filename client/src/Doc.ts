@@ -335,6 +335,7 @@ export function prop<
     : (secondParam as any);
   const persistance: Persistance = options.persistance ?? Persistance.global;
   if (isDocClass(TypeClass)) {
+    // Doc
     return {
       [IsCustomProp]: true,
       isFullCustom: false,
@@ -358,6 +359,7 @@ export function prop<
       overrideKey: options.key,
     } satisfies CustomProp as any;
   } else {
+    // Primitive
     return {
       [IsCustomProp]: true,
       isFullCustom: false,

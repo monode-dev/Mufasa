@@ -15,6 +15,8 @@ type GetListFromTableConfig<
     ? ReadonlyList<OtherInst>
     : List<OtherInst>
   : List<OtherInst>;
+// TODO: Add an option that automatically makes this sortable via Float Sort.
+// TODO: Add an option to automatically delete the contents of this list if the parent is deleted. Maybe even make this be a required parameter.
 export function list<
   OtherClass extends DocClass,
   TableConfig extends

@@ -1,7 +1,7 @@
 import { Device, Session, Cloud } from "./DocStore.js";
 import { ReadonlyProp } from "mosa-js";
 import { isValid } from "./Utils.js";
-import { userInfo } from "os";
+import { v4 as uuidv4 } from "uuid";
 
 // SECTION: Types
 export type UserInfo = {
@@ -66,148 +66,247 @@ export type SignInFuncs = {
 };
 export type User<T extends Cloud.Persister<any>> = ReturnType<
   typeof initializeAuth<ReturnType<T[`getCloudAuth`]>[`signInFuncs`]>
->[`value`];
+>[`user`];
 export function initializeAuth<T extends SignInFuncs>(config: {
   stage: string;
   sessionPersister: Session.Persister;
   directoryPersister: Device.DirectoryPersister;
   getCloudAuth: GetCloudAuth<T>;
 }): {
-  get value(): UserState<T>;
+  get user(): UserState<T>;
+  get workspaceCacheId(): string | null | undefined;
 } {
-  const { useProp, useFormula, doNow, onDispose, useRoot } =
+  const { useProp, useFormula, doNow, doWatch, onDispose, useRoot } =
     config.sessionPersister;
 
-  // SECTION: User
-  return doNow(() => {
-    const { cloudAuth, uid, email, emailVerified } = doNow(() => {
-      const _userInfo = useProp<undefined | null | UserInfo>(undefined);
-      return useRoot(() => ({
-        cloudAuth: config.getCloudAuth({
-          onAuthStateChanged: (user) => {
-            if (user === null && _userInfo.value === user) return;
-            if (
-              _userInfo.value !== undefined &&
-              _userInfo.value?.uid === user?.uid &&
-              _userInfo.value?.email === user?.email &&
-              _userInfo.value?.emailVerified === user?.emailVerified
-            )
-              return;
-            _userInfo.value = user;
-          },
-          stage: config.stage,
-        }),
-        uid: useFormula(() =>
-          isValid(_userInfo.value) ? _userInfo.value.uid : _userInfo.value,
-        ),
-        email: useFormula(() => _userInfo.value?.email ?? null),
-        emailVerified: useFormula(
-          () => _userInfo.value?.emailVerified ?? false,
-        ),
-      }));
-    });
-    const isSigningIn = useRoot(() => useProp(false));
-    const isSigningOut = useRoot(() => useProp(false));
-    async function signOut() {
-      // isSigningOut.value = true;
-      await cloudAuth.signOut();
-      // isSigningOut.value = false;
-    }
-    const UserStates = {
-      pending: {
-        isPending: true,
-      },
-      signedOut: doNow(() => {
-        const signedOut = {
-          isSignedOut: true,
-          get isSigningIn() {
-            return isSigningIn.value;
-          },
-        } as {
-          isSignedOut: true;
-          readonly isSigningIn: boolean;
-        } & T;
-        // TODO: Force these to be single threaded.
-        Object.keys(cloudAuth.signInFuncs).forEach((key) => {
-          (signedOut as any)[key] = async (...args: any[]) => {
-            let error: any = null;
-            isSigningIn.value = true;
-            let result: any = undefined;
-            try {
-              result = await cloudAuth.signInFuncs[key](...(args as []));
-            } catch (e) {
-              error = e;
-            }
-            isSigningIn.value = false;
-            if (isValid(error)) throw error;
-            return result;
-          };
-        });
-        return signedOut;
-      }),
-      createSignedInButNotVerifiedInst: (userInfo: Readonly<UserInfo>) => ({
-        isSignedInButNotVerified: true as const,
-        get uid() {
-          return userInfo.uid;
+  // Connect to the cloud auth
+  const { cloudAuth, uid, email, emailVerified } = doNow(() => {
+    const _userInfo = useProp<undefined | null | UserInfo>(undefined);
+    return useRoot(() => ({
+      cloudAuth: config.getCloudAuth({
+        onAuthStateChanged: (user) => {
+          if (user === null && _userInfo.value === user) return;
+          if (
+            _userInfo.value !== undefined &&
+            _userInfo.value?.uid === user?.uid &&
+            _userInfo.value?.email === user?.email &&
+            _userInfo.value?.emailVerified === user?.emailVerified
+          )
+            return;
+          _userInfo.value = user;
         },
-        get email() {
-          return userInfo.email;
+        stage: config.stage,
+      }),
+      uid: useFormula(() =>
+        isValid(_userInfo.value) ? _userInfo.value.uid : _userInfo.value,
+      ),
+      email: useFormula(() => _userInfo.value?.email ?? null),
+      emailVerified: useFormula(() => _userInfo.value?.emailVerified ?? false),
+    }));
+  });
+  const isSigningIn = useRoot(() => useProp(false));
+  const isSigningOut = useRoot(() => useProp(false));
+  async function signOut() {
+    // isSigningOut.value = true;
+    await cloudAuth.signOut();
+    // isSigningOut.value = false;
+  }
+
+  // Provide a useful tool for managing the user state.
+  /* The reason we define these here is so that we can check if the object changes.
+   * In reality we should do a more complicated reactive object, with a single state
+   * property or something like that. */
+  const UserStates = {
+    pending: {
+      isPending: true,
+    },
+    signedOut: doNow(() => {
+      const signedOut = {
+        isSignedOut: true,
+        get isSigningIn() {
+          return isSigningIn.value;
+        },
+      } as {
+        isSignedOut: true;
+        readonly isSigningIn: boolean;
+      } & T;
+      // TODO: Force these to be single threaded.
+      Object.keys(cloudAuth.signInFuncs).forEach((key) => {
+        (signedOut as any)[key] = async (...args: any[]) => {
+          let error: any = null;
+          isSigningIn.value = true;
+          let result: any = undefined;
+          try {
+            result = await cloudAuth.signInFuncs[key](...(args as []));
+          } catch (e) {
+            error = e;
+          }
+          isSigningIn.value = false;
+          if (isValid(error)) throw error;
+          return result;
+        };
+      });
+      return signedOut;
+    }),
+    createSignedInButNotVerifiedInst: (userInfo: Readonly<UserInfo>) => ({
+      isSignedInButNotVerified: true as const,
+      get uid() {
+        return userInfo.uid;
+      },
+      get email() {
+        return userInfo.email;
+      },
+      signOut,
+    }),
+    // TODO: Maybe swap out the whole object when the user changes.
+    createSignedInInst(
+      userInfo: Readonly<UserInfo>,
+      onDispose: (dispose: () => void) => void,
+    ) {
+      const workspace = createWorkspaceInterface({
+        uid: userInfo.uid,
+        workspaceIntegration: cloudAuth.getWorkspaceIntegration(userInfo.uid),
+        onDispose,
+        directoryPersister: config.directoryPersister,
+        sessionPersister: config.sessionPersister,
+        stage: config.stage,
+      });
+      return {
+        uid: userInfo.uid,
+        email: userInfo.email,
+        isSignedIn: true,
+        // TODO: Leaving a workspace is not updating this.
+        // TODO: Maybe use a query to watch this value.
+        get workspace() {
+          return workspace.value;
+        },
+        get isSigningOut() {
+          return isSigningOut.value;
         },
         signOut,
-      }),
-      // TODO: Maybe swap out the whole object when the user changes.
-      createSignedInInst(
-        userInfo: Readonly<UserInfo>,
-        onDispose: (dispose: () => void) => void,
-      ) {
-        const workspace = createWorkspaceInterface({
-          uid: userInfo.uid,
-          workspaceIntegration: cloudAuth.getWorkspaceIntegration(userInfo.uid),
-          onDispose,
-          directoryPersister: config.directoryPersister,
-          sessionPersister: config.sessionPersister,
-          stage: config.stage,
-        });
-        return {
-          uid: userInfo.uid,
-          email: userInfo.email,
-          isSignedIn: true,
-          // TODO: Leaving a workspace is not updating this.
-          // TODO: Maybe use a query to watch this value.
-          get workspace() {
-            return workspace.value;
-          },
-          get isSigningOut() {
-            return isSigningOut.value;
-          },
-          signOut,
-        };
-      },
-    };
+      };
+    },
+  };
 
-    return useRoot(() =>
-      useFormula(() =>
-        uid.value === undefined
-          ? UserStates.pending
-          : uid.value === null
+  // Compute the current user state.
+  const user = useRoot(() =>
+    useFormula(() =>
+      uid.value === undefined
+        ? UserStates.pending
+        : uid.value === null
           ? UserStates.signedOut
           : emailVerified.value
-          ? UserStates.createSignedInInst(
-              {
+            ? UserStates.createSignedInInst(
+                {
+                  uid: uid.value,
+                  email: email.value,
+                  emailVerified: emailVerified.value,
+                },
+                onDispose,
+              )
+            : UserStates.createSignedInButNotVerifiedInst({
                 uid: uid.value,
                 email: email.value,
                 emailVerified: emailVerified.value,
-              },
-              onDispose,
-            )
-          : UserStates.createSignedInButNotVerifiedInst({
-              uid: uid.value,
-              email: email.value,
-              emailVerified: emailVerified.value,
-            }),
+              }),
+    ),
+  ) as any;
+
+  // Use a separate workspace cache ID each time a user joins a workspace, even the same workspace twice.
+  /* TODO: There are two big problems with this:
+   *
+   * 1. This needs to be set at the same time as workspace Id, otherwise they might fall out of sync.
+   * There is a bigger issue here that we are caching aspects of the UserMetadata doc several different
+   * places. This caching should all happen in one place so there is a single source of truth.
+   * 
+   * 2. We need to delete the old store when the cacheId changes. We can't rely on reactivity for this
+   * since listeners may join after the cacheId has changed and never get a chance to delete the old store
+   * associated with the old cache Id. */
+  const workspaceCacheId = doNow(() => {
+    const workspaceCacheId = useRoot(() =>
+      useProp<string | null | undefined>(undefined),
+    );
+
+    // Start watching the cloud signature
+    const signatureFromCloud = useRoot(() =>
+      useFormula(() =>
+        user.isSignedIn && !user.workspace.isPending
+          ? isValid(user.uid) && isValid(user.workspace.id)
+            ? {
+                uid: user.uid as string,
+                workspaceId: user.workspace.id as string,
+              }
+            : null
+          : undefined,
       ),
-    ) as any;
+    );
+
+    // Workspace cache ID from device
+    const signatureFromDevice = config.directoryPersister
+      .jsonFile(`currentWorkspaceInstConfig.json`)
+      .load<
+        | (typeof signatureFromCloud.value & {
+            cacheId: string;
+          })
+        | null
+      >(null);
+
+    // Load the last known workspace signature, and then watch for changes.
+    signatureFromDevice.loadedFromLocalStorage.then(() => {
+      // Start with the last remembered workspace signature
+      workspaceCacheId.value = signatureFromDevice.data?.cacheId;
+
+      // Watch for changes in the cloud signature
+      useRoot(() =>
+        doWatch(
+          () => {
+            // Wait to update stuff until we have a workspace signature from the cloud.
+            if (signatureFromCloud.value === undefined) return;
+
+            // Only do something if the workspace signature has changed.
+            const uidIsTheSame =
+              signatureFromCloud.value?.uid === signatureFromDevice.data?.uid;
+            const workspaceIdIsTheSame =
+              signatureFromCloud.value?.workspaceId ===
+              signatureFromDevice.data?.workspaceId;
+            if (uidIsTheSame && workspaceIdIsTheSame) return;
+
+            // Apply the new workspace signature and cache ID.
+            const newWorkspaceSignature = isValid(signatureFromCloud.value)
+              ? { ...signatureFromCloud.value, cacheId: uuidv4() }
+              : null;
+            signatureFromDevice.batchUpdate((data) => {
+              data.value = newWorkspaceSignature;
+            });
+            workspaceCacheId.value = newWorkspaceSignature?.cacheId;
+
+              // Dispose of the old store.
+              if (isValid(oldInstConfig?.instId)) {
+                params.deleteStoreInst({
+                  docType: params.docType,
+                  instId: oldInstConfig.instId,
+                  store: oldStore,
+                });
+              }
+          },
+          {
+            on: [signatureFromCloud],
+          },
+        ),
+      );
+    });
+
+    return workspaceCacheId;
   });
+
+  return {
+    get user() {
+      return user.value;
+    },
+    get workspaceCacheId() {
+      return workspaceCacheId.value;
+    },
+  };
 }
 export type UserState<T extends SignInFuncs> = _Or<_UserStates<T>>;
 type _UserStates<T extends SignInFuncs> = {
@@ -263,6 +362,7 @@ function createWorkspaceInterface(config: {
   const isLeavingWorkspace = useProp(false);
   const isDeletingWorkspace = useProp(false);
 
+  // Connect to cloud
   type PendingAsJson = typeof PendingAsJson;
   const PendingAsJson = null;
   type NoneAsJson = typeof NoneAsJson;
@@ -281,7 +381,7 @@ function createWorkspaceInterface(config: {
     });
     const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
       (newMetadata) => {
-        savedMetadata.batchUpdate((data) => {
+        savedMetadata.batchUpdate((savedData) => {
           const newMetadataValue =
             exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
               ? {
@@ -289,7 +389,7 @@ function createWorkspaceInterface(config: {
                   role: newMetadata.role,
                 }
               : NoneAsJson;
-          data.value = newMetadataValue;
+          savedData.value = newMetadataValue;
           userMetadata.value = newMetadataValue;
         });
       },
@@ -473,7 +573,9 @@ function createWorkspaceInterface(config: {
     userMetadata.value === PendingAsJson
       ? WorkspaceStates.pending
       : userMetadata.value === NoneAsJson
-      ? WorkspaceStates.none
-      : WorkspaceStates.createJoinedInst(userMetadata.value /**, onCleanup */),
+        ? WorkspaceStates.none
+        : WorkspaceStates.createJoinedInst(
+            userMetadata.value /**, onCleanup */,
+          ),
   );
 }
