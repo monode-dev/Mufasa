@@ -161,7 +161,7 @@ export function ClientFields(props: {
         keyboard={"numeric"}
         enterKeyHint={`done`}
         onlyWriteOnBlur
-        negativesAreAllowed
+        negativesAreAllowed        
       />
       <Field
         hasFocus={focusOnNotes}
