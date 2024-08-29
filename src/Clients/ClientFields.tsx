@@ -2,13 +2,10 @@ import {
   mdiAccount,
   mdiCheck,
   mdiIdentifier,
-  mdiLockPercent,
   mdiMapMarker,
   mdiPhone,
-  mdiPlus,
   mdiPlusMinusVariant,
   mdiTextBox,
-  mdiTrashCanOutline,
 } from "@mdi/js";
 import {
   Box,
@@ -29,16 +26,16 @@ import {
   Selector,
   Txt,
   useFormula,
-  useProp,
+  useProp
 } from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber, WeekDays } from "./Client";
 import { Component, For, onCleanup, Show, Switch } from "solid-js";
-import { FieldKeyHandler } from "@/AppData";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function ClientFields(props: {
-  firstFieldHasFocus?: Prop<boolean>;
+  autoFocusFirstField?: boolean;
   //client?: Prop<Client>;
   address: Prop<string>;
   name: Prop<string>;
@@ -52,7 +49,6 @@ export function ClientFields(props: {
   create?: boolean;
   notes: Prop<string>;
 }) {
-  const firstFocus = props.firstFieldHasFocus ?? useProp(true);
   const weekSelectorIsOpen = useProp(false);
   const daySelectorIsOpen = useProp(false);
   const dateSelectorIsOpen = useProp(false);
@@ -67,11 +63,11 @@ export function ClientFields(props: {
   // };
   //const keyHintMap = new Map<string, EnterKeyHint>();
 
-  function enterKey(nextprop: Prop<string>): EnterKeyHint {
-    const key =
-      props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
-    // keyHintMap.set(curprop.value, key);
-    console.log("key: ", key);
+  const autoFocusFirstField = useProp(props.autoFocusFirstField ?? false);
+
+  function enterKey(nextprop: Prop<string>, index:Prop<number>): EnterKeyHint {
+    const key = props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
+    enterHintRefs.value.set(index.value, key);
     return key;
   }
 
@@ -81,9 +77,9 @@ export function ClientFields(props: {
   const focusOnNotes = useProp(false);
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  //document.addEventListener("keydown", FieldKeyHandler);
 
   function getDeliveryDates(
     weeks: number,
@@ -158,40 +154,58 @@ export function ClientFields(props: {
     // Return the formatted string
     return `Week of ${month} ${day}${suffix}, ${year}`;
   }
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+  const nameIndex = useProp(1);
+  const idIndex = useProp(2);
+  const phoneIndex = useProp(3);
+  const addressIndex = useProp(4);
+  const rateOffsetIndex = useProp(5);
+  const notesIndex = useProp(6);
+
   return (
     <>
-      <Field
-        hasFocus={firstFocus}
-        hintText={`Name`}
-        iconPath={mdiAccount} //mdiDomain
-        value={props.name}
-        underlined
-        capitalize={`words`}
-        keyboard={"text"}
-        enterKeyHint={useFormula(() => enterKey(props.clientId)).value}
-        onlyWriteOnBlur
-      />
-      <Field
-        hasFocus={focusOnID}
-        hintText={`Client ID`}
-        iconPath={mdiIdentifier}
-        value={props.clientId}
-        underlined
-        formatInput={formatIdNumber}
-        keyboard={"numeric"}
-        enterKeyHint={useFormula(() => enterKey(props.phoneNumber)).value}
-        onlyWriteOnBlur
-      />
-      <Field
-        hasFocus={focusOnPhone}
-        hintText={`Phone`}
-        iconPath={mdiPhone}
-        value={props.phoneNumber}
-        underlined
-        formatInput={formatPhoneNumber}
-        keyboard="tel"
-        enterKeyHint={useFormula(() => enterKey(props.address)).value}
-      />
+      <IndexedField refs={fieldRefs} index={nameIndex}>
+        <Field
+          hasFocus={autoFocusFirstField}
+          hintText={`Name`}
+          iconPath={mdiAccount} //mdiDomain
+          value={props.name}
+          underlined
+          capitalize={`words`}
+          keyboard={"text"}
+          enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
+          onlyWriteOnBlur
+        />
+      </IndexedField>
+      <IndexedField refs={fieldRefs} index={idIndex}>
+        <Field
+          hasFocus={focusOnID}
+          hintText={`Client ID`}
+          iconPath={mdiIdentifier}
+          value={props.clientId}
+          underlined
+          formatInput={formatIdNumber}
+          keyboard={"numeric"}
+          enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
+          onlyWriteOnBlur
+        />
+      </IndexedField>
+      <IndexedField refs={fieldRefs} index={phoneIndex}>
+        <Field
+          hasFocus={focusOnPhone}
+          hintText={`Phone`}
+          iconPath={mdiPhone}
+          value={props.phoneNumber}
+          underlined
+          formatInput={formatPhoneNumber}
+          keyboard="tel"
+          enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
+          onlyWriteOnBlur
+        />
+      </IndexedField>
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
         {(phoneNumber) => (
           <Box padLeft={1.2}>
@@ -237,39 +251,46 @@ export function ClientFields(props: {
           <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
         </Row>
       </Show> */}
-      <Field
-        hasFocus={focusOnAddress}
-        hintText={`Address`}
-        multiline
-        iconPath={mdiMapMarker}
-        value={props.address}
-        underlined
-        capitalize={`words`}
-        keyboard={"text"}
-        enterKeyHint={useFormula(() => enterKey(props.notes)).value}
-        onlyWriteOnBlur
-      />
-      <NumField
-        hint={`$0.00 / gal.`}
-        icon={mdiPlusMinusVariant}
-        value={props.rateOffset}
-        underlined
-        keyboard={"numeric"}
-        enterKeyHint={`done`}
-        onlyWriteOnBlur
-      />
-      <Field
-        hasFocus={focusOnNotes}
-        hintText={`Notes, Gate Code, Key Tag`}
-        multiline
-        iconPath={mdiTextBox}
-        value={props.notes}
-        underlined
-        capitalize={`sentences`}
-        keyboard={"text"}
-        enterKeyHint={`enter`}
-        onlyWriteOnBlur
-      />
+      <IndexedField refs={fieldRefs} index={addressIndex}>
+        <Field
+          hasFocus={focusOnAddress}
+          hintText={`Address`}
+          multiline
+          iconPath={mdiMapMarker}
+          value={props.address}
+          underlined
+          capitalize={`words`}
+          keyboard={"text"}
+          enterKeyHint={ `enter` }
+          onlyWriteOnBlur
+        />
+      </IndexedField>
+      <IndexedField refs={fieldRefs} index={rateOffsetIndex}>
+        <NumField
+          hint={`$0.00 / gal.`}
+          icon={mdiPlusMinusVariant}
+          value={props.rateOffset}
+          underlined
+          keyboard={"numeric"}
+          enterKeyHint={`done`}
+          onlyWriteOnBlur
+          negativesAreAllowed
+        />
+      </IndexedField>
+      <IndexedField refs={fieldRefs} index={notesIndex}>
+        <Field
+          hasFocus={focusOnNotes}
+          hintText={`Notes, Gate Code, Key Tag`}
+          multiline
+          iconPath={mdiTextBox}
+          value={props.notes}
+          underlined
+          capitalize={`sentences`}
+          keyboard={"text"}
+          enterKeyHint={ `enter` }
+          onlyWriteOnBlur
+        />
+      </IndexedField>
       <Row alignTopLeft padBetween={0.35}>
         <Box
           bonusTouchArea

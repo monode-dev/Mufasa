@@ -33,12 +33,13 @@ export default function DeliveriesTab() {
           <Icon
             iconPath={mdiPlus}
             scale={1.25}
-            onClick={() => openCreateClientDialog({
-              onCreate: (delivery) => {
-                console.log(`Created Delivery:`, delivery);
-                pushPage(DeliveryPage, { delivery });
-              },
-            })}
+            onClick={() =>
+              openCreateClientDialog({
+                onCreate: (delivery) => {
+                  pushPage(DeliveryPage, { delivery });
+                },
+              })
+            }
           />
         </Box>
       </Row>
