@@ -37,7 +37,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       if (!exists(fuelName)) return;
       totalPerFuelType.set(
         fuelName,
-        Math.ceil(((totalPerFuelType.get(fuelName) ?? 0) + (sub.sales) ?? 0) * 100) / 100,
+        Math.ceil(((totalPerFuelType.get(fuelName) ?? 0) +  (sub.isCompleted ? ((sub.sales) ?? 0) : 0)) * 100) / 100,
       );
     });
     return totalPerFuelType;
@@ -147,7 +147,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
                 <Txt singleLine width={5} alignLeft>
                   {FuelName}
                 </Txt>
-                <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
+                  <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
               </Row>
             )}
           </For>
