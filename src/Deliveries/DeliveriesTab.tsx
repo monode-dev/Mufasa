@@ -50,7 +50,7 @@ export default function DeliveriesTab() {
       <Column padBetween={1}>
       <For each={[...(Client.getAllDocs() ?? [])]}>
         {(client) => (
-          <Show when={Date.now() >= client.scheduledDeliveryStartDate! && client.scheduledDeliveryStartDate}>
+          <Show when={Date.now() >= client.scheduledDeliveryStartDate! && client.scheduledDeliveryStartDate && client.shouldScheduleDeliveriesForThisClient}>
             <Row padBetween={0.3} padRight={0.6}>
               <Icon iconPath={mdiCircleSmall} scale={2} stroke={$theme.colors.warning} />
               <Txt stroke={$theme.colors.warning} bold widthGrows>{client.name} is due for a delivery.</Txt>
