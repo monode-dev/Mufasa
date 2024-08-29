@@ -5,20 +5,13 @@ import {
   useFormula,
   exists,
   Box,
-  Field,
   NumField,
   Row,
 } from "miwi";
 import { Delivery } from "./Delivery";
-import { formatIdNumber, formatNumWithCommas } from "@/utils";
+import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
 import { FuelType } from "@/model/DataModel";
-// import {
-//   mdiArrowDownCircleOutline,
-//   mdiArrowLeftTop,
-//   mdiArrowUpCircleOutline,
-//   mdiGasStation,
-// } from "@mdi/js";
 
 export function DailyTotalsCard() {
   const upcomingSubDeliveries = useFormula(() => {
@@ -92,7 +85,7 @@ export function DailyTotalsCard() {
         upcomingAndDeliveredFuel.set(fuelName, 0);
       upcomingAndDeliveredFuel.set(
         fuelName,
-        upcomingAndDeliveredFuel.get(fuelName)! + 0,
+        upcomingAndDeliveredFuel.get(fuelName)!,
       );
     });
 
@@ -121,14 +114,6 @@ export function DailyTotalsCard() {
   function findFuelType(fuelName: string) {
     return FuelType.sortedFuelTypes.find((fuel) => fuel.name === fuelName);
   }
-
-  // const [shouldShowTotals, setShouldShowTotals] = createSignal(true);
-
-  // function ToggleTotals() {
-  //   shouldShowTotals() === false
-  //     ? setShouldShowTotals(true)
-  //     : setShouldShowTotals(false);
-  // }
 
   return (
     <Card widthGrows padBetween={0.75}>
@@ -177,7 +162,7 @@ export function DailyTotalsCard() {
                     upcomingSubDeliveries.value
                       .filter(
                         (sub) =>
-                          sub.fuelSpecs?.name === findFuelType(fuelName)!.name,
+                          sub.fuelSpecs?.name === findFuelType(fuelName)?.name,
                       )
                       .reduce((total, sub) => total + (sub.gallons ?? 0), 0),
                     0,
@@ -189,41 +174,8 @@ export function DailyTotalsCard() {
           )}
         </For>
       </Show>
-      {/* <Icon
-        stroke={$theme.colors.primary}
-        iconPath={
-          shouldShowTotals()
-            ? mdiArrowUpCircleOutline
-            : mdiArrowDownCircleOutline
-        }
-        scale={2}
-        onClick={() => {
-          ToggleTotals();
-        }}
-      /> */}
 
       <Box widthGrows height={0.125} fill={$theme.colors.text} />
-      {/* <Show when={Array.from(leftPerFuel.value.entries()).length > 0}>
-        <Txt bold alignCenter>
-          Upcoming
-        </Txt>
-        <For
-          each={Array.from(leftPerFuel.value.entries())}
-          fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
-        >
-          {([fuelName, gallons]) => (
-            <Row>
-              <Txt widthGrows alignLeft singleLine>
-                {fuelName}
-              </Txt>
-              <Txt width={6} alignLeft singleLine>
-                gal: {gallons}
-              </Txt>
-            </Row>
-          )}
-        </For>
-        <Box widthGrows height={0.125} fill={$theme.colors.text} />
-      </Show> */}
       <Column>
         <Txt widthGrows={4} alignLeft>
           Fuel Delivered: {totalGallons.value} gal.
