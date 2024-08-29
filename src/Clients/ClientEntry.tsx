@@ -63,7 +63,6 @@ export default function ClientEntery(props: { client: Client }) {
           onClick={() =>
             openCreateClientDialog({
               onCreate: (delivery) => {
-                console.log(`Created Delivery:`, delivery);
                 pushPage(DeliveryPage, { delivery });
               },
               setClient: props.client,

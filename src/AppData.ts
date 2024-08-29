@@ -10,9 +10,7 @@ import {
   Prop,
   mdColors,
   doNow,
-  KeyboardType,
-  FieldCapitalization,
-  FieldInputType, FormatFieldInput, EnterKeyHint
+
 } from "miwi";
 import { FuelType } from "./model/DataModel";
 import { Client } from "./Clients/Client";
@@ -51,7 +49,7 @@ export function getClientLabel(client: Client | null | undefined): string {
   if (nameExists && clientIdExists) {
     return `${client?.clientId} - ${client?.name}`;
   } else if (nameExists) {
-    return client?.name!;
+    return client?.name;
   } else if (clientIdExists) {
     return `${client?.clientId}`;
   } else {
@@ -62,7 +60,6 @@ export function listClients(
   clients: Iterable<Client>,
   excludeInvalidClients: boolean = false,
 ): Client[] {
-  let prevTime = Date.now();
   let result = [...clients].sort((a, b) => {
     const sortNameA = doNow(() => {
       const name = a?.name?.trim().toLowerCase();
@@ -91,14 +88,9 @@ export function listClients(
     return sortNameA.localeCompare(sortNameB);
   });
 
-  console.log(`listClients sorted: ${Date.now() - prevTime}}`);
-  prevTime = Date.now();
-
   if (excludeInvalidClients) {
     result = result.filter(isClientValid);
   }
-
-  console.log(`listClients filtered: ${Date.now() - prevTime}}`);
 
   return result;
 }
@@ -217,37 +209,6 @@ export function listFuelTypes(
     result = result.filter(FuelType.isValid);
   }
   return result;
-}
-
-interface KeyFieldProps {
-  enterKeyHint?: EnterKeyHint;
-}
-
-export function FieldKeyHandler(event: KeyboardEvent) {
-  if (event.key === "Enter") {
-    const target = event.target as HTMLElement;
-    // enterKeyHint stuff is broken
-    // const field = event.target as unknown as KeyFieldProps;
-    // const enterKeyHint = field.enterKeyHint;
-    // if (enterKeyHint === 'done') return;
-    // if (enterKeyHint === 'next')
-    {
-      const form = document;
-      if (form) {
-        const focusableElements = Array.from(
-          form.querySelectorAll<HTMLElement>(
-            'input, select, textarea, button, [tabindex]:not([tabindex="-1"])'
-          )
-        ).filter(el => !el.hasAttribute('disabled'));
-        const index = focusableElements.indexOf(target);
-        if (index > -1 && index < focusableElements.length - 1) {
-          const nextElement = focusableElements[index + 1];
-          nextElement.focus();
-          event.preventDefault(); // Prevent form submission
-        }
-      }
-    }
-  }
 }
 
 // SECTION: App Data Structure

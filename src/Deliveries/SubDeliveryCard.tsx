@@ -7,7 +7,6 @@ import {
   Txt,
   pushPage,
   NumField,
-  useProp,
   exists,
   useFormula,
   HiddenOption,
@@ -16,7 +15,7 @@ import {
   theme,
   EnterKeyHint,
   Prop,
-  doNow,
+
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
@@ -27,15 +26,20 @@ import { SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
-// import { HiddenOption, HiddenOptions } from "@/components/HiddenOptions";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
-import { Flag } from "mufasa/dist/Utils";
-import { OptionalPropFlag } from "mufasa/dist/Doc";
-import { FieldKeyHandler } from "@/AppData";
+import {Flag} from "mufasa/dist/Utils";
+import {OptionalPropFlag} from "mufasa/dist/Doc";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
   nextSubDelivery: Prop<SubDelivery | undefined>;
+  fieldRefs: Prop<Map<number,HTMLDivElement>>;
+  // filled in enterKey() function
+  enterHintRefs: Prop<Map<number, EnterKeyHint>>;
+  subDeliveryIndex: Prop<number>;
+  nextOverride: Prop<Map<number, Prop<number>>>;
+  noKeyHandler?: boolean;
 }) {
   function handleComplete() {
     pushPage(CompleteSubDeliveryDialog, {
@@ -44,7 +48,6 @@ export default function SubDeliveryCard(props: {
   }
 
   function handleDeleteRequest() {
-    console.log("handleDeleteRequest");
     pushPage(DeleteDialog, {
       obj: props.subDelivery,
       message: `Are you sure you want to permanently delete this step of the delivery?`,
@@ -59,7 +62,6 @@ export default function SubDeliveryCard(props: {
   }
 
   const scale = 1;
-  const isOpen = useProp(false);
 
   const selectedFuel = useFormula(
     () => props.subDelivery.selectedFuel,
@@ -85,21 +87,40 @@ export default function SubDeliveryCard(props: {
   }
 
   function midEnterHint(
-    num:
-      | (number & Flag<typeof OptionalPropFlag>)
-      | (null & Flag<typeof OptionalPropFlag>)
-      | number
-      | null,
-  ): EnterKeyHint {
-    const key = (num ?? 0) <= 0 ? `next` : `done`;
-    console.log("key: ", key);
-    return key;
+    num: (number & Flag<typeof OptionalPropFlag>) | (null & Flag<typeof OptionalPropFlag>
+      ) | number | null): EnterKeyHint {
+    return (num ?? 0) <= 0 ? `next` : `done`;
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs, props.nextOverride));
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  if(!props.noKeyHandler)
+    document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs, props.nextOverride));
+
+  // local zero based indexes are shifted by subDeliveryIndex then converted to 1 based indexes
+  const fields = 3;
+  const baseIndex= useFormula(() => 1 + props.subDeliveryIndex.value * fields);
+  const nameIndex = useFormula(() => baseIndex.value);
+  const rateIndex = useFormula(() => 1 + baseIndex.value);
+  const gallonsIndex = useFormula(() => 2 + baseIndex.value);
+  const overrideNext = useFormula(() => baseIndex.value + fields + 2);
+  function lastEnterHint(sub: Prop<SubDelivery | undefined>, index: Prop<number>): EnterKeyHint {
+    const s = sub.value;
+    let key: EnterKeyHint = `done`;
+    if (exists(s)) {
+      if (s._isOneTimeFuel) {
+        props.nextOverride.value.delete(index.value);
+        if ((s._fuelName ?? ``).trim().length == 0)
+          key = `next`
+      } else if ((s.gallons ?? 0) <= 0){
+        key = `next`
+        props.nextOverride.value.set(index.value, overrideNext);
+      }
+    }
+    return key;
+  }
+
   return (
     <Card
       widthGrows
@@ -185,37 +206,48 @@ export default function SubDeliveryCard(props: {
               }
             >
               <Label label="Name">
-                <Field
-                  value={useFormula(
-                    () => props.subDelivery.explicitFuelName,
-                    (v) => (props.subDelivery.explicitFuelName = v),
-                  )}
-                  underlined
-                  hintText="Fuel Name"
-                  capitalize={`words`}
-                  keyboard={"text"}
-                  enterKeyHint={
-                    useFormula(() =>
-                      midEnterHint(props.subDelivery.explicitRate),
-                    ).value
-                  }
-                  onlyWriteOnBlur
-                />
+                <IndexedField
+                  refs={props.fieldRefs}
+                  index={nameIndex}
+                >
+                  <Field
+                    value={useFormula(
+                      () => props.subDelivery.explicitFuelName,
+                      (v) => (props.subDelivery.explicitFuelName = v),
+                    )}
+                    underlined
+                    hintText="Fuel Name"
+                    capitalize={`words`}
+                    keyboard={"text"}
+                    enterKeyHint = { useFormula(() => {
+                      const key: EnterKeyHint =  midEnterHint(props.subDelivery.explicitRate);
+                      props.enterHintRefs.value.set(nameIndex.value, key);
+                      return key;
+                    }).value }
+                    onlyWriteOnBlur
+                  />
+                </IndexedField>
               </Label>
               <Label label="Rate">
-                <NumField
-                  value={useFormula(
-                    () => props.subDelivery.explicitRate,
-                    (v) => (props.subDelivery.explicitRate = v),
-                  )}
-                  underlined
-                  hint="Rate"
-                  enterKeyHint={
-                    useFormula(() => midEnterHint(props.subDelivery.gallons))
-                      .value
-                  }
-                  onlyWriteOnBlur
-                />
+                <IndexedField
+                  refs={props.fieldRefs}
+                  index={rateIndex}
+                >
+                  <NumField
+                    value={useFormula(
+                      () => props.subDelivery.explicitRate,
+                      (v) => (props.subDelivery.explicitRate = v),
+                    )}
+                    underlined
+                    hint="Rate"
+                    enterKeyHint = { useFormula(() => {
+                      const key: EnterKeyHint =  midEnterHint(props.subDelivery.explicitRate);
+                      props.enterHintRefs.value.set(rateIndex.value, key);
+                      return key;
+                    }).value }
+                    onlyWriteOnBlur
+                  />
+                </IndexedField>
               </Label>
             </Show>
 
@@ -226,71 +258,30 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
-              <NumField
-                value={useFormula(
-                  () => props.subDelivery.gallons,
-                  (v) => (props.subDelivery.gallons = v),
-                )}
-                hintColor={
-                  props.subDelivery.gallons ? undefined : $theme.colors.warning
-                }
-                underlined
-                hint="Est. gal."
-                enterKeyHint={doNow(() => {
-                  const sub = props.nextSubDelivery.value;
-                  return sub?.selectedFuel === ONE_TIME
-                    ? (sub.fuelSpecs.name ?? ``).trim().length == 0
-                      ? `next`
-                      : `done`
-                    : (sub?.gallons ?? 0) === 0
-                      ? `next`
-                      : `done`;
-                })}
-              />
-            </Label>
-            <Label
-              label="Sticked Inches Before"
-              stroke={
-                props.subDelivery.stickedInchesBeforeFilling
-                  ? undefined
-                  : $theme.colors.warning
-              }
-            >
-              <NumField
-                value={useFormula(
-                  () => props.subDelivery.stickedInchesBeforeFilling,
-                  (v) => (props.subDelivery.stickedInchesBeforeFilling = v),
-                )}
-                hintColor={
-                  props.subDelivery.stickedInchesBeforeFilling
-                    ? undefined
-                    : $theme.colors.warning
-                }
-                underlined
-                hint="in."
-              />
-            </Label>
-            <Label
-              label="Sticked Inches After"
-              stroke={
-                props.subDelivery.stickedInchesAfterFilling
-                  ? undefined
-                  : $theme.colors.warning
-              }
-            >
-              <NumField
-                value={useFormula(
-                  () => props.subDelivery.stickedInchesAfterFilling,
-                  (v) => (props.subDelivery.stickedInchesAfterFilling = v),
-                )}
-                hintColor={
-                  props.subDelivery.stickedInchesAfterFilling
-                    ? undefined
-                    : $theme.colors.warning
-                }
-                underlined
-                hint="in."
-              />
+              <IndexedField
+                refs={props.fieldRefs}
+                index={gallonsIndex}
+              >
+                <NumField
+                  value={useFormula(
+                    () => props.subDelivery.gallons,
+                    (v) => (props.subDelivery.gallons = v),
+                  )}
+                  hintColor={
+                    props.subDelivery.gallons ? undefined : $theme.colors.warning
+                  }
+                  underlined
+                  hint="Est. gal."
+                  enterKeyHint={
+                  useFormula(() => {
+                    const key: EnterKeyHint = lastEnterHint(props.nextSubDelivery, gallonsIndex);
+                    props.enterHintRefs.value.set(gallonsIndex.value, key);
+                    return key
+                  }).value}
+                  // allowing write so 0 Gallons warning will go away
+                  // onlyWriteOnBlur
+                />
+              </IndexedField>
             </Label>
             <Show
               when={
