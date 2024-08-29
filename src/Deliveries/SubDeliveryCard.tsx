@@ -15,7 +15,7 @@ import {
   theme,
   EnterKeyHint,
   Prop,
-  doNow,
+
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
@@ -118,7 +118,7 @@ export default function SubDeliveryCard(props: {
     if (exists(s)) {
       if (s._isOneTimeFuel) {
         props.nextOverride.value.delete(index.value);
-        if ((s.fuelName ?? ``).trim().length == 0)
+        if ((s._fuelName ?? ``).trim().length == 0)
           key = `next`
       } else if ((s.gallons ?? 0) <= 0){
         key = `next`
@@ -290,28 +290,6 @@ export default function SubDeliveryCard(props: {
                 />
               </IndexedField>
             </Label>
-            <Label
-              label="Sticked Inches After"
-              stroke={
-                props.subDelivery.stickedInchesAfterFilling
-                  ? undefined
-                  : $theme.colors.warning
-              }
-            >
-              <NumField
-                value={useFormula(
-                  () => props.subDelivery.stickedInchesAfterFilling,
-                  (v) => (props.subDelivery.stickedInchesAfterFilling = v),
-                )}
-                hintColor={
-                  props.subDelivery.stickedInchesAfterFilling
-                    ? undefined
-                    : $theme.colors.warning
-                }
-                underlined
-                hint="in."
-              />
-            </Label> */}
             <Show
               when={
                 exists(props.subDelivery.subInvalidError) &&

@@ -3,12 +3,12 @@ import {
   mdiIdentifier,
   mdiMapMarker,
   mdiPhone,
-  mdiPlus,
+  mdiPlusMinusVariant,
   mdiTextBox,
 } from "@mdi/js";
 import {
   EnterKeyHint,
-  Field,
+  Field, NumField,
   Prop,
   useFormula,
   useProp
@@ -53,7 +53,8 @@ export function ClientFields(props: {
   const idIndex = useProp(2);
   const phoneIndex = useProp(3);
   const addressIndex = useProp(4);
-  const notesIndex = useProp(5);
+  const rateOffsetIndex = useProp(5);
+  const notesIndex = useProp(6);
   return (
     <>
       <IndexedField refs={fieldRefs} index={nameIndex}>
@@ -66,6 +67,7 @@ export function ClientFields(props: {
           capitalize={`words`}
           keyboard={"text"}
           enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
+          onlyWriteOnBlur
         />
       </IndexedField>
       <IndexedField refs={fieldRefs} index={idIndex}>
@@ -78,6 +80,7 @@ export function ClientFields(props: {
           formatInput={formatIdNumber}
           keyboard={"numeric"}
           enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
+          onlyWriteOnBlur
         />
       </IndexedField>
       <IndexedField refs={fieldRefs} index={phoneIndex}>
@@ -90,6 +93,7 @@ export function ClientFields(props: {
           formatInput={formatPhoneNumber}
           keyboard="tel"
           enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
+          onlyWriteOnBlur
         />
       </IndexedField>
       <IndexedField refs={fieldRefs} index={addressIndex}>
@@ -103,12 +107,25 @@ export function ClientFields(props: {
           capitalize={`words`}
           keyboard={"text"}
           enterKeyHint={ `enter` }
+          onlyWriteOnBlur
+        />
+      </IndexedField>
+      <IndexedField refs={fieldRefs} index={rateOffsetIndex}>
+        <NumField
+          hint={`$0.00 / gal.`}
+          icon={mdiPlusMinusVariant}
+          value={props.rateOffset}
+          underlined
+          keyboard={"numeric"}
+          enterKeyHint={`done`}
+          onlyWriteOnBlur
+          negativesAreAllowed
         />
       </IndexedField>
       <IndexedField refs={fieldRefs} index={notesIndex}>
         <Field
           hasFocus={focusOnNotes}
-          hintText={`Notes`}
+          hintText={`Notes, Gate Code, Key Tag`}
           multiline
           iconPath={mdiTextBox}
           value={props.notes}
@@ -116,6 +133,7 @@ export function ClientFields(props: {
           capitalize={`sentences`}
           keyboard={"text"}
           enterKeyHint={ `enter` }
+          onlyWriteOnBlur
         />
       </IndexedField>
     </>
