@@ -44,7 +44,6 @@ export default function SubDeliveryCard(props: {
   }
 
   function handleDeleteRequest() {
-    console.log("handleDeleteRequest");
     pushPage(DeleteDialog, {
       obj: props.subDelivery,
       message: `Are you sure you want to permanently delete this step of the delivery?`,
@@ -91,9 +90,7 @@ export default function SubDeliveryCard(props: {
       | number
       | null,
   ): EnterKeyHint {
-    const key = (num ?? 0) <= 0 ? `next` : `done`;
-    console.log("key: ", key);
-    return key;
+    return (num ?? 0) <= 0 ? `next` : `done`;
   }
 
   onCleanup(() => {

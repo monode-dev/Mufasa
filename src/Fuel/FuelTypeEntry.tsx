@@ -8,11 +8,12 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
-  exists, EnterKeyHint,
+  exists,
+  EnterKeyHint,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
-import {onCleanup} from "solid-js";
-import {FieldKeyHandler} from "@/AppData";
+import { onCleanup } from "solid-js";
+import { FieldKeyHandler } from "@/AppData";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -41,24 +42,22 @@ export default function FuelTypeEntry(props: {
         underlined
         hintText="Unnamed"
         enterKeyHint={
-        useFormula(() => {
-          const key: EnterKeyHint = (props.fuelType.rate ?? 0) <= 0
-            ? `next`
-            : `done`;
-          console.log("key: ", key);
-          return key;
-        }).value
-      }
+          useFormula(() => {
+            const key: EnterKeyHint =
+              (props.fuelType.rate ?? 0) <= 0 ? `next` : `done`;
+            return key;
+          }).value
+        }
         onlyWriteOnBlur
       />
       <NumField
         enterKeyHint={
           useFormula(() => {
-            const key: EnterKeyHint = exists(props.nextFuelType) &&
+            const key: EnterKeyHint =
+              exists(props.nextFuelType) &&
               (props.nextFuelType.name ?? ``).trim().length == 0
                 ? `next`
                 : `done`;
-            console.log("key: ", key);
             return key;
           }).value
         }
