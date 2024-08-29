@@ -10,11 +10,7 @@ import {
   Prop,
   mdColors,
   doNow,
-  KeyboardType,
-  FieldCapitalization,
-  FieldInputType,
-  FormatFieldInput,
-  EnterKeyHint,
+
 } from "miwi";
 import { FuelType } from "./model/DataModel";
 import { Client } from "./Clients/Client";
@@ -53,7 +49,7 @@ export function getClientLabel(client: Client | null | undefined): string {
   if (nameExists && clientIdExists) {
     return `${client?.clientId} - ${client?.name}`;
   } else if (nameExists) {
-    return client?.name!;
+    return client?.name;
   } else if (clientIdExists) {
     return `${client?.clientId}`;
   } else {
@@ -64,7 +60,6 @@ export function listClients(
   clients: Iterable<Client>,
   excludeInvalidClients: boolean = false,
 ): Client[] {
-  let prevTime = Date.now();
   let result = [...clients].sort((a, b) => {
     const sortNameA = doNow(() => {
       const name = a?.name?.trim().toLowerCase();
@@ -92,8 +87,6 @@ export function listClients(
     });
     return sortNameA.localeCompare(sortNameB);
   });
-
-  prevTime = Date.now();
 
   if (excludeInvalidClients) {
     result = result.filter(isClientValid);

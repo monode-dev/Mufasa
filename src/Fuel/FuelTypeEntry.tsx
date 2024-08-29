@@ -56,8 +56,8 @@ export default function FuelTypeEntry(props: {
               : `done`;
             props.enterHintRefs.value.set(nameIndex.value, key);
             return key;
-          }).value
-        }
+          }).value }
+          onlyWriteOnBlur
         />
       </IndexedField>
       <IndexedField
@@ -74,8 +74,7 @@ export default function FuelTypeEntry(props: {
                 : `done`;
             props.enterHintRefs.value.set(rateIndex.value, key);
             return key;
-            }).value
-          }
+            }).value }
           negativesAreAllowed={false}
           underlined
           value={useFormula(

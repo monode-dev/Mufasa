@@ -5,8 +5,7 @@ import {
   mdiLabel,
   mdiMapMarker,
   mdiPencil,
-  mdiPhone,
-  mdiPlusMinusVariant,
+  mdiPhone, mdiPlusMinusVariant,
   mdiTextBox,
 } from "@mdi/js";
 import {
@@ -20,7 +19,7 @@ import {
   Box,
   Txt,
   Prop,
-  EnterKeyHint, useProp
+  EnterKeyHint, useProp, pushPage, NumField
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
 import { Delivery } from "./Delivery";
@@ -28,6 +27,7 @@ import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
 import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
+import ClientPage from "@/Clients/ClientPage";
 
 export function DeliveryFields(props: {
   create?: boolean;
@@ -131,7 +131,8 @@ export function DeliveryFields(props: {
   const nameIndex = useProp(1);
   const phoneIndex = useProp(2);
   const addressIndex = useProp(3);
-  const notesIndex = useProp(4);
+  const offsetIndex = useProp(4);
+  const notesIndex = useProp(5);
 
   return (
     <Column>
@@ -207,6 +208,17 @@ export function DeliveryFields(props: {
             enterKeyHint={ `enter` }
           />
         </IndexedField>
+        <IndexedField refs={fieldRefs} index={offsetIndex}>
+          <NumField
+            hint={`$0.00 / gal.`}
+            icon={mdiPlusMinusVariant}
+            value={one_rateOffset}
+            underlined
+            keyboard={"numeric"}
+            enterKeyHint={`done`}
+            onlyWriteOnBlur
+          />
+      </IndexedField>
       </Show>
       <IndexedField refs={fieldRefs} index={notesIndex}>
         <Field
@@ -214,7 +226,7 @@ export function DeliveryFields(props: {
           underlined
           hintText={`Delivery Notes`}
           iconPath={mdiTextBox}
-          value={one_note}
+          value={deliveryNotes}
           asWideAsParent
           capitalize={`sentences`}
           keyboard={"text"}
