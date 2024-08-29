@@ -1,6 +1,7 @@
 import {
   Box,
-  doWatch, EnterKeyHint,
+  doWatch,
+  EnterKeyHint,
   exists,
   Label,
   mdColors,
@@ -14,9 +15,9 @@ import {
   TankDimension,
   TankGeometry,
 } from "@/Calculator/ShapeUtils";
-import {For, onCleanup} from "solid-js";
+import { For, onCleanup } from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
-import {FieldKeyHandler} from "@/AppData";
+import { FieldKeyHandler } from "@/AppData";
 
 const _dimensionHintText = `in.`;
 
@@ -76,15 +77,14 @@ export default function TankFields(props: {
   });
 
   function enterKey(index: () => number): EnterKeyHint {
-    if(!props.create) return `done`;
+    if (!props.create) return `done`;
     const nextIndex = index().valueOf() + 1;
-    const needsData = dimensions.value.length > nextIndex
-      // if the next dimension is not set or is 0, we need data
-      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
-      : false;
-    const key: EnterKeyHint = needsData ? `next` : `done`;
-    console.log("key: ", key);
-    return key;
+    const needsData =
+      dimensions.value.length > nextIndex
+        ? // if the next dimension is not set or is 0, we need data
+          (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
+        : false;
+    return needsData ? `next` : `done`;
   }
 
   onCleanup(() => {
@@ -122,7 +122,7 @@ export default function TankFields(props: {
                 )}
                 underlined
                 stroke={mdColors.black}
-                enterKeyHint={ useFormula(() => enterKey(index)).value }
+                enterKeyHint={useFormula(() => enterKey(index)).value}
               />
             </Label>
           );

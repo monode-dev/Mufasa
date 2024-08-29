@@ -66,7 +66,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Show>
 
       {/* Client */}
-      <Row>
+      <Row padBetween={1}>
         <Txt
           padLeft={0.2}
           singleLine
@@ -77,6 +77,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         </Txt>
 
         <CallAndMapToIcons
+          forceHintColor={props.delivery.isCompleted}
           phoneNumber={props.delivery.phoneNumber}
           address={props.delivery.address}
         />
