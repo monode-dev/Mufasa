@@ -436,12 +436,14 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     fuelName: string;
     rate: number;
     gallons: number;
+    rateOffset: number;
     // stickedInchesBeforeFilling: number;
     // stickedInchesAfterFilling: number;
   }) {
     this.explicitFuelName = props.fuelName;
     this.explicitRate = props.rate;
     this.gallons = props.gallons;
+    this.explicitRateOffset = props.rateOffset;
     // this.stickedInchesBeforeFilling = props.stickedInchesBeforeFilling;
     // this.stickedInchesAfterFilling = props.stickedInchesAfterFilling;
     this.completedTimePosix = Date.now();

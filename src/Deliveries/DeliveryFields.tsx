@@ -112,7 +112,8 @@ export function DeliveryFields(props: {
   const one_rateOffset = useFormula(
     () =>
       props.delivery.selectedClient === ONE_TIME
-        ? props.delivery._manualRateOffset
+        ? 
+        props.delivery._manualRateOffset
         : 0,
     (v) => (props.delivery._manualRateOffset = v),
   );
