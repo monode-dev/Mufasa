@@ -235,6 +235,7 @@ export function DeliveryFields(props: {
           keyboard={"text"}
           overflowXWraps
           enterKeyHint={`enter`}
+          onlyWriteOnBlur
         />
       </IndexedField>
       <Show when={showErrorMessages() != ""}>
