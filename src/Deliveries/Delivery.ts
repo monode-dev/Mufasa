@@ -195,10 +195,6 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
       return "Please select a valid client.";
     if (this.isDeleted) return `This delivery has been deleted.`;
-    // const subInvalidError = this.sortedSubDeliveries.find(
-    //   (sub) => !sub.isValid,
-    // )?.subInvalidError;
-    // if (subInvalidError) return subInvalidError;
     return undefined;
   });
   readonly isCompleted = formula(() => this.completedTimePosix !== null);
