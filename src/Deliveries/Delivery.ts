@@ -301,7 +301,9 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   computedFuelType: FuelType | null = formula(() =>
     this.selectedFuel === ONE_TIME ? null : (this.selectedFuel as FuelType),
   );
+
   readonly showFuelNameAndRate = formula(() => this.selectedFuel === ONE_TIME);
+
   // Fuel Name
   _fuelName = prop(String, ``, {
     key: `fuelName`,

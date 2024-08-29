@@ -3,11 +3,10 @@ import {
   doWatch,
   EnterKeyHint,
   exists,
-  Label,
-  mdColors,
+  Label, mdColors,
   NumField,
   Prop,
-  useFormula,
+  useFormula, useProp,
 } from "miwi";
 import {
   getDimensionLabel,
@@ -17,7 +16,7 @@ import {
 } from "@/Calculator/ShapeUtils";
 import { For, onCleanup } from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
-import { FieldKeyHandler } from "@/AppData";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 const _dimensionHintText = `in.`;
 
@@ -79,18 +78,24 @@ export default function TankFields(props: {
   function enterKey(index: () => number): EnterKeyHint {
     if (!props.create) return `done`;
     const nextIndex = index().valueOf() + 1;
-    const needsData =
-      dimensions.value.length > nextIndex
-        ? // if the next dimension is not set or is 0, we need data
-          (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
-        : false;
-    return needsData ? `next` : `done`;
+    const needsData = dimensions.value.length > nextIndex
+      // if the next dimension is not set or is 0, we need data
+      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
+      : false;
+    const key: EnterKeyHint = needsData ? `next` : `done`;
+    // 1 based not 0 based
+    enterHintRefs.value.set(index() + 1, key);
+    return key;
   }
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
   return (
     <>
       <Box padBottom={0.25}>
@@ -111,19 +116,23 @@ export default function TankFields(props: {
       {/* We need these to be one-per line for the tank dialog. */}
       <For each={dimensions.value}>
         {(dim, index) => {
+          // Index is 0 based, but we want 1 based for IndexedField to match tabIndex rules
+          const indexRef = useProp(index() + 1);
           return (
             <Label label={getDimensionLabel(dim)}>
-              <NumField
-                negativesAreAllowed={false}
-                hint={_dimensionHintText}
-                value={useFormula(
-                  () => props.tankGeometry[dim],
-                  (val) => (props.tankGeometry[dim] = val),
-                )}
-                underlined
-                stroke={mdColors.black}
-                enterKeyHint={useFormula(() => enterKey(index)).value}
-              />
+              <IndexedField refs={fieldRefs} index={indexRef}>
+                <NumField
+                  negativesAreAllowed={false}
+                  hint={_dimensionHintText}
+                  value={useFormula(
+                    () => props.tankGeometry[dim],
+                    (val) => (props.tankGeometry[dim] = val),
+                  )}
+                  underlined
+                  stroke={mdColors.black}
+                  enterKeyHint={ useFormula(() => enterKey(index)).value }
+                />
+              </IndexedField>
             </Label>
           );
         }}
