@@ -19,12 +19,12 @@ import {
   Button,
   popPage,
   HiddenOption,
-  HiddenOptions,
+  HiddenOptions, Prop, EnterKeyHint,
 } from "miwi";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
-import { For, Show } from "solid-js";
+import {For, onCleanup, Show} from "solid-js";
 import {
   premiumEnabled,
   isSubscribing,
@@ -52,6 +52,7 @@ import { deleteAccount, deleteTeam } from "./DeleteAccountOrTeam";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 import { Match, Switch } from "solid-js/web";
+import {IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -106,6 +107,16 @@ export function SettingsPage() {
   );
 
   const iconSize = 1.25;
+
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function in FuelTypeEntry.tsx
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
+  onCleanup(() => {
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+  });
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+
   return (
     <SimplePage
       floating={
@@ -352,11 +363,13 @@ export function SettingsPage() {
                   >
                     {
                       (fuelType, index) => {
-                        const next = index() + 1;
+                        const dex = index();
+                        const next = dex + 1;
                         const nextFuelType = next < FuelType.sortedFuelTypes.length
                           ? FuelType.sortedFuelTypes[next]
                           : undefined;
-                        return <FuelTypeEntry fuelType={fuelType} nextFuelType={nextFuelType}/>;
+                        return <FuelTypeEntry fuelType={fuelType} nextFuelType={nextFuelType}
+                        enterHintRefs={enterHintRefs} fieldRefs={fieldRefs} subDeliveryIndex={useProp(dex)}/>;
                       }}
                   </For>
                 </SortableColumn>

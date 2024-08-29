@@ -458,7 +458,26 @@ export default function Calculator() {
             negativesAreAllowed={false}
           />
         </Label>
+
+        {/* SECTION  Complete Delivery ActionText */}
+        <Show when={selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value }>
+          <Txt
+            widthGrows
+            stroke={mdColors.green}
+            
+            onClick={() => {
+              selectedTab.value = tabs.delivery;
+              completeDelivery();
+            }}
+          >
+            Complete Delivery
+          </Txt>
+        </Show>
+
+        {/* Divider */}
         <Box widthGrows height={0.125} fill={"grey"} />
+        
+        {/* SECTION Current Tank Info */}
         <Row>
           <Label
             label="Current Fill"
@@ -518,7 +537,7 @@ export default function Calculator() {
           step={1}
         />
       </Card>
-      <Show when={selectedTab.value === tabs.delivery}>
+      {/* <Show when={selectedTab.value === tabs.delivery}>
         <Button
           widthGrows
           fill={
@@ -533,7 +552,7 @@ export default function Calculator() {
         >
           Complete Delivery
         </Button>
-      </Show>
+      </Show> */}
     </Body>
   );
 }

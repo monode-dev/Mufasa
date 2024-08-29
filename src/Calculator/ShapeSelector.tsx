@@ -37,20 +37,20 @@ export default function ShapeSelector(
           icon: undefined,
           stroke: theme.palette.hint,
         }}
-        actionButtons={
-          <Icon
-            iconPath={mdiHelpCircleOutline}
-            onClick={() => {
-              pushPage(InfoCard, {
-                entriesToOpen: [
-                  "Tank",
-                  "Shape",
-                  getTankShape(props.value.value)?.nameLong ?? "",
-                ],
-              });
-            }}
-          />
-        }
+        // actionButtons={
+        //   <Icon
+        //     iconPath={mdiHelpCircleOutline}
+        //     onClick={() => {
+        //       pushPage(InfoCard, {
+        //         entriesToOpen: [
+        //           "Tank",
+        //           "Shape",
+        //           getTankShape(props.value.value)?.nameLong ?? "",
+        //         ],
+        //       });
+        //     }}
+        //   />
+        // }
       >
         <For each={TANK_SHAPE_IDS} fallback={<Txt>Loading...</Txt>}>
           {(shapeId) => (
