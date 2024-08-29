@@ -19,17 +19,15 @@ import {
   useFormula,
   Box,
   Txt,
-  pushPage,
-  EnterKeyHint,
   Prop,
-  NumField,
+  EnterKeyHint, useProp
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
 import { Delivery } from "./Delivery";
-import { FieldKeyHandler, listClients } from "@/AppData";
+import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
-import ClientPage from "@/Clients/ClientPage";
+import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function DeliveryFields(props: {
   create?: boolean;
@@ -86,8 +84,10 @@ export function DeliveryFields(props: {
     );
   }
 
-  function enterKey(prop: Prop<string>): EnterKeyHint {
-    return props.create && prop.value.trim().length == 0 ? `next` : `done`;
+  function enterKey(prop: Prop<string>, index:Prop<number>): EnterKeyHint {
+    const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
+    enterHintRefs.value.set(index.value, key);
+    return key;
   }
 
   const one_name = useFormula(
@@ -120,9 +120,19 @@ export function DeliveryFields(props: {
   );
 
   onCleanup(() => {
-    document.removeEventListener("keydown", FieldKeyHandler);
+    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   });
-  document.addEventListener("keydown", FieldKeyHandler);
+  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+
+  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  // filled in enterKey() function
+  const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
+  const nameIndex = useProp(1);
+  const phoneIndex = useProp(2);
+  const addressIndex = useProp(3);
+  const notesIndex = useProp(4);
+
   return (
     <Column>
       <Row>
@@ -160,59 +170,58 @@ export function DeliveryFields(props: {
         </Show>
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
-        <Field
-          underlined
-          hintText={`Client Name`}
-          iconPath={mdiLabel}
-          value={one_name}
-          widthGrows
-          capitalize={"words"}
-          keyboard={"text"}
-          enterKeyHint={useFormula(() => enterKey(one_phone)).value}
-        />
-        <Field
-          underlined
-          hintText={`Phone`}
-          iconPath={mdiPhone}
-          value={one_phone}
-          widthGrows
-          formatInput={formatPhoneNumber}
-          keyboard="tel"
-          enterKeyHint={useFormula(() => enterKey(one_address)).value}
-        />
+        <IndexedField refs={fieldRefs} index={nameIndex}>
+          <Field
+            underlined
+            hintText={`Client Name`}
+            iconPath={mdiLabel}
+            value={one_name}
+            widthGrows
+            capitalize={"words"}
+            keyboard={"text"}
+            enterKeyHint={ useFormula(() => enterKey(one_phone, nameIndex)).value }
+          />
+        </IndexedField>
+        <IndexedField refs={fieldRefs} index={phoneIndex}>
+          <Field
+            underlined
+            hintText={`Phone`}
+            iconPath={mdiPhone}
+            value={one_phone}
+            widthGrows
+            formatInput={formatPhoneNumber}
+            keyboard="tel"
+            enterKeyHint={ useFormula(() => enterKey(one_address, phoneIndex)).value }
+          />
+        </IndexedField>
+        <IndexedField refs={fieldRefs} index={addressIndex}>
+          <Field
+            multiline
+            underlined
+            hintText={`Address`}
+            iconPath={mdiMapMarker}
+            value={one_address}
+            widthGrows
+            capitalize={`words`}
+            keyboard={"text"}
+            enterKeyHint={ `enter` }
+          />
+        </IndexedField>
+      </Show>
+      <IndexedField refs={fieldRefs} index={notesIndex}>
         <Field
           multiline
           underlined
-          hintText={`Address`}
-          iconPath={mdiMapMarker}
-          value={one_address}
-          widthGrows
-          capitalize={`words`}
+          hintText={`Delivery Notes`}
+          iconPath={mdiTextBox}
+          value={one_note}
+          asWideAsParent
+          capitalize={`sentences`}
           keyboard={"text"}
-          enterKeyHint={useFormula(() => enterKey(deliveryNotes)).value}
+          overflowXWraps
+          enterKeyHint={`enter`}
         />
-        <NumField
-          hint={`$0.00 / gal.`}
-          icon={mdiPlusMinusVariant}
-          value={one_rateOffset}
-          underlined
-          keyboard={"numeric"}
-          enterKeyHint={`done`}
-          onlyWriteOnBlur
-        />
-      </Show>
-      <Field
-        multiline
-        underlined
-        hintText={`Delivery Notes`}
-        iconPath={mdiTextBox}
-        value={deliveryNotes}
-        asWideAsParent
-        capitalize={`sentences`}
-        keyboard={"text"}
-        overflowXWraps
-        enterKeyHint={`done`}
-      />
+      </IndexedField>
       <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>
           <Txt alignLeft stroke={$theme.colors.warning}>
