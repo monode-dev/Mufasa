@@ -1,7 +1,8 @@
-import { mdiPlus } from "@mdi/js";
+import { mdiCheck, mdiCircleSmall, mdiPlus } from "@mdi/js";
 import {
   Body,
   Box,
+  Card,
   Column,
   FloatSort,
   Icon,
@@ -9,15 +10,18 @@ import {
   SortableColumn,
   Txt,
   pushPage,
+  useProp,
 } from "miwi";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { DeliveryPage } from "./DeliveryPage";
 import { DeliveryCard } from "./DeliveryCard";
 import { Delivery } from "./Delivery";
 import { openCreateClientDialog } from "./CreateDeliveryDialog";
 import { DailyTotalsCard } from "./DailyTotalsCard";
+import { Client } from "@/Clients/Client";
 
 export default function DeliveriesTab() {
+  //const isChecked = useProp(false);
   return (
     <Body padBetween={0.5}>
       {/* SECTION: Daily Totals */}
@@ -44,6 +48,32 @@ export default function DeliveriesTab() {
         </Box>
       </Row>
       <Column padBetween={1}>
+      <For each={[...(Client.getAllDocs() ?? [])]}>
+        {(client) => (
+          <Show when={Date.now() >= client.scheduledDeliveryStartDate! && client.scheduledDeliveryStartDate}>
+            <Row padBetween={0.3} padRight={0.6}>
+              <Icon iconPath={mdiCircleSmall} scale={2} stroke={$theme.colors.warning} />
+              <Txt stroke={$theme.colors.warning} bold widthGrows>{client.name} is due for a delivery.</Txt>
+              <Box
+                bonusTouchArea
+                width={1}
+                height={1}
+                outlineSize={1 / 8}
+                cornerRadius={1 / 7}
+                onClick={() => {
+                  //isChecked.value = !isChecked.value;
+                  client.scheduledDeliveryStartDate = client.scheduledDeliveryStartDate! + (client.weeksBetweenScheduledDeliveries! * 604800000);
+                }}
+                outlineColor={$theme.colors.text}
+              >
+                {/* <Show when={isChecked.value}>
+                  <Icon iconPath={mdiCheck} scale={0.8} stroke={$theme.colors.text} />
+                </Show> */}
+              </Box>
+            </Row>
+          </Show>
+        )}
+      </For>
         <SortableColumn
           onSort={(props) =>
             FloatSort.moveItem({

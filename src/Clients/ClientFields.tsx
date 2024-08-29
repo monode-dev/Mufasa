@@ -379,7 +379,7 @@ export function ClientFields(props: {
       </Row>
       <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
         <Row padBetween={0.25}>
-          <Txt>Starting on: </Txt>
+          <Txt>Next delivery date: </Txt>
           <Selector
             value={props.scheduledDeliveryStartDate.value}
             stroke={$theme.colors.hint}
