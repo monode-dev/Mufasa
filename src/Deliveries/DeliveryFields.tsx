@@ -114,9 +114,8 @@ export function DeliveryFields(props: {
         : 0,
     (v) => (props.delivery._manualRateOffset = v),
   );
-  const one_note = useFormula(
-    () =>
-      props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
+  const deliveryNotes = useFormula(
+    () => props.delivery.notes,
     (v) => (props.delivery.notes = v),
   );
 
@@ -190,7 +189,7 @@ export function DeliveryFields(props: {
           widthGrows
           capitalize={`words`}
           keyboard={"text"}
-          enterKeyHint={useFormula(() => enterKey(one_note)).value}
+          enterKeyHint={useFormula(() => enterKey(deliveryNotes)).value}
         />
         <NumField
           hint={`$0.00 / gal.`}
@@ -207,7 +206,7 @@ export function DeliveryFields(props: {
         underlined
         hintText={`Delivery Notes`}
         iconPath={mdiTextBox}
-        value={one_note}
+        value={deliveryNotes}
         asWideAsParent
         capitalize={`sentences`}
         keyboard={"text"}

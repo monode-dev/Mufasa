@@ -68,9 +68,6 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   // Title
   title = formula<string>(
     () => {
-      console.log(
-        `this._manualTitle: ${JSON.stringify(this._manualTitle, null, 2)}`,
-      );
       return this.selectedClient === ONE_TIME
         ? this._manualTitle
         : getClientLabel(this.selectedClient);
@@ -286,12 +283,6 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedFuel: SelectedFuel = formula(
     () => {
-      const selectedFuel = this._isOneTimeFuel
-        ? ONE_TIME
-        : (this._fuelType ?? NONE_SELECTED);
-      console.log(
-        `selectedFuel instanceof FuelType: ${selectedFuel instanceof FuelType}`,
-      );
       return this._isOneTimeFuel ? ONE_TIME : (this._fuelType ?? NONE_SELECTED);
     },
     (value) => {

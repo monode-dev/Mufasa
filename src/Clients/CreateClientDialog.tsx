@@ -149,7 +149,7 @@ function CreateClientDialog(props: {
         <Txt h1>Create Client</Txt>
         <ClientFields
           //client={useProp(tempClient)}
-          firstFieldHasFocus={useProp(true)}
+          autoFocusFirstField
           name={name}
           clientId={clientId}
           phoneNumber={phoneNumber}

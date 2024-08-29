@@ -6,21 +6,14 @@ import {
   mdiPlusMinusVariant,
   mdiTextBox,
 } from "@mdi/js";
-import {
-  EnterKeyHint,
-  Field,
-  NumField,
-  Prop,
-  useFormula,
-  useProp,
-} from "miwi";
+import { EnterKeyHint, Field, NumField, Prop, useFormula, useProp } from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { onCleanup } from "solid-js";
 import { FieldKeyHandler } from "@/AppData";
 
 export function ClientFields(props: {
-  firstFieldHasFocus?: Prop<boolean>;
+  autoFocusFirstField?: boolean;
   //client?: Prop<Client>;
   address: Prop<string>;
   name: Prop<string>;
@@ -30,7 +23,7 @@ export function ClientFields(props: {
   create?: boolean;
   notes: Prop<string>;
 }) {
-  const firstFocus = props.firstFieldHasFocus ?? useProp(true);
+  const autoFocusFirstField = useProp(props.autoFocusFirstField ?? false);
 
   // const addPhoneNumber = () => {
   //   props.client?.value.addPhoneNumber();
@@ -63,7 +56,7 @@ export function ClientFields(props: {
   return (
     <>
       <Field
-        hasFocus={firstFocus}
+        hasFocus={autoFocusFirstField}
         hintText={`Name`}
         iconPath={mdiAccount} //mdiDomain
         value={props.name}
@@ -160,7 +153,7 @@ export function ClientFields(props: {
         keyboard={"numeric"}
         enterKeyHint={`done`}
         onlyWriteOnBlur
-        negativesAreAllowed        
+        negativesAreAllowed
       />
       <Field
         hasFocus={focusOnNotes}
