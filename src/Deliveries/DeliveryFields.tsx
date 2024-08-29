@@ -116,11 +116,12 @@ export function DeliveryFields(props: {
         : 0,
     (v) => (props.delivery._manualRateOffset = v),
   );
-  const one_note = useFormula(
-    () =>
-      props.delivery.selectedClient === ONE_TIME ? props.delivery.notes : ``,
-    (v) => (props.delivery.notes = v),
-  );
+   const one_note = useFormula(
+     () =>
+      props.delivery.notes,
+     (v) => (props.delivery.notes = v),
+   );
+   //props.delivery.selectedClient === ONE_TIME ? ``: props.delivery.notes,
 
   onCleanup(() => {
     document.removeEventListener("keydown", FieldKeyHandler);

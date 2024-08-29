@@ -35,6 +35,7 @@ function CreateDeliveryDialog(props: {
 }) {
   const phoneNumber = useProp(``);
   const explicitAddress = useProp(``);
+  const explicitRateOffset = useProp(0);
   const title = useProp(``);
   const selectedClient = useProp<SelectedClient>(
     exists(props.setClient) ? props.setClient : NONE_SELECTED,
@@ -71,6 +72,12 @@ function CreateDeliveryDialog(props: {
     set address(v) {
       explicitAddress.value = v;
     },
+    get _manualRateOffset() {
+      return explicitRateOffset.value;
+    },
+    set _manualRateOffset(v) {
+      explicitRateOffset.value = v;
+    },
     get notes() {
       return notes.value;
     },
@@ -97,6 +104,7 @@ function CreateDeliveryDialog(props: {
       _manualTitle: title.value,
       _manualPhoneNumber: phoneNumber.value,
       _manualClientAddress: explicitAddress.value,
+      _manualRateOffset: explicitRateOffset.value,
       notes: notes.value,
       sortPosition: Date.now(),
       creationTimePosix: Date.now(),
