@@ -174,7 +174,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
       Math.ceil(
-        this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0) * 100,
+        this.sortedSubDeliveries.reduce((sum, sub) => sum + (sub.isCompleted ? sub.sales : 0), 0) * 100,
       ) / 100,
       2,
     ),
