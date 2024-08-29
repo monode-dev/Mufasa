@@ -48,7 +48,7 @@ export namespace Session {
     docExists(docId: string): boolean;
   };
   export const mockTablePersister: Session.TablePersister = {
-    staticProp: <T>(initVal: T) => ({ value: initVal } as any),
+    staticProp: <T>(initVal: T) => ({ value: initVal }) as any,
     batchUpdate: () => {},
     getProp: (_, __, v) => (typeof v === `function` ? v() : v),
     peekProp: () => undefined,
@@ -122,8 +122,8 @@ export namespace Device {
   export type ToReadonlyJson<T extends Json> = T extends Json[]
     ? ReadonlyArray<Device.ToReadonlyJson<T[number]>>
     : T extends JsonObj
-    ? { readonly [K in keyof T]: Device.ToReadonlyJson<T[K]> }
-    : T;
+      ? { readonly [K in keyof T]: Device.ToReadonlyJson<T[K]> }
+      : T;
 }
 
 // SECTION: Global Doc Persister Types
@@ -342,11 +342,6 @@ export function initializeStoreBank(bankConfig: {
 
     return doNow(() => {
       const store = useRoot(() => useProp(createStore(null)));
-      console.log(
-        `${params.docType} - ${
-          Date.now() - (window as any).startTime
-        } - Temporarily using mock store.`,
-      );
       const instConfigJson = persistance
         .devicePersister?.(params.docType)
         .jsonFile(`currentWorkspaceInstConfig.json`)
@@ -368,23 +363,9 @@ export function initializeStoreBank(bankConfig: {
             : useProp(null),
         );
         store.value = createStore(currentInstConfig.value);
-        console.log(
-          `${params.docType} - ${
-            Date.now() - (window as any).startTime
-          } - loaded signature: ${JSON.stringify(
-            currentInstConfig.value,
-            null,
-            2,
-          )}`,
-        );
 
         // Watch for changes in the signature
         const incomingSignature = await params.workspaceSignature;
-        console.log(
-          `${params.docType} - ${
-            Date.now() - (window as any).startTime
-          } - received incoming signature.`,
-        );
         useRoot(() =>
           doWatch(
             () => {
@@ -428,7 +409,6 @@ export function initializeStoreBank(bankConfig: {
           ),
         );
       });
-      console.log(`${params.docType} - returned store.`);
       return store;
     }) as any;
   }

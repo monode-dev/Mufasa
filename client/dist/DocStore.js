@@ -140,7 +140,6 @@ export function initializeStoreBank(bankConfig) {
         };
         return doNow(() => {
             const store = useRoot(() => useProp(createStore(null)));
-            console.log(`${params.docType} - ${Date.now() - window.startTime} - Temporarily using mock store.`);
             const instConfigJson = persistance
                 .devicePersister?.(params.docType)
                 .jsonFile(`currentWorkspaceInstConfig.json`)
@@ -160,10 +159,8 @@ export function initializeStoreBank(bankConfig) {
                     }
                     : useProp(null));
                 store.value = createStore(currentInstConfig.value);
-                console.log(`${params.docType} - ${Date.now() - window.startTime} - loaded signature: ${JSON.stringify(currentInstConfig.value, null, 2)}`);
                 // Watch for changes in the signature
                 const incomingSignature = await params.workspaceSignature;
-                console.log(`${params.docType} - ${Date.now() - window.startTime} - received incoming signature.`);
                 useRoot(() => doWatch(() => {
                     // Only do something if the workspace signature has changed.
                     const newInstSignature = incomingSignature.value;
@@ -198,7 +195,6 @@ export function initializeStoreBank(bankConfig) {
                     on: [incomingSignature],
                 }));
             });
-            console.log(`${params.docType} - returned store.`);
             return store;
         });
     }

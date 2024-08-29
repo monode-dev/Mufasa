@@ -128,7 +128,6 @@ function createWorkspaceInterface(config) {
     const isJoiningWorkspace = useProp(false);
     const isLeavingWorkspace = useProp(false);
     const isDeletingWorkspace = useProp(false);
-    console.log(`createWorkspaceInterface(${JSON.stringify(config, null, 2)})`);
     const PendingAsJson = null;
     const NoneAsJson = 0;
     const userMetadata = doNow(() => {
@@ -138,7 +137,6 @@ function createWorkspaceInterface(config) {
             .load(PendingAsJson);
         savedMetadata.loadedFromLocalStorage.then(() => {
             userMetadata.value = savedMetadata.data;
-            console.log(`workspace savedMetadata.loadedFromLocalStorage(${JSON.stringify(savedMetadata.data, null, 2)})`);
         });
         const disposeOnSnapshot = workspaceIntegration.onUserMetadata(
         /* TODO: When the app is offline newMetadata is null, and overwrites the savedMetadata. newMetadata
@@ -146,7 +144,6 @@ function createWorkspaceInterface(config) {
         async (newMetadata) => {
             // Wait for userMetadata to get set up.
             await savedMetadata.loadedFromLocalStorage;
-            console.log(`workspaceIntegration.onUserMetadata(${JSON.stringify(newMetadata, null, 2)})`);
             savedMetadata.batchUpdate((data) => {
                 const newMetadataValue = exists(newMetadata?.workspaceId) && exists(newMetadata?.role)
                     ? {
