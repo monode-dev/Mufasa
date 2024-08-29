@@ -220,6 +220,7 @@ export function DeliveryFields(props: {
             keyboard={"numeric"}
             enterKeyHint={`done`}
             onlyWriteOnBlur
+            negativesAreAllowed
           />
       </IndexedField>
       </Show>
