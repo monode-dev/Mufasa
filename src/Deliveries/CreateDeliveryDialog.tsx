@@ -35,7 +35,7 @@ function CreateDeliveryDialog(props: {
 }) {
   const phoneNumber = useProp(``);
   const explicitAddress = useProp(``);
-  const explicitRateOffset = useProp(0);
+  const explicitRateOffset = useProp(0 || null);
   const title = useProp(``);
   const selectedClient = useProp<SelectedClient>(
     exists(props.setClient) ? props.setClient : NONE_SELECTED,
