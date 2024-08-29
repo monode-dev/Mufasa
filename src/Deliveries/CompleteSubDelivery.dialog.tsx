@@ -51,6 +51,7 @@ export default function CompleteSubDeliveryDialog(props: {
       fuelName: fuelName.value,
       rate: preOffsetRate.value!,
       gallons: gallons.value!,
+      rateOffset: rateOffset.value!,
       // stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
       // stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
     });

@@ -110,14 +110,17 @@ export function DeliveryFields(props: {
   const one_rateOffset = useFormula(
     () =>
       props.delivery.selectedClient === ONE_TIME
-        ? props.delivery._manualRateOffset
+        ? 
+        props.delivery._manualRateOffset
         : 0,
     (v) => (props.delivery._manualRateOffset = v),
   );
-  const deliveryNotes = useFormula(
-    () => props.delivery.notes,
-    (v) => (props.delivery.notes = v),
-  );
+   const one_note = useFormula(
+     () =>
+      props.delivery.notes,
+     (v) => (props.delivery.notes = v),
+   );
+   //props.delivery.selectedClient === ONE_TIME ? ``: props.delivery.notes,
 
   onCleanup(() => {
     document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
@@ -226,7 +229,7 @@ export function DeliveryFields(props: {
           underlined
           hintText={`Delivery Notes`}
           iconPath={mdiTextBox}
-          value={deliveryNotes}
+          value={one_note}
           asWideAsParent
           capitalize={`sentences`}
           keyboard={"text"}

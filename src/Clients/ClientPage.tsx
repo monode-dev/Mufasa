@@ -97,6 +97,10 @@ export default function ClientPage(props: { client: Client }) {
             //   () => props.client ?? '',
             //   (val) => (props.client = val),
             // )}
+            shouldScheduleDeliveriesForThisClient={useFormula(
+              () => props.client.shouldScheduleDeliveriesForThisClient ?? false,
+              (val) => (props.client.shouldScheduleDeliveriesForThisClient = val),
+            )} 
             name={useFormula(
               () => props.client.name ?? ``,
               (val) => (props.client.name = val),
@@ -121,6 +125,18 @@ export default function ClientPage(props: { client: Client }) {
             rateOffset={useFormula(
               () => props.client.rateOffset,
               (val) => (props.client.rateOffset = val),
+            )}
+            weeksBetweenScheduledDeliveries={useFormula(
+              () => props.client.weeksBetweenScheduledDeliveries,
+              (val) => (props.client.weeksBetweenScheduledDeliveries = val),
+            )}
+            weekday={useFormula(
+              () => props.client.weekday,
+              (val) => (props.client.weekday = val),
+            )}
+            scheduledDeliveryStartDate={useFormula(
+              () => props.client.scheduledDeliveryStartDate,
+              (val) => (props.client.scheduledDeliveryStartDate = val),
             )}
           />
           <CallAndMapButtons
