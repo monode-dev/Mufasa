@@ -286,7 +286,8 @@ export default function SubDeliveryCard(props: {
                     props.enterHintRefs.value.set(gallonsIndex.value, key);
                     return key
                   }).value}
-                  onlyWriteOnBlur
+                  // allowing write so 0 Gallons warning will go away
+                  // onlyWriteOnBlur
                 />
               </IndexedField>
             </Label>
