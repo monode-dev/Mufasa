@@ -328,20 +328,6 @@ export default function Calculator() {
                         (sub) => !sub._isOneTimeFuel && sub.isValid,
                       ) ?? []
                     }
-                    // fallback={
-                    //   <Box
-                    //     onClick={async () => {
-                    //       selectedDelivery.value?.createSubDelivery();
-                    //       if(selectedDelivery.value?.selectedClient?.tanks.count! >=0) {
-                    //         selectedDelivery.value?.selectedClient?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
-                    //       }
-                    //     }}>
-                    //     <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>
-                    //       <Txt>Add Sub Delivery</Txt>
-                    //       <Icon iconPath={mdiPlus} />
-                    //     </Row>
-                    //   </Box>
-                    // }
                   >
                     {(subDelivery) => (
                       <Txt
