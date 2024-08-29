@@ -47,7 +47,6 @@ export function ClientFields(props: {
     const key =
       props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
     // keyHintMap.set(curprop.value, key);
-    console.log("key: ", key);
     return key;
   }
 

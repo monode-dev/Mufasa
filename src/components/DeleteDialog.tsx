@@ -14,12 +14,10 @@ export default function DeleteDialog(props: { obj: Object; message: string }) {
     closePopUp();
     doDelete();
   }
-  
-  function doDelete(){
+
+  function doDelete() {
     const objWithDelete = props.obj as ObjectWithDeleteDoc;
-    console.log("Cast props.obj to ObjectWithDeleteDoc", objWithDelete);
     objWithDelete.deleteDoc();
-    console.log("ObjectWithDeleteDoc Deleted");
   }
 
   function popOnClickOutside(e: MouseEvent) {

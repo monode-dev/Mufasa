@@ -87,9 +87,7 @@ export function DeliveryFields(props: {
   }
 
   function enterKey(prop: Prop<string>): EnterKeyHint {
-    const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
-    console.log("key: ", key);
-    return key;
+    return props.create && prop.value.trim().length == 0 ? `next` : `done`;
   }
 
   const one_name = useFormula(
