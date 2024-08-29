@@ -325,7 +325,7 @@ export default function Calculator() {
                   <For
                     each={
                       selectedDelivery.value?.sortedSubDeliveries.filter(
-                        (sub) => !sub._isOneTimeFuel,
+                        (sub) => !sub._isOneTimeFuel && sub.isValid,
                       ) ?? []
                     }
                     // fallback={
