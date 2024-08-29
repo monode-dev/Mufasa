@@ -12,7 +12,9 @@ import {
   doNow,
   KeyboardType,
   FieldCapitalization,
-  FieldInputType, FormatFieldInput, EnterKeyHint
+  FieldInputType,
+  FormatFieldInput,
+  EnterKeyHint,
 } from "miwi";
 import { FuelType } from "./model/DataModel";
 import { Client } from "./Clients/Client";
@@ -91,14 +93,11 @@ export function listClients(
     return sortNameA.localeCompare(sortNameB);
   });
 
-  console.log(`listClients sorted: ${Date.now() - prevTime}}`);
   prevTime = Date.now();
 
   if (excludeInvalidClients) {
     result = result.filter(isClientValid);
   }
-
-  console.log(`listClients filtered: ${Date.now() - prevTime}}`);
 
   return result;
 }
@@ -236,9 +235,9 @@ export function FieldKeyHandler(event: KeyboardEvent) {
       if (form) {
         const focusableElements = Array.from(
           form.querySelectorAll<HTMLElement>(
-            'input, select, textarea, button, [tabindex]:not([tabindex="-1"])'
-          )
-        ).filter(el => !el.hasAttribute('disabled'));
+            'input, select, textarea, button, [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((el) => !el.hasAttribute("disabled"));
         const index = focusableElements.indexOf(target);
         if (index > -1 && index < focusableElements.length - 1) {
           const nextElement = focusableElements[index + 1];
