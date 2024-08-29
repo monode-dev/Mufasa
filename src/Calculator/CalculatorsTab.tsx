@@ -323,7 +323,11 @@ export default function Calculator() {
                   </Show>
 
                   <For
-                    each={selectedDelivery.value?.sortedSubDeliveries ?? []}
+                    each={
+                      selectedDelivery.value?.sortedSubDeliveries.filter(
+                        (sub) => !sub._isOneTimeFuel,
+                      ) ?? []
+                    }
                     // fallback={
                     //   <Box
                     //     onClick={async () => {
@@ -460,11 +464,14 @@ export default function Calculator() {
         </Label>
 
         {/* SECTION  Complete Delivery ActionText */}
-        <Show when={selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value }>
+        <Show
+          when={
+            selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value
+          }
+        >
           <Txt
             widthGrows
             stroke={mdColors.green}
-            
             onClick={() => {
               selectedTab.value = tabs.delivery;
               completeDelivery();
@@ -476,7 +483,7 @@ export default function Calculator() {
 
         {/* Divider */}
         <Box widthGrows height={0.125} fill={"grey"} />
-        
+
         {/* SECTION Current Tank Info */}
         <Row>
           <Label
