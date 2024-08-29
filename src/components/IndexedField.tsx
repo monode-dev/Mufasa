@@ -18,7 +18,6 @@ import {
   Prop,
 } from "miwi";
 import {JSX} from "solid-js/jsx-runtime";
-import {children} from "solid-js";
 
 export type SharedFieldProps = BoxProps & {
   onlyWriteOnBlur?: boolean;
@@ -78,10 +77,7 @@ export function IndexedFieldKeyHandler(
       const nextIndex =
         nextOverride?.value.get(currentIndex)?.value
         ?? currentIndex + 1;
-      console.log("=====================");
-      console.log("nextIndex: ", nextIndex);
       const nextElement = fields.get(nextIndex);
-      console.log("nextElement: ", nextElement?.dataset.index);
       if (nextElement) {
         const nextField = nextElement.querySelector('input, select, textarea') as HTMLElement;
         if (nextField) {
@@ -109,7 +105,6 @@ export interface IndexedProps extends SharedFieldProps{
 export function IndexedField(props: IndexedProps) {
 
   function assignRef(el: HTMLDivElement | null, fieldRefs: Prop<Map<number,HTMLDivElement>>) {
-    console.log("assignRef: ", el);
     if (el) {
       fieldRefs.value.set(props.index.value, el);
     }

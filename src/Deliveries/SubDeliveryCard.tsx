@@ -89,9 +89,7 @@ export default function SubDeliveryCard(props: {
   function midEnterHint(
     num: (number & Flag<typeof OptionalPropFlag>) | (null & Flag<typeof OptionalPropFlag>
       ) | number | null): EnterKeyHint {
-    const key = (num ?? 0) <= 0 ? `next` : `done`;
-    console.log("key: ", key);
-    return key;
+    return (num ?? 0) <= 0 ? `next` : `done`;
   }
 
   onCleanup(() => {
@@ -106,12 +104,7 @@ export default function SubDeliveryCard(props: {
   const nameIndex = useFormula(() => baseIndex.value);
   const rateIndex = useFormula(() => 1 + baseIndex.value);
   const gallonsIndex = useFormula(() => 2 + baseIndex.value);
-  const overrideNext = useFormula(() =>{
-    const next = baseIndex.value + fields + 2;
-      console.log("next: ", next);
-      return next;
-  }
-  );
+  const overrideNext = useFormula(() => baseIndex.value + fields + 2);
   function lastEnterHint(sub: Prop<SubDelivery | undefined>, index: Prop<number>): EnterKeyHint {
     const s = sub.value;
     let key: EnterKeyHint = `done`;
@@ -125,7 +118,6 @@ export default function SubDeliveryCard(props: {
         props.nextOverride.value.set(index.value, overrideNext);
       }
     }
-    console.log("key: ", key);
     return key;
   }
 
