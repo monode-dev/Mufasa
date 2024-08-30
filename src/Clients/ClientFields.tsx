@@ -32,6 +32,7 @@ import {
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber, WeekDays } from "./Client";
 import { Component, For, onCleanup, Show, Switch } from "solid-js";
+import { mfs } from "@/model/DataModel";
 
 export function ClientFields(props: {
   autoFocusFirstField?: boolean;
@@ -45,12 +46,14 @@ export function ClientFields(props: {
   weekday: Prop<WeekDays | null>;
   weeksBetweenScheduledDeliveries: Prop<number | null>;
   scheduledDeliveryStartDate: Prop<number | null>;
+  assignedTo: Prop<string>;
   create?: boolean;
   notes: Prop<string>;
 }) {
   const weekSelectorIsOpen = useProp(false);
   const daySelectorIsOpen = useProp(false);
   const dateSelectorIsOpen = useProp(false);
+  const teamMemberSelectorIsOpen = useProp(false);
 
   // const addPhoneNumber = () => {
   //   props.client?.value.addPhoneNumber();
@@ -392,6 +395,51 @@ export function ClientFields(props: {
                 </Txt>
               );
             })}
+          </Selector>
+        </Row>
+        <Row>
+          <Txt>Assigned to: </Txt>
+          <Selector
+            value={props.assignedTo.value}
+            stroke={$theme.colors.hint}
+            getLabelForData={() =>{
+              const assignedMember = mfs.user.workspace?.otherMembers?.find(
+                (member) => member.uid === props.assignedTo.value
+              );
+              if (assignedMember) {
+                return assignedMember.email;
+              } else if (mfs.user.uid === props.assignedTo.value) {
+                return mfs.user.email;
+              } else {
+                return null;
+              }
+            }}
+            isOpen={teamMemberSelectorIsOpen}
+          >
+            <Txt
+              widthGrows
+              onClick={() => {
+                if(mfs.user.workspace?.isOwner){
+                  props.assignedTo.value = mfs.user.uid;
+                }
+              }}
+            >
+              {mfs.user.email}
+            </Txt>
+            <For each={mfs.user.workspace?.otherMembers}>
+              {(member) => (
+                <Txt
+                  widthGrows
+                  onClick={() => {
+                    if(mfs.user.workspace?.isOwner){
+                      props.assignedTo.value = member.uid;
+                    }
+                  }}
+                >
+                  {member.email}
+                </Txt>
+              )}
+            </For>
           </Selector>
         </Row>
       </Show>
