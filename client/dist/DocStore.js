@@ -222,7 +222,10 @@ export function createDocStore(config) {
             await config.cloudWorkspacePersister.updateDoc(docChange);
         }
         catch (e) {
-            console.error(`Error pushing doc change: ${JSON.stringify(e, null, 2)}`, e);
+            // If the doc has already been deleted, no need to push the change.
+            if (e?.code === `not-found`)
+                return;
+            // If some error occurred, throw so we can re-attempt later.
             throw e;
         }
         config.untrackUpload();
