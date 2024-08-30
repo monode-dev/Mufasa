@@ -19,6 +19,7 @@ import { Delivery } from "./Delivery";
 import { openCreateClientDialog } from "./CreateDeliveryDialog";
 import { DailyTotalsCard } from "./DailyTotalsCard";
 import { Client } from "@/Clients/Client";
+import { mfs } from "@/model/DataModel";
 
 export default function DeliveriesTab() {
   return (
@@ -47,12 +48,12 @@ export default function DeliveriesTab() {
         </Box>
       </Row>
       <Column padBetween={1}>
-      <Show when={[...(Client.getAllDocs() ?? [])].filter((client) => client.shouldScheduleDeliveriesForThisClient && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate).length >= 1}>
+      <Show when={[...(Client.getAllDocs() ?? [])].filter((client) => client.shouldScheduleDeliveriesForThisClient && client.assignedTo === mfs.user.uid && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate).length >= 1}>
         <Card overflowXCrops>
           <Txt h2 alignTopLeft widthGrows singleLine>Notifications:</Txt>
           <For each={[...(Client.getAllDocs() ?? [])]}>
             {(client) => (
-              <Show when={client.shouldScheduleDeliveriesForThisClient && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate}>
+              <Show when={client.shouldScheduleDeliveriesForThisClient && client.assignedTo === mfs.user.uid && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate}>
                 <Row padBetween={0.3} padRight={0.6}>
                   <Icon iconPath={mdiCircleSmall} scale={2} />
                   <Txt bold widthGrows>{client.name} is due for a delivery.</Txt>

@@ -32,6 +32,7 @@ import {
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber, WeekDays } from "./Client";
 import { Component, For, onCleanup, Show, Switch } from "solid-js";
+import { mfs } from "@/model/DataModel";
 
 export function ClientFields(props: {
   autoFocusFirstField?: boolean;
@@ -45,12 +46,14 @@ export function ClientFields(props: {
   weekday: Prop<WeekDays | null>;
   weeksBetweenScheduledDeliveries: Prop<number | null>;
   scheduledDeliveryStartDate: Prop<number | null>;
+  assignedTo: Prop<string>;
   create?: boolean;
   notes: Prop<string>;
 }) {
   const weekSelectorIsOpen = useProp(false);
   const daySelectorIsOpen = useProp(false);
   const dateSelectorIsOpen = useProp(false);
+  const teamMemberSelectorIsOpen = useProp(false);
 
   // const addPhoneNumber = () => {
   //   props.client?.value.addPhoneNumber();
@@ -75,7 +78,7 @@ export function ClientFields(props: {
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
 
-  function getDeliveryDates(
+  function getDeliveryDate(
     weeks: number,
     dayOfWeek: string,
     currentDate: Date,
@@ -363,9 +366,14 @@ export function ClientFields(props: {
           <Selector
             value={props.scheduledDeliveryStartDate.value}
             stroke={$theme.colors.hint}
-            getLabelForData={() =>
-              `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ?? null
-            }
+            getLabelForData={() =>{
+
+              if(props.shouldScheduleDeliveriesForThisClient.value && !props.scheduledDeliveryStartDate.value && props.weekday.value && props.weeksBetweenScheduledDeliveries.value){
+                props.scheduledDeliveryStartDate.value = getDeliveryDate(0, props.weekday.value, new Date()).valueOf();
+              }
+
+              return `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ?? null
+            }}
             isOpen={dateSelectorIsOpen}
           >
             {[...Array(4).keys()].map((i) => {
@@ -373,7 +381,7 @@ export function ClientFields(props: {
                 <Txt
                   widthGrows
                   onClick={() => {
-                    const deliveryStartDate = getDeliveryDates(
+                    const deliveryStartDate = getDeliveryDate(
                       i,
                       props.weekday.value!,
                       new Date(),
@@ -382,7 +390,7 @@ export function ClientFields(props: {
                   }}
                 >
                   {doNow(() => {
-                    const deliveryStartDate = getDeliveryDates(
+                    const deliveryStartDate = getDeliveryDate(
                       i,
                       props.weekday.value!,
                       new Date(),
@@ -392,6 +400,51 @@ export function ClientFields(props: {
                 </Txt>
               );
             })}
+          </Selector>
+        </Row>
+        <Row padBetween={0.25}>
+          <Txt>Assigned to: </Txt>
+          <Selector
+            value={props.assignedTo.value}
+            stroke={$theme.colors.hint}
+            getLabelForData={() =>{
+              const assignedMember = mfs.user.workspace?.otherMembers?.find(
+                (member) => member.uid === props.assignedTo.value
+              );
+              if (assignedMember) {
+                return assignedMember.email;
+              } else if (mfs.user.uid === props.assignedTo.value) {
+                return mfs.user.email;
+              } else {
+                return null;
+              }
+            }}
+            isOpen={teamMemberSelectorIsOpen}
+          >
+            <Txt
+              widthGrows
+              onClick={() => {
+                if(mfs.user.workspace?.isOwner){
+                  props.assignedTo.value = mfs.user.uid;
+                }
+              }}
+            >
+              {mfs.user.email}
+            </Txt>
+            <For each={mfs.user.workspace?.otherMembers}>
+              {(member) => (
+                <Txt
+                  widthGrows
+                  onClick={() => {
+                    if(mfs.user.workspace?.isOwner){
+                      props.assignedTo.value = member.uid;
+                    }
+                  }}
+                >
+                  {member.email}
+                </Txt>
+              )}
+            </For>
           </Selector>
         </Row>
       </Show>

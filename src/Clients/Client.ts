@@ -52,6 +52,7 @@ export class Client extends mfs.Doc(`Client`) {
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
   scheduledDeliveryStartDate = prop([Number, null], null);
   shouldScheduleDeliveriesForThisClient = prop(Boolean);
+  assignedTo = prop(String, ``);
   readonly tanks = list(Tank, `mx_parent`);
   onDelete() {
     this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
