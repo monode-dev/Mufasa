@@ -138,6 +138,10 @@ export default function ClientPage(props: { client: Client }) {
               () => props.client.scheduledDeliveryStartDate,
               (val) => (props.client.scheduledDeliveryStartDate = val),
             )}
+            assignedTo={useFormula(
+              () => props.client.assignedTo,
+              (val) => (props.client.assignedTo = val),
+            )}
           />
           <CallAndMapButtons
             phoneNumber={props.client.phoneNumber}
