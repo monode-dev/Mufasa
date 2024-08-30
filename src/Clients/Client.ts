@@ -46,7 +46,7 @@ export class Client extends mfs.Doc(`Client`) {
   );
 
   address = prop(String, ``);
-  notes = prop(String, ``);
+  notes = prop(String, ``);n
   rateOffset = prop([Number, null], null);
   weekday = prop([String, null], WeekDays.none) as ReturnType<typeof prop<[StringConstructor, null], WeekDays>> & WeekDays;
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
