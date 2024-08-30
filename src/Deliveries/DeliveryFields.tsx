@@ -221,6 +221,7 @@ export function DeliveryFields(props: {
           keyboard={"text"}
           overflowXWraps
           enterKeyHint={`enter`}
+          onlyWriteOnBlur
         />
       <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>

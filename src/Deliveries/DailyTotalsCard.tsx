@@ -124,7 +124,7 @@ export function DailyTotalsCard() {
         >
           {([fuelName, deliveredGallons]) => (
             <Row padBetween={1 / 4} alignTopLeft>
-              <Txt singleLine>{`${fuelName}:`}</Txt>
+              <Txt singleLine maxWidth={5}>{`${fuelName}:`}</Txt>
               <Txt widthGrows alignTopLeft overflowXWraps>
                 <span>
                   <div
