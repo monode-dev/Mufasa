@@ -26,7 +26,6 @@ import { Delivery } from "./Delivery";
 import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 import ClientPage from "@/Clients/ClientPage";
 
 export function DeliveryFields(props: {
@@ -122,11 +121,6 @@ export function DeliveryFields(props: {
    );
    //props.delivery.selectedClient === ONE_TIME ? ``: props.delivery.notes,
 
-  onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
-  });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
-
   const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
@@ -174,7 +168,6 @@ export function DeliveryFields(props: {
         </Show>
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
-        <IndexedField refs={fieldRefs} index={nameIndex}>
           <Field
             underlined
             hintText={`Client Name`}
@@ -185,8 +178,6 @@ export function DeliveryFields(props: {
             keyboard={"text"}
             enterKeyHint={ useFormula(() => enterKey(one_phone, nameIndex)).value }
           />
-        </IndexedField>
-        <IndexedField refs={fieldRefs} index={phoneIndex}>
           <Field
             underlined
             hintText={`Phone`}
@@ -197,8 +188,6 @@ export function DeliveryFields(props: {
             keyboard="tel"
             enterKeyHint={ useFormula(() => enterKey(one_address, phoneIndex)).value }
           />
-        </IndexedField>
-        <IndexedField refs={fieldRefs} index={addressIndex}>
           <Field
             multiline
             underlined
@@ -210,8 +199,6 @@ export function DeliveryFields(props: {
             keyboard={"text"}
             enterKeyHint={ `enter` }
           />
-        </IndexedField>
-        <IndexedField refs={fieldRefs} index={offsetIndex}>
           <NumField
             hint={`$0.00 / gal.`}
             icon={mdiPlusMinusVariant}
@@ -222,9 +209,7 @@ export function DeliveryFields(props: {
             onlyWriteOnBlur
             negativesAreAllowed
           />
-      </IndexedField>
       </Show>
-      <IndexedField refs={fieldRefs} index={notesIndex}>
         <Field
           multiline
           underlined
@@ -237,7 +222,6 @@ export function DeliveryFields(props: {
           overflowXWraps
           enterKeyHint={`enter`}
         />
-      </IndexedField>
       <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>
           <Txt alignLeft stroke={$theme.colors.warning}>

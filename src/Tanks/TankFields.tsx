@@ -16,7 +16,6 @@ import {
 } from "@/Calculator/ShapeUtils";
 import { For, onCleanup } from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 const _dimensionHintText = `in.`;
 
@@ -88,10 +87,6 @@ export default function TankFields(props: {
     return key;
   }
 
-  onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
-  });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
   const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
@@ -120,7 +115,6 @@ export default function TankFields(props: {
           const indexRef = useProp(index() + 1);
           return (
             <Label label={getDimensionLabel(dim)}>
-              <IndexedField refs={fieldRefs} index={indexRef}>
                 <NumField
                   negativesAreAllowed={false}
                   hint={_dimensionHintText}
@@ -132,7 +126,6 @@ export default function TankFields(props: {
                   stroke={mdColors.black}
                   enterKeyHint={ useFormula(() => enterKey(index)).value }
                 />
-              </IndexedField>
             </Label>
           );
         }}
