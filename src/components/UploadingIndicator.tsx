@@ -35,7 +35,7 @@ export function UploadingIndicator() {
       )}%, 51%)`,
   );
   return (
-    <Show when={mfs.isUploadingToCloud && false}>
+    <Show when={mfs.isUploadingToCloud}>
       <Row
         scale={1}
         stroke={pulseColor.value}
