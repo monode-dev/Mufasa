@@ -80,6 +80,7 @@ export default function CompletedSubDeliveryFields(props: {
           underlined
           hint="$0.00 / gal."
           stroke={rateOffsetShouldBeGrey.value ? mdColors.grey : undefined}
+          negativesAreAllowed
         />
       </Label>
       {/** Gallons */}

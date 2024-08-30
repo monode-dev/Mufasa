@@ -128,9 +128,8 @@ export default function ClientSelector(props: {
             }}
             widthGrows  
             heightShrinks
-            overflowX={$Overflow.crop}
+            overflowX={$Overflow.wrap}
             stroke={$theme.colors.text}
-            singleLine
           >
             {getClientLabel(client)}
           </Txt>
