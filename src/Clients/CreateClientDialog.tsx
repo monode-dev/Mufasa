@@ -17,6 +17,7 @@ import { Client, WeekDays } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import Fuse from "fuse.js";
 import { LoadCSVDialog } from "./LoadCSVDialog";
+import { assign } from "solid-js/web";
 
 export const openCreateClientDialog = (props: {
   initName?: string;
@@ -46,6 +47,7 @@ function CreateClientDialog(props: {
   const scheduledDeliveryStartDate = useProp<number | null>(null);
   const rateOffset = useProp<number | null>(null);
   const shouldScheduleDeliveriesForThisClient = useProp(false);
+  const assignedTo = useProp(``);
   // const tempClient = Client.create({
   //   name: "",
   //   clientId: "",
@@ -100,6 +102,7 @@ function CreateClientDialog(props: {
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
       scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
+      assignedTo: assignedTo.value,
     };
   });
   const clientIsValid = useFormula(() => {
@@ -143,6 +146,7 @@ function CreateClientDialog(props: {
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
       scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
+      assignedTo: assignedTo.value,
     });
     props.onCreate?.(newClient);  
     // tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
@@ -172,6 +176,7 @@ function CreateClientDialog(props: {
           weeksBetweenScheduledDeliveries={weeksBetweenScheduledDeliveries}
           weekday={weekday}
           scheduledDeliveryStartDate={scheduledDeliveryStartDate}
+          assignedTo={assignedTo}
         />
         <Show when={showErrorMessages() != ""}>
           <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
