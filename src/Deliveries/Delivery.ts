@@ -174,7 +174,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
       Math.ceil(
-        this.sortedSubDeliveries.reduce((sum, sub) => sum + sub.sales, 0) * 100,
+        this.sortedSubDeliveries.reduce((sum, sub) => sum + (sub.isCompleted ? sub.sales : 0), 0) * 100,
       ) / 100,
       2,
     ),
@@ -195,10 +195,6 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     if (this.selectedClient !== ONE_TIME && !isClientValid(this.selectedClient))
       return "Please select a valid client.";
     if (this.isDeleted) return `This delivery has been deleted.`;
-    const subInvalidError = this.sortedSubDeliveries.find(
-      (sub) => !sub.isValid,
-    )?.subInvalidError;
-    if (subInvalidError) return subInvalidError;
     return undefined;
   });
   readonly isCompleted = formula(() => this.completedTimePosix !== null);
@@ -384,7 +380,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Sales
   readonly sales = formula(
-    () => (this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0),
+    () =>  Math.ceil(((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0)) * 100) / 100,
   );
 
   // Full Title

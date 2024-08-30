@@ -323,21 +323,11 @@ export default function Calculator() {
                   </Show>
 
                   <For
-                    each={selectedDelivery.value?.sortedSubDeliveries ?? []}
-                    // fallback={
-                    //   <Box
-                    //     onClick={async () => {
-                    //       selectedDelivery.value?.createSubDelivery();
-                    //       if(selectedDelivery.value?.selectedClient?.tanks.count! >=0) {
-                    //         selectedDelivery.value?.selectedClient?.tanks.forEach(tank => {if (selectedDelivery.value?.sortedSubDeliveries[0]) selectedDelivery.value.sortedSubDeliveries[0]._tank = tank});
-                    //       }
-                    //     }}>
-                    //     <Row stroke={$theme.colors.primary} alignCenterLeft padBetween={0.125}>
-                    //       <Txt>Add Sub Delivery</Txt>
-                    //       <Icon iconPath={mdiPlus} />
-                    //     </Row>
-                    //   </Box>
-                    // }
+                    each={
+                      selectedDelivery.value?.sortedSubDeliveries.filter(
+                        (sub) => !sub._isOneTimeFuel && sub.isValid,
+                      ) ?? []
+                    }
                   >
                     {(subDelivery) => (
                       <Txt
@@ -460,11 +450,14 @@ export default function Calculator() {
         </Label>
 
         {/* SECTION  Complete Delivery ActionText */}
-        <Show when={selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value }>
+        <Show
+          when={
+            selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value
+          }
+        >
           <Txt
             widthGrows
             stroke={mdColors.green}
-            
             onClick={() => {
               selectedTab.value = tabs.delivery;
               completeDelivery();
@@ -476,7 +469,7 @@ export default function Calculator() {
 
         {/* Divider */}
         <Box widthGrows height={0.125} fill={"grey"} />
-        
+
         {/* SECTION Current Tank Info */}
         <Row>
           <Label
