@@ -78,7 +78,7 @@ export function ClientFields(props: {
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
 
-  function getDeliveryDates(
+  function getDeliveryDate(
     weeks: number,
     dayOfWeek: string,
     currentDate: Date,
@@ -366,9 +366,14 @@ export function ClientFields(props: {
           <Selector
             value={props.scheduledDeliveryStartDate.value}
             stroke={$theme.colors.hint}
-            getLabelForData={() =>
-              `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ?? null
-            }
+            getLabelForData={() =>{
+
+              if(props.shouldScheduleDeliveriesForThisClient.value && !props.scheduledDeliveryStartDate.value && props.weekday.value && props.weeksBetweenScheduledDeliveries.value){
+                props.scheduledDeliveryStartDate.value = getDeliveryDate(0, props.weekday.value, new Date()).valueOf();
+              }
+
+              return `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ?? null
+            }}
             isOpen={dateSelectorIsOpen}
           >
             {[...Array(4).keys()].map((i) => {
@@ -376,7 +381,7 @@ export function ClientFields(props: {
                 <Txt
                   widthGrows
                   onClick={() => {
-                    const deliveryStartDate = getDeliveryDates(
+                    const deliveryStartDate = getDeliveryDate(
                       i,
                       props.weekday.value!,
                       new Date(),
@@ -385,7 +390,7 @@ export function ClientFields(props: {
                   }}
                 >
                   {doNow(() => {
-                    const deliveryStartDate = getDeliveryDates(
+                    const deliveryStartDate = getDeliveryDate(
                       i,
                       props.weekday.value!,
                       new Date(),
@@ -397,7 +402,7 @@ export function ClientFields(props: {
             })}
           </Selector>
         </Row>
-        <Row>
+        <Row padBetween={0.25}>
           <Txt>Assigned to: </Txt>
           <Selector
             value={props.assignedTo.value}
