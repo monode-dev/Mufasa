@@ -48,7 +48,7 @@ export default function DeliveriesTab() {
       </Row>
       <Column padBetween={1}>
       <Show when={[...(Client.getAllDocs() ?? [])].filter((client) => client.shouldScheduleDeliveriesForThisClient && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate).length >= 1}>
-        <Card>
+        <Card overflowXCrops>
           <Txt h2 alignTopLeft widthGrows singleLine>Notifications:</Txt>
           <For each={[...(Client.getAllDocs() ?? [])]}>
             {(client) => (
