@@ -223,11 +223,12 @@ export function createDocStore(config) {
         }
         catch (e) {
             // If the doc has already been deleted, no need to push the change.
-            if (e?.code === `not-found`)
-                return;
+            const shouldThrow = e?.code !== `not-found`;
             // If some error occurred, throw so we can re-attempt later.
-            console.error(JSON.stringify(docChange, null, 2), e);
-            throw e;
+            if (shouldThrow) {
+                console.error(JSON.stringify(docChange, null, 2), e);
+                throw e;
+            }
         }
         config.untrackUpload();
     });

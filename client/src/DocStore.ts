@@ -449,10 +449,12 @@ export function createDocStore(config: DocStoreParams) {
         await config.cloudWorkspacePersister.updateDoc(docChange);
       } catch (e) {
         // If the doc has already been deleted, no need to push the change.
-        if ((e as any)?.code === `not-found`) return;
+        const shouldThrow = (e as any)?.code !== `not-found`;
         // If some error occurred, throw so we can re-attempt later.
-        console.error(JSON.stringify(docChange, null, 2), e);
-        throw e;
+        if (shouldThrow) {
+          console.error(JSON.stringify(docChange, null, 2), e);
+          throw e;
+        }
       }
       config.untrackUpload();
     },
