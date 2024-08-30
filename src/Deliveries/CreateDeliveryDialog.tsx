@@ -16,6 +16,7 @@ import { DeliveryFields } from "./DeliveryFields";
 import { Show } from "solid-js";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import { Client } from "@/Clients/Client";
+import { mfs } from "@/model/DataModel";
 
 export const openCreateClientDialog = (props: {
   onCreate: (delivery: Delivery) => void;
@@ -108,6 +109,7 @@ function CreateDeliveryDialog(props: {
       notes: notes.value,
       sortPosition: Date.now(),
       creationTimePosix: Date.now(),
+      createdBy: mfs.user.uid,
     });
     props.onCreate(newDelivery);
   }
