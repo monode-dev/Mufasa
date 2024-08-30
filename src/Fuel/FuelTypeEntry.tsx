@@ -11,7 +11,6 @@ import {
   exists, EnterKeyHint, Prop,
 } from "miwi";
 import { FuelType } from "@/model/DataModel";
-import {IndexedField} from "@/components/IndexedField";
 
 export default function FuelTypeEntry(props: {
   fuelType: FuelType;
@@ -38,10 +37,6 @@ export default function FuelTypeEntry(props: {
   // one based index
   return (
     <Row widthGrows padBetween={1} alignLeft>
-      <IndexedField
-        refs={props.fieldRefs}
-        index={nameIndex}
-      >
         <Field
           value={useFormula(
             () => props.fuelType.name ?? ``,
@@ -59,11 +54,6 @@ export default function FuelTypeEntry(props: {
           }).value }
           onlyWriteOnBlur
         />
-      </IndexedField>
-      <IndexedField
-        refs={props.fieldRefs}
-        index={rateIndex}
-      >
         <NumField
           enterKeyHint={
           useFormula(() => {
@@ -89,7 +79,6 @@ export default function FuelTypeEntry(props: {
           width={5}
           onlyWriteOnBlur
         />
-      </IndexedField>
       <HiddenOptions
         cancelOptions={{
           stroke: theme.palette.hint,

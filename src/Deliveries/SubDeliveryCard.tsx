@@ -29,7 +29,6 @@ import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import {Flag} from "mufasa/dist/Utils";
 import {OptionalPropFlag} from "mufasa/dist/Doc";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -91,12 +90,6 @@ export default function SubDeliveryCard(props: {
       ) | number | null): EnterKeyHint {
     return (num ?? 0) <= 0 ? `next` : `done`;
   }
-
-  onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs, props.nextOverride));
-  });
-  if(!props.noKeyHandler)
-    document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, props.fieldRefs, props.enterHintRefs, props.nextOverride));
 
   // local zero based indexes are shifted by subDeliveryIndex then converted to 1 based indexes
   const fields = 3;
@@ -206,10 +199,6 @@ export default function SubDeliveryCard(props: {
               }
             >
               <Label label="Name">
-                <IndexedField
-                  refs={props.fieldRefs}
-                  index={nameIndex}
-                >
                   <Field
                     value={useFormula(
                       () => props.subDelivery.explicitFuelName,
@@ -226,13 +215,8 @@ export default function SubDeliveryCard(props: {
                     }).value }
                     onlyWriteOnBlur
                   />
-                </IndexedField>
               </Label>
               <Label label="Rate">
-                <IndexedField
-                  refs={props.fieldRefs}
-                  index={rateIndex}
-                >
                   <NumField
                     value={useFormula(
                       () => props.subDelivery.explicitRate,
@@ -247,7 +231,6 @@ export default function SubDeliveryCard(props: {
                     }).value }
                     onlyWriteOnBlur
                   />
-                </IndexedField>
               </Label>
             </Show>
 
@@ -258,10 +241,6 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
-              <IndexedField
-                refs={props.fieldRefs}
-                index={gallonsIndex}
-              >
                 <NumField
                   value={useFormula(
                     () => props.subDelivery.gallons,
@@ -281,7 +260,6 @@ export default function SubDeliveryCard(props: {
                   // allowing write so 0 Gallons warning will go away
                   // onlyWriteOnBlur
                 />
-              </IndexedField>
             </Label>
             <Show
               when={
