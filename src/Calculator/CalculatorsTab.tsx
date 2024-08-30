@@ -4,7 +4,6 @@ import {
   Txt,
   Card,
   Body,
-  Button,
   Row,
   Column,
   Box,
@@ -13,7 +12,6 @@ import {
   NumField,
   doWatch,
   roundToString,
-  Prop,
   useFormula,
   exists,
   pushPage,
@@ -23,6 +21,7 @@ import {
   TabButtons,
   theme,
   Icon,
+  Prop,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -106,27 +105,45 @@ export default function Calculator() {
       exists(TankFields_warning.value) && selectedTab.value == tabs.dimensions,
   );
 
-  const currentGallons = useFormula(() =>
-    !showWarning.value
-      ? getTankShape(tankGeometry.value?.shape)?.calcFilledVolume(
-          tankGeometry.value,
-          selectedSubDelivery.value?.stickedInchesBeforeFilling,
-        )
-      : undefined,
+  const calcStickedInches: Prop<number | null | undefined> = useProp<number | null | undefined>(undefined);
+  
+  const currentGallons = useFormula(() => {
+    // console.log("warn: ", showWarning.value);
+      if (!showWarning.value) {
+        const geo = tankGeometry.value;
+        // console.log("geo: ", geo);
+        const geoShape = geo?.shape;
+        // console.log("geoShape: ", geoShape);
+        const tank = getTankShape(geoShape);
+        // console.log("tank: ", tank);
+        const vol = tank?.calcFilledVolume(
+          geo,
+          calcStickedInches.value,
+        );
+        // console.log("calcStickedInches: ", calcStickedInches.value);
+        // console.log("vol: ", vol);
+        return vol;
+      } else {
+        return undefined;
+      }
+    },
   );
-  const currentFillPercent = useFormula(() =>
-    !showWarning.value &&
-    exists(totalGallons.value) &&
-    exists(currentGallons.value)
-      ? totalGallons.value === 0
-        ? 0
-        : currentGallons.value / totalGallons.value
-      : undefined,
+  const currentFillPercent = useFormula(() => {
+    // console.log("total: ", totalGallons.value);
+    // console.log("current: ", currentGallons.value);
+      return !showWarning.value &&
+      exists(totalGallons.value) &&
+      exists(currentGallons.value)
+        ? totalGallons.value === 0
+          ? 0
+          : currentGallons.value / totalGallons.value
+        : undefined;
+    },
   );
   const gallonsToReachDesiredFill = useFormula(() =>
     calcGallonsToReachPercent(
       tankGeometry.value,
-      selectedSubDelivery.value?.stickedInchesBeforeFilling,
+      calcStickedInches.value,
       desiredFill.value,
     ),
   );
@@ -175,7 +192,7 @@ export default function Calculator() {
 
   function fillOutline(val: number | undefined) {
     if (!exists(val) || isNaN(val))
-      if ((selectedSubDelivery.value?.stickedInchesBeforeFilling ?? 0) > 0)
+      if ((calcStickedInches.value ?? 0) > 0)
         return $theme.colors.error;
       else return undefined;
 
@@ -437,10 +454,9 @@ export default function Calculator() {
         >
           <NumField
             value={useFormula(
-              () => selectedSubDelivery.value?.stickedInchesBeforeFilling,
+              () => calcStickedInches.value,
               (v) => {
-                if (selectedSubDelivery.value)
-                  selectedSubDelivery.value.stickedInchesBeforeFilling = v!;
+                calcStickedInches.value = v;
               },
             )}
             underlined
