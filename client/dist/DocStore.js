@@ -222,7 +222,7 @@ export function createDocStore(config) {
             await config.cloudWorkspacePersister.updateDoc(docChange);
         }
         catch (e) {
-            console.error(`Error pushing doc change: ${JSON.stringify(docChange, null, 2)}`, e);
+            console.error(`Error pushing doc change: ${JSON.stringify(e, null, 2)}`, e);
             throw e;
         }
         config.untrackUpload();

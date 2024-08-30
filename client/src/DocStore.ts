@@ -449,7 +449,7 @@ export function createDocStore(config: DocStoreParams) {
         await config.cloudWorkspacePersister.updateDoc(docChange);
       } catch (e) {
         console.error(
-          `Error pushing doc change: ${JSON.stringify(docChange, null, 2)}`,
+          `Error pushing doc change: ${JSON.stringify(e, null, 2)}`,
           e,
         );
         throw e;
