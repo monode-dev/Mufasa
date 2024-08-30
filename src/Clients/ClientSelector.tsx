@@ -126,10 +126,11 @@ export default function ClientSelector(props: {
             onClick={() => {
               selectOption(client);
             }}
-            widthGrows
+            widthGrows  
             heightShrinks
-            overflowX={$Overflow.wrap}
+            overflowX={$Overflow.crop}
             stroke={$theme.colors.text}
+            singleLine
           >
             {getClientLabel(client)}
           </Txt>
