@@ -1,7 +1,8 @@
-import { mdiPlus } from "@mdi/js";
+import { mdiCheck, mdiCircleSmall, mdiPlus } from "@mdi/js";
 import {
   Body,
   Box,
+  Card,
   Column,
   FloatSort,
   Icon,
@@ -9,13 +10,15 @@ import {
   SortableColumn,
   Txt,
   pushPage,
+  useProp,
 } from "miwi";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { DeliveryPage } from "./DeliveryPage";
 import { DeliveryCard } from "./DeliveryCard";
 import { Delivery } from "./Delivery";
 import { openCreateClientDialog } from "./CreateDeliveryDialog";
 import { DailyTotalsCard } from "./DailyTotalsCard";
+import { Client } from "@/Clients/Client";
 
 export default function DeliveriesTab() {
   return (
@@ -44,6 +47,26 @@ export default function DeliveriesTab() {
         </Box>
       </Row>
       <Column padBetween={1}>
+      <Show when={[...(Client.getAllDocs() ?? [])].filter((client) => client.shouldScheduleDeliveriesForThisClient && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate).length >= 1}>
+        <Card overflowXCrops>
+          <Txt h2 alignTopLeft widthGrows singleLine>Notifications:</Txt>
+          <For each={[...(Client.getAllDocs() ?? [])]}>
+            {(client) => (
+              <Show when={client.shouldScheduleDeliveriesForThisClient && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate}>
+                <Row padBetween={0.3} padRight={0.6}>
+                  <Icon iconPath={mdiCircleSmall} scale={2} />
+                  <Txt bold widthGrows>{client.name} is due for a delivery.</Txt>
+                  <Icon iconPath={mdiCheck} scale={1.4} stroke={$theme.colors.primary}                 
+                    onClick={() => {
+                      client.scheduledDeliveryStartDate = client.scheduledDeliveryStartDate! + (client.weeksBetweenScheduledDeliveries! * 604800000);
+                    }} 
+                  />
+                </Row>
+              </Show>
+            )}
+          </For>
+        </Card>
+      </Show>
         <SortableColumn
           onSort={(props) =>
             FloatSort.moveItem({
