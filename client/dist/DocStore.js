@@ -226,6 +226,7 @@ export function createDocStore(config) {
             if (e?.code === `not-found`)
                 return;
             // If some error occurred, throw so we can re-attempt later.
+            console.error(JSON.stringify(docChange, null, 2), e);
             throw e;
         }
         config.untrackUpload();

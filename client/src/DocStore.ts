@@ -451,6 +451,7 @@ export function createDocStore(config: DocStoreParams) {
         // If the doc has already been deleted, no need to push the change.
         if ((e as any)?.code === `not-found`) return;
         // If some error occurred, throw so we can re-attempt later.
+        console.error(JSON.stringify(docChange, null, 2), e);
         throw e;
       }
       config.untrackUpload();
