@@ -218,7 +218,7 @@ export function DeliveryFields(props: {
             value={one_rateOffset}
             underlined
             keyboard={"numeric"}
-            enterKeyHint={`done`}
+            enterKeyHint={ useFormula(() => enterKey(one_note, offsetIndex)).value }
             onlyWriteOnBlur
             negativesAreAllowed
           />

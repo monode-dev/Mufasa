@@ -262,7 +262,6 @@ export function ClientFields(props: {
           capitalize={`words`}
           keyboard={"text"}
           enterKeyHint={ `enter` }
-          onlyWriteOnBlur
         />
       </IndexedField>
       <IndexedField refs={fieldRefs} index={rateOffsetIndex}>
@@ -272,9 +271,9 @@ export function ClientFields(props: {
           value={props.rateOffset}
           underlined
           keyboard={"numeric"}
-          enterKeyHint={`done`}
-          onlyWriteOnBlur
+          enterKeyHint={ useFormula(() => enterKey(props.notes, rateOffsetIndex)).value }
           negativesAreAllowed
+          onlyWriteOnBlur
         />
       </IndexedField>
       <IndexedField refs={fieldRefs} index={notesIndex}>
@@ -288,7 +287,6 @@ export function ClientFields(props: {
           capitalize={`sentences`}
           keyboard={"text"}
           enterKeyHint={ `enter` }
-          onlyWriteOnBlur
         />
       </IndexedField>
       <Row alignTopLeft padBetween={0.35}>
