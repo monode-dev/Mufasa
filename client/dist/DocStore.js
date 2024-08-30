@@ -218,7 +218,13 @@ export function createDocStore(config) {
     });
     const pushGlobalChange = createPersistedFunction(localJsonPersister.jsonFile(`pushGlobalChange`), async (docChange) => {
         config.trackUpload();
-        await config.cloudWorkspacePersister.updateDoc(docChange);
+        try {
+            await config.cloudWorkspacePersister.updateDoc(docChange);
+        }
+        catch (e) {
+            console.error(`Error pushing doc change: ${JSON.stringify(docChange, null, 2)}`, e);
+            throw e;
+        }
         config.untrackUpload();
     });
     //
