@@ -32,7 +32,6 @@ import {
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { Client, ClientPhoneNumber, WeekDays } from "./Client";
 import { Component, For, onCleanup, Show, Switch } from "solid-js";
-import {IndexedField, IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function ClientFields(props: {
   autoFocusFirstField?: boolean;
@@ -75,11 +74,6 @@ export function ClientFields(props: {
   const focusOnPhone = useProp(false);
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
-
-  onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
-  });
-  //document.addEventListener("keydown", FieldKeyHandler);
 
   function getDeliveryDates(
     weeks: number,
@@ -154,7 +148,7 @@ export function ClientFields(props: {
     // Return the formatted string
     return `Week of ${month} ${day}${suffix}, ${year}`;
   }
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs));
+
   const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
@@ -167,7 +161,6 @@ export function ClientFields(props: {
 
   return (
     <>
-      <IndexedField refs={fieldRefs} index={nameIndex}>
         <Field
           hasFocus={autoFocusFirstField}
           hintText={`Name`}
@@ -179,8 +172,6 @@ export function ClientFields(props: {
           enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
           onlyWriteOnBlur
         />
-      </IndexedField>
-      <IndexedField refs={fieldRefs} index={idIndex}>
         <Field
           hasFocus={focusOnID}
           hintText={`Client ID`}
@@ -192,8 +183,6 @@ export function ClientFields(props: {
           enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
           onlyWriteOnBlur
         />
-      </IndexedField>
-      <IndexedField refs={fieldRefs} index={phoneIndex}>
         <Field
           hasFocus={focusOnPhone}
           hintText={`Phone`}
@@ -205,7 +194,6 @@ export function ClientFields(props: {
           enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
           onlyWriteOnBlur
         />
-      </IndexedField>
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
         {(phoneNumber) => (
           <Box padLeft={1.2}>
@@ -251,7 +239,6 @@ export function ClientFields(props: {
           <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
         </Row>
       </Show> */}
-      <IndexedField refs={fieldRefs} index={addressIndex}>
         <Field
           hasFocus={focusOnAddress}
           hintText={`Address`}
@@ -263,8 +250,6 @@ export function ClientFields(props: {
           keyboard={"text"}
           enterKeyHint={ `enter` }
         />
-      </IndexedField>
-      <IndexedField refs={fieldRefs} index={rateOffsetIndex}>
         <NumField
           hint={`$0.00 / gal.`}
           icon={mdiPlusMinusVariant}
@@ -275,8 +260,6 @@ export function ClientFields(props: {
           negativesAreAllowed
           onlyWriteOnBlur
         />
-      </IndexedField>
-      <IndexedField refs={fieldRefs} index={notesIndex}>
         <Field
           hasFocus={focusOnNotes}
           hintText={`Notes, Gate Code, Key Tag`}
@@ -288,7 +271,6 @@ export function ClientFields(props: {
           keyboard={"text"}
           enterKeyHint={ `enter` }
         />
-      </IndexedField>
       <Row alignTopLeft padBetween={0.35}>
         <Box
           bonusTouchArea

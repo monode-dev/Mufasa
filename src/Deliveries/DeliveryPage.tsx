@@ -25,7 +25,6 @@ import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
 import { SimplePage } from "@/components/SimplePage";
-import {IndexedFieldKeyHandler} from "@/components/IndexedField";
 
 export function DeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
@@ -50,10 +49,7 @@ export function DeliveryPage(props: { delivery: Delivery }) {
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
   // filled in LastEnterHint function
   const nextOverride: Prop<Map<number, Prop<number>>> = useProp(new Map());
-  onCleanup(() => {
-    document.removeEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs, nextOverride));
-  });
-  document.addEventListener("keydown", (event) => IndexedFieldKeyHandler(event, fieldRefs, enterHintRefs, nextOverride));
+
   return (
     <SimplePage>
       <AppBar>
