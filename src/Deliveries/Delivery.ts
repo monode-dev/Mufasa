@@ -30,14 +30,14 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   }
   static get upcomingDeliveries() {
     return FloatSort.toSorted({
-      list: Delivery.getAllDocs().filter((delivery) => !delivery.isCompleted),
+      list: Delivery.getAllDocs().filter((delivery) => !delivery.isCompleted && delivery.createdBy === mfs.user.uid),
       getPos: (delivery) => delivery.sortPosition,
       getUid: (delivery) => delivery.docId ?? ``,
     });
   }
   static get completedDeliveries() {
     return Delivery.getAllDocs()
-      .filter((delivery) => delivery.isCompleted)
+      .filter((delivery) => delivery.isCompleted && delivery.createdBy === mfs.user.uid)
       .sort(
         (a, b) => (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
       );
@@ -185,6 +185,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
 
   // User
   user = prop(String, ``);
+  createdBy = prop(String, ``);
 
   // Checks
   readonly isValid = formula(() => !exists(this.invalidError));
