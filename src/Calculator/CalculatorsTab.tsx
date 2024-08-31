@@ -105,41 +105,38 @@ export default function Calculator() {
       exists(TankFields_warning.value) && selectedTab.value == tabs.dimensions,
   );
 
-  const calcStickedInches: Prop<number | null | undefined> = useProp<number | null | undefined>(undefined);
-  
+  const calcStickedInches: Prop<number | null | undefined> = useProp<
+    number | null | undefined
+  >(undefined);
+
   const currentGallons = useFormula(() => {
     // console.log("warn: ", showWarning.value);
-      if (!showWarning.value) {
-        const geo = tankGeometry.value;
-        // console.log("geo: ", geo);
-        const geoShape = geo?.shape;
-        // console.log("geoShape: ", geoShape);
-        const tank = getTankShape(geoShape);
-        // console.log("tank: ", tank);
-        const vol = tank?.calcFilledVolume(
-          geo,
-          calcStickedInches.value,
-        );
-        // console.log("calcStickedInches: ", calcStickedInches.value);
-        // console.log("vol: ", vol);
-        return vol;
-      } else {
-        return undefined;
-      }
-    },
-  );
+    if (!showWarning.value) {
+      const geo = tankGeometry.value;
+      // console.log("geo: ", geo);
+      const geoShape = geo?.shape;
+      // console.log("geoShape: ", geoShape);
+      const tank = getTankShape(geoShape);
+      // console.log("tank: ", tank);
+      const vol = tank?.calcFilledVolume(geo, calcStickedInches.value);
+      // console.log("calcStickedInches: ", calcStickedInches.value);
+      // console.log("vol: ", vol);
+      return vol;
+    } else {
+      return undefined;
+    }
+  });
   const currentFillPercent = useFormula(() => {
     // console.log("total: ", totalGallons.value);
     // console.log("current: ", currentGallons.value);
-      return !showWarning.value &&
+    return !showWarning.value &&
       exists(totalGallons.value) &&
       exists(currentGallons.value)
-        ? totalGallons.value === 0
-          ? 0
-          : currentGallons.value / totalGallons.value
-        : undefined;
-    },
-  );
+      ? totalGallons.value === 0
+        ? 0
+        : currentGallons.value / totalGallons.value
+      : undefined;
+  });
   const gallonsToReachDesiredFill = useFormula(() =>
     calcGallonsToReachPercent(
       tankGeometry.value,
@@ -192,8 +189,7 @@ export default function Calculator() {
 
   function fillOutline(val: number | undefined) {
     if (!exists(val) || isNaN(val))
-      if ((calcStickedInches.value ?? 0) > 0)
-        return $theme.colors.error;
+      if ((calcStickedInches.value ?? 0) > 0) return $theme.colors.error;
       else return undefined;
 
     return val * 100 > maxSafe ? fillColor(val) : undefined;
@@ -256,6 +252,20 @@ export default function Calculator() {
                   stroke: theme.palette.hint,
                 }}
                 stroke={$theme.colors.text}
+                actionButtons={
+                  <Show when={exists(selectedDelivery.value)}>
+                    <Icon
+                      iconPath={mdiPencil}
+                      onClick={() => {
+                        if (exists(selectedDelivery.value)) {
+                          pushPage(DeliveryPage, {
+                            delivery: selectedDelivery.value,
+                          });
+                        }
+                      }}
+                    />
+                  </Show>
+                }
               >
                 {/* Selector does not allow invalid deliveries */}
                 <For
@@ -280,17 +290,6 @@ export default function Calculator() {
                   )}
                 </For>
               </Selector>
-              <Icon
-                stroke={selectedDelivery.value ? undefined : $theme.colors.hint}
-                iconPath={mdiPencil}
-                onClick={() => {
-                  if (selectedDelivery.value) {
-                    pushPage(DeliveryPage, {
-                      delivery: selectedDelivery.value,
-                    });
-                  }
-                }}
-              />
             </Label>
 
             {/* --Sub Delivery-- */}

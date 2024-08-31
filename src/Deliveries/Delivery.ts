@@ -28,16 +28,41 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   onDelete() {
     this.sortedSubDeliveries.forEach((subDelivery) => subDelivery.deleteDoc());
   }
+  static get currentUsersDeliveries() {
+    return Delivery.getAllDocs().filter((delivery) => {
+      const isMine = delivery.createdBy === mfs.user.uid;
+      const iAmOwner = mfs.user.workspace?.role === `owner`;
+      const createdByIsBlank =
+        !exists(delivery.createdBy) || delivery.createdBy === ``;
+      return isMine || (iAmOwner && createdByIsBlank);
+    });
+  }
   static get upcomingDeliveries() {
     return FloatSort.toSorted({
-      list: Delivery.getAllDocs().filter((delivery) => !delivery.isCompleted && delivery.createdBy === mfs.user.uid),
+      list: Delivery.getAllDocs().filter((delivery) => !delivery.isCompleted),
+      getPos: (delivery) => delivery.sortPosition,
+      getUid: (delivery) => delivery.docId ?? ``,
+    });
+  }
+  static get currentUsersUpcomingDeliveries() {
+    return FloatSort.toSorted({
+      list: Delivery.currentUsersDeliveries.filter(
+        (delivery) => !delivery.isCompleted,
+      ),
       getPos: (delivery) => delivery.sortPosition,
       getUid: (delivery) => delivery.docId ?? ``,
     });
   }
   static get completedDeliveries() {
     return Delivery.getAllDocs()
-      .filter((delivery) => delivery.isCompleted && delivery.createdBy === mfs.user.uid)
+      .filter((delivery) => delivery.isCompleted)
+      .sort(
+        (a, b) => (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
+      );
+  }
+  static get currentUsersCompletedDeliveries() {
+    return Delivery.completedDeliveries
+      .filter((delivery) => delivery.createdBy === mfs.user.uid)
       .sort(
         (a, b) => (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
       );
@@ -174,7 +199,10 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   readonly totalMoney = formula(() =>
     formatNumWithCommas(
       Math.ceil(
-        this.sortedSubDeliveries.reduce((sum, sub) => sum + (sub.isCompleted ? sub.sales : 0), 0) * 100,
+        this.sortedSubDeliveries.reduce(
+          (sum, sub) => sum + (sub.isCompleted ? sub.sales : 0),
+          0,
+        ) * 100,
       ) / 100,
       2,
     ),
@@ -185,7 +213,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
 
   // User
   user = prop(String, ``);
-  createdBy = prop(String, ``);
+  createdBy = prop([String, null]);
 
   // Checks
   readonly isValid = formula(() => !exists(this.invalidError));
@@ -233,18 +261,15 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   // Tank
   _isJustFuel = prop([Boolean, null], null);
   _tank = prop([Tank, null], null);
-  readonly justFuelIsOnlyOptions = formula(
-    () => !exists(this.delivery?.selectedClientDoc),
-  );
-  readonly shouldShowTankSelector = formula(
-    () =>
-      (this.selectedTank !== JUST_FUEL &&
-        this.selectedTank !== NONE_SELECTED) ||
-      exists(this.delivery?.selectedClientDoc),
+  readonly shouldShowTankSelector = formula(() =>
+    exists(this.delivery?.selectedClientDoc),
   );
   selectedTank: SelectedTank = formula(
     () => {
-      return this._isJustFuel ? JUST_FUEL : (this._tank ?? NONE_SELECTED);
+      return this._isJustFuel ||
+        (!this.shouldShowTankSelector && !exists(this._tank))
+        ? JUST_FUEL
+        : (this._tank ?? NONE_SELECTED);
     },
     (value) => {
       if (value === JUST_FUEL) {
@@ -264,12 +289,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       ? this.selectedTank
       : null,
   );
-  readonly tankGeometry: TankGeometry | null = formula(() =>
-    this.shouldShowTankSelector &&
-    this.selectedTank !== JUST_FUEL &&
-    this.selectedTank !== NONE_SELECTED
-      ? this.selectedTank
-      : null,
+  readonly tankGeometry: TankGeometry | null = formula(
+    () => this.selectedKnownTank ?? null,
   );
 
   // Fuel
@@ -381,7 +402,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Sales
   readonly sales = formula(
-    () =>  Math.ceil(((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0)) * 100) / 100,
+    () =>
+      Math.ceil((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0) * 100) / 100,
   );
 
   // Full Title

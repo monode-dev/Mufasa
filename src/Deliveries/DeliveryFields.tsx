@@ -5,7 +5,8 @@ import {
   mdiLabel,
   mdiMapMarker,
   mdiPencil,
-  mdiPhone, mdiPlusMinusVariant,
+  mdiPhone,
+  mdiPlusMinusVariant,
   mdiTextBox,
 } from "@mdi/js";
 import {
@@ -19,7 +20,10 @@ import {
   Box,
   Txt,
   Prop,
-  EnterKeyHint, useProp, pushPage, NumField
+  EnterKeyHint,
+  useProp,
+  pushPage,
+  NumField,
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
 import { Delivery } from "./Delivery";
@@ -75,15 +79,7 @@ export function DeliveryFields(props: {
     return "";
   }
 
-  function editIconShouldBeDisabled() {
-    return (
-      props.delivery.selectedClient === ONE_TIME ||
-      !clientIsValid() ||
-      props.delivery.selectedClient === NONE_SELECTED
-    );
-  }
-
-  function enterKey(prop: Prop<string>, index:Prop<number>): EnterKeyHint {
+  function enterKey(prop: Prop<string>, index: Prop<number>): EnterKeyHint {
     const key = props.create && prop.value.trim().length == 0 ? `next` : `done`;
     enterHintRefs.value.set(index.value, key);
     return key;
@@ -109,19 +105,17 @@ export function DeliveryFields(props: {
   const one_rateOffset = useFormula(
     () =>
       props.delivery.selectedClient === ONE_TIME
-        ? 
-        props.delivery._manualRateOffset
+        ? props.delivery._manualRateOffset
         : 0,
     (v) => (props.delivery._manualRateOffset = v),
   );
-   const one_note = useFormula(
-     () =>
-      props.delivery.notes,
-     (v) => (props.delivery.notes = v),
-   );
-   //props.delivery.selectedClient === ONE_TIME ? ``: props.delivery.notes,
+  const one_note = useFormula(
+    () => props.delivery.notes,
+    (v) => (props.delivery.notes = v),
+  );
+  //props.delivery.selectedClient === ONE_TIME ? ``: props.delivery.notes,
 
-  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  const fieldRefs: Prop<Map<number, HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
@@ -152,77 +146,65 @@ export function DeliveryFields(props: {
             (v) => (props.delivery.selectedClient = v),
           )}
         />
-        <Show when={props.delivery.selectedClient !== ONE_TIME}>
-          <Icon
-            stroke={editIconShouldBeDisabled() ? $theme.colors.hint : undefined}
-            iconPath={mdiPencil}
-            onClick={() => {
-              if (
-                props.delivery.selectedClient &&
-                props.delivery.selectedClient !== ONE_TIME
-              ) {
-                pushPage(ClientPage, { client: props.delivery.selectedClient });
-              }
-            }}
-          />
-        </Show>
       </Row>
       <Show when={props.delivery.selectedClient === ONE_TIME}>
-          <Field
-            underlined
-            hintText={`Client Name`}
-            iconPath={mdiLabel}
-            value={one_name}
-            widthGrows
-            capitalize={"words"}
-            keyboard={"text"}
-            enterKeyHint={ useFormula(() => enterKey(one_phone, nameIndex)).value }
-          />
-          <Field
-            underlined
-            hintText={`Phone`}
-            iconPath={mdiPhone}
-            value={one_phone}
-            widthGrows
-            formatInput={formatPhoneNumber}
-            keyboard="tel"
-            enterKeyHint={ useFormula(() => enterKey(one_address, phoneIndex)).value }
-          />
-          <Field
-            multiline
-            underlined
-            hintText={`Address`}
-            iconPath={mdiMapMarker}
-            value={one_address}
-            widthGrows
-            capitalize={`words`}
-            keyboard={"text"}
-            enterKeyHint={ `enter` }
-          />
-          <NumField
-            hint={`$0.00 / gal.`}
-            icon={mdiPlusMinusVariant}
-            value={one_rateOffset}
-            underlined
-            keyboard={"numeric"}
-            enterKeyHint={ useFormula(() => enterKey(one_note, offsetIndex)).value }
-            onlyWriteOnBlur
-            negativesAreAllowed
-          />
-      </Show>
+        <Field
+          underlined
+          hintText={`Client Name`}
+          iconPath={mdiLabel}
+          value={one_name}
+          widthGrows
+          capitalize={"words"}
+          keyboard={"text"}
+          enterKeyHint={useFormula(() => enterKey(one_phone, nameIndex)).value}
+        />
+        <Field
+          underlined
+          hintText={`Phone`}
+          iconPath={mdiPhone}
+          value={one_phone}
+          widthGrows
+          formatInput={formatPhoneNumber}
+          keyboard="tel"
+          enterKeyHint={
+            useFormula(() => enterKey(one_address, phoneIndex)).value
+          }
+        />
         <Field
           multiline
           underlined
-          hintText={`Delivery Notes`}
-          iconPath={mdiTextBox}
-          value={one_note}
-          asWideAsParent
-          capitalize={`sentences`}
+          hintText={`Address`}
+          iconPath={mdiMapMarker}
+          value={one_address}
+          widthGrows
+          capitalize={`words`}
           keyboard={"text"}
-          overflowXWraps
           enterKeyHint={`enter`}
-          onlyWriteOnBlur
         />
+        <NumField
+          hint={`$0.00 / gal.`}
+          icon={mdiPlusMinusVariant}
+          value={one_rateOffset}
+          underlined
+          keyboard={"numeric"}
+          enterKeyHint={useFormula(() => enterKey(one_note, offsetIndex)).value}
+          onlyWriteOnBlur
+          negativesAreAllowed
+        />
+      </Show>
+      <Field
+        multiline
+        underlined
+        hintText={`Delivery Notes`}
+        iconPath={mdiTextBox}
+        value={one_note}
+        asWideAsParent
+        capitalize={`sentences`}
+        keyboard={"text"}
+        overflowXWraps
+        enterKeyHint={`enter`}
+        onlyWriteOnBlur
+      />
       <Show when={showErrorMessages() != ""}>
         <Box widthGrows alignCenter>
           <Txt alignLeft stroke={$theme.colors.warning}>

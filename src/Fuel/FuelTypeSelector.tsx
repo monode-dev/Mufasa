@@ -97,7 +97,6 @@ export function FuelTypeSelector(props: {
           noneLabel="Select Fuel"
           isOpen={isOpen}
           getLabelForData={getLabelForData}
-          isWide={props.isWide}
           noOptionsText={"No Fuels"}
           cancelOptions={{
             stroke: theme.palette.hint,
