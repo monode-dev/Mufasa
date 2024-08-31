@@ -10,7 +10,6 @@ import {
   SortableColumn,
   Txt,
   pushPage,
-  useProp,
 } from "miwi";
 import { For, Show } from "solid-js";
 import { DeliveryPage } from "./DeliveryPage";
@@ -27,6 +26,54 @@ export default function DeliveriesTab() {
       {/* SECTION: Daily Totals */}
       <Txt h2>Today's Totals</Txt>
       <DailyTotalsCard />
+
+      {/* SECTION: Scheduled Clients */}
+      <Show
+        when={
+          [...(Client.getAllDocs() ?? [])].filter(
+            (client) =>
+              client.shouldScheduleDeliveriesForThisClient &&
+              client.assignedTo === mfs.user.uid &&
+              client.scheduledDeliveryStartDate &&
+              Date.now() >= client.scheduledDeliveryStartDate,
+          ).length >= 1
+        }
+      >
+        <Txt h2 singleLine>
+          Scheduled Clients:
+        </Txt>
+        <Column padBetween={1} overflowXCrops>
+          <For each={[...(Client.getAllDocs() ?? [])]}>
+            {(client) => (
+              <Show
+                when={
+                  client.shouldScheduleDeliveriesForThisClient &&
+                  client.assignedTo === mfs.user.uid &&
+                  client.scheduledDeliveryStartDate &&
+                  Date.now() >= client.scheduledDeliveryStartDate
+                }
+              >
+                <Row padBetween={0.3} padRight={0.6}>
+                  <Icon iconPath={mdiCircleSmall} scale={2} />
+                  <Txt bold widthGrows>
+                    {client.name} is due for a delivery.
+                  </Txt>
+                  <Icon
+                    iconPath={mdiCheck}
+                    scale={1.4}
+                    stroke={$theme.colors.primary}
+                    onClick={() => {
+                      client.scheduledDeliveryStartDate =
+                        client.scheduledDeliveryStartDate! +
+                        client.weeksBetweenScheduledDeliveries! * 604800000;
+                    }}
+                  />
+                </Row>
+              </Show>
+            )}
+          </For>
+        </Column>
+      </Show>
 
       {/* SECTION: Upcoming Deliveries */}
       <Box height={1} />
@@ -48,30 +95,10 @@ export default function DeliveriesTab() {
         </Box>
       </Row>
       <Column padBetween={1}>
-      <Show when={[...(Client.getAllDocs() ?? [])].filter((client) => client.shouldScheduleDeliveriesForThisClient && client.assignedTo === mfs.user.uid && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate).length >= 1}>
-        <Card overflowXCrops>
-          <Txt h2 alignTopLeft widthGrows singleLine>Notifications:</Txt>
-          <For each={[...(Client.getAllDocs() ?? [])]}>
-            {(client) => (
-              <Show when={client.shouldScheduleDeliveriesForThisClient && client.assignedTo === mfs.user.uid && client.scheduledDeliveryStartDate && Date.now() >= client.scheduledDeliveryStartDate}>
-                <Row padBetween={0.3} padRight={0.6}>
-                  <Icon iconPath={mdiCircleSmall} scale={2} />
-                  <Txt bold widthGrows>{client.name} is due for a delivery.</Txt>
-                  <Icon iconPath={mdiCheck} scale={1.4} stroke={$theme.colors.primary}                 
-                    onClick={() => {
-                      client.scheduledDeliveryStartDate = client.scheduledDeliveryStartDate! + (client.weeksBetweenScheduledDeliveries! * 604800000);
-                    }} 
-                  />
-                </Row>
-              </Show>
-            )}
-          </For>
-        </Card>
-      </Show>
         <SortableColumn
           onSort={(props) =>
             FloatSort.moveItem({
-              sortedList: Delivery.upcomingDeliveries,
+              sortedList: Delivery.currentUsersUpcomingDeliveries,
               fromIndex: props.from,
               toIndex: props.to,
               getPos: (delivery) => delivery.sortPosition,
@@ -80,7 +107,7 @@ export default function DeliveriesTab() {
           }
         >
           <For
-            each={Delivery.upcomingDeliveries}
+            each={Delivery.currentUsersUpcomingDeliveries}
             fallback={<Txt hint>Tap + to plan a new delivery.</Txt>}
           >
             {(delivery) => <DeliveryCard delivery={delivery} />}
@@ -93,7 +120,9 @@ export default function DeliveriesTab() {
       <Txt h2>Completed Deliveries</Txt>
       <Column padBetween={1}>
         <For
-          each={Delivery.completedDeliveries.filter((_, i) => i < 20)}
+          each={Delivery.currentUsersCompletedDeliveries.filter(
+            (_, i) => i < 20,
+          )}
           fallback={<Txt hint>No Completed Deliveries</Txt>}
         >
           {(delivery) => <DeliveryCard delivery={delivery} />}
