@@ -11,11 +11,13 @@ import {
   exists,
   useProp,
   theme,
+  pushPage,
 } from "miwi";
 import { For, Show } from "solid-js";
-import { mdiPlus } from "@mdi/js";
+import { mdiPencil, mdiPlus } from "@mdi/js";
 import { Client } from "./Client";
 import { openCreateClientDialog } from "./CreateClientDialog";
+import ClientPage from "./ClientPage";
 
 // import { Selector } from "@/Mock/_Selector";
 
@@ -64,6 +66,20 @@ export default function ClientSelector(props: {
       cancelOptions={{
         stroke: theme.palette.hint,
       }}
+      actionButtons={
+        <Show
+          when={exists(props.value.value) && props.value.value !== ONE_TIME}
+        >
+          <Icon
+            iconPath={mdiPencil}
+            onClick={() => {
+              if (exists(props.value.value) && props.value.value !== ONE_TIME) {
+                pushPage(ClientPage, { client: props.value.value });
+              }
+            }}
+          />
+        </Show>
+      }
     >
       {!clientsAreFiltered.value && (
         <>
@@ -126,7 +142,7 @@ export default function ClientSelector(props: {
             onClick={() => {
               selectOption(client);
             }}
-            widthGrows  
+            widthGrows
             heightShrinks
             overflowX={$Overflow.wrap}
             stroke={$theme.colors.text}
