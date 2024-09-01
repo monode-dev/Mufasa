@@ -25,6 +25,7 @@ type CLIENT_TYPE = Client | typeof ONE_TIME | null | undefined;
 
 export default function ClientSelector(props: {
   value: Prop<CLIENT_TYPE>;
+  onSelect?: (client: CLIENT_TYPE) => void;
   showNewOption?: boolean;
   showOneTimeOption?: boolean;
 }) {
@@ -32,6 +33,7 @@ export default function ClientSelector(props: {
   function selectOption(newClient: CLIENT_TYPE) {
     props.value.value = newClient;
     dropDownIsOpen.value = false;
+    props.onSelect?.(newClient);
   }
   const filterString = useProp(``);
   const filteredClients = useFormula(() => {

@@ -1,4 +1,4 @@
-  import { listTanks } from "@/AppData";
+import { listTanks } from "@/AppData";
 import { mdiPlus } from "@mdi/js";
 import {
   Box,
@@ -24,6 +24,8 @@ type TankType = Tank | typeof JUST_FUEL | null;
 export default function TankSelector(
   props: Readonly<{
     value: Prop<TankType | null | undefined>;
+    isOpen?: Prop<boolean>;
+    onSelect?: (tank: TankType) => void;
     client: Client;
     showNewOption?: boolean;
     showJustFuelOption?: boolean;
@@ -31,15 +33,16 @@ export default function TankSelector(
     hideTanksList?: boolean;
   }>,
 ) {
-  const value: Prop<TankType | null> = useFormula(
+  const value: Prop<TankType> = useFormula(
     () => props.value.value ?? null,
     (newValue) => (props.value.value = newValue),
   );
-  const dropDownIsOpen = useProp(false);
+  const dropDownIsOpen = props.isOpen ?? useProp(false);
 
   function selectOption(newValue: TankType) {
     value.value = newValue;
     dropDownIsOpen.value = false;
+    props.onSelect?.(value.value);
   }
 
   const tanks = useFormula(() => {
