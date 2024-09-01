@@ -15,8 +15,6 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
-  roundToString,
-  Column,
 } from "miwi";
 import { DeliveryPage } from "./DeliveryPage";
 import { For, Show } from "solid-js";
@@ -25,7 +23,6 @@ import { Delivery, SubDelivery } from "./Delivery";
 import DeleteDialog from "@/components/DeleteDialog";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
-import { getTankShape } from "@/Calculator/ShapeUtils";
 import { formatNumWithCommas } from "@/utils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
