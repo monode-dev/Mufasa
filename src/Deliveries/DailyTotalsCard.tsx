@@ -34,22 +34,11 @@ export function DailyTotalsCard() {
   //   return leftPerFuel;
   // });
 
-  const completedSubDeliveriesSince3am = useFormula(() => {
-    const threeAm = new Date();
-    if (threeAm.getHours() < 3) threeAm.setDate(threeAm.getDate() - 1);
-    else threeAm.setHours(3);
-    return [
-      ...Delivery.upcomingDeliveries,
-      ...Delivery.completedDeliveries.filter(
-        (delivery) => (delivery.completedTimePosix ?? 0) > threeAm.getTime(),
-      ),
-    ].flatMap((delivery) =>
-      delivery.sortedSubDeliveries.filter(
-        (sub) =>
-          sub.isCompleted && (sub.completedTimePosix ?? 0) > threeAm.getTime(),
-      ),
-    );
-  });
+  const completedSubDeliveriesSince3am = useFormula(() =>
+    Delivery.usersDeliveriesSince3am.flatMap((delivery) =>
+      delivery.sortedSubDeliveries.filter((sub) => sub.isCompleted),
+    ),
+  );
 
   // const deliveredPerFuel = useFormula(() => {
   //   const deliveredPerFuel = new Map<string, number>();

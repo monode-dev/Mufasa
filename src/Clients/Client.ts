@@ -1,7 +1,7 @@
 import { mfs, premiumEnabled } from "@/model/DataModel";
 import { createLimitTrackers } from "@/model/LimitUtils";
 import { Tank } from "@/Tanks/Tank";
-import { FloatSort } from "miwi";
+import { exists, FloatSort } from "miwi";
 import { prop, list, formula } from "mufasa";
 
 export class Client extends mfs.Doc(`Client`) {
@@ -48,10 +48,13 @@ export class Client extends mfs.Doc(`Client`) {
   address = prop(String, ``);
   notes = prop(String, ``);
   rateOffset = prop([Number, null], null);
-  weekday = prop([String, null], WeekDays.none) as ReturnType<
-    typeof prop<[StringConstructor, null], WeekDays>
+  readonly tanks = list(Tank, `mx_parent`);
+
+  // SECTION: Scheduled Deliveries
+  weekday = prop([String, null], WeekDay.none) as ReturnType<
+    typeof prop<[StringConstructor, null], WeekDay>
   > &
-    WeekDays;
+    WeekDay;
   shouldScheduleDeliveriesForThisClient = formula(
     () => this._shouldScheduleDeliveriesForThisClient,
     (shouldSchedule) => {
@@ -65,7 +68,43 @@ export class Client extends mfs.Doc(`Client`) {
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
   scheduledDeliveryStartDate = prop([Number, null], null);
   assignedTo = prop([String, null], null);
-  readonly tanks = list(Tank, `mx_parent`);
+  static getScheduledClients() {
+    const todaysClients: Client[] = [];
+    const tomorrowsClients: Client[] = [];
+    const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+    Client.getAllDocs().forEach((client) => {
+      if (!client.shouldScheduleDeliveriesForThisClient) return;
+      const isAssignedToCurrentUser = client.assignedTo !== mfs.user.uid;
+      const userIsOwnerAndClientIsUnassigned =
+        mfs.user.workspace?.role === `owner` && !exists(client.assignedTo);
+      if (isAssignedToCurrentUser && userIsOwnerAndClientIsUnassigned) return;
+      if (!exists(client.weeksBetweenScheduledDeliveries)) return;
+      if (!exists(client.weekday)) return;
+      if (!exists(client.scheduledDeliveryStartDate)) return;
+      const normalizedStartDate = new Date(client.scheduledDeliveryStartDate);
+      normalizedStartDate.setDate(
+        normalizedStartDate.getDate() -
+          normalizedStartDate.getDay() +
+          getWeekDayAsJsDayOfWeek(client.weekday),
+      );
+      const daysFromEpochToStartDate = Math.floor(
+        normalizedStartDate.getTime() / 86400000,
+      );
+      const daysBetweenStartAndToday =
+        daysSinceEpoch - daysFromEpochToStartDate;
+      if (daysBetweenStartAndToday < 0) return;
+      const daysBetweenStartAndTomorrow = daysBetweenStartAndToday + 1;
+      const daysBetweenScheduledDeliveries =
+        client.weeksBetweenScheduledDeliveries * 7;
+      if (daysBetweenStartAndToday % daysBetweenScheduledDeliveries === 0) {
+        todaysClients.push(client);
+      }
+      if (daysBetweenStartAndTomorrow % daysBetweenScheduledDeliveries === 0) {
+        tomorrowsClients.push(client);
+      }
+    });
+    return { todaysClients, tomorrowsClients };
+  }
   onDelete() {
     this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
     this.tanks.forEach((tank) => tank.deleteDoc());
@@ -85,8 +124,8 @@ export class ClientPhoneNumber extends mfs.Doc(`ClientPhoneNumber`) {
   }
 }
 
-export type WeekDays = (typeof WeekDays)[keyof typeof WeekDays];
-export const WeekDays = {
+export type WeekDay = (typeof WeekDay)[keyof typeof WeekDay];
+export const WeekDay = {
   monday: `Monday`,
   tuesday: `Tuesday`,
   wednesday: `Wednesday`,
@@ -96,3 +135,7 @@ export const WeekDays = {
   sunday: `Sunday`,
   none: null,
 } as const;
+export function getWeekDayAsJsDayOfWeek(weekDay: Exclude<WeekDay, null>) {
+  // JS dates start on sunday
+  return (Object.keys(WeekDay).indexOf(weekDay) + 1) % 7;
+}

@@ -25,7 +25,7 @@ import {
   useProp,
 } from "miwi";
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
-import { WeekDays } from "./Client";
+import { getWeekDayAsJsDayOfWeek, WeekDay } from "./Client";
 import { For, Show } from "solid-js";
 import { mfs } from "@/model/DataModel";
 
@@ -38,7 +38,7 @@ export function ClientFields(props: {
   phoneNumber: Prop<string>;
   rateOffset: Prop<number | null>;
   shouldScheduleDeliveriesForThisClient: Prop<Boolean>;
-  weekday: Prop<WeekDays | null>;
+  weekday: Prop<WeekDay | null>;
   weeksBetweenScheduledDeliveries: Prop<number | null>;
   scheduledDeliveryStartDate: Prop<number | null>;
   assignedTo: Prop<string | null>;
@@ -77,15 +77,7 @@ export function ClientFields(props: {
   const possibleScheduleStartDates = useFormula(() => {
     if (!exists(props.weeksBetweenScheduledDeliveries.value)) return [];
     if (!exists(props.weekday.value)) return [];
-    const selectedDayOfWeek = {
-      [WeekDays.sunday]: 0,
-      [WeekDays.monday]: 1,
-      [WeekDays.tuesday]: 2,
-      [WeekDays.wednesday]: 3,
-      [WeekDays.thursday]: 4,
-      [WeekDays.friday]: 5,
-      [WeekDays.saturday]: 6,
-    }[props.weekday.value!];
+    const selectedDayOfWeek = getWeekDayAsJsDayOfWeek(props.weekday.value!);
     const currentDayOfWeek = new Date().getDay();
     const daysUntilStart = selectedDayOfWeek - currentDayOfWeek;
     const start = new Date();
@@ -105,8 +97,8 @@ export function ClientFields(props: {
   ): Date {
     const currentDayOfWeek = currentDate.getDay();
     const dayOfTheWeekNum =
-      Object.values(WeekDays).indexOf(
-        Object.values(WeekDays).find((day) => day === dayOfWeek)!,
+      Object.values(WeekDay).indexOf(
+        Object.values(WeekDay).find((day) => day === dayOfWeek)!,
       ) + 1;
 
     // Calculate the start date (first delivery date)
@@ -366,7 +358,7 @@ export function ClientFields(props: {
               stroke: theme.palette.hint,
             }}
           >
-            <For each={Array.from(Object.values(WeekDays)).filter(exists)}>
+            <For each={Array.from(Object.values(WeekDay)).filter(exists)}>
               {(day) => (
                 <HiddenOption onClick={() => (props.weekday.value = day)}>
                   {day}
