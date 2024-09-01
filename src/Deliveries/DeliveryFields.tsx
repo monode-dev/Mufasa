@@ -4,7 +4,6 @@ import {
   mdiAccount,
   mdiLabel,
   mdiMapMarker,
-  mdiPencil,
   mdiPhone,
   mdiPlusMinusVariant,
   mdiTextBox,
@@ -22,18 +21,17 @@ import {
   Prop,
   EnterKeyHint,
   useProp,
-  pushPage,
   NumField,
 } from "miwi";
-import { onCleanup, Show } from "solid-js";
+import { Show } from "solid-js";
 import { Delivery } from "./Delivery";
 import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
-import ClientPage from "@/Clients/ClientPage";
 
 export function DeliveryFields(props: {
   create?: boolean;
+  showScheduledClients?: boolean;
   delivery: Pick<
     Delivery,
     | "address"
@@ -141,6 +139,7 @@ export function DeliveryFields(props: {
         <ClientSelector
           showNewOption
           showOneTimeOption
+          showScheduledClients={props.showScheduledClients}
           value={useFormula(
             () => props.delivery.selectedClient,
             (v) => (props.delivery.selectedClient = v),

@@ -13,7 +13,7 @@ import {
 } from "miwi";
 import { ClientFields } from "./ClientFields";
 import { Show } from "solid-js";
-import { Client, WeekDays } from "./Client";
+import { Client, WeekDay } from "./Client";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import Fuse from "fuse.js";
 import { LoadCSVDialog } from "./LoadCSVDialog";
@@ -43,7 +43,7 @@ function CreateClientDialog(props: {
   const address = useProp(``);
   const notes = useProp(``);
   const weeksBetweenScheduledDeliveries = useProp<number | null>(null);
-  const weekday = useProp(WeekDays.none);
+  const weekday = useProp(WeekDay.none);
   const scheduledDeliveryStartDate = useProp<number | null>(null);
   const rateOffset = useProp<number | null>(null);
   const shouldScheduleDeliveriesForThisClient = useProp(false);

@@ -18,6 +18,7 @@ import { mdiPencil, mdiPlus } from "@mdi/js";
 import { Client } from "./Client";
 import { openCreateClientDialog } from "./CreateClientDialog";
 import ClientPage from "./ClientPage";
+import { Delivery } from "@/Deliveries/Delivery";
 
 // import { Selector } from "@/Mock/_Selector";
 
@@ -28,6 +29,7 @@ export default function ClientSelector(props: {
   onSelect?: (client: CLIENT_TYPE) => void;
   showNewOption?: boolean;
   showOneTimeOption?: boolean;
+  showScheduledClients?: boolean;
 }) {
   const dropDownIsOpen = useProp(false);
   function selectOption(newClient: CLIENT_TYPE) {
@@ -49,6 +51,33 @@ export default function ClientSelector(props: {
   });
 
   const clientsAreFiltered = useFormula(() => filterString.value !== ``);
+  const { todaysClients: _todaysClients, tomorrowsClients: _tomorrowsClients } =
+    Client.getScheduledClients();
+  const upcomingClients = useFormula(
+    () =>
+      new Set(
+        Delivery.currentUsersUpcomingDeliveries
+          .map((delivery) => delivery.selectedClientDoc)
+          .filter(exists),
+      ),
+  );
+  const todaysClients = useFormula(() => {
+    const clientsDeliveredToSince3Am = new Set(
+      Delivery.usersDeliveriesSince3am
+        .map((delivery) => delivery.selectedClientDoc)
+        .filter(exists),
+    );
+    return _todaysClients.filter(
+      (client) =>
+        !upcomingClients.value.has(client) &&
+        !clientsDeliveredToSince3Am.has(client),
+    );
+  });
+  const tomorrowsClients = useFormula(() => {
+    return _tomorrowsClients.filter(
+      (client) => !upcomingClients.value.has(client),
+    );
+  });
 
   return (
     <Selector
@@ -83,49 +112,89 @@ export default function ClientSelector(props: {
         </Show>
       }
     >
-      {!clientsAreFiltered.value && (
-        <>
-          <Show when={props.showNewOption}>
-            {/* New Client */}
-            <Row
-              onClick={() =>
-                openCreateClientDialog({
-                  onCreate: (newObject) => selectOption(newObject),
-                })
-              }
-              widthGrows
-              padBetween={0.125}
-              align={$Align.centerLeft}
-              stroke={$theme.colors.primary}
-            >
-              <Txt>New</Txt>
-              <Icon iconPath={mdiPlus} />
-            </Row>
-          </Show>
-          <Show when={props.showOneTimeOption}>
-            {/* One Time */}
-            <Txt
-              widthGrows
-              onClick={() => {
-                selectOption(ONE_TIME);
-              }}
-              padBetween={0.125}
-              stroke={theme.palette.primary}
-            >
-              One Time
-            </Txt>
-          </Show>
-          {/* Divider */}
-          <Show when={props.showNewOption || props.showOneTimeOption}>
-            <Box
-              widthGrows
-              height={0.125}
-              fill={theme.palette.hint}
-              padBetween={0.125}
-            />
-          </Show>
-        </>
-      )}
+      <Show when={!clientsAreFiltered.value}>
+        <Show when={props.showNewOption}>
+          {/* New Client */}
+          <Row
+            onClick={() =>
+              openCreateClientDialog({
+                onCreate: (newObject) => selectOption(newObject),
+              })
+            }
+            widthGrows
+            padBetween={0.125}
+            align={$Align.centerLeft}
+            stroke={$theme.colors.primary}
+          >
+            <Txt>New</Txt>
+            <Icon iconPath={mdiPlus} />
+          </Row>
+        </Show>
+        <Show when={props.showOneTimeOption}>
+          {/* One Time */}
+          <Txt
+            widthGrows
+            onClick={() => {
+              selectOption(ONE_TIME);
+            }}
+            padBetween={0.125}
+            stroke={theme.palette.primary}
+          >
+            One Time
+          </Txt>
+        </Show>
+        <Show
+          when={props.showScheduledClients && todaysClients.value.length > 0}
+        >
+          {/* Scheduled Clients */}
+          <Txt widthGrows alignCenter bold>
+            Scheduled Today
+          </Txt>
+          <For each={todaysClients.value}>
+            {(client) => (
+              <Txt
+                onClick={() => selectOption(client)}
+                widthGrows
+                heightShrinks
+                overflowX={$Overflow.wrap}
+                stroke={$theme.colors.text}
+              >
+                {getClientLabel(client)}
+              </Txt>
+            )}
+          </For>
+        </Show>
+        <Show
+          when={props.showScheduledClients && tomorrowsClients.value.length > 0}
+        >
+          {/* Scheduled Clients */}
+          <Txt widthGrows alignCenter bold>
+            Scheduled Tomorrow
+          </Txt>
+          <For each={tomorrowsClients.value}>
+            {(client) => (
+              <Txt
+                onClick={() => selectOption(client)}
+                widthGrows
+                heightShrinks
+                overflowX={$Overflow.wrap}
+                stroke={$theme.colors.text}
+              >
+                {getClientLabel(client)}
+              </Txt>
+            )}
+          </For>
+        </Show>
+        {/* Divider */}
+        <Show when={props.showNewOption || props.showOneTimeOption}>
+          <Box
+            widthGrows
+            height={0.125}
+            fill={theme.palette.hint}
+            padBetween={0.125}
+          />
+        </Show>
+      </Show>
       {/* Clients */}
       <Show when={filteredClients.value.length === 0}>
         <Txt
