@@ -13,10 +13,12 @@ import {
   Column,
   doNow,
   EnterKeyHint,
+  exists,
   Field,
   FieldCapitalization,
   FieldInputType,
   FormatFieldInput,
+  HiddenOption,
   Icon,
   KeyboardType,
   Label,
@@ -24,9 +26,10 @@ import {
   Prop,
   Row,
   Selector,
+  theme,
   Txt,
   useFormula,
-  useProp
+  useProp,
 } from "miwi";
 
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
@@ -46,7 +49,7 @@ export function ClientFields(props: {
   weekday: Prop<WeekDays | null>;
   weeksBetweenScheduledDeliveries: Prop<number | null>;
   scheduledDeliveryStartDate: Prop<number | null>;
-  assignedTo: Prop<string>;
+  assignedTo: Prop<string | null>;
   create?: boolean;
   notes: Prop<string>;
 }) {
@@ -67,8 +70,9 @@ export function ClientFields(props: {
 
   const autoFocusFirstField = useProp(props.autoFocusFirstField ?? false);
 
-  function enterKey(nextprop: Prop<string>, index:Prop<number>): EnterKeyHint {
-    const key = props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
+  function enterKey(nextprop: Prop<string>, index: Prop<number>): EnterKeyHint {
+    const key =
+      props.create && nextprop.value.trim().length == 0 ? `next` : `done`;
     enterHintRefs.value.set(index.value, key);
     return key;
   }
@@ -82,7 +86,7 @@ export function ClientFields(props: {
     weeks: number,
     dayOfWeek: string,
     currentDate: Date,
-  ): (Date) {
+  ): Date {
     const currentDayOfWeek = currentDate.getDay();
     const dayOfTheWeekNum =
       Object.values(WeekDays).indexOf(
@@ -105,10 +109,10 @@ export function ClientFields(props: {
   function formatStartDate(posixTime: number) {
     // Create a new Date object from the posix time
     let date = new Date(posixTime);
-  
+
     // Array of day names
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  
+
     // Array of month names
     const months = [
       "Jan",
@@ -124,11 +128,11 @@ export function ClientFields(props: {
       "Nov",
       "Dec",
     ];
-  
+
     // Get the day of the week, the month and the date
     let month = months[date.getMonth()];
     let day = date.getDate();
-  
+
     // Add the ordinal suffix
     let suffix = "";
     switch (day % 10) {
@@ -144,15 +148,15 @@ export function ClientFields(props: {
       default:
         suffix = "th";
     }
-  
+
     // Get the year
     let year = date.getFullYear();
-  
+
     // Return the formatted string
-    return `Week of ${month} ${day}${suffix}, ${year}`;
+    return `${month} ${day}${suffix}, ${year}`;
   }
 
-  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  const fieldRefs: Prop<Map<number, HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
   const nameIndex = useProp(1);
@@ -164,39 +168,45 @@ export function ClientFields(props: {
 
   return (
     <>
-        <Field
-          hasFocus={autoFocusFirstField}
-          hintText={`Name`}
-          iconPath={mdiAccount} //mdiDomain
-          value={props.name}
-          underlined
-          capitalize={`words`}
-          keyboard={"text"}
-          enterKeyHint={ useFormula(() => enterKey(props.clientId, nameIndex)).value }
-          onlyWriteOnBlur
-        />
-        <Field
-          hasFocus={focusOnID}
-          hintText={`Client ID`}
-          iconPath={mdiIdentifier}
-          value={props.clientId}
-          underlined
-          formatInput={formatIdNumber}
-          keyboard={"numeric"}
-          enterKeyHint={ useFormula(() => enterKey(props.phoneNumber, idIndex)).value }
-          onlyWriteOnBlur
-        />
-        <Field
-          hasFocus={focusOnPhone}
-          hintText={`Phone`}
-          iconPath={mdiPhone}
-          value={props.phoneNumber}
-          underlined
-          formatInput={formatPhoneNumber}
-          keyboard="tel"
-          enterKeyHint={ useFormula(() => enterKey(props.address, phoneIndex)).value }
-          onlyWriteOnBlur
-        />
+      <Field
+        hasFocus={autoFocusFirstField}
+        hintText={`Name`}
+        iconPath={mdiAccount} //mdiDomain
+        value={props.name}
+        underlined
+        capitalize={`words`}
+        keyboard={"text"}
+        enterKeyHint={
+          useFormula(() => enterKey(props.clientId, nameIndex)).value
+        }
+        onlyWriteOnBlur
+      />
+      <Field
+        hasFocus={focusOnID}
+        hintText={`Client ID`}
+        iconPath={mdiIdentifier}
+        value={props.clientId}
+        underlined
+        formatInput={formatIdNumber}
+        keyboard={"numeric"}
+        enterKeyHint={
+          useFormula(() => enterKey(props.phoneNumber, idIndex)).value
+        }
+        onlyWriteOnBlur
+      />
+      <Field
+        hasFocus={focusOnPhone}
+        hintText={`Phone`}
+        iconPath={mdiPhone}
+        value={props.phoneNumber}
+        underlined
+        formatInput={formatPhoneNumber}
+        keyboard="tel"
+        enterKeyHint={
+          useFormula(() => enterKey(props.address, phoneIndex)).value
+        }
+        onlyWriteOnBlur
+      />
       {/* <For each={props.client?.value.sortedAdditionalPhoneNumbers}>
         {(phoneNumber) => (
           <Box padLeft={1.2}>
@@ -223,7 +233,7 @@ export function ClientFields(props: {
                 keyboard="tel"
               />
               <Icon
-                stroke={$theme.colors.error}
+                stroke={theme.palette.error}
                 iconPath={mdiTrashCanOutline}
                 scale={1.3}
                 onClick={() => deletePhoneNumber(phoneNumber)}
@@ -235,46 +245,50 @@ export function ClientFields(props: {
       <Show when={props.client}>
         <Row onClick={addPhoneNumber} padBetween={0.25}>
           <Icon
-            stroke={$theme.colors.primary}
+            stroke={theme.palette.primary}
             iconPath={mdiPlus}
             scale={1.25}
           />
-          <Txt stroke={$theme.colors.primary}>Add Phone Number</Txt>
+          <Txt stroke={theme.palette.primary}>Add Phone Number</Txt>
         </Row>
       </Show> */}
-        <Field
-          hasFocus={focusOnAddress}
-          hintText={`Address`}
-          multiline
-          iconPath={mdiMapMarker}
-          value={props.address}
-          underlined
-          capitalize={`words`}
-          keyboard={"text"}
-          enterKeyHint={ `enter` }
-        />
-        <NumField
-          hint={`$0.00 / gal.`}
-          icon={mdiPlusMinusVariant}
-          value={props.rateOffset}
-          underlined
-          keyboard={"numeric"}
-          enterKeyHint={ useFormula(() => enterKey(props.notes, rateOffsetIndex)).value }
-          negativesAreAllowed
-          onlyWriteOnBlur
-        />
-        <Field
-          hasFocus={focusOnNotes}
-          hintText={`Notes, Gate Code, Key Tag`}
-          multiline
-          iconPath={mdiTextBox}
-          value={props.notes}
-          underlined
-          capitalize={`sentences`}
-          keyboard={"text"}
-          enterKeyHint={ `enter` }
-        />
-      <Row alignTopLeft padBetween={0.35}>
+      <Field
+        hasFocus={focusOnAddress}
+        hintText={`Address`}
+        multiline
+        iconPath={mdiMapMarker}
+        value={props.address}
+        underlined
+        capitalize={`words`}
+        keyboard={"text"}
+        enterKeyHint={`enter`}
+      />
+      <NumField
+        hint={`$0.00 / gal.`}
+        icon={mdiPlusMinusVariant}
+        value={props.rateOffset}
+        underlined
+        keyboard={"numeric"}
+        enterKeyHint={
+          useFormula(() => enterKey(props.notes, rateOffsetIndex)).value
+        }
+        negativesAreAllowed
+        onlyWriteOnBlur
+      />
+      <Field
+        hasFocus={focusOnNotes}
+        hintText={`Notes, Gate Code, Key Tag`}
+        multiline
+        iconPath={mdiTextBox}
+        value={props.notes}
+        underlined
+        capitalize={`sentences`}
+        keyboard={"text"}
+        enterKeyHint={`enter`}
+      />
+
+      {/* SECTION: Schedule Deliveries */}
+      <Row alignTopLeft padBetween={0.25}>
         <Box
           bonusTouchArea
           width={1}
@@ -285,108 +299,108 @@ export function ClientFields(props: {
             props.shouldScheduleDeliveriesForThisClient.value =
               !props.shouldScheduleDeliveriesForThisClient.value;
           }}
-          outlineColor={$theme.colors.text}
-          // outlineColor={props.shouldScheduleDeliveriesForThisClient.value ? $theme.colors.hint : $theme.colors.primary}
-          // fill={
-          //   props.shouldScheduleDeliveriesForThisClient.value ? $theme.colors.hint : undefined
-          // }
+          outlineColor={theme.palette.text}
         >
           <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
-            <Icon iconPath={mdiCheck} scale={0.8} stroke={$theme.colors.text} />
+            <Icon iconPath={mdiCheck} scale={0.8} stroke={theme.palette.text} />
           </Show>
         </Box>
         <Txt widthGrows alignTopLeft>
           Schedule deliveries
         </Txt>
       </Row>
-      <Row>
-        <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
-          <Label label="Every">
-            <Box width={3.7}>
-              <Selector
-                value={props.weeksBetweenScheduledDeliveries.value}
-                stroke={$theme.colors.hint}
-                getLabelForData={() =>
-                  `${props.weeksBetweenScheduledDeliveries.value ?? `#`} wk` ??
-                  null
-                }
-                isOpen={weekSelectorIsOpen}
-                noneLabel="# wk"
-                dropDownWidth={6}
-              >
-                {[...Array(4).keys()].map((i) => (
-                  <Txt
-                    stroke={
-                      props.weeksBetweenScheduledDeliveries.value === i + 1
-                        ? $theme.colors.primary
-                        : "inherit"
-                    }
-                    onClick={() => {
-                      props.weeksBetweenScheduledDeliveries.value = i + 1;
-                    }}
-                  >
-                    {i + 1} wk
-                  </Txt>
-                ))}
-              </Selector>
-            </Box>
-            <Txt>on </Txt>
-            <Box width={7}>
-              <Selector
-                value={props.weekday.value}
-                getLabelForData={() => props.weekday.value}
-                noneLabel="day"
-                isOpen={daySelectorIsOpen}
-                dropDownWidth={8}
-              >
-                <For each={Array.from(Object.values(WeekDays))}>
-                  {(day) => (
-                    <Txt
-                      stroke={
-                        props.weekday.value === day
-                          ? $theme.colors.primary
-                          : "inherit"
-                      }
-                      onClick={() => {
-                        props.weekday.value = day;
-                      }}
-                    >
-                      {day}
-                    </Txt>
-                  )}
-                </For>
-              </Selector>
-            </Box>
-          </Label>
-        </Show>
-      </Row>
       <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
-        <Row padBetween={0.25}>
-          <Txt>Next delivery date: </Txt>
+        <Label label="Every">
+          <Selector
+            value={props.weeksBetweenScheduledDeliveries.value}
+            stroke={theme.palette.hint}
+            getLabelForData={() =>
+              !exists(props.weeksBetweenScheduledDeliveries.value)
+                ? null
+                : props.weeksBetweenScheduledDeliveries.value === 1
+                  ? `week`
+                  : `${props.weeksBetweenScheduledDeliveries.value} weeks`
+            }
+            isOpen={weekSelectorIsOpen}
+            noneLabel="Pick frequency"
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
+          >
+            <For each={Array.from(Array(4).keys()).map((i) => i + 1)}>
+              {(numWeeks) => (
+                <HiddenOption
+                  onClick={() => {
+                    props.weeksBetweenScheduledDeliveries.value = numWeeks;
+                  }}
+                >
+                  {numWeeks === 1 ? `week` : `${numWeeks} weeks`}
+                </HiddenOption>
+              )}
+            </For>
+          </Selector>
+        </Label>
+        <Label label={`On`}>
+          <Selector
+            value={props.weekday.value}
+            getLabelForData={() => props.weekday.value}
+            noneLabel="Pick day of week"
+            isOpen={daySelectorIsOpen}
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
+          >
+            <For each={Array.from(Object.values(WeekDays)).filter(exists)}>
+              {(day) => (
+                <HiddenOption onClick={() => (props.weekday.value = day)}>
+                  {day}
+                </HiddenOption>
+              )}
+            </For>
+          </Selector>
+        </Label>
+        <Label label="Starting on">
           <Selector
             value={props.scheduledDeliveryStartDate.value}
-            stroke={$theme.colors.hint}
-            getLabelForData={() =>{
+            stroke={theme.palette.hint}
+            getLabelForData={(startDate) => {
+              if (!exists(startDate)) return null;
 
-              if(props.shouldScheduleDeliveriesForThisClient.value && !props.scheduledDeliveryStartDate.value && props.weekday.value && props.weeksBetweenScheduledDeliveries.value){
-                props.scheduledDeliveryStartDate.value = getDeliveryDate(0, props.weekday.value, new Date()).valueOf();
+              if (
+                props.shouldScheduleDeliveriesForThisClient.value &&
+                !props.scheduledDeliveryStartDate.value &&
+                props.weekday.value &&
+                props.weeksBetweenScheduledDeliveries.value
+              ) {
+                props.scheduledDeliveryStartDate.value = getDeliveryDate(
+                  0,
+                  props.weekday.value,
+                  new Date(),
+                ).valueOf();
               }
 
-              return `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ?? null
+              return (
+                `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ??
+                null
+              );
             }}
+            noneLabel="Pick start date"
             isOpen={dateSelectorIsOpen}
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
           >
             {[...Array(4).keys()].map((i) => {
               return (
-                <Txt
-                  widthGrows
+                <HiddenOption
                   onClick={() => {
                     const deliveryStartDate = getDeliveryDate(
                       i,
                       props.weekday.value!,
                       new Date(),
                     );
-                    props.scheduledDeliveryStartDate.value = deliveryStartDate.valueOf();
+                    props.scheduledDeliveryStartDate.value =
+                      deliveryStartDate.valueOf();
                   }}
                 >
                   {doNow(() => {
@@ -394,59 +408,48 @@ export function ClientFields(props: {
                       i,
                       props.weekday.value!,
                       new Date(),
-                    )
+                    );
                     return `${formatStartDate(deliveryStartDate.valueOf())}`;
                   })}
-                </Txt>
+                </HiddenOption>
               );
             })}
           </Selector>
-        </Row>
-        <Row padBetween={0.25}>
-          <Txt>Assigned to: </Txt>
+        </Label>
+        <Label label="Driver">
           <Selector
             value={props.assignedTo.value}
-            stroke={$theme.colors.hint}
-            getLabelForData={() =>{
-              const assignedMember = mfs.user.workspace?.otherMembers?.find(
-                (member) => member.uid === props.assignedTo.value
-              );
-              if (assignedMember) {
-                return assignedMember.email;
-              } else if (mfs.user.uid === props.assignedTo.value) {
-                return mfs.user.email;
-              } else {
-                return null;
-              }
-            }}
+            getLabelForData={(assignedUid) =>
+              assignedUid === mfs.user.uid
+                ? mfs.user.email
+                : (mfs.user.workspace?.otherMembers?.find(
+                    (member) => member.uid === assignedUid,
+                  )?.email ?? null)
+            }
+            noneLabel="Assign to driver"
             isOpen={teamMemberSelectorIsOpen}
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
           >
-            <Txt
-              widthGrows
-              onClick={() => {
-                if(mfs.user.workspace?.isOwner){
-                  props.assignedTo.value = mfs.user.uid;
-                }
-              }}
+            <HiddenOption
+              singleLine={false}
+              onClick={() => (props.assignedTo.value = mfs.user.uid!)}
             >
               {mfs.user.email}
-            </Txt>
+            </HiddenOption>
             <For each={mfs.user.workspace?.otherMembers}>
               {(member) => (
-                <Txt
-                  widthGrows
-                  onClick={() => {
-                    if(mfs.user.workspace?.isOwner){
-                      props.assignedTo.value = member.uid;
-                    }
-                  }}
+                <HiddenOption
+                  singleLine={false}
+                  onClick={() => (props.assignedTo.value = member.uid)}
                 >
                   {member.email}
-                </Txt>
+                </HiddenOption>
               )}
             </For>
           </Selector>
-        </Row>
+        </Label>
       </Show>
     </>
   );

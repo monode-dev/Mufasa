@@ -1,5 +1,5 @@
 import TankSelector from "@/Tanks/TankSelector";
-import { Label, Prop, Txt, exists } from "miwi";
+import { Label, Prop, Txt, exists, useProp } from "miwi";
 import { Show, createEffect } from "solid-js";
 import ClientSelector from "./ClientSelector";
 import { Tank } from "@/Tanks/Tank";
@@ -9,10 +9,12 @@ export function ClientAndTankSelector(
   props: Readonly<{
     client: Prop<Client | null | undefined>;
     tank: Prop<Tank | null | undefined>;
+    onTankSelected?: () => void;
     showNewOption?: boolean;
     showJustFuelOption?: boolean;
   }>,
 ) {
+  const tankSelectorIsOpen = useProp(false);
   createEffect(() => {
     const tankIsChildOfClient = [...(props.client.value?.tanks ?? [])].some(
       (tank) => {
@@ -32,9 +34,15 @@ export function ClientAndTankSelector(
   }
   return (
     <>
-      <Label label="Client" stroke={isClientDeleted() ? $theme.colors.warning : undefined}>
+      <Label
+        label="Client"
+        stroke={isClientDeleted() ? $theme.colors.warning : undefined}
+      >
         <ClientSelector
           value={props.client}
+          onSelect={() => {
+            tankSelectorIsOpen.value = true;
+          }}
           showOneTimeOption={false}
           showNewOption={true}
         />
@@ -45,6 +53,8 @@ export function ClientAndTankSelector(
         <Label label="Tank">
           <TankSelector
             value={props.tank}
+            isOpen={tankSelectorIsOpen}
+            onSelect={props.onTankSelected}
             client={props.client.value!}
             showNewOption={props.showNewOption ?? false}
             showJustFuelOption={props.showJustFuelOption ?? false}

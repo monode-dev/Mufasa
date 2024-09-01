@@ -1,7 +1,7 @@
 import { mfs, premiumEnabled } from "@/model/DataModel";
 import { createLimitTrackers } from "@/model/LimitUtils";
 import { Tank } from "@/Tanks/Tank";
-import { FloatSort, useProp } from "miwi";
+import { FloatSort } from "miwi";
 import { prop, list, formula } from "mufasa";
 
 export class Client extends mfs.Doc(`Client`) {
@@ -46,13 +46,25 @@ export class Client extends mfs.Doc(`Client`) {
   );
 
   address = prop(String, ``);
-  notes = prop(String, ``);n
+  notes = prop(String, ``);
   rateOffset = prop([Number, null], null);
-  weekday = prop([String, null], WeekDays.none) as ReturnType<typeof prop<[StringConstructor, null], WeekDays>> & WeekDays;
+  weekday = prop([String, null], WeekDays.none) as ReturnType<
+    typeof prop<[StringConstructor, null], WeekDays>
+  > &
+    WeekDays;
+  shouldScheduleDeliveriesForThisClient = formula(
+    () => this._shouldScheduleDeliveriesForThisClient,
+    (shouldSchedule) => {
+      this._shouldScheduleDeliveriesForThisClient = shouldSchedule;
+      this.assignedTo = shouldSchedule ? (mfs.user.uid ?? null) : null;
+    },
+  );
+  _shouldScheduleDeliveriesForThisClient = prop(Boolean, false, {
+    key: `shouldScheduleDeliveriesForThisClient`,
+  });
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
   scheduledDeliveryStartDate = prop([Number, null], null);
-  shouldScheduleDeliveriesForThisClient = prop(Boolean);
-  assignedTo = prop(String, ``);
+  assignedTo = prop([String, null], null);
   readonly tanks = list(Tank, `mx_parent`);
   onDelete() {
     this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
@@ -73,7 +85,7 @@ export class ClientPhoneNumber extends mfs.Doc(`ClientPhoneNumber`) {
   }
 }
 
-export type WeekDays = (typeof WeekDays)[keyof typeof WeekDays]
+export type WeekDays = (typeof WeekDays)[keyof typeof WeekDays];
 export const WeekDays = {
   monday: `Monday`,
   tuesday: `Tuesday`,
