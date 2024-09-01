@@ -18,9 +18,9 @@ import { withLimitConfirmation } from "@/model/LimitUi";
 import { Client } from "@/Clients/Client";
 import { mfs } from "@/model/DataModel";
 
-export const openCreateClientDialog = (props: {
+export const openCreateDeliveryDialog = (props: {
   onCreate: (delivery: Delivery) => void;
-  setClient?: Client;
+  initClient?: Client;
 }) =>
   withLimitConfirmation({
     count: Delivery.limit.count,
@@ -32,14 +32,14 @@ export const openCreateClientDialog = (props: {
 
 function CreateDeliveryDialog(props: {
   onCreate: (delivery: Delivery) => void;
-  setClient?: Client;
+  initClient?: Client;
 }) {
   const phoneNumber = useProp(``);
   const explicitAddress = useProp(``);
   const explicitRateOffset = useProp(0 || null);
   const title = useProp(``);
   const selectedClient = useProp<SelectedClient>(
-    exists(props.setClient) ? props.setClient : NONE_SELECTED,
+    exists(props.initClient) ? props.initClient : NONE_SELECTED,
   );
   const notes = useProp(``);
   const deliveryProps = {
@@ -109,14 +109,14 @@ function CreateDeliveryDialog(props: {
       notes: notes.value,
       sortPosition: Date.now(),
       creationTimePosix: Date.now(),
-      createdBy: mfs.user.uid,
+      createdBy: mfs.user.uid ?? null,
     });
     props.onCreate(newDelivery);
   }
 
   return (
-    <Page onClick={popPage} fill="#00000099">
-      <Card preventClickPropagation width={`75%`} shadowSize={2}>
+    <Page onClick={popPage} fill="#00000099" padAround={1}>
+      <Card preventClickPropagation shadowSize={2}>
         <Txt h1>Create Delivery</Txt>
         <DeliveryFields delivery={deliveryProps} create />
         <Show when={warningMessage.value}>

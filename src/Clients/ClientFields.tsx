@@ -9,18 +9,11 @@ import {
 } from "@mdi/js";
 import {
   Box,
-  BoxProps,
-  Column,
-  doNow,
   EnterKeyHint,
   exists,
   Field,
-  FieldCapitalization,
-  FieldInputType,
-  FormatFieldInput,
   HiddenOption,
   Icon,
-  KeyboardType,
   Label,
   NumField,
   Prop,
@@ -31,10 +24,9 @@ import {
   useFormula,
   useProp,
 } from "miwi";
-
 import { formatPhoneNumber, formatIdNumber } from "@/utils";
-import { Client, ClientPhoneNumber, WeekDays } from "./Client";
-import { Component, For, onCleanup, Show, Switch } from "solid-js";
+import { WeekDays } from "./Client";
+import { For, Show } from "solid-js";
 import { mfs } from "@/model/DataModel";
 
 export function ClientFields(props: {
@@ -82,6 +74,30 @@ export function ClientFields(props: {
   const focusOnAddress = useProp(false);
   const focusOnNotes = useProp(false);
 
+  const possibleScheduleStartDates = useFormula(() => {
+    if (!exists(props.weeksBetweenScheduledDeliveries.value)) return [];
+    if (!exists(props.weekday.value)) return [];
+    const selectedDayOfWeek = {
+      [WeekDays.sunday]: 0,
+      [WeekDays.monday]: 1,
+      [WeekDays.tuesday]: 2,
+      [WeekDays.wednesday]: 3,
+      [WeekDays.thursday]: 4,
+      [WeekDays.friday]: 5,
+      [WeekDays.saturday]: 6,
+    }[props.weekday.value!];
+    const currentDayOfWeek = new Date().getDay();
+    const daysUntilStart = selectedDayOfWeek - currentDayOfWeek;
+    const start = new Date();
+    start.setDate(start.getDate() + daysUntilStart);
+    const startDates = [];
+    for (let i = 0; i < props.weeksBetweenScheduledDeliveries.value; i++) {
+      const date = new Date(start);
+      date.setDate(date.getDate() + i * 7);
+      startDates.push(date);
+    }
+    return startDates.map((date) => date.valueOf());
+  });
   function getDeliveryDate(
     weeks: number,
     dayOfWeek: string,
@@ -327,7 +343,7 @@ export function ClientFields(props: {
               stroke: theme.palette.hint,
             }}
           >
-            <For each={Array.from(Array(4).keys()).map((i) => i + 1)}>
+            <For each={Array.from(Array(8).keys()).map((i) => i + 1)}>
               {(numWeeks) => (
                 <HiddenOption
                   onClick={() => {
@@ -359,63 +375,39 @@ export function ClientFields(props: {
             </For>
           </Selector>
         </Label>
-        <Label label="Starting on">
-          <Selector
-            value={props.scheduledDeliveryStartDate.value}
-            stroke={theme.palette.hint}
-            getLabelForData={(startDate) => {
-              if (!exists(startDate)) return null;
-
-              if (
-                props.shouldScheduleDeliveriesForThisClient.value &&
-                !props.scheduledDeliveryStartDate.value &&
-                props.weekday.value &&
-                props.weeksBetweenScheduledDeliveries.value
-              ) {
-                props.scheduledDeliveryStartDate.value = getDeliveryDate(
-                  0,
-                  props.weekday.value,
-                  new Date(),
-                ).valueOf();
+        <Show
+          when={
+            exists(props.weeksBetweenScheduledDeliveries.value) &&
+            props.weeksBetweenScheduledDeliveries.value > 1 &&
+            exists(props.weekday.value)
+          }
+        >
+          <Label label="Starting on">
+            <Selector
+              value={props.scheduledDeliveryStartDate.value}
+              stroke={theme.palette.hint}
+              getLabelForData={(startDate) =>
+                exists(startDate) ? formatStartDate(startDate) : null
               }
-
-              return (
-                `${formatStartDate(props.scheduledDeliveryStartDate.value!)}` ??
-                null
-              );
-            }}
-            noneLabel="Pick start date"
-            isOpen={dateSelectorIsOpen}
-            cancelOptions={{
-              stroke: theme.palette.hint,
-            }}
-          >
-            {[...Array(4).keys()].map((i) => {
-              return (
-                <HiddenOption
-                  onClick={() => {
-                    const deliveryStartDate = getDeliveryDate(
-                      i,
-                      props.weekday.value!,
-                      new Date(),
-                    );
-                    props.scheduledDeliveryStartDate.value =
-                      deliveryStartDate.valueOf();
-                  }}
-                >
-                  {doNow(() => {
-                    const deliveryStartDate = getDeliveryDate(
-                      i,
-                      props.weekday.value!,
-                      new Date(),
-                    );
-                    return `${formatStartDate(deliveryStartDate.valueOf())}`;
-                  })}
-                </HiddenOption>
-              );
-            })}
-          </Selector>
-        </Label>
+              noneLabel="Pick start date"
+              noOptionsText={"Select frequency and day of week first."}
+              isOpen={dateSelectorIsOpen}
+              cancelOptions={{ stroke: theme.palette.hint }}
+            >
+              <For each={possibleScheduleStartDates.value}>
+                {(date) => (
+                  <HiddenOption
+                    onClick={() =>
+                      (props.scheduledDeliveryStartDate.value = date)
+                    }
+                  >
+                    {formatStartDate(date)}
+                  </HiddenOption>
+                )}
+              </For>
+            </Selector>
+          </Label>
+        </Show>
         <Label label="Driver">
           <Selector
             value={props.assignedTo.value}
@@ -432,6 +424,7 @@ export function ClientFields(props: {
               stroke: theme.palette.hint,
             }}
           >
+            {/* TODO: These should wrap, but that is not working in Selectors right now. */}
             <HiddenOption
               singleLine={false}
               onClick={() => (props.assignedTo.value = mfs.user.uid!)}

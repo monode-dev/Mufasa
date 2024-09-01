@@ -21,14 +21,13 @@ import {
 
 export const openCreateFuelTypeDialog = (props: {
   onCreate?: (newObject: FuelType) => void;
-}) => 
+}) =>
   withLimitConfirmation({
     count: FuelType.limit.count,
     limit: FuelType.limit.max,
     labelSingular: `Fuel Type`,
     labelPlural: `Fuel Types`,
-    action: () =>
-      pushPage(CreateFuelTypeDialog, props),
+    action: () => pushPage(CreateFuelTypeDialog, props),
   });
 
 function CreateFuelTypeDialog(props: {
@@ -74,13 +73,20 @@ function CreateFuelTypeDialog(props: {
       heightGrows
       fill="#00000099"
       bonusTouchArea={false}
+      padAround={1}
     >
-      <Card width="75%" shadowSize={0} preventClickPropagation>
+      <Card shadowSize={0} preventClickPropagation>
         <Txt h1>Create Fuel Type</Txt>
         {/* TODO Doest it need autofocus like other cards (for consistency)? */}
         <Label label="Name" widthGrows>
-          <Field value={name} hintText="Unnamed" underlined
-          capitalize={"words"} keyboard={"text"} hasFocus={useProp(true)}/>
+          <Field
+            value={name}
+            hintText="Unnamed"
+            underlined
+            capitalize={"words"}
+            keyboard={"text"}
+            hasFocus={useProp(true)}
+          />
         </Label>
         <Label label="Rate" widthGrows>
           <NumField
