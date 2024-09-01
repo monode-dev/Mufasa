@@ -250,10 +250,8 @@ export default function Calculator() {
                 noneLabel={"Select Delivery"}
                 getLabelForData={(delivery) => delivery?.title ?? null}
                 noOptionsText={"No Upcoming Deliveries"}
-                cancelOptions={{
-                  stroke: theme.palette.hint,
-                }}
-                stroke={$theme.colors.text}
+                cancelOptions={{ stroke: theme.palette.hint }}
+                stroke={theme.palette.text}
                 actionButtons={
                   <Show when={exists(selectedDelivery.value)}>
                     <Icon
@@ -274,7 +272,7 @@ export default function Calculator() {
                   each={Delivery.upcomingDeliveries.filter(
                     (delivery) => delivery.isValid,
                   )}
-                  fallback={<Txt hint>No Upcoming Deliveries</Txt>}
+                  // fallback={<Txt hint>No Upcoming Deliveries</Txt>}
                 >
                   {(delivery) => (
                     <Txt

@@ -1,8 +1,7 @@
-import { mdiCheck, mdiCircleSmall, mdiPlus } from "@mdi/js";
+import { mdiPlus } from "@mdi/js";
 import {
   Body,
   Box,
-  Card,
   Column,
   FloatSort,
   Icon,
@@ -10,91 +9,87 @@ import {
   SortableColumn,
   Txt,
   pushPage,
+  theme,
+  useFormula,
 } from "miwi";
 import { For, Show } from "solid-js";
 import { DeliveryPage } from "./DeliveryPage";
 import { DeliveryCard } from "./DeliveryCard";
 import { Delivery } from "./Delivery";
-import { openCreateClientDialog } from "./CreateDeliveryDialog";
+import { openCreateDeliveryDialog } from "./CreateDeliveryDialog";
 import { DailyTotalsCard } from "./DailyTotalsCard";
 import { Client } from "@/Clients/Client";
 import { mfs } from "@/model/DataModel";
+import { withLimitConfirmation } from "@/model/LimitUi";
 
 export default function DeliveriesTab() {
+  const scheduledClients = useFormula(() => {
+    return Client.getAllDocs().filter(
+      (client) =>
+        client.shouldScheduleDeliveriesForThisClient &&
+        client.assignedTo === mfs.user.uid &&
+        client.scheduledDeliveryStartDate &&
+        // TODO: Flesh this out
+        Date.now() >= client.scheduledDeliveryStartDate,
+    );
+  });
   return (
     <Body padBetween={0.5}>
       {/* SECTION: Daily Totals */}
       <Txt h2>Today's Totals</Txt>
       <DailyTotalsCard />
 
-      {/* SECTION: Scheduled Clients */}
-      <Show
-        when={
-          [...(Client.getAllDocs() ?? [])].filter(
-            (client) =>
-              client.shouldScheduleDeliveriesForThisClient &&
-              client.assignedTo === mfs.user.uid &&
-              client.scheduledDeliveryStartDate &&
-              Date.now() >= client.scheduledDeliveryStartDate,
-          ).length >= 1
-        }
-      >
-        <Txt h2 singleLine>
-          Scheduled Clients:
-        </Txt>
-        <Column padBetween={1} overflowXCrops>
-          <For each={[...(Client.getAllDocs() ?? [])]}>
-            {(client) => (
-              <Show
-                when={
-                  client.shouldScheduleDeliveriesForThisClient &&
-                  client.assignedTo === mfs.user.uid &&
-                  client.scheduledDeliveryStartDate &&
-                  Date.now() >= client.scheduledDeliveryStartDate
-                }
-              >
-                <Row padBetween={0.3} padRight={0.6}>
-                  <Icon iconPath={mdiCircleSmall} scale={2} />
-                  <Txt bold widthGrows>
-                    {client.name} is due for a delivery.
-                  </Txt>
-                  <Icon
-                    iconPath={mdiCheck}
-                    scale={1.4}
-                    stroke={$theme.colors.primary}
-                    onClick={() => {
-                      client.scheduledDeliveryStartDate =
-                        client.scheduledDeliveryStartDate! +
-                        client.weeksBetweenScheduledDeliveries! * 604800000;
-                    }}
-                  />
-                </Row>
-              </Show>
-            )}
-          </For>
-        </Column>
-      </Show>
-
       {/* SECTION: Upcoming Deliveries */}
       <Box height={1} />
-      <Row widthGrows align={$Align.spaceBetween}>
-        <Box width={1.75} />
+      <Row widthGrows spaceBetween>
+        <Box width={1.25} />
         <Txt h2>Upcoming Deliveries</Txt>
-        <Box width={1.75} align={$Align.centerLeft}>
-          <Icon
-            iconPath={mdiPlus}
-            scale={1.25}
-            onClick={() =>
-              openCreateClientDialog({
-                onCreate: (delivery) => {
-                  pushPage(DeliveryPage, { delivery });
-                },
-              })
-            }
-          />
-        </Box>
+        <Icon
+          iconPath={mdiPlus}
+          scale={1.25}
+          onClick={() =>
+            openCreateDeliveryDialog({
+              onCreate: (delivery) => {
+                pushPage(DeliveryPage, { delivery });
+              },
+            })
+          }
+        />
       </Row>
       <Column padBetween={1}>
+        <For each={scheduledClients.value}>
+          {(client) => (
+            <Row alignCenterLeft stroke={theme.palette.hint}>
+              {/* TODO: Handle tomorrow */}
+              <Txt bold widthGrows>
+                {client.name} is due for a delivery.
+              </Txt>
+              <Icon
+                iconPath={mdiPlus}
+                scale={1.25}
+                stroke={theme.palette.primary}
+                onClick={() =>
+                  withLimitConfirmation({
+                    count: Delivery.limit.count,
+                    limit: Delivery.limit.max,
+                    labelSingular: `Delivery`,
+                    labelPlural: `Deliveries`,
+                    action: () => {
+                      const delivery = Delivery.create({
+                        _isOneTimeClient: false,
+                        _client: client,
+                        sortPosition: Date.now(),
+                        creationTimePosix: Date.now(),
+                        createdBy: mfs.user.uid ?? null,
+                      });
+                      pushPage(DeliveryPage, { delivery });
+                    },
+                  })
+                }
+              />
+            </Row>
+          )}
+        </For>
         <SortableColumn
           onSort={(props) =>
             FloatSort.moveItem({
@@ -108,13 +103,16 @@ export default function DeliveriesTab() {
         >
           <For
             each={Delivery.currentUsersUpcomingDeliveries}
-            fallback={<Txt hint>Tap + to plan a new delivery.</Txt>}
+            fallback={
+              <Show when={scheduledClients.value.length === 0}>
+                <Txt hint>Tap + to plan a new delivery.</Txt>
+              </Show>
+            }
           >
             {(delivery) => <DeliveryCard delivery={delivery} />}
           </For>
         </SortableColumn>
       </Column>
-
       {/* SECTION: Completed Deliveries */}
       <Box height={1} />
       <Txt h2>Completed Deliveries</Txt>

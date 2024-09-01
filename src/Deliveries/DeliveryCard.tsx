@@ -144,24 +144,24 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       {/* <Box widthGrows height={0.125} fill={$theme.colors.text} /> */}
 
       <Show when={props.delivery.sortedSubDeliveries}>
-        <Column>
-          <For each={Array.from(totalPerFuelType.value.entries())}>
-            {([FuelName, totalSalesWorth]) => (
-              <Row>
-                <Txt singleLine width={5} alignLeft>
-                  {FuelName}
-                </Txt>
-                <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
-              </Row>
-            )}
-          </For>
+        <For each={Array.from(totalPerFuelType.value.entries())}>
+          {([FuelName, totalSalesWorth]) => (
+            <Row>
+              <Txt singleLine width={5} alignLeft>
+                {FuelName}
+              </Txt>
+              <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
+            </Row>
+          )}
+        </For>
+        <Show when={props.delivery.sortedSubDeliveries.length > 0}>
           <Row>
             <Txt bold alignLeft width={5}>
               Total:
             </Txt>
             <Txt widthGrows>${props.delivery.totalMoney}</Txt>
           </Row>
-        </Column>
+        </Show>
       </Show>
 
       {/* Notes */}
