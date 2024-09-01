@@ -14,7 +14,7 @@ import { isClientValid, getClientLabel } from "@/AppData";
 import ClientPage from "./ClientPage";
 import { Client } from "./Client";
 import { mdiTankerTruck } from "@mdi/js";
-import { openCreateClientDialog } from "@/Deliveries/CreateDeliveryDialog";
+import { openCreateDeliveryDialog } from "@/Deliveries/CreateDeliveryDialog";
 import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 export default function ClientEntery(props: { client: Client }) {
@@ -61,11 +61,11 @@ export default function ClientEntery(props: { client: Client }) {
           text={`Delivery`}
           icon={mdiTankerTruck}
           onClick={() =>
-            openCreateClientDialog({
+            openCreateDeliveryDialog({
               onCreate: (delivery) => {
                 pushPage(DeliveryPage, { delivery });
               },
-              setClient: props.client,
+              initClient: props.client,
             })
           }
         />

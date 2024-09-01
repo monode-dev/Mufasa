@@ -98,7 +98,8 @@ function CreateClientDialog(props: {
       address: address.value,
       notes: notes.value,
       rateOffset: rateOffset.value,
-      shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
+      shouldScheduleDeliveriesForThisClient:
+        shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
       scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
@@ -142,13 +143,14 @@ function CreateClientDialog(props: {
       address: address.value,
       notes: notes.value,
       rateOffset: rateOffset.value,
-      shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
+      shouldScheduleDeliveriesForThisClient:
+        shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
       scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
       assignedTo: assignedTo.value,
     });
-    props.onCreate?.(newClient);  
+    props.onCreate?.(newClient);
     // tempClient.sortedAdditionalPhoneNumbers.forEach((num) => {
     //   newClient.addPhoneNumber();
     //   newClient.sortedAdditionalPhoneNumbers[newClient.sortedAdditionalPhoneNumbers.length - 1].name = num.name;
@@ -159,8 +161,8 @@ function CreateClientDialog(props: {
   }
 
   return (
-    <Page onClick={closePopUp} fill="#00000099">
-      <Card preventClickPropagation width={`75%`} shadowSize={0}>
+    <Page onClick={closePopUp} fill="#00000099" padAround={1}>
+      <Card preventClickPropagation shadowSize={0}>
         <Txt h1>Create Client</Txt>
         <ClientFields
           //client={useProp(tempClient)}
@@ -172,7 +174,9 @@ function CreateClientDialog(props: {
           notes={notes}
           create
           rateOffset={rateOffset}
-          shouldScheduleDeliveriesForThisClient={shouldScheduleDeliveriesForThisClient}
+          shouldScheduleDeliveriesForThisClient={
+            shouldScheduleDeliveriesForThisClient
+          }
           weeksBetweenScheduledDeliveries={weeksBetweenScheduledDeliveries}
           weekday={weekday}
           scheduledDeliveryStartDate={scheduledDeliveryStartDate}

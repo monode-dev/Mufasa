@@ -72,14 +72,13 @@ export default function CompleteSubDeliveryDialog(props: {
 
   // TODO: Add transitions
   return (
-    <Page onClick={popOnClickOutside} fill="#00000099">
+    <Page onClick={popOnClickOutside} fill="#00000099" padAround={1}>
       <Card
         ref={(el: HTMLDivElement) => {
           if (el) {
             cardRef.value = el;
           }
         }}
-        width={"75%"}
         shadowSize={0}
       >
         {/* --Fields-- */}
