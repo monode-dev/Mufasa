@@ -8,7 +8,6 @@ import {
   Column,
   Box,
   Label,
-  mdColors,
   NumField,
   doWatch,
   roundToString,
@@ -18,10 +17,11 @@ import {
   useProp,
   Selector,
   Slider,
-  TabButtons,
   theme,
   Icon,
   Prop,
+  HiddenOption,
+  Button,
 } from "miwi";
 import { For, Show } from "solid-js";
 import {
@@ -44,7 +44,7 @@ export default function Calculator() {
   // Constants
   const emptyText = `--`;
   // Tab Control
-  const selectedTab = useProp(0);
+  const selectedCalcType = useProp(0);
   const tabs = { delivery: 0, tank: 1, dimensions: 2 };
   // Delivery Tab
   const selectedDelivery = useProp<Delivery | null>(null);
@@ -86,9 +86,9 @@ export default function Calculator() {
   const explicitTankGeometry = createReactiveTankGeometry();
   // Calculations
   const tankGeometry = useFormula(() =>
-    selectedTab.value === tabs.delivery
+    selectedCalcType.value === tabs.delivery
       ? (selectedSubDelivery.value?.tankGeometry ?? explicitTankGeometry)
-      : selectedTab.value === tabs.tank
+      : selectedCalcType.value === tabs.tank
         ? selectedTank.value
         : explicitTankGeometry,
   );
@@ -102,12 +102,19 @@ export default function Calculator() {
   const TankFields_warning = useProp("");
   const showWarning = useFormula(
     () =>
-      exists(TankFields_warning.value) && selectedTab.value == tabs.dimensions,
+      exists(TankFields_warning.value) &&
+      selectedCalcType.value == tabs.dimensions,
   );
 
   const calcStickedInches: Prop<number | null | undefined> = useProp<
     number | null | undefined
   >(undefined);
+  const stickedInchesHasFocus = useProp(false);
+  const focusOnStickedInchesIfEmpty = () => {
+    if (!exists(calcStickedInches.value)) {
+      stickedInchesHasFocus.value = true;
+    }
+  };
 
   const currentGallons = useFormula(() => {
     // console.log("warn: ", showWarning.value);
@@ -197,41 +204,36 @@ export default function Calculator() {
 
   return (
     <Body asWideAsParent padBetween={0.5}>
-      <Txt h2>Tank Details</Txt>
+      <Txt h2>Calculate Fill</Txt>
       <Card widthGrows>
-        {/*<Row widthGrows spaceBetween>
-          {/*
-          <Button
-            pill
-            outlined={selectedTab.value !== tabs.delivery}
-            onClick={() => (selectedTab.value = tabs.delivery)}
+        <Label label="Calc for">
+          <Selector
+            value={selectedCalcType.value}
+            getLabelForData={(tabIndex) =>
+              ["Upcoming Delivery", "Look Up Tank", "Manual Dimensions"][
+                tabIndex
+              ]
+            }
+            cancelOptions={{
+              stroke: theme.palette.hint,
+            }}
           >
-            Delivery
-          </Button>
-          <Button
-            pill
-            outlined={selectedTab.value !== tabs.tank}
-            onClick={() => (selectedTab.value = tabs.tank)}
-          >
-            Tank
-          </Button>
-          <Button
-            pill
-            outlined={selectedTab.value !== tabs.dimensions}
-            onClick={() => (selectedTab.value = tabs.dimensions)}
-          >
-            Dimensions
-          </Button>
-          */}
-        <Box stroke={$theme.colors.primary} spaceEvenly>
-          <TabButtons
-            selectedTab={selectedTab}
-            labels={["Delivery", "Tank", "Dimensions"]}
-          />
-        </Box>
+            <For
+              each={["Upcoming Delivery", "Look Up Tank", "Manual Dimensions"]}
+            >
+              {(calcType, getIndex) => (
+                <HiddenOption
+                  onClick={() => (selectedCalcType.value = getIndex())}
+                >
+                  {calcType}
+                </HiddenOption>
+              )}
+            </For>
+          </Selector>
+        </Label>
 
         {/*</Row>*/}
-        <Show when={selectedTab.value === tabs.delivery}>
+        <Show when={selectedCalcType.value === tabs.delivery}>
           <Column>
             {/* --Delivery-- */}
             <Label
@@ -279,6 +281,7 @@ export default function Calculator() {
                       onclick={() => {
                         selectedDelivery.value = delivery;
                         deliverySelectorIsOpen.value = false;
+                        subDeliverySelectorIsOpen.value = true;
                       }}
                       widthGrows
                       heightShrinks
@@ -316,10 +319,7 @@ export default function Calculator() {
                   noneLabel={"Select Tank"}
                   getLabelForData={getSubDeliveryName}
                   noOptionsText={"No Tanks"}
-                  cancelOptions={{
-                    stroke: theme.palette.hint,
-                  }}
-                  stroke={$theme.colors.text}
+                  cancelOptions={{ stroke: theme.palette.hint }}
                 >
                   <Show
                     when={
@@ -350,6 +350,7 @@ export default function Calculator() {
                         onclick={() => {
                           selectedSubDelivery.value = subDelivery;
                           subDeliverySelectorIsOpen.value = false;
+                          focusOnStickedInchesIfEmpty();
                         }}
                         widthGrows
                         heightShrinks
@@ -423,16 +424,17 @@ export default function Calculator() {
         </Show>
 
         {/* TANK TAB */}
-        <Show when={selectedTab.value === tabs.tank}>
+        <Show when={selectedCalcType.value === tabs.tank}>
           <ClientAndTankSelector
             client={selectedClient}
             tank={selectedTank}
+            onTankSelected={focusOnStickedInchesIfEmpty}
             showNewOption={!selectedClient.value?.isDeleted}
           />
         </Show>
 
         {/* DIMENSIONS TAB */}
-        <Show when={selectedTab.value === tabs.dimensions}>
+        <Show when={selectedCalcType.value === tabs.dimensions}>
           <TankFields
             create
             tankGeometry={tankGeometry.value!}
@@ -458,40 +460,20 @@ export default function Calculator() {
                 calcStickedInches.value = v;
               },
             )}
+            hasFocusSig={stickedInchesHasFocus}
             underlined
             hint="in."
             negativesAreAllowed={false}
           />
         </Label>
 
-        {/* SECTION  Complete Delivery ActionText */}
-        <Show
-          when={
-            selectedTab.value === tabs.delivery && deliveryCanBeCompleted.value
-          }
-        >
-          <Txt
-            widthGrows
-            stroke={mdColors.green}
-            onClick={() => {
-              selectedTab.value = tabs.delivery;
-              completeDelivery();
-            }}
-          >
-            Complete Delivery
-          </Txt>
-        </Show>
-
-        {/* Divider */}
-        <Box widthGrows height={0.125} fill={"grey"} />
-
         {/* SECTION Current Tank Info */}
-        <Row>
+        <Row widthGrows spaceBetweenX padBetween={0.5} overflowXWraps>
           <Label
             label="Current Fill"
             align={$Align.centerLeft}
-            widthGrows
             stroke={fillColor(currentFillPercent.value ?? 0)}
+            widthShrinks
           >
             {exists(currentFillPercent.value) &&
             !isNaN(currentFillPercent.value)
@@ -501,26 +483,23 @@ export default function Calculator() {
           <Label
             label="Current Gal"
             align={$Align.centerLeft}
-            widthGrows
             overflowXCrops
+            widthShrinks
           >
             {exists(currentGallons.value) && !isNaN(currentGallons.value)
               ? formatNumWithCommas(currentGallons.value)
               : emptyText}
           </Label>
         </Row>
-      </Card>
 
-      {/* SECTION: Fill Details */}
-      <Box height={1.25} />
-      <Txt h2>Fill Details</Txt>
-      <Card widthGrows>
-        <Row>
+        {/* SECTION: Fill Details */}
+        <Box widthGrows height={0.125} fill={"grey"} />
+        <Row widthGrows spaceBetweenX padBetween={0.5} overflowXWraps>
           <Label
             stroke={desiredFillTextColor.value}
             label="Desired Fill"
             align={$Align.centerLeft}
-            widthGrows
+            widthShrinks
           >
             {desiredStr(desiredFill.value)}
           </Label>
@@ -528,8 +507,7 @@ export default function Calculator() {
             stroke={desiredFillTextColor.value}
             label="Gal. to Add"
             align={$Align.centerLeft}
-            widthGrows
-            overflowXCrops
+            widthShrinks
           >
             {exists(gallonsToReachDesiredFill.value) &&
             !isNaN(gallonsToReachDesiredFill.value)
@@ -544,23 +522,24 @@ export default function Calculator() {
           color={sliderColor.value}
           step={1}
         />
-      </Card>
-      {/* <Show when={selectedTab.value === tabs.delivery}>
+
+        {/* SECTION: Complete Delivery */}
         <Button
           widthGrows
           fill={
-            deliveryCanBeCompleted.value && selectedTab.value === tabs.delivery
-              ? mdColors.green
-              : mdColors.grey
+            selectedCalcType.value === tabs.delivery &&
+            deliveryCanBeCompleted.value
+              ? theme.palette.primary
+              : theme.palette.hint
           }
           onClick={() => {
-            selectedTab.value = tabs.delivery;
+            if (selectedCalcType.value === tabs.delivery) return;
             completeDelivery();
           }}
         >
           Complete Delivery
         </Button>
-      </Show> */}
+      </Card>
     </Body>
   );
 }
