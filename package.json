@@ -15,64 +15,42 @@
     "icons:android": "npx @capacitor/assets generate --iconBackgroundColor \"#ffffff\" --splashBackgroundColor \"#ffffff\" --splashBackgroundColorDark \"#ffffff\" --logoSplashScale 0.25 --android"
   },
   "dependencies": {
-    "@capacitor-community/apple-sign-in": "^5.0.0",
-    "@capacitor/android": "5.7.7",
-    "@capacitor/app": "^5.0.8",
-    "@capacitor/core": "^5.7.7",
-    "@capacitor/filesystem": "^5.2.2",
-    "@capacitor/ios": "5.7.7",
-    "@capacitor/network": "^5.0.8",
-    "@capacitor/share": "^5.0.8",
-    "@capacitor/splash-screen": "^5.0.8",
-    "@codetrix-studio/capacitor-google-auth": "^3.3.6",
+    "@capacitor-community/apple-sign-in": "^6.0.0",
+    "@capacitor/android": "6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/core": "6.1.2",
+    "@capacitor/filesystem": "^6.0.1",
+    "@capacitor/ios": "6.1.2",
+    "@capacitor/network": "^6.0.2",
+    "@capacitor/share": "^6.0.2",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@codetrix-studio/capacitor-google-auth": "3.4.0-rc.4",
     "@mdi/js": "^7.4.47",
-    "@revenuecat/purchases-capacitor": "^7.7.1",
+    "@revenuecat/purchases-capacitor": "9.0.0",
     "audit": "^0.0.6",
     "buffer": "^6.0.3",
-    "firebase": "^10.12.5",
+    "firebase": "^10.13.1",
     "fuse.js": "^7.0.0",
     "gsap": "^3.12.5",
     "jszip": "^3.10.1",
     "miap": "^0.0.9",
     "miwi": "^0.2.25",
-    "mufasa": "^0.2.356",
+    "mufasa": "^0.2.357",
     "sha.js": "^2.4.11",
-    "solid-js": "1.8.19",
+    "solid-js": "1.8.22",
     "xcode": "^3.0.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "5.7.7",
+    "@capacitor/cli": "^6.1.2",
     "@types/sha.js": "^2.4.4",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "7.18.0",
-    "@typescript-eslint/parser": "7.18.0",
-    "canvas": "^2.11.2",
-    "eslint": "^8.57.0",
-    "eslint-plugin-unused-imports": "^3.2.0",
-    "prettier": "^3.3.3",
     "solid-devtools": "^0.30.1",
     "sucrase": "^3.35.0",
-    "tsx": "^4.16.5",
-    "typescript": "5.4.5",
-    "vite": "5.3.5",
+    "tsx": "^4.19.0",
+    "typescript": "5.5.4",
+    "vite": "5.4.2",
     "vite-plugin-solid": "^2.10.2",
     "xml-js": "^1.6.11",
     "xml2js": "^0.6.2"
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint",
-      "unused-imports"
-    ],
-    "rules": {
-      "@typescript-eslint/no-unused-vars": "off",
-      "unused-imports/no-unused-imports": "warn"
-    }
-  },
-  "volta": {
-    "node": "20.17.0",
-    "yarn": "4.4.0",
-    "npm": "10.8.2"
   }
 }
