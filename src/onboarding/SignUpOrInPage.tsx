@@ -253,6 +253,7 @@ export function SignUpOrInPage(props: {
                 // tempValue={email}
                 hintText="Email"
                 underlined
+                keyboard={"email"}
               />
               {/* Password */}
               <Field
