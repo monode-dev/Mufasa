@@ -61,8 +61,8 @@ export class Delivery extends mfs.Doc(`Delivery`) {
       );
   }
   static get currentUsersCompletedDeliveries() {
-    return Delivery.completedDeliveries
-      .filter((delivery) => delivery.createdBy === mfs.user.uid)
+    return Delivery.currentUsersDeliveries
+      .filter((delivery) => delivery.isCompleted)
       .sort(
         (a, b) => (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
       );
