@@ -19,12 +19,14 @@ import {
   Button,
   popPage,
   HiddenOption,
-  HiddenOptions, Prop, EnterKeyHint,
+  HiddenOptions,
+  Prop,
+  EnterKeyHint,
 } from "miwi";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { App } from "@capacitor/app";
-import {For, onCleanup, Show} from "solid-js";
+import { For, onCleanup, Show } from "solid-js";
 import {
   premiumEnabled,
   isSubscribing,
@@ -107,7 +109,7 @@ export function SettingsPage() {
 
   const iconSize = 1.25;
 
-  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  const fieldRefs: Prop<Map<number, HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function in FuelTypeEntry.tsx
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
@@ -247,7 +249,14 @@ export function SettingsPage() {
             <For
               each={mfs.user?.workspace?.otherMembers}
               fallback={
-                <Show when={premiumEnabled.value}>
+                <Show
+                  when={premiumEnabled.value}
+                  fallback={
+                    <Txt hint widthGrows alignCenterLeft>
+                      No other team members.
+                    </Txt>
+                  }
+                >
                   <Txt hint widthGrows alignCenterLeft>
                     <span>
                       Tap the{" "}
@@ -287,7 +296,7 @@ export function SettingsPage() {
           </Show>
 
           {/* SECTION: Subscription */}
-          <Show when={isOwner.value}>
+          {/* <Show when={isOwner.value}>
             <Show
               when={premiumEnabled.value}
               fallback={
@@ -305,7 +314,7 @@ export function SettingsPage() {
             >
               <></>
             </Show>
-          </Show>
+          </Show> */}
 
           {/* SECTION: Fuel Types */}
           <>
@@ -355,16 +364,23 @@ export function SettingsPage() {
                     each={FuelType.sortedFuelTypes}
                     fallback={<Txt hint>Tap + to add Fuel Types.</Txt>}
                   >
-                    {
-                      (fuelType, index) => {
-                        const dex = index();
-                        const next = dex + 1;
-                        const nextFuelType = next < FuelType.sortedFuelTypes.length
+                    {(fuelType, index) => {
+                      const dex = index();
+                      const next = dex + 1;
+                      const nextFuelType =
+                        next < FuelType.sortedFuelTypes.length
                           ? FuelType.sortedFuelTypes[next]
                           : undefined;
-                        return <FuelTypeEntry fuelType={fuelType} nextFuelType={nextFuelType}
-                        enterHintRefs={enterHintRefs} fieldRefs={fieldRefs} subDeliveryIndex={useProp(dex)}/>;
-                      }}
+                      return (
+                        <FuelTypeEntry
+                          fuelType={fuelType}
+                          nextFuelType={nextFuelType}
+                          enterHintRefs={enterHintRefs}
+                          fieldRefs={fieldRefs}
+                          subDeliveryIndex={useProp(dex)}
+                        />
+                      );
+                    }}
                   </For>
                 </SortableColumn>
               </Match>
