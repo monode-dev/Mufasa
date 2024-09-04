@@ -26,7 +26,7 @@ export default function ShapeSelector(
       <Selector
         value={props.value.value}
         isOpen={dropDownIsOpen}
-        noneLabel="Select Shape"
+        hintText="Select Shape"
         getLabelForData={(shapeId: TankShapeId | null) => {
           if (!exists(shapeId)) return null;
           const tankShape = getTankShape(shapeId);

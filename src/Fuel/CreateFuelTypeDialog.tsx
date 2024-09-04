@@ -72,7 +72,7 @@ function CreateFuelTypeDialog(props: {
       widthGrows
       heightGrows
       fill="#00000099"
-      bonusTouchArea={false}
+      touchRadius={0}
       padAround={1}
     >
       <Card shadowSize={0} preventClickPropagation>

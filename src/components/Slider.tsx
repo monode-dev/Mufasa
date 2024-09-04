@@ -11,21 +11,20 @@ export function Slider(
   } & BoxProps,
 ) {
   const thumbHeight = 1;
-  const trackHeight = .5;
+  const trackHeight = 0.5;
   let isDragging = useProp(false);
   let slider: HTMLElement | undefined = undefined;
-  
 
   function updateValue(clientX: number) {
     const rect = slider!.getBoundingClientRect();
     let newValue =
       ((clientX - rect.left) / rect.width) * (props.max - props.min) +
       props.min;
-    const step = props.step ? (props.step * .01) : .01; 
-    newValue = Math.round(newValue / step) * step; 
+    const step = props.step ? props.step * 0.01 : 0.01;
+    newValue = Math.round(newValue / step) * step;
 
     const clampedValue = Math.max(props.min, Math.min(props.max, newValue));
-    props.value.value = clampedValue;  
+    props.value.value = clampedValue;
   }
 
   function startDrag(event: MouseEvent | TouchEvent) {
@@ -72,8 +71,7 @@ export function Slider(
               Math.max(
                 0,
                 100 *
-                  ((props.value.value - props.min) /
-                    (props.max - props.min)),
+                  ((props.value.value - props.min) / (props.max - props.min)),
               ),
             )}%`}
             height={trackHeight}
@@ -94,7 +92,7 @@ export function Slider(
               cornerRadius={thumbHeight / 2}
               fill={props.trackHSL}
               preventClickPropagation={true}
-              bonusTouchArea
+              touchRadius={0.5}
             />
           </Box>
         </Row>
