@@ -56,7 +56,7 @@ export default function TankSelector(
   return (
     <Selector
       value={value.value}
-      noneLabel={"Select Tank"}
+      hintText={"Select Tank"}
       isOpen={dropDownIsOpen}
       getLabelForData={(data: TankType) => {
         if (!exists(data)) return null;

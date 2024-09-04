@@ -127,7 +127,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Icon iconPath={mdiArrowUpLeft} scale={1.75} />
           <Txt>Tap the </Txt>
           <Box
-            bonusTouchArea
             width={1}
             height={1}
             outlineSize={1 / 8}
@@ -208,7 +207,6 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           padTop={0.045}
         >
           <Box
-            bonusTouchArea
             onClick={() =>
               props.subDelivery.isCompleted
                 ? pushPage(ConfirmSubDeliveryUncompletion, {

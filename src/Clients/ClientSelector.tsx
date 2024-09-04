@@ -82,7 +82,7 @@ export default function ClientSelector(props: {
   return (
     <Selector
       value={props.value.value}
-      noneLabel="Select Client"
+      hintText="Select Client"
       isOpen={dropDownIsOpen}
       //modalIsOpenSig={dropDownIsOpen}
       getLabelForData={(data: CLIENT_TYPE) => {

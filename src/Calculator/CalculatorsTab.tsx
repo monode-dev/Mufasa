@@ -247,7 +247,7 @@ export default function Calculator() {
               <Selector
                 value={selectedDelivery.value}
                 isOpen={deliverySelectorIsOpen}
-                noneLabel={"Select Delivery"}
+                hintText={"Select Delivery"}
                 getLabelForData={(delivery) => delivery?.title ?? null}
                 noOptionsText={"No Upcoming Deliveries"}
                 cancelOptions={{ stroke: theme.palette.hint }}
@@ -314,7 +314,7 @@ export default function Calculator() {
                 <Selector
                   value={selectedSubDelivery.value}
                   isOpen={subDeliverySelectorIsOpen}
-                  noneLabel={"Select Tank"}
+                  hintText={"Select Tank"}
                   getLabelForData={getSubDeliveryName}
                   noOptionsText={"No Tanks"}
                   cancelOptions={{ stroke: theme.palette.hint }}
