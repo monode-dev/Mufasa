@@ -59,9 +59,9 @@ export function FuelTypeSelector(props: {
     props.fuelType.value = _fuelType;
     isOpen.value = false;
   }
-  const noneLabel = `Select Fuel`;
+  const hintText = `Select Fuel`;
   function getLabelForData(data: SelectedFuelType | null) {
-    return data == ONE_TIME ? oneTimeLabel : (data?.name ?? null);
+    return data == ONE_TIME ? oneTimeLabel : data?.name ?? null;
   }
 
   return (
@@ -94,7 +94,7 @@ export function FuelTypeSelector(props: {
       >
         <Selector
           value={props.fuelType.value ?? null}
-          noneLabel="Select Fuel"
+          hintText="Select Fuel"
           isOpen={isOpen}
           getLabelForData={getLabelForData}
           noOptionsText={"No Fuels"}

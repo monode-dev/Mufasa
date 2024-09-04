@@ -37,6 +37,7 @@ setTheme({
     primary: "#4caf50",
     hint: mdColors.grey,
   },
+  // debugInteractableArea: true,
 });
 
 const root = document.getElementById("root");

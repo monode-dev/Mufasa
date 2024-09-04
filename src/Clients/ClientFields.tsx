@@ -298,7 +298,6 @@ export function ClientFields(props: {
       {/* SECTION: Schedule Deliveries */}
       <Row alignTopLeft padBetween={0.25}>
         <Box
-          bonusTouchArea
           width={1}
           height={1}
           outlineSize={1 / 8}
@@ -330,7 +329,7 @@ export function ClientFields(props: {
                   : `${props.weeksBetweenScheduledDeliveries.value} weeks`
             }
             isOpen={weekSelectorIsOpen}
-            noneLabel="Pick frequency"
+            hintText="Pick frequency"
             cancelOptions={{
               stroke: theme.palette.hint,
             }}
@@ -352,7 +351,7 @@ export function ClientFields(props: {
           <Selector
             value={props.weekday.value}
             getLabelForData={() => props.weekday.value}
-            noneLabel="Pick day of week"
+            hintText="Pick day of week"
             isOpen={daySelectorIsOpen}
             cancelOptions={{
               stroke: theme.palette.hint,
@@ -381,7 +380,7 @@ export function ClientFields(props: {
               getLabelForData={(startDate) =>
                 exists(startDate) ? formatStartDate(startDate) : null
               }
-              noneLabel="Pick start date"
+              hintText="Pick start date"
               noOptionsText={"Select frequency and day of week first."}
               isOpen={dateSelectorIsOpen}
               cancelOptions={{ stroke: theme.palette.hint }}
@@ -410,7 +409,7 @@ export function ClientFields(props: {
                     (member) => member.uid === assignedUid,
                   )?.email ?? null)
             }
-            noneLabel="Assign to driver"
+            hintText="Assign to driver"
             isOpen={teamMemberSelectorIsOpen}
             cancelOptions={{
               stroke: theme.palette.hint,
