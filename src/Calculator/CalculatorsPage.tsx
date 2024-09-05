@@ -204,7 +204,7 @@ export function CalculatorsPage() {
 
   return (
     <SimplePage>
-      <InlineAppBar name="Calculate Fill" />
+      <InlineAppBar name="Calculate Fill" padBottom={0.5} />
       <SimpleBody
         /* We need to pad the top to give room for the shadow. */
         padTop={0.5}

@@ -21,7 +21,7 @@ import { SplashScreen } from "@capacitor/splash-screen";
 import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
 import { onMount } from "solid-js";
 import { mfs } from "./model/DataModel";
-import { HomePage } from "./HomePage";
+import { DeliveriesPage } from "./Deliveries/DeliveriesPage";
 import { LoadingPage } from "./onboarding/LoadingPage";
 import { SignUpOrInPage } from "./onboarding/SignUpOrInPage";
 import { StartOrJoinTeamPage } from "./onboarding/StartOrJoinTeamPage";
@@ -157,7 +157,7 @@ export function PageSwitch() {
 
   return (
     <Box asWideAsParent asTallAsParent>
-      <Switch fallback={<HomePage />}>
+      <Switch fallback={<DeliveriesPage />}>
         <Match when={mfs.user.isPending}>
           <LoadingPage name="Loading" />
         </Match>
