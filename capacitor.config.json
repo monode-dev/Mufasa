@@ -1,6 +1,6 @@
 {
   "appId": "us.tke.ninetypercent",
-  "appName": "Ninety Percent",
+  "appName": "90%",
   "webDir": "dist/website",
   "backgroundColor": "#f9fafdff",
   "bundledWebRuntime": false,

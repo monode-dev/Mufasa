@@ -3,7 +3,7 @@ import { Box, Row, Prop, pushPage, doWatch } from "miwi";
 import OutlinedActionButton from "./OutlinedActionButton";
 import { mdiMagnify, mdiPlus } from "@mdi/js";
 import ClientSearchBar from "./ClientSearchBar";
-import ClientPage from "./ClientPage";
+import EditClientPage from "./EditClientPage";
 import { openCreateClientDialog } from "./CreateClientDialog";
 import { LoadCSVDialog } from "./LoadCSVDialog";
 
@@ -43,7 +43,7 @@ export default function ClientActionBar(props: {
           onClick={() =>
             openCreateClientDialog({
               onCreate: (newClient) =>
-                pushPage(ClientPage, { client: newClient }),
+                pushPage(EditClientPage, { client: newClient }),
             })
           }
         />

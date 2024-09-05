@@ -17,7 +17,7 @@ import { For, Show } from "solid-js";
 import { mdiPencil, mdiPlus } from "@mdi/js";
 import { Client } from "./Client";
 import { openCreateClientDialog } from "./CreateClientDialog";
-import ClientPage from "./ClientPage";
+import EditClientPage from "./EditClientPage";
 import { Delivery } from "@/Deliveries/Delivery";
 
 // import { Selector } from "@/Mock/_Selector";
@@ -105,7 +105,7 @@ export default function ClientSelector(props: {
             iconPath={mdiPencil}
             onClick={() => {
               if (exists(props.value.value) && props.value.value !== ONE_TIME) {
-                pushPage(ClientPage, { client: props.value.value });
+                pushPage(EditClientPage, { client: props.value.value });
               }
             }}
           />
