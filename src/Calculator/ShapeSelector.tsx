@@ -1,18 +1,6 @@
-import {
-  Label,
-  Prop,
-  Txt,
-  exists,
-  useProp,
-  Selector,
-  Icon,
-  pushPage,
-  theme,
-} from "miwi";
+import { Label, Prop, Txt, exists, useProp, Selector, theme } from "miwi";
 import { TANK_SHAPE_IDS, TankShapeId, getTankShape } from "./ShapeUtils";
 import { For } from "solid-js";
-import { mdiHelpCircleOutline } from "@mdi/js";
-import { InfoCard } from "@/components/InfoCard";
 
 export default function ShapeSelector(
   props: Readonly<{

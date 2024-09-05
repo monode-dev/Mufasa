@@ -15,12 +15,12 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
+  DeleteDialog,
 } from "miwi";
 import { EditDeliveryPage } from "./EditDeliveryPage";
 import { For, Show } from "solid-js";
-import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
+import CompleteSubDeliveryDialog from "./CompleteSubDeliveryDialog";
 import { Delivery, SubDelivery } from "./Delivery";
-import DeleteDialog from "@/components/DeleteDialog";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 import { formatNumWithCommas } from "@/utils";
@@ -268,7 +268,7 @@ function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
       <DeleteOption
         onClick={() =>
           pushPage(DeleteDialog, {
-            obj: props.delivery,
+            onDelete: () => props.delivery.deleteDoc(),
             message: `Are you sure you want to permanently delete this delivery?`,
           })
         }

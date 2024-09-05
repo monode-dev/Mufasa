@@ -15,25 +15,24 @@ import {
   theme,
   EnterKeyHint,
   Prop,
-
+  DeleteDialog,
 } from "miwi";
 import { onCleanup, Show } from "solid-js";
-import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
+import CompleteSubDeliveryDialog from "./CompleteSubDeliveryDialog";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
 import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
 import { SubDelivery } from "./Delivery";
-import DeleteDialog from "@/components/DeleteDialog";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
-import {Flag} from "mufasa/dist/Utils";
-import {OptionalPropFlag} from "mufasa/dist/Doc";
+import { Flag } from "mufasa/dist/Utils";
+import { OptionalPropFlag } from "mufasa/dist/Doc";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
   nextSubDelivery: Prop<SubDelivery | undefined>;
-  fieldRefs: Prop<Map<number,HTMLDivElement>>;
+  fieldRefs: Prop<Map<number, HTMLDivElement>>;
   // filled in enterKey() function
   enterHintRefs: Prop<Map<number, EnterKeyHint>>;
   subDeliveryIndex: Prop<number>;
@@ -48,14 +47,14 @@ export default function SubDeliveryCard(props: {
 
   function handleDeleteRequest() {
     pushPage(DeleteDialog, {
-      obj: props.subDelivery,
+      onDelete: () => props.subDelivery.deleteDoc(),
       message: `Are you sure you want to permanently delete this step of the delivery?`,
     });
   }
 
   function handleDeleteOfCompletedSubDelivery() {
     pushPage(DeleteDialog, {
-      obj: props.subDelivery,
+      onDelete: () => props.subDelivery.deleteDoc(),
       message: `Are you sure you want to permanently delete this completed delivery?`,
     });
   }
@@ -86,28 +85,34 @@ export default function SubDeliveryCard(props: {
   }
 
   function midEnterHint(
-    num: (number & Flag<typeof OptionalPropFlag>) | (null & Flag<typeof OptionalPropFlag>
-      ) | number | null): EnterKeyHint {
+    num:
+      | (number & Flag<typeof OptionalPropFlag>)
+      | (null & Flag<typeof OptionalPropFlag>)
+      | number
+      | null,
+  ): EnterKeyHint {
     return (num ?? 0) <= 0 ? `next` : `done`;
   }
 
   // local zero based indexes are shifted by subDeliveryIndex then converted to 1 based indexes
   const fields = 3;
-  const baseIndex= useFormula(() => 1 + props.subDeliveryIndex.value * fields);
+  const baseIndex = useFormula(() => 1 + props.subDeliveryIndex.value * fields);
   const nameIndex = useFormula(() => baseIndex.value);
   const rateIndex = useFormula(() => 1 + baseIndex.value);
   const gallonsIndex = useFormula(() => 2 + baseIndex.value);
   const overrideNext = useFormula(() => baseIndex.value + fields + 2);
-  function lastEnterHint(sub: Prop<SubDelivery | undefined>, index: Prop<number>): EnterKeyHint {
+  function lastEnterHint(
+    sub: Prop<SubDelivery | undefined>,
+    index: Prop<number>,
+  ): EnterKeyHint {
     const s = sub.value;
     let key: EnterKeyHint = `done`;
     if (exists(s)) {
       if (s._isOneTimeFuel) {
         props.nextOverride.value.delete(index.value);
-        if ((s._fuelName ?? ``).trim().length == 0)
-          key = `next`
-      } else if ((s.gallons ?? 0) <= 0){
-        key = `next`
+        if ((s._fuelName ?? ``).trim().length == 0) key = `next`;
+      } else if ((s.gallons ?? 0) <= 0) {
+        key = `next`;
         props.nextOverride.value.set(index.value, overrideNext);
       }
     }
@@ -199,38 +204,46 @@ export default function SubDeliveryCard(props: {
               }
             >
               <Label label="Name">
-                  <Field
-                    value={useFormula(
-                      () => props.subDelivery.explicitFuelName,
-                      (v) => (props.subDelivery.explicitFuelName = v),
-                    )}
-                    underlined
-                    hintText="Fuel Name"
-                    capitalize={`words`}
-                    keyboard={"text"}
-                    enterKeyHint = { useFormula(() => {
-                      const key: EnterKeyHint =  midEnterHint(props.subDelivery.explicitRate);
+                <Field
+                  value={useFormula(
+                    () => props.subDelivery.explicitFuelName,
+                    (v) => (props.subDelivery.explicitFuelName = v),
+                  )}
+                  underlined
+                  hintText="Fuel Name"
+                  capitalize={`words`}
+                  keyboard={"text"}
+                  enterKeyHint={
+                    useFormula(() => {
+                      const key: EnterKeyHint = midEnterHint(
+                        props.subDelivery.explicitRate,
+                      );
                       props.enterHintRefs.value.set(nameIndex.value, key);
                       return key;
-                    }).value }
-                    onlyWriteOnBlur
-                  />
+                    }).value
+                  }
+                  onlyWriteOnBlur
+                />
               </Label>
               <Label label="Rate">
-                  <NumField
-                    value={useFormula(
-                      () => props.subDelivery.explicitRate,
-                      (v) => (props.subDelivery.explicitRate = v),
-                    )}
-                    underlined
-                    hint="Rate"
-                    enterKeyHint = { useFormula(() => {
-                      const key: EnterKeyHint =  midEnterHint(props.subDelivery.explicitRate);
+                <NumField
+                  value={useFormula(
+                    () => props.subDelivery.explicitRate,
+                    (v) => (props.subDelivery.explicitRate = v),
+                  )}
+                  underlined
+                  hint="Rate"
+                  enterKeyHint={
+                    useFormula(() => {
+                      const key: EnterKeyHint = midEnterHint(
+                        props.subDelivery.explicitRate,
+                      );
                       props.enterHintRefs.value.set(rateIndex.value, key);
                       return key;
-                    }).value }
-                    onlyWriteOnBlur
-                  />
+                    }).value
+                  }
+                  onlyWriteOnBlur
+                />
               </Label>
             </Show>
 
@@ -241,25 +254,29 @@ export default function SubDeliveryCard(props: {
                 props.subDelivery.gallons ? undefined : $theme.colors.warning
               }
             >
-                <NumField
-                  value={useFormula(
-                    () => props.subDelivery.gallons,
-                    (v) => (props.subDelivery.gallons = v),
-                  )}
-                  hintColor={
-                    props.subDelivery.gallons ? undefined : $theme.colors.warning
-                  }
-                  underlined
-                  hint="Est. gal."
-                  enterKeyHint={
+              <NumField
+                value={useFormula(
+                  () => props.subDelivery.gallons,
+                  (v) => (props.subDelivery.gallons = v),
+                )}
+                hintColor={
+                  props.subDelivery.gallons ? undefined : $theme.colors.warning
+                }
+                underlined
+                hint="Est. gal."
+                enterKeyHint={
                   useFormula(() => {
-                    const key: EnterKeyHint = lastEnterHint(props.nextSubDelivery, gallonsIndex);
+                    const key: EnterKeyHint = lastEnterHint(
+                      props.nextSubDelivery,
+                      gallonsIndex,
+                    );
                     props.enterHintRefs.value.set(gallonsIndex.value, key);
-                    return key
-                  }).value}
-                  // allowing write so 0 Gallons warning will go away
-                  // onlyWriteOnBlur
-                />
+                    return key;
+                  }).value
+                }
+                // allowing write so 0 Gallons warning will go away
+                // onlyWriteOnBlur
+              />
             </Label>
             <Show
               when={
