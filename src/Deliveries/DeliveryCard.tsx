@@ -16,7 +16,7 @@ import {
   DeleteOption,
   theme,
 } from "miwi";
-import { DeliveryPage } from "./DeliveryPage";
+import { EditDeliveryPage } from "./EditDeliveryPage";
 import { For, Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDelivery.dialog";
 import { Delivery, SubDelivery } from "./Delivery";
@@ -36,7 +36,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         fuelName,
         Math.ceil(
           ((totalPerFuelType.get(fuelName) ?? 0) +
-            (sub.isCompleted ? (sub.sales ?? 0) : 0)) *
+            (sub.isCompleted ? sub.sales ?? 0 : 0)) *
             100,
         ) / 100,
       );
@@ -51,7 +51,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       preventClickPropagation
       stroke={props.delivery.isCompleted ? $theme.colors.hint : undefined}
       onClick={() =>
-        pushPage(DeliveryPage, {
+        pushPage(EditDeliveryPage, {
           delivery: props.delivery,
         })
       }
@@ -180,8 +180,8 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
     props.subDelivery.isCompleted
       ? $theme.colors.hint
       : props.subDelivery.isValid
-        ? undefined
-        : $theme.colors.warning,
+      ? undefined
+      : $theme.colors.warning,
   );
   return (
     <>
@@ -257,7 +257,7 @@ function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
       <HiddenOption
         padBetween={0.25}
         onClick={() =>
-          pushPage(DeliveryPage, {
+          pushPage(EditDeliveryPage, {
             delivery: props.delivery,
           })
         }

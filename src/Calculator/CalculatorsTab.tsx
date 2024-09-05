@@ -37,7 +37,7 @@ import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
 import { mdiPencil } from "@mdi/js";
-import { DeliveryPage } from "@/Deliveries/DeliveryPage";
+import { EditDeliveryPage } from "@/Deliveries/EditDeliveryPage";
 
 const maxSafe = 90.0001;
 export default function Calculator() {
@@ -87,10 +87,10 @@ export default function Calculator() {
   // Calculations
   const tankGeometry = useFormula(() =>
     selectedCalcType.value === tabs.delivery
-      ? (selectedSubDelivery.value?.tankGeometry ?? explicitTankGeometry)
+      ? selectedSubDelivery.value?.tankGeometry ?? explicitTankGeometry
       : selectedCalcType.value === tabs.tank
-        ? selectedTank.value
-        : explicitTankGeometry,
+      ? selectedTank.value
+      : explicitTankGeometry,
   );
   const desiredFill = useProp(0.9);
   const totalGallons = useFormula(() =>
@@ -258,7 +258,7 @@ export default function Calculator() {
                       iconPath={mdiPencil}
                       onClick={() => {
                         if (exists(selectedDelivery.value)) {
-                          pushPage(DeliveryPage, {
+                          pushPage(EditDeliveryPage, {
                             delivery: selectedDelivery.value,
                           });
                         }
