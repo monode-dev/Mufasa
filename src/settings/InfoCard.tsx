@@ -1,10 +1,22 @@
-import { Card, Page, Txt, popPage } from "miwi";
-import { InfoEntry } from "./InfoEntry";
+import {
+  Box,
+  Card,
+  Column,
+  Icon,
+  Page,
+  Row,
+  Txt,
+  mdColors,
+  popPage,
+  useProp,
+} from "miwi";
+import { mdiMenuDown, mdiMenuRight } from "@mdi/js";
+import { Show, JSXElement } from "solid-js";
 
 export function InfoCard(
   props: Readonly<{
     entriesToOpen?: string[];
-  }>
+  }>,
 ) {
   return (
     <Page onClick={popPage} fill="#00000099">
@@ -24,13 +36,15 @@ export function InfoCard(
           shouldBeOpen={props.entriesToOpen?.includes("Tank")}
         >
           <InfoEntry
-          entryTitle="Shape"
-          shouldBeOpen={props.entriesToOpen?.includes("Shape")}
+            entryTitle="Shape"
+            shouldBeOpen={props.entriesToOpen?.includes("Shape")}
           >
             <InfoEntry
               entryTitle="Horizontal Cylinder"
               entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes("Horizontal Cylinder")}
+              shouldBeOpen={props.entriesToOpen?.includes(
+                "Horizontal Cylinder",
+              )}
             />
             <InfoEntry
               entryTitle="Oval"
@@ -87,5 +101,42 @@ export function InfoCard(
         />
       </Card>
     </Page>
+  );
+}
+
+function InfoEntry(props: {
+  entryTitle: string;
+  entryContent?: string;
+  children?: JSXElement;
+  shouldBeOpen?: boolean;
+}) {
+  const showEntry = props.shouldBeOpen ? useProp(true) : useProp(false);
+  function toggleShowEntry() {
+    showEntry.value = !showEntry.value;
+  }
+
+  return (
+    <Column padBetween={0} asWideAsParent>
+      <Row>
+        <Icon
+          stroke={mdColors.black}
+          iconPath={showEntry.value ? mdiMenuDown : mdiMenuRight}
+        />
+
+        {/* Title */}
+        <Txt onClick={toggleShowEntry} widthGrows alignLeft bold>
+          {props.entryTitle}
+        </Txt>
+      </Row>
+      {/* Content */}
+      <Show when={showEntry.value}>
+        <Txt overflowXSpills padLeft={1} widthGrows alignLeft>
+          {props.entryContent}
+        </Txt>
+        <Box padLeft={1} alignLeft asWideAsParent>
+          {props.children}
+        </Box>
+      </Show>
+    </Column>
   );
 }

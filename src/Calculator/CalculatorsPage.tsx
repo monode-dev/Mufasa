@@ -27,7 +27,7 @@ import {
   getTankShape,
 } from "@/Calculator/ShapeUtils";
 import { formatNumWithCommas } from "@/utils";
-import CompleteSubDeliveryDialog from "@/Deliveries/CompleteSubDelivery.dialog";
+import CompleteSubDeliveryDialog from "@/Deliveries/CompleteSubDeliveryDialog";
 import TankFields from "@/Tanks/TankFields";
 import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";

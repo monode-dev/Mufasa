@@ -1,5 +1,4 @@
 import { isTankValid } from "@/AppData";
-import DeleteDialog from "@/components/DeleteDialog";
 import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
 import {
   Txt,
@@ -14,6 +13,7 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
+  DeleteDialog,
 } from "miwi";
 import TankFields from "./TankFields";
 import { Client } from "@/Clients/Client";
@@ -42,7 +42,7 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
           <DeleteOption
             onClick={() =>
               pushPage(DeleteDialog, {
-                obj: props.tank,
+                onDelete: () => props.tank.deleteDoc(),
                 message: `Are you sure you want to delete this tank?`,
               })
             }
