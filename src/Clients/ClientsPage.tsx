@@ -26,7 +26,7 @@ import { SimpleBody } from "@/components/SimpleBody";
 import { SimplePage } from "@/components/SimplePage";
 import { isClientValid, getClientLabel } from "@/AppData";
 import { openCreateDeliveryDialog } from "@/Deliveries/CreateDeliveryDialog";
-import { DeliveryPage } from "@/Deliveries/DeliveryPage";
+import { EditDeliveryPage } from "@/Deliveries/EditDeliveryPage";
 
 export default function ClientsPage() {
   const filterString = useProp(``);
@@ -176,7 +176,7 @@ export default function ClientsPage() {
                   onClick={() =>
                     openCreateDeliveryDialog({
                       onCreate: (delivery) => {
-                        pushPage(DeliveryPage, { delivery });
+                        pushPage(EditDeliveryPage, { delivery });
                       },
                       initClient: client,
                     })
