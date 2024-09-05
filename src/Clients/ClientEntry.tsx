@@ -8,48 +8,28 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
+  useFormula,
 } from "miwi";
 import DeleteDialog from "../components/DeleteDialog";
 import { isClientValid, getClientLabel } from "@/AppData";
-import ClientPage from "./ClientPage";
+import EditClientPage from "./EditClientPage";
 import { Client } from "./Client";
 import { mdiTankerTruck } from "@mdi/js";
 import { openCreateDeliveryDialog } from "@/Deliveries/CreateDeliveryDialog";
 import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 export default function ClientEntery(props: { client: Client }) {
-  function deletePressed() {
-    pushPage(DeleteDialog, {
-      obj: props.client,
-      message: `Are you sure you want to permanently delete "${
-        props.client.clientId ?? ``
-      }${props.client.clientId && props.client.name ? ` - ` : ``}${
-        props.client.name ?? ``
-      }"?`,
-    });
-  }
-
-  let myTextColor = useProp<string>(mdColors.black);
-
-  function clicked() {
-    myTextColor.value = mdColors.green;
-    setTimeout(() => (myTextColor.value = mdColors.black), 250);
-    setTimeout(() => pushPage(ClientPage, { client: props.client }), 17);
-  }
-
   return (
     <Row
-      onClick={clicked}
+      onClick={() => pushPage(EditClientPage, { client: props.client })}
       widthGrows
       height={1}
       spaceBetween
-      stroke={myTextColor.value}
+      stroke={
+        isClientValid(props.client) ? theme.palette.text : theme.palette.warning
+      }
     >
-      <Txt
-        widthGrows
-        singleLine
-        stroke={isClientValid(props.client) ? myTextColor.value : mdColors.grey}
-      >
+      <Txt widthGrows singleLine>
         {getClientLabel(props.client)}
       </Txt>
       <HiddenOptions
@@ -69,7 +49,18 @@ export default function ClientEntery(props: { client: Client }) {
             })
           }
         />
-        <DeleteOption onClick={deletePressed} />
+        <DeleteOption
+          onClick={() =>
+            pushPage(DeleteDialog, {
+              obj: props.client,
+              message: `Are you sure you want to permanently delete "${
+                props.client.clientId ?? ``
+              }${props.client.clientId && props.client.name ? ` - ` : ``}${
+                props.client.name ?? ``
+              }"?`,
+            })
+          }
+        />
       </HiddenOptions>
     </Row>
   );

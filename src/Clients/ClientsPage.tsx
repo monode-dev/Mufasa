@@ -9,16 +9,24 @@ import {
   pushPage,
   useProp,
   Field,
+  Column,
+  DeleteDialog,
+  DeleteOption,
+  HiddenOption,
+  HiddenOptions,
+  theme,
 } from "miwi";
-import { mdiClose, mdiMagnify, mdiPlus } from "@mdi/js";
+import { mdiClose, mdiMagnify, mdiPlus, mdiTankerTruck } from "@mdi/js";
 import { For, Show } from "solid-js";
-import ClientEntry from "./ClientEntry";
 import { openCreateClientDialog } from "./CreateClientDialog";
-import ClientPage from "./ClientPage";
+import EditClientPage, { openDeleteClientDialog } from "./EditClientPage";
 import { Client } from "./Client";
 import { InlineAppBar } from "@/components/InlineAppBar";
 import { SimpleBody } from "@/components/SimpleBody";
 import { SimplePage } from "@/components/SimplePage";
+import { isClientValid, getClientLabel } from "@/AppData";
+import { openCreateDeliveryDialog } from "@/Deliveries/CreateDeliveryDialog";
+import { DeliveryPage } from "@/Deliveries/DeliveryPage";
 
 export default function ClientsPage() {
   const filterString = useProp(``);
@@ -33,45 +41,6 @@ export default function ClientsPage() {
     );
   });
 
-  // Filter clients based on the search string.
-  const filteredClients = useFormula(() => {
-    const asArray = [...(Client.getAllDocs() ?? [])];
-    const filtered =
-      filterString.value.length === 0
-        ? asArray
-        : asArray.filter((client) => {
-            return (
-              (client.name
-                ?.toLowerCase()
-                .includes(filterString.value.toLowerCase()) ??
-                false) ||
-              (client.clientId
-                ?.toLowerCase()
-                .includes(filterString.value.toLowerCase()) ??
-                false)
-            );
-          });
-    return filtered
-      .sort((a, b) => (a.name ?? ``).localeCompare(b.name ?? ``))
-      .slice(0, Math.min(75, filtered.length));
-  });
-
-  const createClient = () =>
-    openCreateClientDialog({
-      initName: Number.isNaN(Number(filterString.value))
-        ? filterString.value
-        : undefined,
-      initClientId: Number.isNaN(Number(filterString.value))
-        ? undefined
-        : filterString.value,
-      onCreate: (newObject) => {
-        pushPage(ClientPage, { client: newObject });
-        if (isSearching.value) {
-          requestAnimationFrame(() => (isSearching.value = false));
-        }
-      },
-    });
-
   return (
     <SimplePage>
       {/* SECTION: App Bar */}
@@ -85,7 +54,25 @@ export default function ClientsPage() {
                 onClick={() => (isSearching.value = !isSearching.value)}
               />
             </Show>
-            <Icon iconPath={mdiPlus} onClick={() => createClient()} />
+            <Icon
+              iconPath={mdiPlus}
+              onClick={() =>
+                openCreateClientDialog({
+                  initName: Number.isNaN(Number(filterString.value))
+                    ? filterString.value
+                    : undefined,
+                  initClientId: Number.isNaN(Number(filterString.value))
+                    ? undefined
+                    : filterString.value,
+                  onCreate: (newObject) => {
+                    pushPage(EditClientPage, { client: newObject });
+                    if (isSearching.value) {
+                      requestAnimationFrame(() => (isSearching.value = false));
+                    }
+                  },
+                })
+              }
+            />
           </Row>
         }
       />
@@ -93,29 +80,32 @@ export default function ClientsPage() {
       <SimpleBody>
         {/* SECTION: Search */}
         <Show when={isSearching.value}>
-          <Row>
-            <Row
-              widthGrows
-              padAroundY={0.25}
-              // padAroundX={0.25}
-              cornerRadius={0.75}
-              align={$Align.centerLeft}
-              stroke={mdColors.grey}
-            >
-              <Field
-                hintText={"Search by Name or ID"}
-                scale={1}
+          <Column padBetween={0.5}>
+            <Row>
+              <Row
                 widthGrows
-                hasFocus={useProp(true)} // Check if this is correct !!!
-                value={filterString}
+                padAroundY={0.25}
+                // padAroundX={0.25}
+                cornerRadius={0.75}
+                align={$Align.centerLeft}
+                stroke={mdColors.grey}
+              >
+                <Field
+                  hintText={"Search by Name or ID"}
+                  scale={1}
+                  widthGrows
+                  hasFocus={useProp(true)} // Check if this is correct !!!
+                  value={filterString}
+                />
+              </Row>
+              <Icon
+                iconPath={mdiClose}
+                scale={1.125}
+                onClick={() => (isSearching.value = false)}
               />
             </Row>
-            <Icon
-              iconPath={mdiClose}
-              scale={1.25}
-              onClick={() => (isSearching.value = false)}
-            />
-          </Row>
+            <Box widthGrows height={0.125} fill={mdColors.grey} />
+          </Column>
         </Show>
 
         {/* SECTION: Actions */}
@@ -125,7 +115,7 @@ export default function ClientsPage() {
             iconPath={mdiPlus}
             onClick={()=>pushPage(LoadCSVDialog, undefined)}
           /> */}
-        <Show when={filterString.value.length > 0}>
+        {/* <Show when={filterString.value.length > 0}>
           <Row
             widthGrows
             height={1}
@@ -138,14 +128,64 @@ export default function ClientsPage() {
             <Icon iconPath={mdiPlus} />
           </Row>
           <Box widthGrows height={0.125} fill={mdColors.grey} />
-        </Show>
+        </Show> */}
 
         {/* SECTION: Clients */}
         <For
           fallback={<Txt hint>Click the + button to create a new client.</Txt>}
-          each={filteredClients.value}
+          each={Client.getAllDocs()
+            .filter((client) => {
+              if (filterString.value.length === 0) return true;
+              return (
+                (client.name
+                  ?.toLowerCase()
+                  .includes(filterString.value.toLowerCase()) ??
+                  false) ||
+                (client.clientId
+                  ?.toLowerCase()
+                  .includes(filterString.value.toLowerCase()) ??
+                  false)
+              );
+            })
+            .sort((a, b) => (a.name ?? ``).localeCompare(b.name ?? ``))
+            .slice(0, 75)}
         >
-          {(client) => <ClientEntry client={client} />}
+          {(client) => (
+            <Row
+              onClick={() => pushPage(EditClientPage, { client })}
+              widthGrows
+              height={1}
+              spaceBetween
+              stroke={
+                isClientValid(client)
+                  ? theme.palette.text
+                  : theme.palette.warning
+              }
+            >
+              <Txt widthGrows singleLine>
+                {getClientLabel(client)}
+              </Txt>
+              <HiddenOptions
+                cancelOptions={{
+                  stroke: theme.palette.hint,
+                }}
+              >
+                <HiddenOption
+                  text={`Delivery`}
+                  icon={mdiTankerTruck}
+                  onClick={() =>
+                    openCreateDeliveryDialog({
+                      onCreate: (delivery) => {
+                        pushPage(DeliveryPage, { delivery });
+                      },
+                      initClient: client,
+                    })
+                  }
+                />
+                <DeleteOption onClick={() => openDeleteClientDialog(client)} />
+              </HiddenOptions>
+            </Row>
+          )}
         </For>
       </SimpleBody>
     </SimplePage>

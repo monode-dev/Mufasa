@@ -1,4 +1,4 @@
-import { For, createEffect } from "solid-js";
+import { For } from "solid-js";
 import { listTanks } from "@/AppData";
 import {
   AppBar,
@@ -20,11 +20,12 @@ import {
   HiddenOptions,
   DeleteOption,
   theme,
+  doWatch,
+  DeleteDialog,
 } from "miwi";
 import { mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
 import { SettingsPage } from "@/settings/SettingsPage";
-import DeleteDialog from "@/components/DeleteDialog";
 import { TankCard } from "@/Tanks/TankCard";
 import { CallAndMapButtons } from "./CallAndMapToButtons";
 import { Delivery } from "@/Deliveries/Delivery";
@@ -32,65 +33,45 @@ import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 import { SimplePage } from "@/components/SimplePage";
+import { InlineAppBar } from "@/components/InlineAppBar";
+import { SimpleBody } from "@/components/SimpleBody";
 
-export default function ClientPage(props: { client: Client }) {
-  createEffect(() => {
-    if (props.client.isDeleted) {
-      popPage();
-    }
+export function openDeleteClientDialog(client: Client) {
+  pushPage(DeleteDialog, {
+    message: `Are you sure you want to permanently delete "${
+      client.clientId ?? ``
+    }${client.clientId && client.name ? ` - ` : ``}${client.name ?? ``}"?`,
+    onDelete: () => client.deleteDoc(),
   });
+}
 
-  const nav = useNav();
-
+export default function EditClientPage(props: { client: Client }) {
+  doWatch(() => {
+    if (props.client.isDeleted) popPage();
+  });
   const sortedTanks = useFormula(() => listTanks(props.client.tanks));
-  const relatedDeliveries = useFormula(() =>
-    Delivery.completedDeliveries.filter(
-      (delivery) =>
-        exists(delivery.selectedClientDoc?.docId) &&
-        exists(props.client.docId) &&
-        delivery.selectedClientDoc.docId === props.client.docId,
-    ),
-  );
-
-  function deletePressed() {
-    pushPage(DeleteDialog, {
-      obj: props.client,
-      message: `Are you sure you want to permanently delete "${
-        props.client.clientId ?? ``
-      } ${props.client.clientId && props.client.name ? ` - ` : ``} ${
-        props.client.name ?? ``
-      }"?`,
-    });
-  }
 
   return (
     <SimplePage>
-      <AppBar
-        shadowSize={1.25}
+      <InlineAppBar
+        name="Edit Client"
         right={
-          <Icon
-            iconPath={mdiCog}
-            onClick={() => {
-              nav.pushPage(SettingsPage, {});
-            }}
-          />
-        }
-      >
-        {/* Client Info */}
-        <Txt h1>Edit Client</Txt>
-      </AppBar>
-      <Body padBetween={0.5}>
-        <Row widthGrows alignX={$Align.spaceBetween} alignY={$Align.start}>
-          <Icon iconPath={mdiDotsVertical} stroke={mdColors.transparent} />
-          <Txt h2>Client Info</Txt>
           <HiddenOptions
             cancelOptions={{
               stroke: theme.palette.hint,
             }}
           >
-            <DeleteOption onClick={deletePressed} />
+            <DeleteOption
+              onClick={() => openDeleteClientDialog(props.client)}
+            />
           </HiddenOptions>
-        </Row>
+        }
+      />
+      <SimpleBody
+        padBetween={0.5}
+        /* We need to pad the top to give room for the shadow. */
+        padTop={0.5}
+      >
         <Card>
           <ClientFields
             // client={useFormula(
@@ -99,8 +80,9 @@ export default function ClientPage(props: { client: Client }) {
             // )}
             shouldScheduleDeliveriesForThisClient={useFormula(
               () => props.client.shouldScheduleDeliveriesForThisClient ?? false,
-              (val) => (props.client.shouldScheduleDeliveriesForThisClient = val),
-            )} 
+              (val) =>
+                (props.client.shouldScheduleDeliveriesForThisClient = val),
+            )}
             name={useFormula(
               () => props.client.name ?? ``,
               (val) => (props.client.name = val),
@@ -201,13 +183,18 @@ export default function ClientPage(props: { client: Client }) {
         </Row>
         <Column padBetween={1}>
           <For
-            each={relatedDeliveries.value}
+            each={Delivery.completedDeliveries.filter(
+              (delivery) =>
+                exists(delivery.selectedClientDoc?.docId) &&
+                exists(props.client.docId) &&
+                delivery.selectedClientDoc.docId === props.client.docId,
+            )}
             fallback={<Txt hint>No deliveries to this Client.</Txt>}
           >
             {(delivery) => <DeliveryCard delivery={delivery} />}
           </For>
         </Column>
-      </Body>
+      </SimpleBody>
     </SimplePage>
   );
 }
