@@ -15,7 +15,6 @@ import { premiumEnabled, store, mfs } from "@/model/DataModel";
 import { inviteTeamMember, memberLimit } from "@/model/Team";
 import { mdiAccountMultiplePlusOutline } from "@mdi/js";
 import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
-import { FloatingActionButton } from "@/components/Floating";
 import { SimpleDocEntry } from "@/components/SimpleDocEntry";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import { exportData } from "./ExportData";

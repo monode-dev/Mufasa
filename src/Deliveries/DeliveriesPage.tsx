@@ -10,7 +10,6 @@ import {
 } from "miwi";
 import { mdiMenu, mdiPlus } from "@mdi/js";
 import { SettingsPage } from "../settings/SettingsPage";
-import DeliveriesTab from "./DeliveriesTab";
 import { mfs } from "../model/DataModel";
 import { SimplePage } from "../components/SimplePage";
 import { InlineAppBar } from "../components/InlineAppBar";
