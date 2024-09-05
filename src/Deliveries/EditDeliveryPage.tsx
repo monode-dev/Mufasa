@@ -1,7 +1,5 @@
-import { mdiDotsVertical, mdiPlus } from "@mdi/js";
+import { mdiPlus } from "@mdi/js";
 import {
-  AppBar,
-  Body,
   Box,
   Card,
   Column,
@@ -12,21 +10,32 @@ import {
   SortableColumn,
   Txt,
   useFormula,
-  mdColors,
   pushPage,
   exists,
   DeleteOption,
-  theme, Prop, useProp, EnterKeyHint,
+  theme,
+  Prop,
+  useProp,
+  EnterKeyHint,
+  DeleteDialog,
 } from "miwi";
-import {For, onCleanup, Show} from "solid-js";
+import { For, Show } from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
-import DeleteDialog from "@/components/DeleteDialog";
 import { Delivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
 import { SimplePage } from "@/components/SimplePage";
+import { SimpleBody } from "@/components/SimpleBody";
+import { InlineAppBar } from "@/components/InlineAppBar";
 
-export function DeliveryPage(props: { delivery: Delivery }) {
+export function openDeleteDeliveryDialog(delivery: Delivery) {
+  pushPage(DeleteDialog, {
+    onDelete: () => delivery.deleteDoc(),
+    message: `Are you sure you want to permanently delete this delivery?`,
+  });
+}
+
+export function EditDeliveryPage(props: { delivery: Delivery }) {
   const relatedDeliveries = useFormula(() =>
     Delivery.completedDeliveries.filter(
       (delivery) =>
@@ -37,14 +46,7 @@ export function DeliveryPage(props: { delivery: Delivery }) {
     ),
   );
 
-  function handleDeleteRequest() {
-    pushPage(DeleteDialog, {
-      obj: props.delivery,
-      message: `Are you sure you want to permanently delete this delivery?`,
-    });
-  }
-
-  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  const fieldRefs: Prop<Map<number, HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function in SubDeliveryCard.tsx
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
   // filled in LastEnterHint function
@@ -52,32 +54,32 @@ export function DeliveryPage(props: { delivery: Delivery }) {
 
   return (
     <SimplePage>
-      <AppBar>
-        <Txt h2>Edit Delivery</Txt>
-      </AppBar>
-      <Body>
-        {/* SECTION Client */}
-        <Row widthGrows alignX={$Align.spaceBetween} alignY={$Align.start}>
-          <Icon iconPath={mdiDotsVertical} stroke={mdColors.transparent} />
-          <Txt h2 widthGrows alignCenter>
-            Client
-          </Txt>
+      <InlineAppBar
+        name="Edit Delivery"
+        right={
           <HiddenOptions
             scale={1.125}
             cancelOptions={{
               stroke: theme.palette.hint,
             }}
           >
-            <DeleteOption onClick={handleDeleteRequest} />
+            <DeleteOption
+              onClick={() => openDeleteDeliveryDialog(props.delivery)}
+            />
           </HiddenOptions>
-        </Row>
+        }
+      />
+      <SimpleBody
+        /* We need to pad the top to give room for the shadow. */
+        padTop={0.5}
+      >
         {/* Client Card */}
         <Card pad={1} widthGrows>
           <DeliveryFields delivery={props.delivery} />
         </Card>
-        <Box />
 
         {/* SECTION Sub Deliveries */}
+        <Box />
         <Row widthGrows alignX={$Align.spaceBetween}>
           <Box width={1.75} />
           <Txt h2>Individual Deliveries</Txt>
@@ -113,15 +115,22 @@ export function DeliveryPage(props: { delivery: Delivery }) {
                 {(subDelivery, index) => {
                   const dex = index();
                   const next = dex + 1;
-                  const nextSubDelivery = useFormula(() => next < props.delivery.sortedSubDeliveries.length
-                    ? props.delivery.sortedSubDeliveries[next]
-                    : undefined);
-                  return <SubDeliveryCard
-                    subDelivery={subDelivery} nextSubDelivery={nextSubDelivery}
-                    enterHintRefs={enterHintRefs} fieldRefs={fieldRefs}
-                    subDeliveryIndex={useProp(dex)} nextOverride={nextOverride}
-                    noKeyHandler
-                  />;
+                  const nextSubDelivery = useFormula(() =>
+                    next < props.delivery.sortedSubDeliveries.length
+                      ? props.delivery.sortedSubDeliveries[next]
+                      : undefined,
+                  );
+                  return (
+                    <SubDeliveryCard
+                      subDelivery={subDelivery}
+                      nextSubDelivery={nextSubDelivery}
+                      enterHintRefs={enterHintRefs}
+                      fieldRefs={fieldRefs}
+                      subDeliveryIndex={useProp(dex)}
+                      nextOverride={nextOverride}
+                      noKeyHandler
+                    />
+                  );
                 }}
               </For>
             </SortableColumn>
@@ -136,7 +145,7 @@ export function DeliveryPage(props: { delivery: Delivery }) {
             {(delivery) => <DeliveryCard delivery={delivery} />}
           </For>
         </Show>
-      </Body>
+      </SimpleBody>
     </SimplePage>
   );
 }

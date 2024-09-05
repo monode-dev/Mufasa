@@ -11,7 +11,7 @@ import {
   pushPage,
 } from "miwi";
 import { For } from "solid-js";
-import { DeliveryPage } from "./DeliveryPage";
+import { EditDeliveryPage } from "./EditDeliveryPage";
 import { DeliveryCard } from "./DeliveryCard";
 import { Delivery } from "./Delivery";
 import { openCreateDeliveryDialog } from "./CreateDeliveryDialog";
@@ -35,7 +35,7 @@ export default function DeliveriesTab() {
           onClick={() =>
             openCreateDeliveryDialog({
               onCreate: (delivery) => {
-                pushPage(DeliveryPage, { delivery });
+                pushPage(EditDeliveryPage, { delivery });
               },
             })
           }

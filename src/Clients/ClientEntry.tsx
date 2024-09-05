@@ -2,13 +2,10 @@ import {
   Row,
   Txt,
   pushPage,
-  useProp,
-  mdColors,
   HiddenOption,
   HiddenOptions,
   DeleteOption,
   theme,
-  useFormula,
 } from "miwi";
 import DeleteDialog from "../components/DeleteDialog";
 import { isClientValid, getClientLabel } from "@/AppData";
@@ -16,7 +13,7 @@ import EditClientPage from "./EditClientPage";
 import { Client } from "./Client";
 import { mdiTankerTruck } from "@mdi/js";
 import { openCreateDeliveryDialog } from "@/Deliveries/CreateDeliveryDialog";
-import { DeliveryPage } from "@/Deliveries/DeliveryPage";
+import { EditDeliveryPage } from "@/Deliveries/EditDeliveryPage";
 
 export default function ClientEntery(props: { client: Client }) {
   return (
@@ -43,7 +40,7 @@ export default function ClientEntery(props: { client: Client }) {
           onClick={() =>
             openCreateDeliveryDialog({
               onCreate: (delivery) => {
-                pushPage(DeliveryPage, { delivery });
+                pushPage(EditDeliveryPage, { delivery });
               },
               initClient: props.client,
             })
