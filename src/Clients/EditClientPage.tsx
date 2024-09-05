@@ -66,6 +66,7 @@ export default function EditClientPage(props: { client: Client }) {
             />
           </HiddenOptions>
         }
+        padBottom={0.5}
       />
       <SimpleBody
         padBetween={0.5}
