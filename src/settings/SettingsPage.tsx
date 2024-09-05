@@ -32,6 +32,7 @@ import { TeamSettingsPage } from "./TeamSettingsPage";
 import { InlineAppBar } from "@/components/InlineAppBar";
 import { FuelsPage } from "../Fuel/FuelsPage";
 import ClientsPage from "@/Clients/ClientsPage";
+import { CalculatorsPage } from "@/Calculator/CalculatorsPage";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -89,7 +90,11 @@ export function SettingsPage() {
           onClick={() => pushPage(FuelsPage, {})}
         />
         {/* TODO */}
-        <SettingsOption icon={mdiCalculator} text={`Calculators`} />
+        <SettingsOption
+          icon={mdiCalculator}
+          text={`Calculators`}
+          onClick={() => pushPage(CalculatorsPage, {})}
+        />
         <SettingsOption
           icon={mdiAccountGroupOutline}
           text={`Team`}
