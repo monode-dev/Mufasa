@@ -119,6 +119,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       {/* Completion hint. */}
       <Show
         when={
+          !props.delivery.isCompleted &&
           props.delivery.subDeliveries.count > 0 &&
           SubDelivery.numSubDeliveriesCompleted <= 0
         }

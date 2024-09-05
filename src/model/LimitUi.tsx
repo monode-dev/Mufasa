@@ -13,7 +13,7 @@ import { ConfirmationPopUp } from "../components/ConfirmationPopUp";
 import { Client } from "@/Clients/Client";
 import { mfs, store, premiumEnabled, FuelType } from "@/model/DataModel";
 import { PrivacyPolicyPage } from "@/settings/PrivacyPolicyPage";
-import { openTermsOfUse } from "@/settings/SettingsPage";
+import { openTermsOfUse } from "@/settings/AccountSettingsPage";
 import { memberLimit } from "@/model/Team";
 import { Tank } from "@/Tanks/Tank";
 import { Delivery, SubDelivery } from "@/Deliveries/Delivery";

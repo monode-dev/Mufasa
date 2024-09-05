@@ -20,39 +20,11 @@ export function DailyTotalsCard() {
     );
   });
 
-  // const leftPerFuel = useFormula(() => {
-  //   const leftPerFuel = new Map<string, number>();
-  //   upcomingSubDeliveries.value.forEach((sub) => {
-  //     const fuelName = sub.fuelSpecs?.name;
-  //     if (!exists(fuelName)) return;
-  //     if (!leftPerFuel.has(fuelName)) leftPerFuel.set(fuelName, 0);
-  //     leftPerFuel.set(
-  //       fuelName,
-  //       leftPerFuel.get(fuelName)! + (sub.gallons ?? 0),
-  //     );
-  //   });
-  //   return leftPerFuel;
-  // });
-
   const completedSubDeliveriesSince3am = useFormula(() =>
     Delivery.usersDeliveriesSince3am.flatMap((delivery) =>
       delivery.sortedSubDeliveries.filter((sub) => sub.isCompleted),
     ),
   );
-
-  // const deliveredPerFuel = useFormula(() => {
-  //   const deliveredPerFuel = new Map<string, number>();
-  //   completedSubDeliveriesSince3am.value.forEach((sub) => {
-  //     const fuelName = sub.fuelSpecs?.name;
-  //     if (!exists(fuelName)) return;
-  //     if (!deliveredPerFuel.has(fuelName)) deliveredPerFuel.set(fuelName, 0);
-  //     deliveredPerFuel.set(
-  //       fuelName,
-  //       deliveredPerFuel.get(fuelName)! + (sub.gallons ?? 0),
-  //     );
-  //   });
-  //   return deliveredPerFuel;
-  // });
 
   const upcomingAndDeliveredFuel = useFormula(() => {
     const upcomingAndDeliveredFuel = new Map<string, number>();
@@ -78,27 +50,8 @@ export function DailyTotalsCard() {
       );
     });
 
-    return upcomingAndDeliveredFuel;
+    return Array.from(upcomingAndDeliveredFuel.entries());
   });
-
-  const totalGallons = useFormula(() =>
-    formatNumWithCommas(
-      completedSubDeliveriesSince3am.value.reduce(
-        (total, sub) => total + (sub.gallons ?? 0),
-        0,
-      ),
-      0,
-    ),
-  );
-  const totalSales = useFormula(() =>
-    formatNumWithCommas(
-      completedSubDeliveriesSince3am.value.reduce(
-        (total, sub) => total + sub.sales,
-        0,
-      ),
-      0,
-    ),
-  );
 
   function findFuelType(fuelName: string) {
     return FuelType.sortedFuelTypes.find((fuel) => fuel.name === fuelName);
@@ -106,9 +59,9 @@ export function DailyTotalsCard() {
 
   return (
     <Card widthGrows padBetween={0.75}>
-      <Show when={true /* shouldShowTotals() */}>
+      <Show when={upcomingAndDeliveredFuel.value.length > 0}>
         <For
-          each={Array.from(upcomingAndDeliveredFuel.value.entries())}
+          each={upcomingAndDeliveredFuel.value}
           fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
         >
           {([fuelName, deliveredGallons]) => (
@@ -162,15 +115,27 @@ export function DailyTotalsCard() {
             </Row>
           )}
         </For>
+        <Box widthGrows height={0.125} fill={$theme.colors.text} />
       </Show>
 
-      <Box widthGrows height={0.125} fill={$theme.colors.text} />
       <Column>
         <Txt widthGrows={4} alignLeft>
-          Fuel Delivered: {totalGallons.value} gal.
+          Fuel Delivered: {formatNumWithCommas(
+      completedSubDeliveriesSince3am.value.reduce(
+        (total, sub) => total + (sub.gallons ?? 0),
+        0,
+      ),
+      0,
+    )} gal.
         </Txt>
         <Txt widthGrows={3} alignLeft>
-          Today's Sales: ${totalSales.value}
+          Today's Sales: ${formatNumWithCommas(
+      completedSubDeliveriesSince3am.value.reduce(
+        (total, sub) => total + sub.sales,
+        0,
+      ),
+      0,
+    )}
         </Txt>
       </Column>
     </Card>

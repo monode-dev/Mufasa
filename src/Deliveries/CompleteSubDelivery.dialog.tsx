@@ -79,7 +79,6 @@ export default function CompleteSubDeliveryDialog(props: {
             cardRef.value = el;
           }
         }}
-        shadowSize={0}
       >
         {/* --Fields-- */}
         <CompletedSubDeliveryFields
