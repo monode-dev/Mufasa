@@ -21,49 +21,47 @@ export default function ClientActionBar(props: {
   });
 
   return (
-    <>
-      <Row
-        fill={$theme.colors.primary}
-        widthGrows
-        align={$Align.spaceEvenly}
-        padAroundY={0.75}
-        padAroundX={0}
-        shadowSize={1.25}
-        shadowDirection={$Align.bottomCenter}
-      >
-        <Show when={!props.isSearching.value}>
-          <OutlinedActionButton
-            action={"Search"}
-            iconPath={mdiMagnify}
-            onClick={toggleSearch} // TODO prove that this works
-          ></OutlinedActionButton>
+    <Row
+      fill={$theme.colors.primary}
+      widthGrows
+      align={$Align.spaceEvenly}
+      padAroundY={0.75}
+      padAroundX={0}
+      shadowSize={1.25}
+      shadowDirection={$Align.bottomCenter}
+    >
+      <Show when={!props.isSearching.value}>
+        <OutlinedActionButton
+          action={"Search"}
+          iconPath={mdiMagnify}
+          onClick={toggleSearch} // TODO prove that this works
+        ></OutlinedActionButton>
 
-          <OutlinedActionButton
-            action={"New"}
-            iconPath={mdiPlus}
-            onClick={() =>
-              openCreateClientDialog({
-                onCreate: (newClient) =>
-                  pushPage(ClientPage, { client: newClient }),
-              })
-            }
-          />
-          {/* <OutlinedActionButton
+        <OutlinedActionButton
+          action={"New"}
+          iconPath={mdiPlus}
+          onClick={() =>
+            openCreateClientDialog({
+              onCreate: (newClient) =>
+                pushPage(ClientPage, { client: newClient }),
+            })
+          }
+        />
+        {/* <OutlinedActionButton
             action={"Add from CSV"}
             iconPath={mdiPlus}
             onClick={()=>pushPage(LoadCSVDialog, undefined)}
           /> */}
-        </Show>
+      </Show>
 
-        <Show when={props.isSearching.value}>
-          <Box padAroundX={2}>
-            <ClientSearchBar
-              filterString={props.filterString}
-              isSearching={props.isSearching}
-            />
-          </Box>
-        </Show>
-      </Row>
-    </>
+      <Show when={props.isSearching.value}>
+        <Box padAroundX={2}>
+          <ClientSearchBar
+            filterString={props.filterString}
+            isSearching={props.isSearching}
+          />
+        </Box>
+      </Show>
+    </Row>
   );
 }

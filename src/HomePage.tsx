@@ -1,5 +1,5 @@
 import { useProp, useNav, Page, AppBar, Icon, TabButtons, TabView } from "miwi";
-import { mdiCog } from "@mdi/js";
+import { mdiCog, mdiMenu } from "@mdi/js";
 import { SettingsPage } from "./settings/SettingsPage";
 import CalculatorsTab from "@/Calculator/CalculatorsTab";
 import ClientsTab from "./Clients/ClientsTab";
@@ -19,7 +19,7 @@ export function HomePage() {
         shadowSize={selectedTab.value === 0 ? 0 : 1.25}
         right={
           <Icon
-            iconPath={mdiCog}
+            iconPath={mdiMenu}
             onClick={() => {
               nav.pushPage(SettingsPage, {});
             }}
