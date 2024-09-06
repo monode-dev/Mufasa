@@ -24,6 +24,7 @@ import {
   DeleteOption,
   theme,
   DeleteDialog,
+  doWatch,
 } from "miwi";
 import { EditDeliveryPage } from "./EditDeliveryPage";
 import { For, Show } from "solid-js";
@@ -33,10 +34,24 @@ import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 import { formatNumWithCommas, formatPosixTime } from "@/utils";
 import { CalculateFillDialog } from "@/Calculator/CalculateFillDialog";
+import { doNow } from "mufasa/dist/Utils";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
+  const showPerFuelTotals = doNow(() => {
+    const showPerFuelTotals = useProp(false);
+    /* Josh asked to have all delivery totals collapsed by default except for the most recently completed delivery. */
+    const isMostRecentlyCompletedDelivery = useFormula(() =>
+      props.delivery.isCompleted
+        ? Delivery.currentUsersCompletedDeliveries[0] === props.delivery
+        : false,
+    );
+    doWatch(() => {
+      if (!props.delivery.isCompleted) return;
+      showPerFuelTotals.value = isMostRecentlyCompletedDelivery.value;
+    });
+    return showPerFuelTotals;
+  });
   // TODO: Make this based off of fuel id not fuel name
-  const showPerFuelTotals = useProp(false);
   const totalPerFuelType = useFormula(() => {
     const totalPerFuelType = new Map<string, number>();
     props.delivery.sortedSubDeliveries.forEach((sub) => {
