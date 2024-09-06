@@ -24,6 +24,7 @@ import { Delivery, SubDelivery } from "./Delivery";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
 import { formatNumWithCommas } from "@/utils";
+import { CalculateFillDialog } from "@/Calculator/CalculateFillDialog";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   // TODO: Make this based off of fuel id not fuel name
@@ -213,7 +214,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
                 ? pushPage(ConfirmSubDeliveryUncompletion, {
                     subDelivery: props.subDelivery,
                   })
-                : pushPage(CompleteSubDeliveryDialog, {
+                : pushPage(CalculateFillDialog, {
                     subDelivery: props.subDelivery,
                   })
             }
