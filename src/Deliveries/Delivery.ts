@@ -419,13 +419,19 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Sales
   readonly sales = formula(
-    /* JS math has small rounding errors. e.g. 3.099 * 100 = 309.90000000000003
-     * To overcome this we round to three decimals, and then round up to the nearest cent. */
-    () =>
-      Math.ceil(
-        Math.round((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0) * 100000) /
-          1000,
-      ) / 100,
+    /* JS math has small rounding errors. e.g. `3.099 * 100 = 309.90000000000003` To overcome
+     * this we use accurate and we truncate everything past five decimals and then round to two
+     * decimals */
+    () => {
+      const rate = this.fuelSpecs?.rate ?? 0;
+      const gallons = this.gallons ?? 0;
+      const rawSales = accurate.mul(rate, gallons);
+      const truncated = accurate.divide(
+        Math.floor(accurate.mul(rawSales, 100000)),
+        100000,
+      );
+      return accurate.divide(Math.round(accurate.mul(truncated, 100)), 100);
+    },
   );
 
   // Full Title
