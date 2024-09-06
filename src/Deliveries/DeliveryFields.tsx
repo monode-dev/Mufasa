@@ -132,8 +132,8 @@ export function DeliveryFields(props: {
             !clientIsValid()
               ? mdColors.orange
               : exists(props.delivery.selectedClient !== NONE_SELECTED)
-                ? mdColors.black
-                : mdColors.grey
+              ? mdColors.black
+              : mdColors.grey
           }
         />
         <ClientSelector
@@ -185,7 +185,7 @@ export function DeliveryFields(props: {
           icon={mdiPlusMinusVariant}
           value={one_rateOffset}
           underlined
-          keyboard={"numeric"}
+          keyboard={"decimal"}
           enterKeyHint={useFormula(() => enterKey(one_note, offsetIndex)).value}
           onlyWriteOnBlur
           negativesAreAllowed
