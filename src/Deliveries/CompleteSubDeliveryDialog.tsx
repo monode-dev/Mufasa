@@ -60,7 +60,7 @@ export default function CompleteSubDeliveryDialog(props: {
       />
 
       {/* --Buttons-- */}
-      <Row widthGrows>
+      <Row padBetween={1}>
         <Button widthGrows outlined onclick={popPage}>
           Cancel
         </Button>

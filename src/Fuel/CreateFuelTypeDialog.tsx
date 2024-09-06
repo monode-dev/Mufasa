@@ -70,7 +70,7 @@ function CreateFuelTypeDialog(props: {
           hint="$/gal."
         />
       </Label>
-      <Row widthGrows>
+      <Row padBetween={1}>
         <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>

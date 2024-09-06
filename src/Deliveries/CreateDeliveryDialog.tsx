@@ -99,7 +99,7 @@ function CreateDeliveryDialog(props: {
           {warningMessage.value}
         </Txt>
       </Show>
-      <Row widthGrows>
+      <Row padBetween={1}>
         <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>
