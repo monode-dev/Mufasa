@@ -1,4 +1,13 @@
-import { mdiPencil, mdiCheck, mdiArrowUpLeft } from "@mdi/js";
+import {
+  mdiPencil,
+  mdiCheck,
+  mdiArrowUpLeft,
+  mdiCalculatorVariant,
+  mdiCalculator,
+  mdiArrowLeft,
+  mdiChevronLeft,
+  mdiChevronDown,
+} from "@mdi/js";
 import {
   Box,
   Card,
@@ -6,7 +15,6 @@ import {
   Txt,
   Icon,
   exists,
-  formatPosixTime,
   pushPage,
   useProp,
   useFormula,
@@ -23,11 +31,12 @@ import CompleteSubDeliveryDialog from "./CompleteSubDeliveryDialog";
 import { Delivery, SubDelivery } from "./Delivery";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
-import { formatNumWithCommas } from "@/utils";
+import { formatNumWithCommas, formatPosixTime } from "@/utils";
 import { CalculateFillDialog } from "@/Calculator/CalculateFillDialog";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
   // TODO: Make this based off of fuel id not fuel name
+  const showPerFuelTotals = useProp(false);
   const totalPerFuelType = useFormula(() => {
     const totalPerFuelType = new Map<string, number>();
     props.delivery.sortedSubDeliveries.forEach((sub) => {
@@ -78,12 +87,21 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           {props.delivery.title}
         </Txt>
 
-        <CallAndMapToIcons
-          forceHintColor={props.delivery.isCompleted}
-          phoneNumber={props.delivery.phoneNumber}
-          address={props.delivery.address}
-        />
         <Show when={!props.delivery.isCompleted}>
+          <Icon
+            stroke={theme.palette.primary}
+            onClick={() =>
+              pushPage(CalculateFillDialog, { delivery: props.delivery })
+            }
+            iconPath={mdiCalculator}
+          />
+
+          <CallAndMapToIcons
+            forceHintColor={props.delivery.isCompleted}
+            phoneNumber={props.delivery.phoneNumber}
+            address={props.delivery.address}
+          />
+
           <DeliveryCardOptionButtons delivery={props.delivery} />
         </Show>
       </Row>
@@ -91,6 +109,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       {/* Client Notes */}
       <Show
         when={
+          !props.delivery.isCompleted &&
           exists(props.delivery._client?.notes) &&
           props.delivery._client.notes.trim().length > 0
         }
@@ -139,26 +158,33 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         </Row>
       </Show>
 
-      {/* <Box widthGrows height={0.125} fill={$theme.colors.text} /> */}
-
-      <Show when={props.delivery.sortedSubDeliveries}>
-        <For each={Array.from(totalPerFuelType.value.entries())}>
-          {([FuelName, totalSalesWorth]) => (
-            <Row>
-              <Txt singleLine width={5} alignLeft>
-                {FuelName}
-              </Txt>
-              <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
-            </Row>
-          )}
-        </For>
-        <Show when={props.delivery.sortedSubDeliveries.length > 0}>
-          <Row>
-            <Txt bold alignLeft width={5}>
-              Total:
-            </Txt>
-            <Txt widthGrows>${props.delivery.totalMoney}</Txt>
-          </Row>
+      {/* Totals */}
+      <Show when={props.delivery.sortedSubDeliveries.length > 0}>
+        <Row
+          onClick={() => (showPerFuelTotals.value = !showPerFuelTotals.value)}
+        >
+          <Txt bold alignLeft /* width={5} */>
+            Total:
+          </Txt>
+          <Txt widthGrows bold>
+            ${props.delivery.totalMoney}
+          </Txt>
+          <Icon
+            scale={1 + 3 / 16}
+            iconPath={showPerFuelTotals.value ? mdiChevronDown : mdiChevronLeft}
+          />
+        </Row>
+        <Show when={showPerFuelTotals.value}>
+          <For each={Array.from(totalPerFuelType.value.entries())}>
+            {([FuelName, totalSalesWorth]) => (
+              <Row>
+                <Txt singleLine alignLeft /* width={5} */>
+                  {FuelName}:
+                </Txt>
+                <Txt widthGrows>${formatNumWithCommas(totalSalesWorth, 2)}</Txt>
+              </Row>
+            )}
+          </For>
         </Show>
       </Show>
 
@@ -214,7 +240,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
                 ? pushPage(ConfirmSubDeliveryUncompletion, {
                     subDelivery: props.subDelivery,
                   })
-                : pushPage(CalculateFillDialog, {
+                : pushPage(CompleteSubDeliveryDialog, {
                     subDelivery: props.subDelivery,
                   })
             }
@@ -246,6 +272,7 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
   );
 }
 
+// TODO: Add calculate, map, and call buttons as options.
 function DeliveryCardOptionButtons(props: { delivery: Delivery }) {
   const isOpen = useProp(false);
 

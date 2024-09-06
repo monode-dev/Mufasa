@@ -17,6 +17,7 @@ import {
 import { For, Show } from "solid-js";
 import { mdiFuel, mdiPlus } from "@mdi/js";
 import { FuelType } from "@/model/DataModel";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 type SelectedFuelType = FuelType | typeof ONE_TIME | null;
 
@@ -132,7 +133,7 @@ export function FuelTypeSelector(props: {
           </Show>
           {/* Divider */}
           <Show when={props.showNewOption || props.showOneTimeOption}>
-            <Box widthGrows height={0.125} fill={mdColors.grey} />
+            <HorizontalDivider />
           </Show>
           {/* Fuel Types */}
           <Show when={FuelType.sortedFuelTypes.length == 0}>

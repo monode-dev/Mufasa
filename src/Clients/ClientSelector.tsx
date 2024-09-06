@@ -19,6 +19,7 @@ import { Client } from "./Client";
 import { openCreateClientDialog } from "./CreateClientDialog";
 import EditClientPage from "./EditClientPage";
 import { Delivery } from "@/Deliveries/Delivery";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 // import { Selector } from "@/Mock/_Selector";
 
@@ -187,12 +188,7 @@ export default function ClientSelector(props: {
         </Show>
         {/* Divider */}
         <Show when={props.showNewOption || props.showOneTimeOption}>
-          <Box
-            widthGrows
-            height={0.125}
-            fill={theme.palette.hint}
-            padBetween={0.125}
-          />
+          <HorizontalDivider />
         </Show>
       </Show>
       {/* Clients */}
