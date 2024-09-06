@@ -22,7 +22,7 @@ export function ConfirmSubDeliveryUncompletion(props: {
           }}
           fill={mdColors.green}
         >
-          Un-Complete
+          Uncomplete
         </Button>
       </Row>
     </Dialog>
