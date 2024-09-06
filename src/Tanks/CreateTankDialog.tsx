@@ -4,8 +4,6 @@ import {
   useProp,
   exists,
   Prop,
-  Box,
-  Card,
   Txt,
   Field,
   Row,
@@ -13,6 +11,7 @@ import {
   FloatSort,
   doWatch,
   pushPage,
+  Dialog,
 } from "miwi";
 import { isTankValid } from "@/AppData";
 import { createReactiveTankGeometry } from "@/Calculator/ShapeUtils";
@@ -68,7 +67,7 @@ function CreateTankDialog(props: {
           getPos: (tank) => tank.sortPos,
           getUid: (tank) => tank.docId,
         }),
-      }) satisfies Partial<Tank>,
+      } satisfies Partial<Tank>),
   );
 
   function showErrors() {
@@ -78,21 +77,6 @@ function CreateTankDialog(props: {
   doWatch(() => {
     tankIsValid.value = isTankValid(computedTank.value);
   });
-
-  function handleYes() {
-    if (!tankIsValid.value) {
-      showErrors();
-      return;
-    }
-    popPage();
-    if (!exists(props.client.tanks)) return;
-    const newTank = Tank.create({
-      ...computedTank.value,
-      mx_parent: props.client,
-      creationTimePosix: Date.now(),
-    });
-    if (exists(props.onCreate)) props.onCreate(newTank);
-  }
 
   const TankFields_warning = useProp("");
   const showWarning = useFormula(
@@ -109,63 +93,67 @@ function CreateTankDialog(props: {
   });
 
   return (
-    <Box
-      widthGrows
-      heightGrows
-      onClick={popPage}
-      fill="#00000099"
-      padAround={1}
-    >
-      <Card
-        shadowSize={2}
-        preventClickPropagation
-        outlineColor={live_error_msg.value ? $theme.colors.warning : undefined}
-      >
-        <Txt h1>Create Tank</Txt>
-        {/* Fuel Selector */}
-        <Row>
-          <Txt>Fuel: </Txt>
-          <FuelTypeSelector
-            hideIcon
-            fuelType={fuelType}
-            showNewOption={true}
-            show_errors={show_errors}
-          />
-        </Row>
-        {/* Shape Selector conditionally renders Tank Fields */}
-        <TankFields
-          create
-          tankGeometry={tankGeometry}
-          oneDimPerRow
-          warningMessage={TankFields_warning}
+    <Dialog widthGrows>
+      <Txt h1>Create Tank</Txt>
+      {/* Fuel Selector */}
+      <Row>
+        <Txt>Fuel: </Txt>
+        <FuelTypeSelector
+          hideIcon
+          fuelType={fuelType}
+          showNewOption={true}
+          show_errors={show_errors}
         />
-        {/* Notes */}
-        <Field
-          value={notes}
-          hintText="Notes, Combination, Key Tag"
-          iconPath={mdiLabel}
-          underlined
-          multiline
-          capitalize={"sentences"}
-          keyboard={"text"}
-        />
+      </Row>
+      {/* Shape Selector conditionally renders Tank Fields */}
+      <TankFields
+        create
+        tankGeometry={tankGeometry}
+        oneDimPerRow
+        warningMessage={TankFields_warning}
+      />
+      {/* Notes */}
+      <Field
+        value={notes}
+        hintText="Notes, Combination, Key Tag"
+        iconPath={mdiLabel}
+        underlined
+        multiline
+        capitalize={"sentences"}
+        keyboard={"text"}
+      />
 
-        <Show when={showWarning}>
-          <Txt widthGrows stroke={$theme.colors.warning}>
-            {warningMessage.value}
-          </Txt>
-        </Show>
+      <Show when={showWarning}>
+        <Txt widthGrows stroke={$theme.colors.warning}>
+          {warningMessage.value}
+        </Txt>
+      </Show>
 
-        {/* Cancel and Create Buttons */}
-        <Row widthGrows align={$Align.spaceEvenly}>
-          <Button outlined onClick={popPage}>
-            Cancel
-          </Button>
-          <Button onClick={handleYes} fill={$theme.colors.primary}>
-            Create
-          </Button>
-        </Row>
-      </Card>
-    </Box>
+      {/* Cancel and Create Buttons */}
+      <Row widthGrows align={$Align.spaceEvenly}>
+        <Button outlined onClick={popPage}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            if (!tankIsValid.value) {
+              showErrors();
+              return;
+            }
+            popPage();
+            if (!exists(props.client.tanks)) return;
+            const newTank = Tank.create({
+              ...computedTank.value,
+              mx_parent: props.client,
+              creationTimePosix: Date.now(),
+            });
+            if (exists(props.onCreate)) props.onCreate(newTank);
+          }}
+          fill={$theme.colors.primary}
+        >
+          Create
+        </Button>
+      </Row>
+    </Dialog>
   );
 }

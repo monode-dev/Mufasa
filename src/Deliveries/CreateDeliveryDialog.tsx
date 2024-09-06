@@ -9,6 +9,7 @@ import {
   ONE_TIME,
   pushPage,
   exists,
+  Dialog,
 } from "miwi";
 import { Delivery, SelectedClient } from "./Delivery";
 import { NONE_SELECTED } from "@/utils";
@@ -89,50 +90,49 @@ function CreateDeliveryDialog(props: {
 
   const warningMessage = useProp(``);
 
-  function handleYes() {
-    if (!selectedClient.value) {
-      warningMessage.value = `Please select a client.`;
-      return;
-    }
-    popPage();
-    const newDelivery = Delivery.create({
-      _isOneTimeClient: selectedClient.value === ONE_TIME,
-      _client:
-        selectedClient.value === ONE_TIME ||
-        selectedClient.value === NONE_SELECTED
-          ? null
-          : selectedClient.value,
-      _manualTitle: title.value,
-      _manualPhoneNumber: phoneNumber.value,
-      _manualClientAddress: explicitAddress.value,
-      _manualRateOffset: explicitRateOffset.value,
-      notes: notes.value,
-      sortPosition: Date.now(),
-      creationTimePosix: Date.now(),
-      createdBy: mfs.user.uid ?? null,
-    });
-    props.onCreate(newDelivery);
-  }
-
   return (
-    <Page onClick={popPage} fill="#00000099" padAround={1}>
-      <Card preventClickPropagation shadowSize={2}>
-        <Txt h1>Create Delivery</Txt>
-        <DeliveryFields delivery={deliveryProps} showScheduledClients create />
-        <Show when={warningMessage.value}>
-          <Txt widthGrows alignLeft stroke={$theme.colors.warning}>
-            {warningMessage.value}
-          </Txt>
-        </Show>
-        <Row widthGrows align={$Align.spaceEvenly}>
-          <Button outlined onClick={popPage}>
-            Cancel
-          </Button>
-          <Button onClick={handleYes} fill={$theme.colors.primary}>
-            Create
-          </Button>
-        </Row>
-      </Card>
-    </Page>
+    <Dialog widthGrows>
+      <Txt h1>Create Delivery</Txt>
+      <DeliveryFields delivery={deliveryProps} showScheduledClients create />
+      <Show when={warningMessage.value}>
+        <Txt widthGrows alignLeft stroke={$theme.colors.warning}>
+          {warningMessage.value}
+        </Txt>
+      </Show>
+      <Row widthGrows align={$Align.spaceEvenly}>
+        <Button outlined onClick={popPage}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            if (!selectedClient.value) {
+              warningMessage.value = `Please select a client.`;
+              return;
+            }
+            popPage();
+            const newDelivery = Delivery.create({
+              _isOneTimeClient: selectedClient.value === ONE_TIME,
+              _client:
+                selectedClient.value === ONE_TIME ||
+                selectedClient.value === NONE_SELECTED
+                  ? null
+                  : selectedClient.value,
+              _manualTitle: title.value,
+              _manualPhoneNumber: phoneNumber.value,
+              _manualClientAddress: explicitAddress.value,
+              _manualRateOffset: explicitRateOffset.value,
+              notes: notes.value,
+              sortPosition: Date.now(),
+              creationTimePosix: Date.now(),
+              createdBy: mfs.user.uid ?? null,
+            });
+            props.onCreate(newDelivery);
+          }}
+          fill={$theme.colors.primary}
+        >
+          Create
+        </Button>
+      </Row>
+    </Dialog>
   );
 }
