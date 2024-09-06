@@ -88,7 +88,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
   _isOneTimeClient = prop(Boolean, false);
   _client = prop([Client, null], null);
   selectedClient: SelectedClient = formula(
-    () => (this._isOneTimeClient ? ONE_TIME : (this._client ?? NONE_SELECTED)),
+    () => (this._isOneTimeClient ? ONE_TIME : this._client ?? NONE_SELECTED),
     (value) => {
       if (value === ONE_TIME) {
         this._isOneTimeClient = true;
@@ -138,7 +138,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     () =>
       this.selectedClient === ONE_TIME
         ? this._manualClientAddress
-        : (this.selectedClient?.address ?? ``),
+        : this.selectedClient?.address ?? ``,
     (value) => {
       this._manualClientAddress = value;
     },
@@ -150,7 +150,7 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     () =>
       this.selectedClient === ONE_TIME
         ? this._manualPhoneNumber
-        : (this.selectedClient?.phoneNumber ?? ``),
+        : this.selectedClient?.phoneNumber ?? ``,
     (value) => {
       this._manualPhoneNumber = value;
     },
@@ -165,8 +165,8 @@ export class Delivery extends mfs.Doc(`Delivery`) {
     this.selectedClient === ONE_TIME
       ? this._manualRateOffset
       : this.selectedClient === NONE_SELECTED
-        ? null
-        : this.selectedClient?.rateOffset,
+      ? null
+      : this.selectedClient?.rateOffset,
   );
 
   // Notes
@@ -285,7 +285,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       return this._isJustFuel ||
         (!this.shouldShowTankSelector && !exists(this._tank))
         ? JUST_FUEL
-        : (this._tank ?? NONE_SELECTED);
+        : this._tank ?? NONE_SELECTED;
     },
     (value) => {
       if (value === JUST_FUEL) {
@@ -317,7 +317,7 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
   selectedFuel: SelectedFuel = formula(
     () => {
-      return this._isOneTimeFuel ? ONE_TIME : (this._fuelType ?? NONE_SELECTED);
+      return this._isOneTimeFuel ? ONE_TIME : this._fuelType ?? NONE_SELECTED;
     },
     (value) => {
       if (value === ONE_TIME) {
@@ -418,8 +418,13 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
   // Sales
   readonly sales = formula(
+    /* JS math has small rounding errors. e.g. 3.099 * 100 = 309.90000000000003
+     * To overcome this we round to three decimals, and then round up to the nearest cent. */
     () =>
-      Math.ceil((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0) * 100) / 100,
+      Math.ceil(
+        Math.round((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0) * 1000) /
+          10,
+      ) / 100,
   );
 
   // Full Title
@@ -499,8 +504,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
         !exists(this.explicitFuelName) || this.explicitFuelName.trim() === ``
           ? `Give the fuel a name.`
           : !exists(this.explicitRate) || this.explicitRate < 0
-            ? `Give the fuel a rate.`
-            : undefined;
+          ? `Give the fuel a rate.`
+          : undefined;
 
       // Completed
       if (this.isCompleted) return explicitFuelError;
@@ -523,19 +528,19 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
         return this.selectedFuel === NONE_SELECTED
           ? `Please select a fuel.`
           : this.selectedFuel === ONE_TIME
-            ? explicitFuelError
-            : !FuelType.isValid(this.selectedFuel)
-              ? `Please select a valid fuel.`
-              : undefined;
+          ? explicitFuelError
+          : !FuelType.isValid(this.selectedFuel)
+          ? `Please select a valid fuel.`
+          : undefined;
       } else {
         // Tank
         return !exists(this.selectedTank)
           ? `Please select a tank.`
           : !isTankValid(this.selectedTank)
-            ? `Please select a valid tank.`
-            : !FuelType.isValid(this.selectedTank.fuelType)
-              ? `Please select a valid fuel.`
-              : undefined;
+          ? `Please select a valid tank.`
+          : !FuelType.isValid(this.selectedTank.fuelType)
+          ? `Please select a valid fuel.`
+          : undefined;
       }
     });
 
