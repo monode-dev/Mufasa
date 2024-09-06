@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "341748622809-m63o15jt3ip279hsvfddtv6psd1rfn7u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "us.tke.ninetypercent",
+            "certificate_hash": "e97fb136de8a03bd61dbe00bd10732b0c887b789"
+          }
+        },
+        {
           "client_id": "341748622809-dvuhen59vt6mji564rcpbur95jukaqrm.apps.googleusercontent.com",
           "client_type": 3
         }
