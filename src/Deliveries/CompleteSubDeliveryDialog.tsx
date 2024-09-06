@@ -1,18 +1,16 @@
 import {
   Button,
-  Card,
-  Page,
   Row,
   useFormula,
   exists,
   mdColors,
   popPage,
   useProp,
+  Dialog,
 } from "miwi";
 import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
 import { SubDelivery } from "./Delivery";
 
-// noinspection t
 export default function CompleteSubDeliveryDialog(props: {
   subDelivery: SubDelivery;
 }) {
@@ -45,64 +43,44 @@ export default function CompleteSubDeliveryDialog(props: {
     // stickedInchesAfterFilling.value >= 0,
   );
 
-  function completeDelivery() {
-    if (!canComplete.value) return;
-    props.subDelivery.complete({
-      fuelName: fuelName.value,
-      rate: preOffsetRate.value!,
-      gallons: gallons.value!,
-      rateOffset: rateOffset.value!,
-      // stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
-      // stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
-    });
-  }
-
-  function handleYes() {
-    completeDelivery();
-    popPage();
-  }
-  // Close the pop up when the user clicks outside of it
-  const cardRef = useProp<HTMLDivElement | null>(null);
-  function popOnClickOutside(e: MouseEvent) {
-    if (!cardRef.value?.contains(e.target as Node)) {
-      popPage();
-      e.stopPropagation();
-    }
-  }
+  function completeDelivery() {}
 
   // TODO: Add transitions
   return (
-    <Page onClick={popOnClickOutside} fill="#00000099" padAround={1}>
-      <Card
-        ref={(el: HTMLDivElement) => {
-          if (el) {
-            cardRef.value = el;
-          }
-        }}
-      >
-        {/* --Fields-- */}
-        <CompletedSubDeliveryFields
-          fuelNameSig={fuelName}
-          rateSig={preOffsetRate}
-          rateOffset={rateOffset}
-          gallonsSig={gallons}
-          stickedInchesBeforeFillingSig={stickedInchesBeforeFilling}
-          stickedInchesAfterFillingSig={stickedInchesAfterFilling}
-        />
+    <Dialog widthGrows>
+      {/* --Fields-- */}
+      <CompletedSubDeliveryFields
+        fuelNameSig={fuelName}
+        rateSig={preOffsetRate}
+        rateOffset={rateOffset}
+        gallonsSig={gallons}
+        stickedInchesBeforeFillingSig={stickedInchesBeforeFilling}
+        stickedInchesAfterFillingSig={stickedInchesAfterFilling}
+      />
 
-        {/* --Buttons-- */}
-        <Row widthGrows align={$Align.spaceEvenly}>
-          <Button outlined onclick={popPage}>
-            Cancel
-          </Button>
-          <Button
-            onclick={handleYes}
-            fill={canComplete.value ? mdColors.green : mdColors.grey}
-          >
-            Complete
-          </Button>
-        </Row>
-      </Card>
-    </Page>
+      {/* --Buttons-- */}
+      <Row widthGrows align={$Align.spaceEvenly}>
+        <Button outlined onclick={popPage}>
+          Cancel
+        </Button>
+        <Button
+          onclick={() => {
+            if (!canComplete.value) return;
+            props.subDelivery.complete({
+              fuelName: fuelName.value,
+              rate: preOffsetRate.value!,
+              gallons: gallons.value!,
+              rateOffset: rateOffset.value!,
+              // stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
+              // stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
+            });
+            popPage();
+          }}
+          fill={canComplete.value ? mdColors.green : mdColors.grey}
+        >
+          Complete
+        </Button>
+      </Row>
+    </Dialog>
   );
 }

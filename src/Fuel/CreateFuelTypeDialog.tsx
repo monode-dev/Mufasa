@@ -17,6 +17,7 @@ import {
   Txt,
   pushPage,
   FloatSort,
+  Dialog,
 } from "miwi";
 
 export const openCreateFuelTypeDialog = (props: {
@@ -33,9 +34,6 @@ export const openCreateFuelTypeDialog = (props: {
 function CreateFuelTypeDialog(props: {
   onCreate?: (newObject: FuelType) => void;
 }) {
-  // Assign prop defaults
-  props.onCreate = props.onCreate ?? undefined;
-
   const name = useProp(``) as Prop<string>;
   const rate = useProp(null) as Prop<number | null>;
 
@@ -50,64 +48,53 @@ function CreateFuelTypeDialog(props: {
     return FuelType.isValid(computedFuelType.value);
   });
 
-  function handleYes() {
-    if (!fuelTypeIsValid.value) return;
-    popPage();
-    const createdPosix = Date.now();
-    const newFuelType = FuelType.create({
-      ...computedFuelType.value,
-      createdPosix: createdPosix,
-      _sortPos: FloatSort.getNewEndPos({
-        list: FuelType.sortedFuelTypes,
-        getPos: (fuelType) => fuelType.sortPos,
-        getUid: (fuelType) => fuelType.docId,
-      }),
-    });
-    if (exists(props.onCreate)) props.onCreate(newFuelType);
-  }
-
   return (
-    <Box
-      onClick={popPage}
-      widthGrows
-      heightGrows
-      fill="#00000099"
-      touchRadius={0}
-      padAround={1}
-    >
-      <Card shadowSize={0} preventClickPropagation>
-        <Txt h1>Create Fuel Type</Txt>
-        {/* TODO Doest it need autofocus like other cards (for consistency)? */}
-        <Label label="Name" widthGrows>
-          <Field
-            value={name}
-            hintText="Unnamed"
-            underlined
-            capitalize={"words"}
-            keyboard={"text"}
-            hasFocus={useProp(true)}
-          />
-        </Label>
-        <Label label="Rate" widthGrows>
-          <NumField
-            negativesAreAllowed={false}
-            underlined
-            value={rate}
-            hint="$/gal."
-          />
-        </Label>
-        <Row widthGrows align={$Align.spaceEvenly}>
-          <Button outlined onClick={popPage}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleYes}
-            fill={fuelTypeIsValid.value ? mdColors.green : mdColors.grey}
-          >
-            Create
-          </Button>
-        </Row>
-      </Card>
-    </Box>
+    <Dialog widthGrows>
+      <Txt h1>Create Fuel Type</Txt>
+      {/* TODO Doest it need autofocus like other cards (for consistency)? */}
+      <Label label="Name" widthGrows>
+        <Field
+          value={name}
+          hintText="Unnamed"
+          underlined
+          capitalize={"words"}
+          keyboard={"text"}
+          hasFocus={useProp(true)}
+        />
+      </Label>
+      <Label label="Rate" widthGrows>
+        <NumField
+          negativesAreAllowed={false}
+          underlined
+          value={rate}
+          hint="$/gal."
+        />
+      </Label>
+      <Row widthGrows align={$Align.spaceEvenly}>
+        <Button outlined onClick={popPage}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            if (!fuelTypeIsValid.value) return;
+            popPage();
+            const createdPosix = Date.now();
+            const newFuelType = FuelType.create({
+              ...computedFuelType.value,
+              createdPosix: createdPosix,
+              _sortPos: FloatSort.getNewEndPos({
+                list: FuelType.sortedFuelTypes,
+                getPos: (fuelType) => fuelType.sortPos,
+                getUid: (fuelType) => fuelType.docId,
+              }),
+            });
+            if (exists(props.onCreate)) props.onCreate(newFuelType);
+          }}
+          fill={fuelTypeIsValid.value ? mdColors.green : mdColors.grey}
+        >
+          Create
+        </Button>
+      </Row>
+    </Dialog>
   );
 }

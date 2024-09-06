@@ -1,15 +1,4 @@
-import {
-  Box,
-  Card,
-  Column,
-  Icon,
-  Page,
-  Row,
-  Txt,
-  mdColors,
-  popPage,
-  useProp,
-} from "miwi";
+import { Box, Column, Dialog, Icon, Row, Txt, mdColors, useProp } from "miwi";
 import { mdiMenuDown, mdiMenuRight } from "@mdi/js";
 import { Show, JSXElement } from "solid-js";
 
@@ -19,88 +8,76 @@ export function InfoCard(
   }>,
 ) {
   return (
-    <Page onClick={popPage} fill="#00000099">
-      <Card
-        overflowXScrolls
-        maxHeight={40}
-        preventClickPropagation
-        width={`75%`}
-        shadowSize={2}
-        height={35}
-        alignTopCenter
+    <Dialog>
+      <Txt h1>info</Txt>
+      <InfoEntry
+        entryTitle="Tank"
+        entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+        shouldBeOpen={props.entriesToOpen?.includes("Tank")}
       >
-        <Txt h1>info</Txt>
         <InfoEntry
-          entryTitle="Tank"
-          entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-          shouldBeOpen={props.entriesToOpen?.includes("Tank")}
+          entryTitle="Shape"
+          shouldBeOpen={props.entriesToOpen?.includes("Shape")}
         >
           <InfoEntry
-            entryTitle="Shape"
-            shouldBeOpen={props.entriesToOpen?.includes("Shape")}
-          >
-            <InfoEntry
-              entryTitle="Horizontal Cylinder"
-              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes(
-                "Horizontal Cylinder",
-              )}
-            />
-            <InfoEntry
-              entryTitle="Oval"
-              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes("Oval")}
-            />
-            <InfoEntry
-              entryTitle="Rectangle"
-              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes("Rectangle")}
-            />
-            <InfoEntry
-              entryTitle="Vertical Cylinder"
-              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes("Vertical Cylinder")}
-            />
-            <InfoEntry
-              entryTitle="Ellipse"
-              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes("Ellipse")}
-            />
-            <InfoEntry
-              entryTitle="Truck Bed Tank"
-              entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-              shouldBeOpen={props.entriesToOpen?.includes("Truck Bed Tank")}
-            />
-          </InfoEntry>
-        </InfoEntry>
-        <InfoEntry
-          entryTitle="Client"
-          entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-          shouldBeOpen={props.entriesToOpen?.includes("Client")}
-        />
-        <InfoEntry
-          entryTitle="Delivery"
-          entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-          shouldBeOpen={props.entriesToOpen?.includes("Delivery")}
-        >
-          <InfoEntry
-            entryTitle="Sub Delivery"
+            entryTitle="Horizontal Cylinder"
             entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-            shouldBeOpen={props.entriesToOpen?.includes("Sub Delivery")}
+            shouldBeOpen={props.entriesToOpen?.includes("Horizontal Cylinder")}
+          />
+          <InfoEntry
+            entryTitle="Oval"
+            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+            shouldBeOpen={props.entriesToOpen?.includes("Oval")}
+          />
+          <InfoEntry
+            entryTitle="Rectangle"
+            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+            shouldBeOpen={props.entriesToOpen?.includes("Rectangle")}
+          />
+          <InfoEntry
+            entryTitle="Vertical Cylinder"
+            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+            shouldBeOpen={props.entriesToOpen?.includes("Vertical Cylinder")}
+          />
+          <InfoEntry
+            entryTitle="Ellipse"
+            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+            shouldBeOpen={props.entriesToOpen?.includes("Ellipse")}
+          />
+          <InfoEntry
+            entryTitle="Truck Bed Tank"
+            entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+            shouldBeOpen={props.entriesToOpen?.includes("Truck Bed Tank")}
           />
         </InfoEntry>
+      </InfoEntry>
+      <InfoEntry
+        entryTitle="Client"
+        entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+        shouldBeOpen={props.entriesToOpen?.includes("Client")}
+      />
+      <InfoEntry
+        entryTitle="Delivery"
+        entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+        shouldBeOpen={props.entriesToOpen?.includes("Delivery")}
+      >
         <InfoEntry
-          entryTitle="Address"
+          entryTitle="Sub Delivery"
           entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-          shouldBeOpen={props.entriesToOpen?.includes("Address")}
+          shouldBeOpen={props.entriesToOpen?.includes("Sub Delivery")}
         />
-        <InfoEntry
-          entryTitle="Calculator"
-          entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
-          shouldBeOpen={props.entriesToOpen?.includes("Calculator")}
-        />
-      </Card>
-    </Page>
+      </InfoEntry>
+      <InfoEntry
+        entryTitle="Address"
+        entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+        shouldBeOpen={props.entriesToOpen?.includes("Address")}
+      />
+      <InfoEntry
+        entryTitle="Calculator"
+        entryContent="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius totam mollitia, accusamus aliquid inventore recusandae ratione illo, animi veniam blanditiis molestias corrupti libero fuga laudantium alias id fugit! Dignissimos, nobis.  "
+        shouldBeOpen={props.entriesToOpen?.includes("Calculator")}
+      />
+    </Dialog>
   );
 }
 

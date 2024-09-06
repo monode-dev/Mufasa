@@ -10,6 +10,7 @@ import {
   popPage,
   useProp,
   pushPage,
+  Dialog,
 } from "miwi";
 import { ClientFields } from "./ClientFields";
 import { Show } from "solid-js";
@@ -161,39 +162,37 @@ function CreateClientDialog(props: {
   }
 
   return (
-    <Page onClick={closePopUp} fill="#00000099" padAround={1}>
-      <Card preventClickPropagation shadowSize={0}>
-        <Txt h1>Create Client</Txt>
-        <ClientFields
-          //client={useProp(tempClient)}
-          autoFocusFirstField
-          name={name}
-          clientId={clientId}
-          phoneNumber={phoneNumber}
-          address={address}
-          notes={notes}
-          create
-          rateOffset={rateOffset}
-          shouldScheduleDeliveriesForThisClient={
-            shouldScheduleDeliveriesForThisClient
-          }
-          weeksBetweenScheduledDeliveries={weeksBetweenScheduledDeliveries}
-          weekday={weekday}
-          scheduledDeliveryStartDate={scheduledDeliveryStartDate}
-          assignedTo={assignedTo}
-        />
-        <Show when={showErrorMessages() != ""}>
-          <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
-        </Show>
-        <Row widthGrows align={$Align.spaceEvenly}>
-          <Button outlined onClick={closePopUp}>
-            Cancel
-          </Button>
-          <Button onClick={handleYes} fill={mdColors.green}>
-            Create
-          </Button>
-        </Row>
-      </Card>
-    </Page>
+    <Dialog widthGrows>
+      <Txt h1>Create Client</Txt>
+      <ClientFields
+        //client={useProp(tempClient)}
+        autoFocusFirstField
+        name={name}
+        clientId={clientId}
+        phoneNumber={phoneNumber}
+        address={address}
+        notes={notes}
+        create
+        rateOffset={rateOffset}
+        shouldScheduleDeliveriesForThisClient={
+          shouldScheduleDeliveriesForThisClient
+        }
+        weeksBetweenScheduledDeliveries={weeksBetweenScheduledDeliveries}
+        weekday={weekday}
+        scheduledDeliveryStartDate={scheduledDeliveryStartDate}
+        assignedTo={assignedTo}
+      />
+      <Show when={showErrorMessages() != ""}>
+        <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
+      </Show>
+      <Row widthGrows align={$Align.spaceEvenly}>
+        <Button outlined onClick={closePopUp}>
+          Cancel
+        </Button>
+        <Button onClick={handleYes} fill={mdColors.green}>
+          Create
+        </Button>
+      </Row>
+    </Dialog>
   );
 }
