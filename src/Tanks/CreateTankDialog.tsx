@@ -93,7 +93,7 @@ function CreateTankDialog(props: {
   });
 
   return (
-    <Dialog widthGrows>
+    <Dialog>
       <Txt h1>Create Tank</Txt>
       {/* Fuel Selector */}
       <Row>
@@ -130,11 +130,12 @@ function CreateTankDialog(props: {
       </Show>
 
       {/* Cancel and Create Buttons */}
-      <Row widthGrows align={$Align.spaceEvenly}>
-        <Button outlined onClick={popPage}>
+      <Row>
+        <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>
         <Button
+          widthGrows
           onClick={() => {
             if (!tankIsValid.value) {
               showErrors();

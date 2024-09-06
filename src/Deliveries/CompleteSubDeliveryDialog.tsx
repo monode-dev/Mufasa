@@ -47,7 +47,7 @@ export default function CompleteSubDeliveryDialog(props: {
 
   // TODO: Add transitions
   return (
-    <Dialog widthGrows>
+    <Dialog>
       {/* --Fields-- */}
       <CompletedSubDeliveryFields
         fuelNameSig={fuelName}
@@ -60,11 +60,12 @@ export default function CompleteSubDeliveryDialog(props: {
       />
 
       {/* --Buttons-- */}
-      <Row widthGrows align={$Align.spaceEvenly}>
-        <Button outlined onclick={popPage}>
+      <Row widthGrows>
+        <Button widthGrows outlined onclick={popPage}>
           Cancel
         </Button>
         <Button
+          widthGrows
           onclick={() => {
             if (!canComplete.value) return;
             props.subDelivery.complete({
