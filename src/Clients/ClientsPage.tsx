@@ -27,6 +27,7 @@ import { SimplePage } from "@/components/SimplePage";
 import { isClientValid, getClientLabel } from "@/AppData";
 import { openCreateDeliveryDialog } from "@/Deliveries/CreateDeliveryDialog";
 import { EditDeliveryPage } from "@/Deliveries/EditDeliveryPage";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 export default function ClientsPage() {
   const filterString = useProp(``);
@@ -104,7 +105,7 @@ export default function ClientsPage() {
                 onClick={() => (isSearching.value = false)}
               />
             </Row>
-            <Box widthGrows height={0.125} fill={mdColors.grey} />
+            <HorizontalDivider />
           </Column>
         </Show>
 
@@ -127,7 +128,7 @@ export default function ClientsPage() {
             <Txt>New Client</Txt>
             <Icon iconPath={mdiPlus} />
           </Row>
-          <Box widthGrows height={0.125} fill={mdColors.grey} />
+          <HorizontalDivider />
         </Show> */}
 
         {/* SECTION: Clients */}

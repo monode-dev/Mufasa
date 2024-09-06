@@ -5,7 +5,7 @@ import {
   mapToAddress,
 } from "@/AppData";
 import { mdiMapMarker, mdiPhoneInTalk } from "@mdi/js";
-import { Row, Icon, theme } from "miwi";
+import { Icon, theme } from "miwi";
 
 export function CallAndMapToIcons(props: {
   forceHintColor?: boolean;
@@ -13,7 +13,7 @@ export function CallAndMapToIcons(props: {
   address: string | undefined | null;
 }) {
   return (
-    <Row>
+    <>
       <Icon
         stroke={
           canCallPhoneNumber(props.phoneNumber) && !props.forceHintColor
@@ -37,6 +37,6 @@ export function CallAndMapToIcons(props: {
         }}
         iconPath={mdiMapMarker}
       />
-    </Row>
+    </>
   );
 }

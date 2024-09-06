@@ -21,7 +21,7 @@ export default function CompleteSubDeliveryDialog(props: {
   const rateOffset = useProp<number | null>(
     props.subDelivery.fuelSpecs?.rateOffset ?? null,
   );
-  const gallons = useProp<number | null>(props.subDelivery.gallons);
+  const gallons = useProp<number | null>(null);
 
   const stickedInchesBeforeFilling = useProp<number | null>(
     props.subDelivery.stickedInchesBeforeFilling,
@@ -54,6 +54,7 @@ export default function CompleteSubDeliveryDialog(props: {
         rateSig={preOffsetRate}
         rateOffset={rateOffset}
         gallonsSig={gallons}
+        gallonsHintText="Delivered gal."
         stickedInchesBeforeFillingSig={stickedInchesBeforeFilling}
         stickedInchesAfterFillingSig={stickedInchesAfterFilling}
       />

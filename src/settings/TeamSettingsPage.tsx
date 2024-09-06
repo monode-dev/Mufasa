@@ -20,6 +20,7 @@ import { withLimitConfirmation } from "@/model/LimitUi";
 import { exportData } from "./ExportData";
 import { deleteTeam } from "./DeleteAccountOrTeam";
 import { InlineAppBar } from "@/components/InlineAppBar";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 export function TeamSettingsPage() {
   const isOwner = useFormula(() => mfs.user.workspace?.role === `owner`);
@@ -146,10 +147,7 @@ export function TeamSettingsPage() {
           </Show> */}
 
           {/* SECTION: Options */}
-          <Box height={0} />
-          <Txt h2 widthGrows singleLine alignCenter>
-            Options
-          </Txt>
+          <HorizontalDivider />
           <Txt
             widthGrows
             singleLine
@@ -158,14 +156,14 @@ export function TeamSettingsPage() {
           >
             Export Team Data
           </Txt>
-          <Txt
+          {/* <Txt
             widthGrows
             singleLine
             alignCenterLeft
             onClick={() => store.goToSubscriptionManagement()}
           >
             Manage Subscription
-          </Txt>
+          </Txt> */}
           <Txt
             widthGrows
             singleLine

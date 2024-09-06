@@ -18,6 +18,7 @@ import { For, Show } from "solid-js";
 import { openCreateTankDialog } from "./CreateTankDialog";
 import { Client } from "@/Clients/Client";
 import { Tank } from "./Tank";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 type TankType = Tank | typeof JUST_FUEL | null;
 
@@ -102,7 +103,7 @@ export default function TankSelector(
           !props.hideTanksList
         }
       >
-        <Box widthGrows height={0.125} fill={mdColors.grey} />
+        <HorizontalDivider />
       </Show>
 
       {/* Tanks */}

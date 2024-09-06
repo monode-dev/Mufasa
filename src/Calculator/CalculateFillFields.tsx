@@ -34,23 +34,20 @@ import { Client } from "@/Clients/Client";
 import { Tank } from "@/Tanks/Tank";
 import { mdiPencil } from "@mdi/js";
 import { EditDeliveryPage } from "@/Deliveries/EditDeliveryPage";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 const maxSafe = 90.0001;
-export function CalculateFillFields(props: { subDelivery?: SubDelivery }) {
+export function CalculateFillFields(props: { delivery?: Delivery }) {
   // Constants
   const emptyText = `--`;
   // Tab Control
   const selectedCalcType = useProp(0);
   const tabs = { delivery: 0, tank: 1, dimensions: 2 };
   // Delivery Tab
-  const selectedDelivery = useProp<Delivery | null>(
-    props.subDelivery?.delivery ?? null,
-  );
+  const selectedDelivery = useProp<Delivery | null>(props.delivery ?? null);
   const deliverySelectorIsOpen = useProp(false);
-  const selectedSubDelivery = useProp<SubDelivery | null>(
-    props.subDelivery ?? null,
-  );
-  const showCalcTypeSelector = useFormula(() => !exists(props.subDelivery));
+  const selectedSubDelivery = useProp<SubDelivery | null>(null);
+  const showCalcTypeSelector = useFormula(() => !exists(props.delivery));
 
   // combined 3 doWatch into one to avoid a possible infinite loop
   doWatch(() => {
@@ -161,28 +158,6 @@ export function CalculateFillFields(props: { subDelivery?: SubDelivery }) {
       stickedInchesBeforeFilling.value,
       desiredFill.value,
     ),
-  );
-  let estGallonsWhenSubDeliveryWasSelected: number | null = null;
-  doWatch(() => {
-    if (exists(selectedSubDelivery.value)) {
-      estGallonsWhenSubDeliveryWasSelected = selectedSubDelivery.value.gallons;
-    } else {
-      estGallonsWhenSubDeliveryWasSelected = null;
-    }
-  });
-  doWatch(
-    () => {
-      if (exists(selectedSubDelivery.value?.gallons)) {
-        selectedSubDelivery.value.gallons = exists(
-          gallonsToReachDesiredFill.value,
-        )
-          ? Math.round(gallonsToReachDesiredFill.value)
-          : estGallonsWhenSubDeliveryWasSelected;
-      }
-    },
-    {
-      on: [gallonsToReachDesiredFill],
-    },
   );
 
   // Complete Delivery
@@ -334,71 +309,67 @@ export function CalculateFillFields(props: { subDelivery?: SubDelivery }) {
             exists(selectedDelivery.value) && selectedDelivery.value?.isValid
           }
         >
-          <Show when={showCalcTypeSelector.value}>
-            <Label
-              label="Tank"
-              stroke={
-                !selectedSubDelivery.value?.isValid &&
-                selectedSubDelivery.value &&
-                selectedSubDelivery.value?.delivery.selectedClient !=
-                  selectedDelivery.value?.selectedClient
-                  ? $theme.colors.warning
-                  : undefined
-              }
+          <Label
+            label="Tank"
+            stroke={
+              !selectedSubDelivery.value?.isValid &&
+              selectedSubDelivery.value &&
+              selectedSubDelivery.value?.delivery.selectedClient !=
+                selectedDelivery.value?.selectedClient
+                ? $theme.colors.warning
+                : undefined
+            }
+          >
+            <Selector
+              value={selectedSubDelivery.value}
+              isOpen={subDeliverySelectorIsOpen}
+              hintText={"Select Tank"}
+              getLabelForData={getSubDeliveryName}
+              noOptionsText={"No Tanks"}
+              cancelOptions={{ stroke: theme.palette.hint }}
             >
-              <Selector
-                value={selectedSubDelivery.value}
-                isOpen={subDeliverySelectorIsOpen}
-                hintText={"Select Tank"}
-                getLabelForData={getSubDeliveryName}
-                noOptionsText={"No Tanks"}
-                cancelOptions={{ stroke: theme.palette.hint }}
+              <Show
+                when={
+                  (selectedDelivery.value?.sortedSubDeliveries?.length ?? 0) <=
+                  0
+                }
               >
-                <Show
-                  when={
-                    (selectedDelivery.value?.sortedSubDeliveries?.length ??
-                      0) <= 0
-                  }
+                <Txt
+                  onclick={() => {
+                    subDeliverySelectorIsOpen.value = false;
+                  }}
+                  hint
+                  widthGrows
                 >
+                  No Individual Deliveries
+                </Txt>
+              </Show>
+
+              <For
+                each={
+                  selectedDelivery.value?.sortedSubDeliveries.filter(
+                    (sub) => !sub._isOneTimeFuel && sub.isValid,
+                  ) ?? []
+                }
+              >
+                {(subDelivery) => (
                   <Txt
                     onclick={() => {
+                      selectedSubDelivery.value = subDelivery;
                       subDeliverySelectorIsOpen.value = false;
+                      focusOnStickedInchesIfEmpty();
                     }}
-                    hint
                     widthGrows
+                    heightShrinks
+                    overflowX={$Overflow.wrap}
+                    stroke={subDelivery.completedTimePosix ? "grey" : undefined}
                   >
-                    No Individual Deliveries
+                    {getSubDeliveryName(subDelivery) ?? `Unknown Delivery`}
                   </Txt>
-                </Show>
-
-                <For
-                  each={
-                    selectedDelivery.value?.sortedSubDeliveries.filter(
-                      (sub) => !sub._isOneTimeFuel && sub.isValid,
-                    ) ?? []
-                  }
-                >
-                  {(subDelivery) => (
-                    <Txt
-                      onclick={() => {
-                        selectedSubDelivery.value = subDelivery;
-                        subDeliverySelectorIsOpen.value = false;
-                        focusOnStickedInchesIfEmpty();
-                      }}
-                      widthGrows
-                      heightShrinks
-                      overflowX={$Overflow.wrap}
-                      stroke={
-                        subDelivery.completedTimePosix ? "grey" : undefined
-                      }
-                    >
-                      {getSubDeliveryName(subDelivery) ?? `Unknown Delivery`}
-                    </Txt>
-                  )}
-                </For>
-              </Selector>
-            </Label>
-          </Show>
+                )}
+              </For>
+            </Selector>
+          </Label>
 
           {/* <Show
                 when={
@@ -524,7 +495,7 @@ export function CalculateFillFields(props: { subDelivery?: SubDelivery }) {
       </Row>
 
       {/* SECTION: Fill Details */}
-      <Box widthGrows height={0.125} fill={"grey"} />
+      <HorizontalDivider />
       <Row widthGrows spaceBetweenX padBetween={0.5} overflowXWraps>
         <Label
           stroke={desiredFillTextColor.value}
