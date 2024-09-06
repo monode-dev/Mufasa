@@ -17,7 +17,7 @@ export function ConfirmationPopUp(props: {
       >
         {props.children}
       </Show>
-      <Row widthGrows padBetween={1}>
+      <Row padBetween={1}>
         <Button
           outlined
           widthGrows

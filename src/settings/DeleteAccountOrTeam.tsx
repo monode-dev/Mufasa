@@ -58,10 +58,10 @@ function DeleteAccountOrTeamPopup(props: { deleteType: `account` | `team` }) {
             {props.deleteType === `team`
               ? `Are you sure you want to permanently delete this team, all of its data in the cloud, and all its data on all members' phones? This cannot be undone.`
               : mfs.user.workspace?.role === `owner`
-                ? `Are you sure you want to permanently delete your account, this team, all of the team's data in the cloud, and all the team data on all the members' phones? This cannot be undone.`
-                : `Are you sure you want to permanently delete your account?`}
+              ? `Are you sure you want to permanently delete your account, this team, all of the team's data in the cloud, and all the team data on all the members' phones? This cannot be undone.`
+              : `Are you sure you want to permanently delete your account?`}
           </Txt>
-          <Row>
+          <Row padBetween={1}>
             <Button outlined widthGrows onClick={() => popPage()}>
               Cancel
             </Button>
@@ -87,7 +87,7 @@ function DeleteAccountOrTeamPopup(props: { deleteType: `account` | `team` }) {
             Would you like to export all team data on this phone before you
             delete the team?
           </Txt>
-          <Row>
+          <Row padBetween={1}>
             <Button
               outlined
               widthGrows
@@ -112,7 +112,7 @@ function DeleteAccountOrTeamPopup(props: { deleteType: `account` | `team` }) {
             Would you like to cancel your subscription before you delete your
             team?
           </Txt>
-          <Row>
+          <Row padBetween={1}>
             <Button outlined widthGrows onClick={() => startDelete()}>
               Skip
             </Button>
@@ -132,7 +132,7 @@ function DeleteAccountOrTeamPopup(props: { deleteType: `account` | `team` }) {
       <Match when={step.value === Step.unsubscribing}>
         <Dialog>
           <Txt>Are you ready to delete your team?</Txt>
-          <Row>
+          <Row padBetween={1}>
             <Button outlined widthGrows onClick={() => popPage()}>
               Cancel
             </Button>

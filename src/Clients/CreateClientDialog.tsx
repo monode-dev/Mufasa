@@ -185,7 +185,7 @@ function CreateClientDialog(props: {
       <Show when={showErrorMessages() != ""}>
         <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
       </Show>
-      <Row widthGrows>
+      <Row padBetween={1}>
         <Button outlined widthGrows onClick={closePopUp}>
           Cancel
         </Button>

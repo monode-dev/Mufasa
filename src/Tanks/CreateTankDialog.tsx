@@ -130,7 +130,7 @@ function CreateTankDialog(props: {
       </Show>
 
       {/* Cancel and Create Buttons */}
-      <Row>
+      <Row padBetween={1}>
         <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>

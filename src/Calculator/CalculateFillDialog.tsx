@@ -5,7 +5,7 @@ import { CalculateFillFields } from "./CalculateFillFields";
 
 export function CalculateFillDialog(props: { delivery: Delivery }) {
   return (
-    <Dialog widthGrows>
+    <Dialog>
       <Txt h2>Calculate Fill</Txt>
       <CalculateFillFields delivery={props.delivery} />
       <Button widthGrows outlined onClick={() => popPage()}>
