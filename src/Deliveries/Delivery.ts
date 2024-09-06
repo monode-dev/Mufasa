@@ -14,6 +14,7 @@ import {
 import { FloatSort, doNow, exists } from "miwi";
 import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
+import accurate from "accurate";
 
 // SECTION: Delivery
 export type SelectedClient = Client | ONE_TIME | NONE_SELECTED;
@@ -422,8 +423,8 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
      * To overcome this we round to three decimals, and then round up to the nearest cent. */
     () =>
       Math.ceil(
-        Math.round((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0) * 1000) /
-          10,
+        Math.round((this.fuelSpecs.rate ?? 0) * (this.gallons ?? 0) * 100000) /
+          1000,
       ) / 100,
   );
 

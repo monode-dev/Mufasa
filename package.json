@@ -27,6 +27,7 @@
     "@codetrix-studio/capacitor-google-auth": "3.4.0-rc.4",
     "@mdi/js": "^7.4.47",
     "@revenuecat/purchases-capacitor": "9.0.0",
+    "accurate": "^1.5.8",
     "audit": "^0.0.6",
     "buffer": "^6.0.3",
     "firebase": "^10.13.1",
