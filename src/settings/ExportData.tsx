@@ -17,8 +17,8 @@ import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import JSZip from "jszip";
 import { Share } from "@capacitor/share";
 import { devLog } from "@/utils";
-import {Tank} from "@/Tanks/Tank";
-import {Delivery, SubDelivery} from "@/Deliveries/Delivery";
+import { Tank } from "@/Tanks/Tank";
+import { Delivery, SubDelivery } from "@/Deliveries/Delivery";
 
 export function exportData() {
   pushPage(ExportingDataPopup, {});
@@ -36,7 +36,7 @@ function ExportingDataPopup() {
             Are you sure you want to export a copy of all data on this phone?
             This might take a few minutes.
           </Txt>
-          <Row>
+          <Row padBetween={1}>
             <Button
               outlined
               widthGrows

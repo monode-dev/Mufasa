@@ -43,7 +43,7 @@ export function LoadCSVDialog() {
     <Dialog>
       <Txt>Select a CSV file</Txt>
       <input class="form-control" id="csvFile" type="file" accept=".csv" />
-      <Row widthGrows>
+      <Row padBetween={1}>
         <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>

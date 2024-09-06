@@ -10,7 +10,7 @@ export function ConfirmSubDeliveryUncompletion(props: {
       <Txt>Are you sure you want to un-complete this completed delivery.</Txt>
 
       {/* --Buttons-- */}
-      <Row widthGrows>
+      <Row padBetween={1}>
         <Button widthGrows outlined onclick={popPage}>
           Cancel
         </Button>
