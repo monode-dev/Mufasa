@@ -12,6 +12,7 @@ import { Delivery } from "./Delivery";
 import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
 import { FuelType } from "@/model/DataModel";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 export function DailyTotalsCard() {
   const upcomingSubDeliveries = useFormula(() => {
@@ -115,27 +116,30 @@ export function DailyTotalsCard() {
             </Row>
           )}
         </For>
-        <Box widthGrows height={0.125} fill={$theme.colors.text} />
+        <HorizontalDivider />
       </Show>
 
       <Column>
         <Txt widthGrows={4} alignLeft>
-          Fuel Delivered: {formatNumWithCommas(
-      completedSubDeliveriesSince3am.value.reduce(
-        (total, sub) => total + (sub.gallons ?? 0),
-        0,
-      ),
-      0,
-    )} gal.
+          Fuel Delivered:{" "}
+          {formatNumWithCommas(
+            completedSubDeliveriesSince3am.value.reduce(
+              (total, sub) => total + (sub.gallons ?? 0),
+              0,
+            ),
+            0,
+          )}{" "}
+          gal.
         </Txt>
         <Txt widthGrows={3} alignLeft>
-          Today's Sales: ${formatNumWithCommas(
-      completedSubDeliveriesSince3am.value.reduce(
-        (total, sub) => total + sub.sales,
-        0,
-      ),
-      0,
-    )}
+          Today's Sales: $
+          {formatNumWithCommas(
+            completedSubDeliveriesSince3am.value.reduce(
+              (total, sub) => total + sub.sales,
+              0,
+            ),
+            0,
+          )}
         </Txt>
       </Column>
     </Card>

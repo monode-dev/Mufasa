@@ -7,6 +7,7 @@ import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
 import { PrivacyPolicyPage } from "./PrivacyPolicyPage";
 import { deleteAccount } from "./DeleteAccountOrTeam";
 import { InlineAppBar } from "@/components/InlineAppBar";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 export const openTermsOfUse = () =>
   window.open(
@@ -34,7 +35,7 @@ export function AccountSettingsPage() {
         >
           {emailIsValid(mfs.user.email) ? mfs.user.email : `Unknown Email!`}
         </Txt>
-        <Box widthGrows height={0.125} fill={theme.palette.hint} />
+        <HorizontalDivider />
 
         <Txt
           widthGrows

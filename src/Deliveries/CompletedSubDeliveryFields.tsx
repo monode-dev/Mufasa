@@ -13,6 +13,7 @@ export default function CompletedSubDeliveryFields(props: {
   rateSig: Prop<number | null | undefined>;
   rateOffset: Prop<number | null | undefined>;
   gallonsSig: Prop<number | null | undefined>;
+  gallonsHintText?: string;
   stickedInchesBeforeFillingSig: Prop<number | null | undefined>;
   stickedInchesAfterFillingSig: Prop<number | null | undefined>;
   allGrey?: boolean;
@@ -89,7 +90,7 @@ export default function CompletedSubDeliveryFields(props: {
           value={props.gallonsSig}
           // hasFocus={gallonsHasFocus}
           underlined
-          hint="Est. gal."
+          hint={props.gallonsHintText ?? `Est. gal.`}
           stroke={gallonsShouldBeGrey.value ? mdColors.grey : undefined}
         />
       </Label>
