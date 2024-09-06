@@ -276,7 +276,7 @@ export function ClientFields(props: {
         icon={mdiPlusMinusVariant}
         value={props.rateOffset}
         underlined
-        keyboard={"numeric"}
+        keyboard={"decimal"}
         enterKeyHint={
           useFormula(() => enterKey(props.notes, rateOffsetIndex)).value
         }
@@ -325,8 +325,8 @@ export function ClientFields(props: {
               !exists(props.weeksBetweenScheduledDeliveries.value)
                 ? null
                 : props.weeksBetweenScheduledDeliveries.value === 1
-                  ? `week`
-                  : `${props.weeksBetweenScheduledDeliveries.value} weeks`
+                ? `week`
+                : `${props.weeksBetweenScheduledDeliveries.value} weeks`
             }
             isOpen={weekSelectorIsOpen}
             hintText="Pick frequency"
@@ -405,9 +405,9 @@ export function ClientFields(props: {
             getLabelForData={(assignedUid) =>
               assignedUid === mfs.user.uid
                 ? mfs.user.email
-                : (mfs.user.workspace?.otherMembers?.find(
+                : mfs.user.workspace?.otherMembers?.find(
                     (member) => member.uid === assignedUid,
-                  )?.email ?? null)
+                  )?.email ?? null
             }
             hintText="Assign to driver"
             isOpen={teamMemberSelectorIsOpen}
