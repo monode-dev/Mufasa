@@ -91,7 +91,7 @@ function CreateDeliveryDialog(props: {
   const warningMessage = useProp(``);
 
   return (
-    <Dialog widthGrows>
+    <Dialog>
       <Txt h1>Create Delivery</Txt>
       <DeliveryFields delivery={deliveryProps} showScheduledClients create />
       <Show when={warningMessage.value}>
@@ -99,11 +99,12 @@ function CreateDeliveryDialog(props: {
           {warningMessage.value}
         </Txt>
       </Show>
-      <Row widthGrows align={$Align.spaceEvenly}>
-        <Button outlined onClick={popPage}>
+      <Row widthGrows>
+        <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>
         <Button
+          widthGrows
           onClick={() => {
             if (!selectedClient.value) {
               warningMessage.value = `Please select a client.`;
