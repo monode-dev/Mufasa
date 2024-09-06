@@ -162,7 +162,7 @@ function CreateClientDialog(props: {
   }
 
   return (
-    <Dialog widthGrows>
+    <Dialog>
       <Txt h1>Create Client</Txt>
       <ClientFields
         //client={useProp(tempClient)}
@@ -185,11 +185,11 @@ function CreateClientDialog(props: {
       <Show when={showErrorMessages() != ""}>
         <Txt stroke={$theme.colors.warning}>{showErrorMessages()}</Txt>
       </Show>
-      <Row widthGrows align={$Align.spaceEvenly}>
-        <Button outlined onClick={closePopUp}>
+      <Row widthGrows>
+        <Button outlined widthGrows onClick={closePopUp}>
           Cancel
         </Button>
-        <Button onClick={handleYes} fill={mdColors.green}>
+        <Button widthGrows onClick={handleYes} fill={mdColors.green}>
           Create
         </Button>
       </Row>

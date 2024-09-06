@@ -43,11 +43,12 @@ export function LoadCSVDialog() {
     <Dialog>
       <Txt>Select a CSV file</Txt>
       <input class="form-control" id="csvFile" type="file" accept=".csv" />
-      <Row widthGrows align={$Align.spaceEvenly}>
-        <Button outlined onClick={popPage}>
+      <Row widthGrows>
+        <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>
         <Button
+          widthGrows
           onClick={() => {
             const csvFile = document.getElementById(
               "csvFile",

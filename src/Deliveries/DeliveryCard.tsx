@@ -87,6 +87,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           {props.delivery.title}
         </Txt>
 
+        {/* TODO: This should be map, calculate, call, edit. */}
         <Show when={!props.delivery.isCompleted}>
           <Icon
             stroke={theme.palette.primary}

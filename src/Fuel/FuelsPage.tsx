@@ -8,6 +8,7 @@ import {
   FloatSort,
   Prop,
   EnterKeyHint,
+  theme,
 } from "miwi";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";

@@ -49,7 +49,7 @@ function CreateFuelTypeDialog(props: {
   });
 
   return (
-    <Dialog widthGrows>
+    <Dialog>
       <Txt h1>Create Fuel Type</Txt>
       {/* TODO Doest it need autofocus like other cards (for consistency)? */}
       <Label label="Name" widthGrows>
@@ -70,11 +70,12 @@ function CreateFuelTypeDialog(props: {
           hint="$/gal."
         />
       </Label>
-      <Row widthGrows align={$Align.spaceEvenly}>
-        <Button outlined onClick={popPage}>
+      <Row widthGrows>
+        <Button widthGrows outlined onClick={popPage}>
           Cancel
         </Button>
         <Button
+          widthGrows
           onClick={() => {
             if (!fuelTypeIsValid.value) return;
             popPage();

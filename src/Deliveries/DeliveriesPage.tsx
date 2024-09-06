@@ -6,6 +6,7 @@ import {
   pushPage,
   Row,
   SortableColumn,
+  theme,
   Txt,
 } from "miwi";
 import { mdiMenu, mdiPlus } from "@mdi/js";

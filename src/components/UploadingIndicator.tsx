@@ -22,6 +22,7 @@ function pulse(config?: { pulseMs?: number; max?: number; min?: number }) {
   return value;
 }
 
+// TODO: This should bee green. In-fact, it should be based off of the theme.palette.primary color.
 export function UploadingIndicator() {
   const pulsePercent = pulse({ pulseMs: 1.35 * 1000 });
   const applyShift = (max: number, min: number, shift: number) =>
