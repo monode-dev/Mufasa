@@ -8,7 +8,7 @@ import {
   useProp,
   Dialog,
 } from "miwi";
-import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
+import { CompletedSubDeliveryFields } from "./CompletedSubDeliveryFields";
 import { SubDelivery } from "./Delivery";
 
 export default function CompleteSubDeliveryDialog(props: {
@@ -16,7 +16,7 @@ export default function CompleteSubDeliveryDialog(props: {
 }) {
   const fuelName = useProp<string>(props.subDelivery.fuelSpecs?.name ?? ``);
   const preOffsetRate = useProp<number | null>(
-    props.subDelivery.fuelSpecs?.preOffsetRate ?? null,
+    props.subDelivery.fuelSpecs?.baseRate ?? null,
   );
   const rateOffset = useProp<number | null>(
     props.subDelivery.fuelSpecs?.rateOffset ?? null,
@@ -30,15 +30,16 @@ export default function CompleteSubDeliveryDialog(props: {
     props.subDelivery.stickedInchesAfterFilling,
   );
 
-  const canComplete = useFormula(
+  const mayComplete = useFormula(
     () =>
       fuelName.value.trim() !== `` &&
       exists(preOffsetRate.value) &&
       preOffsetRate.value >= 0 &&
       exists(gallons.value) &&
-      gallons.value >= 0,
-    // exists(stickedInchesBeforeFilling.value) &&
-    // stickedInchesBeforeFilling.value >= 0 &&
+      gallons.value >= 0 &&
+      exists(stickedInchesBeforeFilling.value) &&
+      stickedInchesBeforeFilling.value >= 0,
+    // Sticked inches after filling is optional
     // exists(stickedInchesAfterFilling.value) &&
     // stickedInchesAfterFilling.value >= 0,
   );
@@ -50,13 +51,14 @@ export default function CompleteSubDeliveryDialog(props: {
     <Dialog>
       {/* --Fields-- */}
       <CompletedSubDeliveryFields
-        fuelNameSig={fuelName}
-        rateSig={preOffsetRate}
+        fuelName={fuelName}
+        baseRate={preOffsetRate}
         rateOffset={rateOffset}
-        gallonsSig={gallons}
+        gallons={gallons}
         gallonsHintText="Delivered gal."
-        stickedInchesBeforeFillingSig={stickedInchesBeforeFilling}
-        stickedInchesAfterFillingSig={stickedInchesAfterFilling}
+        stickedInchesBeforeFilling={stickedInchesBeforeFilling}
+        stickedInchesAfterFilling={stickedInchesAfterFilling}
+        tankGeometry={props.subDelivery.tankGeometry}
       />
 
       {/* --Buttons-- */}
@@ -67,18 +69,18 @@ export default function CompleteSubDeliveryDialog(props: {
         <Button
           widthGrows
           onclick={() => {
-            if (!canComplete.value) return;
+            if (!mayComplete.value) return;
             props.subDelivery.complete({
               fuelName: fuelName.value,
               rate: preOffsetRate.value!,
               gallons: gallons.value!,
               rateOffset: rateOffset.value!,
-              // stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
-              // stickedInchesAfterFilling: stickedInchesAfterFilling.value!,
+              stickedInchesBeforeFilling: stickedInchesBeforeFilling.value!,
+              stickedInchesAfterFilling: stickedInchesAfterFilling.value,
             });
             popPage();
           }}
-          fill={canComplete.value ? mdColors.green : mdColors.grey}
+          fill={mayComplete.value ? mdColors.green : mdColors.grey}
         >
           Complete
         </Button>
