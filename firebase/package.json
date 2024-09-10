@@ -8,6 +8,7 @@
     "start": "npm run shell",
     "pre:deploy": "npm run build",
     "deploy": "firebase deploy --only functions",
+    "deploy:config": "firebase deploy --only firestore:rules,firestore:indexes,storage:rules",
     "logs": "firebase functions:log"
   },
   "engines": {
