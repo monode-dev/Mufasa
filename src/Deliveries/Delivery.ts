@@ -15,6 +15,7 @@ import { FloatSort, doNow, exists } from "miwi";
 import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import accurate from "accurate";
+import { calcEffectiveRate, calcSales } from "./CompletedSubDeliveryFields";
 
 // SECTION: Delivery
 export type SelectedClient = Client | ONE_TIME | NONE_SELECTED;
@@ -363,49 +364,51 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   readonly fuelSpecs = formula(() => {
     // Only apply rate offset if there is a selected client, and the user has not manually typed a rate.
     const rateOffsetFromClient = this.delivery?.rateOffsetFromClient ?? 0;
-    if (this.isCompleted) {
-      // Use the explicit value
-      return {
-        name: this.explicitFuelName,
-        rate: (this.explicitRate ?? 0) + (this.explicitRateOffset ?? 0),
-        preOffsetRate: this.explicitRate,
-        rateOffset: this.explicitRateOffset,
-      };
-    } else if (exists(this.selectedKnownTank)) {
-      // Infer from Tank info
-      return {
-        name: this.selectedKnownTank.fuelType?.name ?? null,
-        rate:
-          (this.selectedKnownTank.fuelType?.rate ?? 0) +
-          (rateOffsetFromClient ?? 0),
-        preOffsetRate: this.selectedKnownTank.fuelType?.rate ?? null,
-        rateOffset: rateOffsetFromClient,
-      };
-    } else {
-      // Infer from selected Fuel
-      if (this.selectedFuel === ONE_TIME) {
+    const baseFuelRate = doNow(() => {
+      if (this.isCompleted) {
+        // Use the explicit value
         return {
           name: this.explicitFuelName,
-          rate: (this.explicitRate ?? 0) + (this.explicitRateOffset ?? 0),
-          preOffsetRate: this.explicitRate,
+          baseRate: this.explicitRate,
           rateOffset: this.explicitRateOffset,
         };
-      } else if (this.selectedFuel instanceof FuelType) {
+      } else if (exists(this.selectedKnownTank)) {
+        // Infer from Tank info
         return {
-          name: this.selectedFuel.name ?? null,
-          rate: (this.selectedFuel.rate ?? 0) + (rateOffsetFromClient ?? 0),
-          preOffsetRate: this.selectedFuel.rate ?? null,
+          name: this.selectedKnownTank.fuelType?.name ?? null,
+          baseRate: this.selectedKnownTank.fuelType?.rate ?? null,
           rateOffset: rateOffsetFromClient,
         };
       } else {
-        return {
-          name: null,
-          rate: 0,
-          preOffsetRate: null,
-          rateOffset: null,
-        };
+        // Infer from selected Fuel
+        if (this.selectedFuel === ONE_TIME) {
+          return {
+            name: this.explicitFuelName,
+            baseRate: this.explicitRate,
+            rateOffset: this.explicitRateOffset,
+          };
+        } else if (this.selectedFuel instanceof FuelType) {
+          return {
+            name: this.selectedFuel.name ?? null,
+            baseRate: this.selectedFuel.rate ?? null,
+            rateOffset: rateOffsetFromClient,
+          };
+        } else {
+          return {
+            name: null,
+            baseRate: null,
+            rateOffset: null,
+          };
+        }
       }
-    }
+    });
+    return {
+      ...baseFuelRate,
+      effectiveRate: calcEffectiveRate({
+        baseRate: baseFuelRate.baseRate ?? 0,
+        rateOffset: baseFuelRate.rateOffset ?? 0,
+      }),
+    };
   });
 
   // Gallons
@@ -418,20 +421,11 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   stickedInchesAfterFilling = prop([Number, null], null);
 
   // Sales
-  readonly sales = formula(
-    /* JS math has small rounding errors. e.g. `3.099 * 100 = 309.90000000000003` To overcome
-     * this we use accurate and we truncate everything past five decimals and then round to two
-     * decimals */
-    () => {
-      const rate = this.fuelSpecs?.rate ?? 0;
-      const gallons = this.gallons ?? 0;
-      const rawSales = accurate.mul(rate, gallons);
-      const truncated = accurate.divide(
-        Math.floor(accurate.mul(rawSales, 100000)),
-        100000,
-      );
-      return accurate.divide(Math.round(accurate.mul(truncated, 100)), 100);
-    },
+  readonly sales = formula(() =>
+    calcSales({
+      effectiveRate: this.fuelSpecs?.effectiveRate ?? 0,
+      gallons: this.gallons ?? 0,
+    }),
   );
 
   // Full Title
@@ -477,15 +471,15 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     rate: number;
     gallons: number;
     rateOffset: number;
-    // stickedInchesBeforeFilling: number;
-    // stickedInchesAfterFilling: number;
+    stickedInchesBeforeFilling: number;
+    stickedInchesAfterFilling: number | null;
   }) {
     this.explicitFuelName = props.fuelName;
     this.explicitRate = props.rate;
     this.gallons = props.gallons;
     this.explicitRateOffset = props.rateOffset;
-    // this.stickedInchesBeforeFilling = props.stickedInchesBeforeFilling;
-    // this.stickedInchesAfterFilling = props.stickedInchesAfterFilling;
+    this.stickedInchesBeforeFilling = props.stickedInchesBeforeFilling;
+    this.stickedInchesAfterFilling = props.stickedInchesAfterFilling;
     this.completedTimePosix = Date.now();
     SubDelivery._numSubDeliveriesCompleted.value += 1;
   }
