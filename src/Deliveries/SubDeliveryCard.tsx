@@ -17,9 +17,9 @@ import {
   Prop,
   DeleteDialog,
 } from "miwi";
-import { onCleanup, Show } from "solid-js";
+import { Show } from "solid-js";
 import CompleteSubDeliveryDialog from "./CompleteSubDeliveryDialog";
-import CompletedSubDeliveryFields from "./CompletedSubDeliveryFields";
+import { CompletedSubDeliveryFields } from "./CompletedSubDeliveryFields";
 import TankSelector from "@/Tanks/TankSelector";
 import { FuelTypeSelector } from "@/Fuel/FuelTypeSelector";
 import { SubDelivery } from "./Delivery";
@@ -320,11 +320,11 @@ export default function SubDeliveryCard(props: {
         </Row>
         {/* NOTE propToSig is interfering with turning the text in the card gray when subDelivery is completed */}
         <CompletedSubDeliveryFields
-          fuelNameSig={useFormula(
+          fuelName={useFormula(
             () => props.subDelivery.explicitFuelName,
             (v) => (props.subDelivery.explicitFuelName = v),
           )}
-          rateSig={useFormula(
+          baseRate={useFormula(
             () => props.subDelivery.explicitRate,
             (v) => (props.subDelivery.explicitRate = v),
           )}
@@ -332,18 +332,19 @@ export default function SubDeliveryCard(props: {
             () => props.subDelivery.explicitRateOffset,
             (v) => (props.subDelivery.explicitRateOffset = v),
           )}
-          gallonsSig={useFormula(
+          gallons={useFormula(
             () => props.subDelivery.gallons,
             (v) => (props.subDelivery.gallons = v),
           )}
-          stickedInchesBeforeFillingSig={useFormula(
+          stickedInchesBeforeFilling={useFormula(
             () => props.subDelivery.stickedInchesBeforeFilling,
             (v) => (props.subDelivery.stickedInchesBeforeFilling = v),
           )}
-          stickedInchesAfterFillingSig={useFormula(
+          stickedInchesAfterFilling={useFormula(
             () => props.subDelivery.stickedInchesAfterFilling,
             (v) => (props.subDelivery.stickedInchesAfterFilling = v),
           )}
+          tankGeometry={props.subDelivery.tankGeometry}
           allGrey={true}
         />
       </Show>

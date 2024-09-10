@@ -127,16 +127,10 @@ export function CalculateFillFields(props: { delivery?: Delivery }) {
   const currentGallons = useFormula(() => {
     // console.log("warn: ", showWarning.value);
     if (!showWarning.value) {
-      const geo = tankGeometry.value;
-      // console.log("geo: ", geo);
-      const geoShape = geo?.shape;
-      // console.log("geoShape: ", geoShape);
-      const tank = getTankShape(geoShape);
-      // console.log("tank: ", tank);
-      const vol = tank?.calcFilledVolume(geo, stickedInchesBeforeFilling.value);
-      // console.log("calcStickedInches: ", calcStickedInches.value);
-      // console.log("vol: ", vol);
-      return vol;
+      return getTankShape(tankGeometry.value?.shape)?.calcFilledVolume(
+        tankGeometry.value,
+        stickedInchesBeforeFilling.value,
+      );
     } else {
       return undefined;
     }
