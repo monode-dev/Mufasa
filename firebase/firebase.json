@@ -3,9 +3,6 @@
     "rules": "firebase.rules",
     "indexes": "firestore.indexes.json"
   },
-  "storage": {
-    "rules": "firebase.rules"
-  },
   "functions": [
     {
       "source": ".",
