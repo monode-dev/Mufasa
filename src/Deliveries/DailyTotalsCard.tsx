@@ -1,13 +1,4 @@
-import {
-  Card,
-  Txt,
-  Column,
-  useFormula,
-  exists,
-  Box,
-  NumField,
-  Row,
-} from "miwi";
+import { Card, Txt, Column, useFormula, exists, NumField, Row } from "miwi";
 import { Delivery } from "./Delivery";
 import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
