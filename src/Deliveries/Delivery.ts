@@ -443,6 +443,15 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
 
     return `${gallonsPart}${fuelPart}${tankPart}`;
   });
+  readonly cutTitle = formula(() => {
+    const gallonsPart = `${formatNumWithCommas(this.gallons ?? 0, 0)} gal.`;
+    const fuelPart = `of ${this.fuelSpecs?.name ?? `an unknown fuel`}`;
+    const tankPart = ` - "${doNow(() => { 
+      if(this.selectedTank != "justFuel" && this.selectedTank?.notes === " ") return " ";
+      return this.selectedTank != "justFuel" ? this.selectedTank?.notes : " ";
+    })}"`
+    return `${gallonsPart}${fuelPart}${tankPart}`;
+  });
 
   // Sort Position
   sortPosition = formula(
