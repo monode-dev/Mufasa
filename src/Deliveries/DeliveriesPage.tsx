@@ -8,20 +8,27 @@ import {
   SortableColumn,
   Txt,
 } from "miwi";
-import { mdiMenu, mdiPlus } from "@mdi/js";
+import { mdiArrowUpLeft, mdiArrowUpRight, mdiMenu, mdiPlus } from "@mdi/js";
 import { SettingsPage } from "../settings/SettingsPage";
 import { mfs } from "../model/DataModel";
 import { SimplePage } from "../components/SimplePage";
 import { InlineAppBar } from "../components/InlineAppBar";
 import { SimpleBody } from "../components/SimpleBody";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { openCreateDeliveryDialog } from "./CreateDeliveryDialog";
 import { Delivery } from "./Delivery";
 import { EditDeliveryPage } from "./EditDeliveryPage";
 import { DailyTotalsCard } from "./DeliveriesPage.tsx.folder/DailyTotalsCard";
 import { DeliveryCard } from "./DeliveriesPage.tsx.folder/DeliveryCard";
+import { autoSavingProp } from "@/utils";
 
 export function DeliveriesPage() {
+  
+  const haveSortedUpcomingDeliveryCards = autoSavingProp<boolean>(
+    `haveSortedUpcomingDeliveryCards`,
+    false
+  );
+
   // Preload the other members
   if (mfs.user.workspace?.role === `owner`) {
     mfs.user.workspace.otherMembers;
@@ -68,14 +75,17 @@ export function DeliveriesPage() {
         </Row>
         <Column padBetween={1}>
           <SortableColumn
+            onPickUp={() => haveSortedUpcomingDeliveryCards.value = true}
             onSort={(props) =>
-              FloatSort.moveItem({
-                sortedList: Delivery.currentUsersUpcomingDeliveries,
-                fromIndex: props.from,
-                toIndex: props.to,
-                getPos: (delivery) => delivery.sortPosition,
-                setPos: (delivery, pos) => (delivery.sortPosition = pos),
-              })
+              {            
+                FloatSort.moveItem({
+                  sortedList: Delivery.currentUsersUpcomingDeliveries,
+                  fromIndex: props.from,
+                  toIndex: props.to,
+                  getPos: (delivery) => delivery.sortPosition,
+                  setPos: (delivery, pos) => (delivery.sortPosition = pos),
+                })
+              }
             }
           >
             <For
@@ -85,6 +95,16 @@ export function DeliveriesPage() {
               {(delivery) => <DeliveryCard delivery={delivery} />}
             </For>
           </SortableColumn>
+
+            {/* Hint text for sorting upcoming delivery cards*/}
+            <Show when={!haveSortedUpcomingDeliveryCards.value}>
+            <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
+              <Txt>Tap and hold to sort</Txt>
+              <Box scale={1.25} padBottom={0.5} width={1} height={1}>
+                <Icon iconPath={mdiArrowUpRight} />
+              </Box>
+            </Row>
+          </Show>
         </Column>
         {/* SECTION: Completed Deliveries */}
         <Box height={1} />

@@ -1,5 +1,6 @@
 import {
   mdiArrowUpLeft,
+  mdiArrowUpRight,
   mdiCalculator,
   mdiChevronDown,
   mdiChevronUp,
@@ -18,7 +19,7 @@ import {
 } from "miwi";
 import { For, Show } from "solid-js";
 import { CallAndMapToIcons } from "@/Clients/CallAndMapToIcons";
-import { formatNumWithCommas, formatPosixTime } from "@/utils";
+import { autoSavingProp, formatNumWithCommas, formatPosixTime } from "@/utils";
 import { CalculateFillDialog } from "@/Calculator/CalculateFillDialog";
 import { Delivery, SubDelivery } from "../Delivery";
 import { EditDeliveryPage } from "../EditDeliveryPage";
@@ -30,6 +31,11 @@ export function DeliveryCard(props: { delivery: Delivery }) {
   const isExpanded = useProp(
     // Only auto expand if this delivery has been recently completed.
     (props.delivery.completedTimePosix ?? 0) > Delivery.threeAm.getTime(),
+  );
+
+  const haveOpenedCalculatorByIcon = autoSavingProp<boolean>(
+    `haveOpenedCalculatorByIcon`,
+    false,
   );
 
   return (
@@ -73,9 +79,10 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         <Show when={!props.delivery.isCompleted}>
           <Icon
             stroke={theme.palette.primary}
-            onClick={() =>
-              pushPage(CalculateFillDialog, { delivery: props.delivery })
-            }
+            onClick={() => {
+              haveOpenedCalculatorByIcon.value = true;
+              pushPage(CalculateFillDialog, { delivery: props.delivery });
+            }}
             iconPath={mdiCalculator}
           />
 
@@ -86,6 +93,29 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           />
         </Show>
       </Row>
+
+      <Show
+        when={
+          !haveOpenedCalculatorByIcon.value &&
+          !props.delivery.isCompleted &&
+          props.delivery.subDeliveries.count > 0 &&
+          Delivery.currentUsersUpcomingDeliveries.indexOf(props.delivery) === 0
+        }
+      >
+        <Row
+          stroke={$theme.colors.hint}
+          padBetween={0.75}
+          overflowYSpills
+          alignTopRight
+        >
+          <Txt singleLine widthGrows alignCenterRight>
+            Tank Fill Calculator
+          </Txt>
+          <Box padRight={4.71} height={0.5} width={0.5} overflowYSpills>
+            <Icon scale={1.25} iconPath={mdiArrowUpRight} />
+          </Box>
+        </Row>
+      </Show>
 
       {/* Client Notes */}
       <Show
@@ -127,7 +157,8 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         when={
           !props.delivery.isCompleted &&
           props.delivery.subDeliveries.count > 0 &&
-          SubDelivery.numSubDeliveriesCompleted <= 0
+          SubDelivery.numSubDeliveriesCompleted <= 0 &&
+          Delivery.currentUsersUpcomingDeliveries.indexOf(props.delivery) === 0
         }
       >
         <Row stroke={$theme.colors.hint} alignTopLeft padBetween={0.25}>
