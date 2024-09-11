@@ -1,8 +1,8 @@
 import {
   mdiArrowUpLeft,
   mdiCalculator,
-  mdiChevronLeft,
   mdiChevronDown,
+  mdiChevronUp,
 } from "@mdi/js";
 import {
   Box,
@@ -53,7 +53,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Icon
             scale={1.25}
             onClick={() => (isExpanded.value = !isExpanded.value)}
-            iconPath={isExpanded.value ? mdiChevronDown : mdiChevronLeft}
+            iconPath={isExpanded.value ? mdiChevronUp : mdiChevronDown}
           />
         </Row>
       </Show>

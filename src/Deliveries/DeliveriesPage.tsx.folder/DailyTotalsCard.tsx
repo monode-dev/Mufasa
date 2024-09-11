@@ -3,7 +3,7 @@ import { Delivery } from "../Delivery";
 import { formatNumWithCommas } from "@/utils";
 import { For, Show } from "solid-js";
 import { HorizontalDivider } from "@/components/HorizontalDivider";
-import { mdiChevronDown, mdiChevronLeft } from "@mdi/js";
+import { mdiChevronDown, mdiChevronUp } from "@mdi/js";
 import {
   compileAllFuelTotals,
   RunningTotalsForFuel,
@@ -40,7 +40,7 @@ export function DailyTotalsCard() {
         </Txt>
         <Icon
           scale={1.25}
-          iconPath={isExpanded.value ? mdiChevronDown : mdiChevronLeft}
+          iconPath={isExpanded.value ? mdiChevronUp : mdiChevronDown}
         />
       </Row>
 
