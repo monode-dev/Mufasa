@@ -9,16 +9,16 @@ import {
   theme,
   Txt,
 } from "miwi";
-import { mdiMenu, mdiPlus } from "@mdi/js";
+import { mdiArrowTopRight, mdiArrowUpLeft, mdiArrowUpRight, mdiArrowUpThick, mdiMenu, mdiPlus } from "@mdi/js";
 import { SettingsPage } from "../settings/SettingsPage";
 import { mfs } from "../model/DataModel";
 import { SimplePage } from "../components/SimplePage";
 import { InlineAppBar } from "../components/InlineAppBar";
 import { SimpleBody } from "../components/SimpleBody";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { openCreateDeliveryDialog } from "./CreateDeliveryDialog";
 import { DailyTotalsCard } from "./DailyTotalsCard";
-import { Delivery } from "./Delivery";
+import { Delivery, SubDelivery } from "./Delivery";
 import { DeliveryCard } from "./DeliveryCard";
 import { EditDeliveryPage } from "./EditDeliveryPage";
 
