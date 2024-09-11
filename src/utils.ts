@@ -8,7 +8,22 @@ import {
   doNow,
 } from "miwi";
 import { createRoot } from "solid-js";
-import Decimal from "decimal.js";
+import * as _MathJs from "mathjs";
+export const MathJs = {
+  pow: (a: number, b: number): number => _MathJs.evaluate(`${a} ^ ${b}`),
+  add: (...nums: number[]): number => _MathJs.evaluate(nums.join(` + `)),
+  sub: (...nums: number[]): number => _MathJs.evaluate(nums.join(` - `)),
+  mul: (...nums: number[]): number => _MathJs.evaluate(nums.join(` * `)),
+  div: (...nums: number[]): number => _MathJs.evaluate(nums.join(` / `)),
+  mod: (a: number, b: number): number => _MathJs.evaluate(`${a} % ${b}`),
+  min: (...nums: number[]): number => _MathJs.min(nums),
+  max: (...nums: number[]): number => _MathJs.max(nums),
+  floor: (num: number): number => _MathJs.floor(num),
+  round: (num: number, digits: number = 0): number =>
+    _MathJs.round(num, digits),
+  ceil: (num: number): number => _MathJs.ceil(num),
+  random: (): number => Math.random(),
+};
 
 // SECTION: Dev Logs
 export const { devLogs, devLog } = doNow(() => {
@@ -60,33 +75,11 @@ export function autoSavingProp<T extends number | boolean | string>(
   }
 }
 
-export function formatNumWithCommas(
-  num: number,
-  digits: number | `min` = 0,
-): string {
-  const rounded = roundToString(num, digits);
+export function formatNumWithCommas(num: number, digits: number = 0): string {
+  const rounded = MathJs.round(num, digits).toString();
   const [whole, decimal] = rounded.split(`.`);
   const wholeWithComma = whole.replace(/\B(?=(\d{3})+(?!\d))/g, `,`);
   return `${wholeWithComma}${exists(decimal) ? `.${decimal}` : ``}`;
-}
-
-export function roundToMatch(num: number, digits: number | `min` = 0): number {
-  const rounded = roundToString(num, digits);
-  return Number(rounded);
-}
-
-export function roundToString(num: number, digits: number | `min` = 0): string {
-  // Sometimes there are rounding errors. adding a 0.000..01 on the end seems to reduce these.
-  const significantDecimals = num.toString().split(`.`)[1]?.length ?? 0;
-  const actualDigits = digits === `min` ? significantDecimals : digits;
-  const numRoundingOffset = Decimal.pow(
-    10,
-    Decimal.sub(-significantDecimals, 1),
-  );
-  const digitRoundOffset = Decimal.pow(10, Decimal.sub(-actualDigits, 1));
-  const roundingOffset = Decimal.min(numRoundingOffset, digitRoundOffset);
-  const result = Decimal.add(num, roundingOffset).toFixed(actualDigits);
-  return result;
 }
 
 export type NONE_SELECTED = typeof NONE_SELECTED;
