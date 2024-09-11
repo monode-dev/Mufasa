@@ -75,10 +75,9 @@ export function DeliveriesPage() {
         </Row>
         <Column padBetween={1}>
           <SortableColumn
+            onPickUp={() => haveSortedUpcomingDeliveryCards.value = true}
             onSort={(props) =>
-              {
-                haveSortedUpcomingDeliveryCards.value = true
-                
+              {            
                 FloatSort.moveItem({
                   sortedList: Delivery.currentUsersUpcomingDeliveries,
                   fromIndex: props.from,
@@ -97,8 +96,8 @@ export function DeliveriesPage() {
             </For>
           </SortableColumn>
 
-            {/* Hint text for sorting */}
-            <Show when={haveSortedUpcomingDeliveryCards.value === false}>
+            {/* Hint text for sorting upcoming delivery cards*/}
+            <Show when={!haveSortedUpcomingDeliveryCards.value}>
             <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
               <Txt>Tap and hold to sort</Txt>
               <Box scale={1.25} padBottom={0.5} width={1} height={1}>
