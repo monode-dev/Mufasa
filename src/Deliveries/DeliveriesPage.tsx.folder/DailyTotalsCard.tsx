@@ -44,21 +44,25 @@ export function DailyTotalsCard() {
         />
       </Row>
 
-      {/* Body */}
-      <Show when={isExpanded.value}>
-        {/* Running Fuel Totals */}
-        <Show when={allFuelTotals.value.length > 0}>
-          <For
-            each={allFuelTotals.value}
-            fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
-          >
-            {(thisFuelsTotals) => (
-              <RunningTotalsForFuel fuelTotals={thisFuelsTotals} />
-            )}
-          </For>
+      {/* Running Fuel Totals */}
+      <Show when={allFuelTotals.value.length > 0}>
+        <For
+          each={allFuelTotals.value}
+          fallback={<Txt hint>No upcoming sub-deliveries.</Txt>}
+        >
+          {(thisFuelsTotals) => (
+            <RunningTotalsForFuel
+              fuelTotals={thisFuelsTotals}
+              collapseUnlessImportant={!isExpanded.value}
+            />
+          )}
+        </For>
+        <Show when={isExpanded.value}>
           <HorizontalDivider />
         </Show>
+      </Show>
 
+      <Show when={isExpanded.value}>
         {/* Total Fuel Delivered */}
         <Txt widthGrows={4} alignLeft>
           Fuel Delivered:{" "}
