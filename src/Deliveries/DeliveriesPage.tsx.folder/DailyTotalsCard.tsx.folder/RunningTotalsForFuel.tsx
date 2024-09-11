@@ -16,15 +16,6 @@ export function compileAllFuelTotals(props: {
 }): FuelTotals[] {
   const subDeliveriesByFuelId = new Map<string, FuelTotals>();
 
-  console.log(
-    `sub: ${[
-      ...props.upcomingSubDeliveries,
-      ...props.completedSubDeliveriesSince3am,
-    ]
-      .map((sub) => sub.fuelSpecs.name)
-      .join(", ")}`,
-  );
-
   // Add each upcoming sub-delivery to the correct fuel
   props.upcomingSubDeliveries.forEach((sub) => {
     const fuelEntry = ensureFuelInMap(sub);

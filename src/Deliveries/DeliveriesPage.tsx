@@ -17,9 +17,9 @@ import { SimpleBody } from "../components/SimpleBody";
 import { For } from "solid-js";
 import { openCreateDeliveryDialog } from "./CreateDeliveryDialog";
 import { Delivery } from "./Delivery";
-import { DeliveryCard } from "./DeliveryCard";
 import { EditDeliveryPage } from "./EditDeliveryPage";
 import { DailyTotalsCard } from "./DeliveriesPage.tsx.folder/DailyTotalsCard";
+import { DeliveryCard } from "./DeliveriesPage.tsx.folder/DeliveryCard";
 
 export function DeliveriesPage() {
   // Preload the other members
@@ -92,7 +92,7 @@ export function DeliveriesPage() {
         <Column padBetween={1}>
           <For
             each={Delivery.currentUsersCompletedDeliveries.filter(
-              (_, i) => i < 20,
+              (_, i) => i < 30,
             )}
             fallback={<Txt hint>No Completed Deliveries</Txt>}
           >

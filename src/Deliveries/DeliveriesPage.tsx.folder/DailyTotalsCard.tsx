@@ -36,10 +36,10 @@ export function DailyTotalsCard() {
       {/* Title */}
       <Row onClick={() => (isExpanded.value = !isExpanded.value)}>
         <Txt widthGrows bold>
-          Running Totals:
+          Running Totals
         </Txt>
         <Icon
-          scale={1 + 3 / 16}
+          scale={1.25}
           iconPath={isExpanded.value ? mdiChevronDown : mdiChevronLeft}
         />
       </Row>
