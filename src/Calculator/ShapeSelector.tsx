@@ -8,10 +8,11 @@ import {
   theme,
   Icon,
   pushPage,
+  Row,
+  Box,
 } from "miwi";
 import { TANK_SHAPE_IDS, TankShapeId, getTankShape } from "./ShapeUtils";
 import { For } from "solid-js";
-import { InfoCard } from "@/settings/InfoCard";
 import { mdiHelpCircleOutline } from "@mdi/js";
 import { ShapeInfoDialog } from "./ShapeInfoDialog";
 
@@ -22,6 +23,7 @@ export default function ShapeSelector(
     hideActionButtons?: boolean;
   }>,
 ) {
+  const shapeIconSize = 1.675;
   const dropDownIsOpen = useProp(false);
   return (
     <Label label={props.label}>
@@ -32,11 +34,23 @@ export default function ShapeSelector(
         getLabelForData={(shapeId: TankShapeId | null) => {
           if (!exists(shapeId)) return null;
           const tankShape = getTankShape(shapeId);
-          return tankShape.nameLong;
+          return (
+            <Row padBetween={0.5}>
+              <Box width={shapeIconSize} height={1}>
+                <Box
+                  width={shapeIconSize}
+                  height={shapeIconSize}
+                  fill={getTankShape(shapeId)!.iconImage}
+                />
+              </Box>
+              <Txt widthGrows singleLine>
+                {tankShape.nameLong}
+              </Txt>
+            </Row>
+          );
         }}
         noOptionsText={"No Shapes"}
         cancelOptions={{
-          icon: undefined,
           stroke: theme.palette.hint,
         }}
         actionButtons={
@@ -55,17 +69,25 @@ export default function ShapeSelector(
       >
         <For each={TANK_SHAPE_IDS} fallback={<Txt>Loading...</Txt>}>
           {(shapeId) => (
-            <Txt
+            <Row
               onClick={() => {
                 props.value.value = shapeId;
                 dropDownIsOpen.value = false;
               }}
-              widthGrows
-              heightShrinks
-              overflowX={$Overflow.wrap}
+              padBetween={0.5}
+              // alignTopLeft - alignCenter looked better
             >
-              {getTankShape(shapeId).nameLong}
-            </Txt>
+              <Box width={shapeIconSize} height={1}>
+                <Box
+                  width={shapeIconSize}
+                  height={shapeIconSize}
+                  fill={getTankShape(shapeId)!.iconImage}
+                />
+              </Box>
+              <Txt widthGrows heightShrinks overflowX={$Overflow.wrap}>
+                {getTankShape(shapeId).nameLong}
+              </Txt>
+            </Row>
           )}
         </For>
       </Selector>

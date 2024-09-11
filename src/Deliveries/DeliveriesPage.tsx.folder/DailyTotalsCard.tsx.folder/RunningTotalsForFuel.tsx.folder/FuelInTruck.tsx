@@ -6,6 +6,8 @@ import { doNow } from "miwi";
 export const FuelInTruck = doNow(() => {
   const savedJsonString = autoSavingProp(`fuelInTruck`, `[]`);
   return {
+    recordLoad(fuelId: string, loadAmount: number) {},
+    getRecentLoads(fuelId: string) {},
     getFuelId(sub: SubDelivery) {
       return sub.actualFuelType !== NONE_SELECTED
         ? sub.actualFuelType === ONE_TIME
