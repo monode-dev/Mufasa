@@ -1,7 +1,8 @@
-import { mdiDotsVertical } from "@mdi/js";
-import { Column, Row, Txt, Icon, formatNumWithCommas, useFormula } from "miwi";
+import { Column, Row, Txt, formatNumWithCommas, useFormula, theme } from "miwi";
 import { SubDelivery } from "../../Delivery";
 import { NONE_SELECTED, ONE_TIME } from "@/utils";
+import { FuelInTruck } from "./RunningTotalsForFuel.tsx.folder/FuelInTruck";
+import { FuelType } from "@/model/DataModel";
 
 export type FuelTotals = {
   fuelId: string | undefined;
@@ -15,6 +16,15 @@ export function compileAllFuelTotals(props: {
   completedSubDeliveriesSince3am: SubDelivery[];
 }): FuelTotals[] {
   const subDeliveriesByFuelId = new Map<string, FuelTotals>();
+  FuelType.sortedFuelTypes.forEach((fuelType) => {
+    const fuelId = `id-${fuelType.docId}`;
+    subDeliveriesByFuelId.set(fuelId, {
+      fuelId,
+      fuelName: fuelType.name ?? `Unknown Fuel`,
+      upcoming: [],
+      delivered: [],
+    });
+  });
 
   // Add each upcoming sub-delivery to the correct fuel
   props.upcomingSubDeliveries.forEach((sub) => {
@@ -30,18 +40,13 @@ export function compileAllFuelTotals(props: {
     fuelEntry.delivered.push(sub);
   });
 
-  return Array.from(subDeliveriesByFuelId.values());
+  return Array.from(subDeliveriesByFuelId.values()).filter(
+    (totals) => totals.upcoming.length > 0 || totals.delivered.length > 0,
+  );
 
   function ensureFuelInMap(sub: SubDelivery): FuelTotals | undefined {
     // Calculate the fuel ID in this context
-    const fuelId =
-      sub.actualFuelType !== NONE_SELECTED
-        ? sub.actualFuelType === ONE_TIME
-          ? sub.fuelSpecs.name
-            ? `ot-${sub.fuelSpecs.name}`
-            : undefined
-          : `id-${sub.actualFuelType.docId}`
-        : undefined;
+    const fuelId = FuelInTruck.getFuelId(sub);
     if (!fuelId) return;
 
     // Ensure the fuel is in the map
@@ -79,7 +84,7 @@ export function RunningTotalsForFuel(props: { fuelTotals: FuelTotals }) {
       <Row>
         <Txt singleLine widthGrows>{`${props.fuelTotals.fuelName}:`}</Txt>
         {/* TODO: Add and remove fuel */}
-        <Icon iconPath={mdiDotsVertical} />
+        <Txt stroke={theme.palette.primary}>Add initial fuel in truck.</Txt>
       </Row>
       <Txt singleLine widthGrows>{`${formatNumWithCommas(
         deliveredGallons.value,
