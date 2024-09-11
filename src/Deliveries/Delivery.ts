@@ -14,7 +14,6 @@ import {
 import { FloatSort, doNow, exists } from "miwi";
 import { prop, list, formula } from "mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
-import accurate from "accurate";
 import { calcEffectiveRate, calcSales } from "./CompletedSubDeliveryFields";
 
 // SECTION: Delivery

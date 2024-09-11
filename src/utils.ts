@@ -8,6 +8,7 @@ import {
   doNow,
 } from "miwi";
 import { createRoot } from "solid-js";
+import Decimal from "decimal.js";
 
 // SECTION: Dev Logs
 export const { devLogs, devLog } = doNow(() => {
@@ -78,10 +79,13 @@ export function roundToString(num: number, digits: number | `min` = 0): string {
   // Sometimes there are rounding errors. adding a 0.000..01 on the end seems to reduce these.
   const significantDecimals = num.toString().split(`.`)[1]?.length ?? 0;
   const actualDigits = digits === `min` ? significantDecimals : digits;
-  const numRoundingOffset = Math.pow(10, -significantDecimals - 1);
-  const digitRoundOffset = Math.pow(10, -actualDigits - 1);
-  const roundingOffset = Math.min(numRoundingOffset, digitRoundOffset);
-  const result = (num + roundingOffset).toFixed(actualDigits);
+  const numRoundingOffset = Decimal.pow(
+    10,
+    Decimal.sub(-significantDecimals, 1),
+  );
+  const digitRoundOffset = Decimal.pow(10, Decimal.sub(-actualDigits, 1));
+  const roundingOffset = Decimal.min(numRoundingOffset, digitRoundOffset);
+  const result = Decimal.add(num, roundingOffset).toFixed(actualDigits);
   return result;
 }
 
