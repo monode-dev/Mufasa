@@ -35,20 +35,18 @@ import { formatNumWithCommas, formatPosixTime } from "@/utils";
 import { CalculateFillDialog } from "@/Calculator/CalculateFillDialog";
 
 export function DeliveryCard(props: { delivery: Delivery }) {
-  const showPerFuelTotals = doNow(() => {
-    const showPerFuelTotals = useProp(false);
-    /* Josh asked to have all delivery totals collapsed by default except for the most recently completed delivery. */
-    const isMostRecentlyCompletedDelivery = useFormula(() =>
-      props.delivery.isCompleted
-        ? Delivery.currentUsersCompletedDeliveries[0] === props.delivery
-        : false,
-    );
-    doWatch(() => {
-      if (!props.delivery.isCompleted) return;
-      showPerFuelTotals.value = isMostRecentlyCompletedDelivery.value;
-    });
-    return showPerFuelTotals;
+  
+  const completedDeliveriesSince3am = useFormula(() =>
+    Delivery.usersDeliveriesSince3am.filter((delivery) => delivery.isCompleted),
+  );
+
+  const showCard = useProp(false);
+  showCard.value = doNow(() => {
+    if (completedDeliveriesSince3am.value.find((delivery) => delivery === props.delivery)) return true;
+    if (!completedDeliveriesSince3am.value.find((delivery) => delivery === props.delivery) && props.delivery.isCompleted) return false;
+    return false;
   });
+
   // TODO: Make this based off of fuel id not fuel name
   const totalPerFuelType = useFormula(() => {
     const totalPerFuelType = new Map<string, number>();
@@ -85,7 +83,11 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Txt singleLine widthGrows>
             {formatPosixTime(props.delivery.completedTimePosix!)}
           </Txt>
-          <DeliveryCardOptionButtons delivery={props.delivery} />
+          <Icon
+            scale={1 + 3 / 16}
+            onClick={() => (showCard.value = !showCard.value)}
+            iconPath={showCard.value ? mdiChevronDown : mdiChevronLeft}
+          />
         </Row>
       </Show>
 
@@ -116,7 +118,12 @@ export function DeliveryCard(props: { delivery: Delivery }) {
             address={props.delivery.address}
           />
 
-          <DeliveryCardOptionButtons delivery={props.delivery} />
+          <Icon
+            scale={1 + 3 / 16}
+            onClick={() => (showCard.value = !showCard.value)}
+            iconPath={showCard.value ? mdiChevronDown : mdiChevronLeft}
+          />
+
         </Show>
       </Row>
 
@@ -147,7 +154,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           </>
         }
       >
-        {(subDelivery) => <SubDeliveryRow subDelivery={subDelivery} />}
+        {(subDelivery) => <SubDeliveryRow subDelivery={subDelivery} showCard={showCard.value}/>}
       </For>
 
       {/* Completion hint. */}
@@ -173,22 +180,15 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Show>
 
       {/* Totals */}
-      <Show when={props.delivery.sortedSubDeliveries.length > 0}>
-        <Row
-          onClick={() => (showPerFuelTotals.value = !showPerFuelTotals.value)}
-        >
+      <Show when={showCard.value && props.delivery.sortedSubDeliveries.length > 0}>
+        <Row>
           <Txt bold alignLeft /* width={5} */>
             Total:
           </Txt>
           <Txt widthGrows bold>
             ${props.delivery.totalMoney}
           </Txt>
-          <Icon
-            scale={1 + 3 / 16}
-            iconPath={showPerFuelTotals.value ? mdiChevronDown : mdiChevronLeft}
-          />
         </Row>
-        <Show when={showPerFuelTotals.value}>
           <For each={Array.from(totalPerFuelType.value.entries())}>
             {([FuelName, totalSalesWorth]) => (
               <Row>
@@ -199,7 +199,6 @@ export function DeliveryCard(props: { delivery: Delivery }) {
               </Row>
             )}
           </For>
-        </Show>
       </Show>
 
       {/* Notes */}
@@ -216,7 +215,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
   );
 }
 
-export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
+export function SubDeliveryRow(props: { subDelivery: SubDelivery, showCard?: boolean }) {
   const highlightColor = useFormula(() =>
     props.subDelivery.isCompleted
       ? $theme.colors.hint
@@ -279,7 +278,14 @@ export function SubDeliveryRow(props: { subDelivery: SubDelivery }) {
           alignTopLeft
           stroke={highlightColor.value ?? $theme.colors.text}
         >
-          {props.subDelivery.title}
+          {
+
+          doNow(() => {
+            if(!props.showCard && props.subDelivery.delivery.isCompleted) return props.subDelivery.cutTitle;
+            return props.subDelivery.title; 
+          })
+          
+          }
         </Txt>
       </Row>
     </>
