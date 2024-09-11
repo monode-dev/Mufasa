@@ -1,4 +1,4 @@
-import { mdiPlus } from "@mdi/js";
+import { mdiArrowUpRight, mdiPlus } from "@mdi/js";
 import {
   Box,
   Card,
@@ -29,6 +29,7 @@ import { InlineAppBar } from "@/components/InlineAppBar";
 import { DeliveryCard } from "./DeliveriesPage.tsx.folder/DeliveryCard";
 import { TotalsForDelivery } from "./DeliveriesPage.tsx.folder/DeliveryCard.tsx.folder/TotalsForDelivery";
 import { HorizontalDivider } from "@/components/HorizontalDivider";
+import { autoSavingProp } from "@/utils";
 
 export function openDeleteDeliveryDialog(delivery: Delivery) {
   pushPage(DeleteDialog, {
@@ -53,6 +54,11 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
   // filled in LastEnterHint function
   const nextOverride: Prop<Map<number, Prop<number>>> = useProp(new Map());
+  
+  const haveSortedSubdeliveryCards = autoSavingProp<boolean>(
+    `haveSortedSubdeliveryCards`,
+    false
+  );
 
   return (
     <SimplePage>
@@ -105,8 +111,9 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
             fallback={<Txt hint>Tap + to add an individual delivery.</Txt>}
           >
             <SortableColumn
+              onPickUp={() => haveSortedSubdeliveryCards.value = true}
               shouldLog
-              onSort={(sortProps) =>
+              onSort={(sortProps) => {
                 FloatSort.moveItem({
                   sortedList: props.delivery.sortedSubDeliveries,
                   fromIndex: sortProps.from,
@@ -114,6 +121,8 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
                   getPos: (delivery) => delivery.sortPosition,
                   setPos: (delivery, pos) => (delivery.sortPosition = pos),
                 })
+              }
+
               }
             >
               <For each={props.delivery.sortedSubDeliveries}>
@@ -139,6 +148,15 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
                 }}
               </For>
             </SortableColumn>
+            {/* Hint text for sorting sub-delivery cards*/}
+            <Show when={!haveSortedSubdeliveryCards.value}>
+              <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
+                <Txt>Tap and hold to sort</Txt>
+                <Box scale={1.25} padBottom={0.5} width={1} height={1}>
+                  <Icon iconPath={mdiArrowUpRight} />
+                </Box>
+              </Row>
+            </Show>
           </Show>
         </Column>
 

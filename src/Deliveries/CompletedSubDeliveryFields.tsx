@@ -1,4 +1,5 @@
 import { getTankShape, TankGeometry } from "@/Calculator/ShapeUtils";
+import { RateOffsetField } from "@/components/RateOffsetField";
 import {
   Field,
   Label,
@@ -93,14 +94,7 @@ export function CompletedSubDeliveryFields(props: {
       </Label>
 
       {/** Rate Offset */}
-      <Label label="Rate Offset">
-        <NumField
-          value={props.rateOffset}
-          underlined
-          hint="$0.00 / gal."
-          negativesAreAllowed
-        />
-      </Label>
+      <RateOffsetField label={"Rate Offset"} rateOffset={props.rateOffset}/>
 
       {/** Gallons */}
       <Label label="Gallons">
