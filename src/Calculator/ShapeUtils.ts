@@ -1,15 +1,21 @@
 import { exists } from "miwi";
 import { createMutable } from "solid-js/store";
 import { Tank } from "@/Tanks/Tank";
+import hCylIcon from "@/assets/H-cylinder-tank.png";
+import rectIcon from "@/assets/Rectangle-tank.png";
+import vCylIcon from "@/assets/V-cylinder-tank.png";
+import ellipseIcon from "@/assets/Ellipse-tank.png";
+import truckBedIcon from "@/assets/L-tank.png";
+import capsuleIcon from "@/assets/Pill-tank.png";
 
 export const CUBIC_INCHES_PER_GALLON = 231;
 
 export type TankShapeId =
   | `horizontalCylinder`
-  | `oval`
   | `rectangle`
   | `verticalCylinder`
   | `horizontalEllipse`
+  | `oval`
   | `truckBedTank`;
 // | `diamondTank`;
 export type TankDimension =
@@ -49,6 +55,7 @@ export type TankShapeDetails = {
   readonly nameLong: string;
   readonly nameShort: string;
   readonly dimensions: TankDimension[];
+  readonly iconImage: string;
   calcFilledVolume(
     tank: Partial<Tank> | null | undefined,
     stickedInches: number | null | undefined,
@@ -62,6 +69,7 @@ const _tankShapes: {
     nameLong: `Horizontal Cylinder`,
     nameShort: `H. Cyl.`,
     dimensions: [`length`, `diameter`],
+    iconImage: hCylIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [`length`, `diameter`] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -89,6 +97,7 @@ const _tankShapes: {
     nameLong: `Rectangle`,
     nameShort: `Rect.`,
     dimensions: [`length`, `depth`, `height`],
+    iconImage: rectIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [`length`, `depth`, `height`] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -115,6 +124,7 @@ const _tankShapes: {
     nameLong: `Vertical Cylinder`,
     nameShort: `V. Cyl.`,
     dimensions: [`height`, `diameter`],
+    iconImage: vCylIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [`diameter`, `height`] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -145,6 +155,7 @@ const _tankShapes: {
     nameLong: `Ellipse`,
     nameShort: `Ellipse`,
     dimensions: [`length`, `height`, `depth`],
+    iconImage: ellipseIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [`length`, `height`, `depth`] as const) {
         if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
@@ -175,6 +186,7 @@ const _tankShapes: {
     nameLong: `Capsule`,
     nameShort: `Capsule`,
     dimensions: [`length`, `depth`, `fullHeight`, `squareHeight`],
+    iconImage: capsuleIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [
         `length`,
@@ -239,6 +251,7 @@ const _tankShapes: {
     nameLong: `L-Shaped`,
     nameShort: `L-Shaped`,
     dimensions: [`length`, `topDepth`, `fullDepth`, `wideHeight`, `fullHeight`],
+    iconImage: truckBedIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [
         `length`,
