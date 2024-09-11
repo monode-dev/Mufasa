@@ -8,7 +8,8 @@ import {
 } from "@/Calculator/ShapeUtils";
 import { Client } from "@/Clients/Client";
 import { spaceChar } from "@/AppData";
-import { exists, roundToString, doNow } from "miwi";
+import { exists, doNow } from "miwi";
+import { MathJs } from "@/utils";
 
 export class Tank extends mfs.Doc(`Tank`) {
   static readonly limit = createLimitTrackers({
@@ -60,7 +61,7 @@ export class Tank extends mfs.Doc(`Tank`) {
             .map((x) => x[0].toUpperCase())
             .join(``);
           const value = exists(tank[dimensionId])
-            ? roundToString(tank[dimensionId])
+            ? MathJs.round(tank[dimensionId]).toString()
             : `?`;
           return `${text} ${acronym}:${value}`;
         }, ``)
@@ -69,7 +70,7 @@ export class Tank extends mfs.Doc(`Tank`) {
       volume: doNow(() => {
         const volume = shapeUtils?.calcTotalVolume(tank);
         return exists(volume)
-          ? `${roundToString(volume ?? 0, 0)}${spaceChar}Gal.`
+          ? `${MathJs.round(volume ?? 0)}${spaceChar}Gal.`
           : `Unknown Volume`;
       }),
       notes:
