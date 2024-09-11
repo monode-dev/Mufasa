@@ -333,9 +333,6 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
       }
     },
   );
-  computedFuelType: FuelType | null = formula(() =>
-    this.selectedFuel === ONE_TIME ? null : (this.selectedFuel as FuelType),
-  );
 
   readonly showFuelNameAndRate = formula(() => this.selectedFuel === ONE_TIME);
 
@@ -360,6 +357,12 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
     },
   );
   explicitRateOffset = prop([Number, null], null);
+  readonly actualFuelType = formula(() =>
+    this.selectedTank === JUST_FUEL
+      ? this.selectedFuel
+      : this.selectedKnownTank?.fuelType ?? NONE_SELECTED,
+  );
+
   readonly fuelSpecs = formula(() => {
     // Only apply rate offset if there is a selected client, and the user has not manually typed a rate.
     const rateOffsetFromClient = this.delivery?.rateOffsetFromClient ?? 0;
