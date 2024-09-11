@@ -28,6 +28,7 @@ import { Delivery } from "./Delivery";
 import { listClients } from "@/AppData";
 import { Client } from "@/Clients/Client";
 import Fuse from "fuse.js";
+import { RateOffsetField } from "@/components/RateOffsetField";
 
 export function DeliveryFields(props: {
   create?: boolean;
@@ -180,15 +181,10 @@ export function DeliveryFields(props: {
           keyboard={"text"}
           enterKeyHint={`enter`}
         />
-        <NumField
-          hint={`$0.00 / gal.`}
-          icon={mdiPlusMinusVariant}
-          value={one_rateOffset}
-          underlined
-          keyboard={"decimal"}
-          enterKeyHint={useFormula(() => enterKey(one_note, offsetIndex)).value}
-          onlyWriteOnBlur
-          negativesAreAllowed
+        <RateOffsetField
+          iconPath={mdiPlusMinusVariant}
+          rateOffset={one_rateOffset}
+          enterKeyHit={enterKey(one_note, offsetIndex)}
         />
       </Show>
       <Field
