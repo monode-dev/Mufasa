@@ -34,8 +34,8 @@ export function DeliveryCard(props: { delivery: Delivery }) {
     (props.delivery.completedTimePosix ?? 0) > Delivery.threeAm.getTime(),
   );
 
-  const haveOpenedCalculator = autoSavingProp<boolean>(
-    `haveOpenedCalculator`,
+  const haveOpenedCalculatorByIcon = autoSavingProp<boolean>(
+    `haveOpenedCalculatorByIcon`,
     false
   );
 
@@ -82,7 +82,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
             stroke={theme.palette.primary}
             onClick={() =>
               {
-                haveOpenedCalculator.value = true;
+                haveOpenedCalculatorByIcon.value = true;
                 pushPage(CalculateFillDialog, { delivery: props.delivery })
               }
             }
@@ -98,7 +98,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
       </Row>
 
       <Show when={
-        !haveOpenedCalculator.value &&
+        !haveOpenedCalculatorByIcon.value &&
         !props.delivery.isCompleted &&
         props.delivery.subDeliveries.count > 0 &&
         Delivery.currentUsersUpcomingDeliveries.indexOf(props.delivery) === 0
