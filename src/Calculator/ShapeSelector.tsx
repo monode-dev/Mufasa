@@ -1,11 +1,25 @@
-import { Label, Prop, Txt, exists, useProp, Selector, theme } from "miwi";
+import {
+  Label,
+  Prop,
+  Txt,
+  exists,
+  useProp,
+  Selector,
+  theme,
+  Icon,
+  pushPage,
+} from "miwi";
 import { TANK_SHAPE_IDS, TankShapeId, getTankShape } from "./ShapeUtils";
 import { For } from "solid-js";
+import { InfoCard } from "@/settings/InfoCard";
+import { mdiHelpCircleOutline } from "@mdi/js";
+import { ShapeInfoDialog } from "./ShapeInfoDialog";
 
 export default function ShapeSelector(
   props: Readonly<{
     value: Prop<TankShapeId | null>;
     label: string | undefined;
+    hideActionButtons?: boolean;
   }>,
 ) {
   const dropDownIsOpen = useProp(false);
@@ -25,20 +39,19 @@ export default function ShapeSelector(
           icon: undefined,
           stroke: theme.palette.hint,
         }}
-        // actionButtons={
-        //   <Icon
-        //     iconPath={mdiHelpCircleOutline}
-        //     onClick={() => {
-        //       pushPage(InfoCard, {
-        //         entriesToOpen: [
-        //           "Tank",
-        //           "Shape",
-        //           getTankShape(props.value.value)?.nameLong ?? "",
-        //         ],
-        //       });
-        //     }}
-        //   />
-        // }
+        actionButtons={
+          props.hideActionButtons ? undefined : (
+            <Icon
+              iconPath={mdiHelpCircleOutline}
+              onClick={() => {
+                if (!exists(props.value.value)) return;
+                pushPage(ShapeInfoDialog, {
+                  shapeId: props.value.value,
+                });
+              }}
+            />
+          )
+        }
       >
         <For each={TANK_SHAPE_IDS} fallback={<Txt>Loading...</Txt>}>
           {(shapeId) => (

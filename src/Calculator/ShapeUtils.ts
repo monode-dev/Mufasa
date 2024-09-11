@@ -85,70 +85,6 @@ const _tankShapes: {
       );
     },
   },
-  oval: {
-    nameLong: `Oval`,
-    nameShort: `Oval`,
-    dimensions: [`length`, `depth`, `fullHeight`, `squareHeight`],
-    calcFilledVolume(tank, stickedInches) {
-      for (const dimension of [
-        `length`,
-        `depth`,
-        `fullHeight`,
-        `squareHeight`,
-      ] as const) {
-        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
-          return undefined;
-        }
-      }
-      if (!exists(stickedInches)) return undefined;
-
-      // Compute relevant tank info
-      const ellipseHeight = tank?.fullHeight! - tank?.squareHeight!;
-
-      // Distribute the fuel between the parts
-      let undistributedFuel = stickedInches;
-      let inchesInEllipse = Math.min(undistributedFuel, ellipseHeight / 2);
-      undistributedFuel = Math.max(undistributedFuel - inchesInEllipse, 0);
-      const inchesInRectangle = Math.min(
-        undistributedFuel,
-        tank?.squareHeight!,
-      );
-      undistributedFuel = Math.max(undistributedFuel - inchesInRectangle, 0);
-      inchesInEllipse += Math.min(undistributedFuel, ellipseHeight / 2);
-      undistributedFuel = Math.max(undistributedFuel - inchesInEllipse, 0);
-
-      // Calculate the volume of the filled parts
-      const ellipseArea = calcEllipseSegmentArea(
-        tank?.depth!,
-        ellipseHeight,
-        inchesInEllipse,
-      );
-      const rectangleArea = inchesInRectangle * tank?.depth!;
-      const filledArea = ellipseArea + rectangleArea;
-      return (filledArea * tank?.length!) / CUBIC_INCHES_PER_GALLON;
-    },
-    calcTotalVolume(tank) {
-      for (const dimension of [
-        `length`,
-        `depth`,
-        `fullHeight`,
-        `squareHeight`,
-      ] as const) {
-        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
-          return undefined;
-        }
-      }
-
-      const ellipseHeight = tank?.fullHeight! - tank?.squareHeight!;
-      const ellipseArea = calcEllipseArea(tank?.depth!, ellipseHeight);
-      const rectangleArea = tank?.squareHeight! * tank?.depth!;
-
-      return (
-        ((rectangleArea + ellipseArea) * tank?.length!) /
-        CUBIC_INCHES_PER_GALLON
-      );
-    },
-  },
   rectangle: {
     nameLong: `Rectangle`,
     nameShort: `Rect.`,
@@ -235,9 +171,73 @@ const _tankShapes: {
       );
     },
   },
+  oval: {
+    nameLong: `Capsule`,
+    nameShort: `Capsule`,
+    dimensions: [`length`, `depth`, `fullHeight`, `squareHeight`],
+    calcFilledVolume(tank, stickedInches) {
+      for (const dimension of [
+        `length`,
+        `depth`,
+        `fullHeight`,
+        `squareHeight`,
+      ] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+      if (!exists(stickedInches)) return undefined;
+
+      // Compute relevant tank info
+      const ellipseHeight = tank?.fullHeight! - tank?.squareHeight!;
+
+      // Distribute the fuel between the parts
+      let undistributedFuel = stickedInches;
+      let inchesInEllipse = Math.min(undistributedFuel, ellipseHeight / 2);
+      undistributedFuel = Math.max(undistributedFuel - inchesInEllipse, 0);
+      const inchesInRectangle = Math.min(
+        undistributedFuel,
+        tank?.squareHeight!,
+      );
+      undistributedFuel = Math.max(undistributedFuel - inchesInRectangle, 0);
+      inchesInEllipse += Math.min(undistributedFuel, ellipseHeight / 2);
+      undistributedFuel = Math.max(undistributedFuel - inchesInEllipse, 0);
+
+      // Calculate the volume of the filled parts
+      const ellipseArea = calcEllipseSegmentArea(
+        tank?.depth!,
+        ellipseHeight,
+        inchesInEllipse,
+      );
+      const rectangleArea = inchesInRectangle * tank?.depth!;
+      const filledArea = ellipseArea + rectangleArea;
+      return (filledArea * tank?.length!) / CUBIC_INCHES_PER_GALLON;
+    },
+    calcTotalVolume(tank) {
+      for (const dimension of [
+        `length`,
+        `depth`,
+        `fullHeight`,
+        `squareHeight`,
+      ] as const) {
+        if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {
+          return undefined;
+        }
+      }
+
+      const ellipseHeight = tank?.fullHeight! - tank?.squareHeight!;
+      const ellipseArea = calcEllipseArea(tank?.depth!, ellipseHeight);
+      const rectangleArea = tank?.squareHeight! * tank?.depth!;
+
+      return (
+        ((rectangleArea + ellipseArea) * tank?.length!) /
+        CUBIC_INCHES_PER_GALLON
+      );
+    },
+  },
   truckBedTank: {
-    nameLong: `Truck Bed Tank`,
-    nameShort: `Truck Bed`,
+    nameLong: `L-Shaped`,
+    nameShort: `L-Shaped`,
     dimensions: [`length`, `topDepth`, `fullDepth`, `wideHeight`, `fullHeight`],
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [
