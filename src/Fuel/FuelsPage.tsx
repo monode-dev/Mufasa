@@ -14,15 +14,21 @@ import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { For, Show } from "solid-js";
 import { FuelType } from "@/model/DataModel";
-import { mdiPlus } from "@mdi/js";
+import { mdiArrowUpRight, mdiPlus } from "@mdi/js";
 import { openCreateFuelTypeDialog } from "@/Fuel/CreateFuelTypeDialog";
 import FuelTypeEntry from "@/Fuel/FuelTypeEntry";
 import { InlineAppBar } from "@/components/InlineAppBar";
+import { autoSavingProp } from "@/utils";
 
 export function FuelsPage() {
   const fieldRefs: Prop<Map<number, HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function in FuelTypeEntry.tsx
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
+
+  const haveSortedFuelTypes = autoSavingProp<boolean>(
+    `haveSortedFuelTypes`,
+    false
+  );
 
   return (
     <SimplePage>
@@ -61,14 +67,16 @@ export function FuelsPage() {
 
           {/* Fuels */}
           <SortableColumn
-            onSort={(props) =>
-              FloatSort.moveItem({
-                sortedList: FuelType.sortedFuelTypes,
-                fromIndex: props.from,
-                toIndex: props.to,
-                getPos: (fuelTypes) => fuelTypes.sortPos,
-                setPos: (fuelTypes, pos) => (fuelTypes.sortPos = pos),
-              })
+            onPickUp={() => haveSortedFuelTypes.value = true}
+            onSort={(props) => {
+                FloatSort.moveItem({
+                  sortedList: FuelType.sortedFuelTypes,
+                  fromIndex: props.from,
+                  toIndex: props.to,
+                  getPos: (fuelTypes) => fuelTypes.sortPos,
+                  setPos: (fuelTypes, pos) => (fuelTypes.sortPos = pos),
+                })
+              }
             }
           >
             <For
@@ -94,6 +102,15 @@ export function FuelsPage() {
               }}
             </For>
           </SortableColumn>
+          {/* Hint text for sorting fuel types*/}
+          <Show when={!haveSortedFuelTypes.value}>
+            <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
+              <Txt>Tap and hold to sort</Txt>
+              <Box scale={1.25} padBottom={0.5} width={1} height={1}>
+                <Icon iconPath={mdiArrowUpRight} />
+              </Box>
+            </Row>
+          </Show>
         </Show>
       </SimpleBody>
     </SimplePage>
