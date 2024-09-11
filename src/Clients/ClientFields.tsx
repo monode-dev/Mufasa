@@ -28,6 +28,7 @@ import { formatPhoneNumber, formatIdNumber } from "@/utils";
 import { getWeekDayAsJsDayOfWeek, WeekDay } from "./Client";
 import { For, Show } from "solid-js";
 import { mfs } from "@/model/DataModel";
+import { RateOffsetField } from "@/components/RateOffsetField";
 
 export function ClientFields(props: {
   autoFocusFirstField?: boolean;
@@ -271,17 +272,10 @@ export function ClientFields(props: {
         keyboard={"text"}
         enterKeyHint={`enter`}
       />
-      <NumField
-        hint={`$0.00 / gal.`}
-        icon={mdiPlusMinusVariant}
-        value={props.rateOffset}
-        underlined
-        keyboard={"decimal"}
-        enterKeyHint={
-          useFormula(() => enterKey(props.notes, rateOffsetIndex)).value
-        }
-        negativesAreAllowed
-        onlyWriteOnBlur
+      <RateOffsetField
+        iconPath={mdiPlusMinusVariant}
+        rateOffset={props.rateOffset}
+        enterKeyHit={enterKey(props.notes, rateOffsetIndex)}
       />
       <Field
         hasFocus={focusOnNotes}

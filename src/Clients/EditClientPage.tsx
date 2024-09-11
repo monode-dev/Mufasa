@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { listTanks } from "@/AppData";
 import {
   AppBar,
@@ -23,7 +23,7 @@ import {
   doWatch,
   DeleteDialog,
 } from "miwi";
-import { mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
+import { mdiArrowUpRight, mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
 import { SettingsPage } from "@/settings/SettingsPage";
 import { TankCard } from "@/Tanks/TankCard";
@@ -35,6 +35,7 @@ import { SimplePage } from "@/components/SimplePage";
 import { InlineAppBar } from "@/components/InlineAppBar";
 import { SimpleBody } from "@/components/SimpleBody";
 import { DeliveryCard } from "@/Deliveries/DeliveriesPage.tsx.folder/DeliveryCard";
+import { autoSavingProp } from "@/utils";
 
 export function openDeleteClientDialog(client: Client) {
   pushPage(DeleteDialog, {
@@ -50,6 +51,11 @@ export default function EditClientPage(props: { client: Client }) {
     if (props.client.isDeleted) popPage();
   });
   const sortedTanks = useFormula(() => listTanks(props.client.tanks));
+
+  const haveSortedTankCards = autoSavingProp<boolean>(
+    `haveSortedTankCards`,
+    false
+  )
 
   return (
     <SimplePage>
@@ -148,14 +154,16 @@ export default function EditClientPage(props: { client: Client }) {
         </Row>
         <Column padBetween={1}>
           <SortableColumn
-            onSort={(props) =>
-              FloatSort.moveItem({
-                sortedList: sortedTanks.value,
-                fromIndex: props.from,
-                toIndex: props.to,
-                getPos: (tank) => tank.sortPos!,
-                setPos: (tank, pos) => (tank.sortPos = pos),
-              })
+            onPickUp={() => (haveSortedTankCards.value = true)}
+            onSort={(props) => {
+                FloatSort.moveItem({
+                  sortedList: sortedTanks.value,
+                  fromIndex: props.from,
+                  toIndex: props.to,
+                  getPos: (tank) => tank.sortPos!,
+                  setPos: (tank, pos) => (tank.sortPos = pos),
+                })
+              }
             }
           >
             <For
@@ -165,6 +173,16 @@ export default function EditClientPage(props: { client: Client }) {
               {(tank) => <TankCard tank={tank} client={props.client} />}
             </For>
           </SortableColumn>
+
+          {/* Hint text for sorting tank cards*/}
+          <Show when={!haveSortedTankCards.value}>
+            <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
+              <Txt>Tap and hold to sort</Txt>
+              <Box scale={1.25} padBottom={0.5} width={1} height={1}>
+                <Icon iconPath={mdiArrowUpRight} />
+              </Box>
+            </Row>
+          </Show>
         </Column>
 
         <Box height={1} />
