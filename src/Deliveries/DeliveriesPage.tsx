@@ -6,10 +6,9 @@ import {
   pushPage,
   Row,
   SortableColumn,
-  theme,
   Txt,
 } from "miwi";
-import { mdiArrowUpRight, mdiMenu, mdiPlus } from "@mdi/js";
+import { mdiMenu, mdiPlus } from "@mdi/js";
 import { SettingsPage } from "../settings/SettingsPage";
 import { mfs } from "../model/DataModel";
 import { SimplePage } from "../components/SimplePage";
