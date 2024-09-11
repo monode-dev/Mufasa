@@ -288,7 +288,7 @@ const _tankShapes: {
   //  diamondTank: {
   //   nameLong: `Diamond Tank`,
   //   nameShort: `Diamond`,
-  //   dimensions: [`squareSide`, `rectangularSide`], 
+  //   dimensions: [`squareSide`, `rectangularSide`],
   //   calcFilledVolume(tank, stickedInches) {
   //     for (const dimension of [`squareSide`, `rectangularSide`] as const) {
   //       if (!exists(tank?.[dimension]) || tank?.[dimension]! <= 0) {

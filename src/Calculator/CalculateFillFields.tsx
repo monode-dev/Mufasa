@@ -1,11 +1,9 @@
 import {
   Txt,
   Row,
-  Box,
   Label,
   NumField,
   doWatch,
-  roundToString,
   useFormula,
   exists,
   pushPage,
@@ -25,7 +23,7 @@ import {
   createReactiveTankGeometry,
   getTankShape,
 } from "@/Calculator/ShapeUtils";
-import { formatNumWithCommas } from "@/utils";
+import { formatNumWithCommas, MathJs } from "@/utils";
 import CompleteSubDeliveryDialog from "@/Deliveries/CompleteSubDeliveryDialog";
 import TankFields from "@/Tanks/TankFields";
 import { ClientAndTankSelector } from "@/Clients/ClientAndTankSelector";
@@ -193,7 +191,7 @@ export function CalculateFillFields(props: { delivery?: Delivery }) {
   });
 
   function desiredStr(val: number) {
-    return roundToString(val * 100) + "%";
+    return MathJs.round(val * 100).toString() + "%";
   }
 
   function fillOutline(val: number | undefined) {
@@ -473,7 +471,7 @@ export function CalculateFillFields(props: { delivery?: Delivery }) {
           widthShrinks
         >
           {exists(currentFillPercent.value) && !isNaN(currentFillPercent.value)
-            ? `${roundToString(100 * currentFillPercent.value)}%`
+            ? `${MathJs.round(100 * currentFillPercent.value)}%`
             : emptyText}
         </Label>
         <Label
