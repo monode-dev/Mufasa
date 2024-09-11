@@ -272,7 +272,11 @@ export function ClientFields(props: {
         keyboard={"text"}
         enterKeyHint={`enter`}
       />
-      <RateOffsetField iconPath={mdiPlusMinusVariant} rateOffset={props.rateOffset} enterKeyHit={useFormula(() => enterKey(props.notes, rateOffsetIndex)).value}/>
+      <RateOffsetField
+        iconPath={mdiPlusMinusVariant}
+        rateOffset={props.rateOffset}
+        enterKeyHit={enterKey(props.notes, rateOffsetIndex)}
+      />
       <Field
         hasFocus={focusOnNotes}
         hintText={`Notes, Gate Code, Key Tag`}
