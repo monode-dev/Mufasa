@@ -29,12 +29,12 @@ import { SettingsPage } from "@/settings/SettingsPage";
 import { TankCard } from "@/Tanks/TankCard";
 import { CallAndMapButtons } from "./CallAndMapToButtons";
 import { Delivery } from "@/Deliveries/Delivery";
-import { DeliveryCard } from "@/Deliveries/DeliveryCard";
 import { Client } from "./Client";
 import { openCreateTankDialog } from "@/Tanks/CreateTankDialog";
 import { SimplePage } from "@/components/SimplePage";
 import { InlineAppBar } from "@/components/InlineAppBar";
 import { SimpleBody } from "@/components/SimpleBody";
+import { DeliveryCard } from "@/Deliveries/DeliveriesPage.tsx.folder/DeliveryCard";
 
 export function openDeleteClientDialog(client: Client) {
   pushPage(DeleteDialog, {
