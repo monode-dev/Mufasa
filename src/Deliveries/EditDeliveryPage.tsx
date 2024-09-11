@@ -22,11 +22,13 @@ import {
 import { For, Show } from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
 import { Delivery } from "./Delivery";
-import { DeliveryCard } from "./DeliveryCard";
 import { DeliveryFields } from "./DeliveryFields";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { InlineAppBar } from "@/components/InlineAppBar";
+import { DeliveryCard } from "./DeliveriesPage.tsx.folder/DeliveryCard";
+import { TotalsForDelivery } from "./DeliveriesPage.tsx.folder/DeliveryCard.tsx.folder/TotalsForDelivery";
+import { HorizontalDivider } from "@/components/HorizontalDivider";
 
 export function openDeleteDeliveryDialog(delivery: Delivery) {
   pushPage(DeleteDialog, {
@@ -75,8 +77,10 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
         padTop={0.5}
       >
         {/* Client Card */}
-        <Card pad={1} widthGrows>
+        <Card pad={1} widthGrows alignLeft>
           <DeliveryFields delivery={props.delivery} />
+          <HorizontalDivider />
+          <TotalsForDelivery delivery={props.delivery} />
         </Card>
 
         {/* SECTION Sub Deliveries */}

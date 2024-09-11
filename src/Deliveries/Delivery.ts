@@ -68,19 +68,20 @@ export class Delivery extends mfs.Doc(`Delivery`) {
         (a, b) => (b.completedTimePosix ?? 0) - (a.completedTimePosix ?? 0),
       );
   }
+  static get threeAm() {
+    const now = new Date();
+    const yesterday = new Date(now.valueOf() - 86400000);
+    const isBefore3Am = now.getHours() < 3;
+    const threeAm = new Date(isBefore3Am ? yesterday : now);
+    threeAm.setHours(3, 0, 0, 0);
+    return threeAm;
+  }
   static get usersDeliveriesSince3am() {
-    const threeAm = doNow(() => {
-      const now = new Date();
-      const yesterday = new Date(now.valueOf() - 86400000);
-      const isBefore3Am = now.getHours() < 3;
-      const threeAm = new Date(isBefore3Am ? yesterday : now);
-      threeAm.setHours(3, 0, 0, 0);
-      return threeAm;
-    });
     return [
       ...Delivery.currentUsersUpcomingDeliveries,
       ...Delivery.currentUsersCompletedDeliveries.filter(
-        (delivery) => (delivery.completedTimePosix ?? 0) > threeAm.getTime(),
+        (delivery) =>
+          (delivery.completedTimePosix ?? 0) > this.threeAm.getTime(),
       ),
     ];
   }
@@ -431,27 +432,26 @@ export class SubDelivery extends mfs.Doc(`SubDelivery`) {
   );
 
   // Full Title
-  readonly title = formula(() => {
+  readonly title = formula(() => this._getTitle({ shouldSimplify: false }));
+  readonly shorterTitle = formula(() =>
+    this._getTitle({ shouldSimplify: true }),
+  );
+  private _getTitle(props: { shouldSimplify: boolean }) {
     const gallonsPart = `${formatNumWithCommas(this.gallons ?? 0, 0)} gal.`;
     const fuelPart = `of ${this.fuelSpecs?.name ?? `an unknown fuel`}`;
     const tankPart =
       this.selectedTank instanceof Tank
-        ? ` to ${this.selectedTank.getLabel({
-            excludeParts: [`fuel`, `volume`],
-          })}`
+        ? !props.shouldSimplify || this.selectedTank.notes.trim().length > 0
+          ? ` to ${this.selectedTank.getLabel({
+              excludeParts: props.shouldSimplify
+                ? [`fuel`, `dimensions`, `shape`, `volume`]
+                : [`fuel`, `volume`],
+            })}`
+          : ``
         : ``;
 
     return `${gallonsPart}${fuelPart}${tankPart}`;
-  });
-  readonly cutTitle = formula(() => {
-    const gallonsPart = `${formatNumWithCommas(this.gallons ?? 0, 0)} gal.`;
-    const fuelPart = `of ${this.fuelSpecs?.name ?? `an unknown fuel`}`;
-    const tankPart = ` - "${doNow(() => { 
-      if(this.selectedTank != "justFuel" && this.selectedTank?.notes === " ") return " ";
-      return this.selectedTank != "justFuel" ? this.selectedTank?.notes : " ";
-    })}"`
-    return `${gallonsPart}${fuelPart}${tankPart}`;
-  });
+  }
 
   // Sort Position
   sortPosition = formula(
