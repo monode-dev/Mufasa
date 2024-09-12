@@ -52,7 +52,8 @@ export default function ClientSelector(props: {
   });
 
   const clientsAreFiltered = useFormula(() => filterString.value !== ``);
-  const { todaysClients: _todaysClients, tomorrowsClients: _tomorrowsClients } = Client.getScheduledClients();
+  const { todaysClients: _todaysClients, tomorrowsClients: _tomorrowsClients } =
+    Client.getScheduledClients();
   console.log(_todaysClients, _tomorrowsClients);
   const upcomingClients = useFormula(
     () =>
@@ -147,9 +148,10 @@ export default function ClientSelector(props: {
         <Show
           when={props.showScheduledClients && todaysClients.value.length > 0}
         >
+          <HorizontalDivider />
           {/* Scheduled Clients */}
-          <Txt widthGrows alignCenter bold>
-            Scheduled Today
+          <Txt widthGrows alignCenterLeft bold>
+            Scheduled Today:
           </Txt>
           <For each={todaysClients.value}>
             {(client) => (
@@ -168,9 +170,10 @@ export default function ClientSelector(props: {
         <Show
           when={props.showScheduledClients && tomorrowsClients.value.length > 0}
         >
+          <HorizontalDivider />
           {/* Scheduled Clients */}
-          <Txt widthGrows alignCenter bold>
-            Scheduled Tomorrow
+          <Txt widthGrows alignCenterLeft bold>
+            Scheduled Tomorrow:
           </Txt>
           <For each={tomorrowsClients.value}>
             {(client) => (
