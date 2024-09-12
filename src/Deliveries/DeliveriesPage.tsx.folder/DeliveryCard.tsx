@@ -161,17 +161,35 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           Delivery.currentUsersUpcomingDeliveries.indexOf(props.delivery) === 0
         }
       >
-        <Row stroke={$theme.colors.hint} alignTopLeft padBetween={0.25}>
-          <Icon iconPath={mdiArrowUpLeft} scale={1.75} />
-          <Txt>Tap the </Txt>
-          <Box
-            width={1}
-            height={1}
-            outlineSize={1 / 8}
-            outlineColor={$theme.colors.hint}
-            cornerRadius={1 / 7}
-          ></Box>
-          <Txt>to complete the delivery.</Txt>
+        <Row
+          stroke={$theme.colors.hint}
+          alignTopRight
+          padBetween={0.25}
+          padLeft={0.5}
+        >
+          <Box height={0.5} width={0.5} overflowYSpills>
+            <Icon scale={1.25} iconPath={mdiArrowUpLeft} />
+          </Box>
+          <Txt hint widthGrows alignCenterLeft>
+            <span>
+              Tap the{" "}
+              <div
+                style={{
+                  display: `inline-block`,
+                  "vertical-align": `middle`,
+                }}
+              >
+                <Box
+                  width={1}
+                  height={1}
+                  outlineSize={1 / 8}
+                  outlineColor={$theme.colors.hint}
+                  cornerRadius={1 / 7}
+                />
+              </div>{" "}
+              to complete the delivery.
+            </span>
+          </Txt>
         </Row>
       </Show>
 
