@@ -21,14 +21,8 @@ import { firebasePersister } from "mufasa/firebase";
 import { mfs } from "./DataModel";
 import shajs from "sha.js";
 import firebaseConfig from "@/assets/firebase-config.json";
-import googleAuthConfig from "@/assets/google-auth-config.json";
 import appleAuthConfig from "@/assets/apple-auth-config.json";
 
-GoogleAuth.initialize({
-  clientId: googleAuthConfig.clientId,
-  scopes: ["profile", "email"],
-  grantOfflineAccess: true,
-});
 export const firebase = initializeApp(firebaseConfig);
 export const firestore = getFirestore(firebase);
 export const firebaseStorage = getStorage(firebase);
@@ -42,7 +36,11 @@ export async function signInWithApple() {
   try {
     await mfs.user.signInWithApple?.();
   } catch (error) {
-    appleSignInLogs.value = `${appleSignInLogs.value}${JSON.stringify(error, null, 2)}\n`;
+    appleSignInLogs.value = `${appleSignInLogs.value}${JSON.stringify(
+      error,
+      null,
+      2,
+    )}\n`;
   }
 }
 
@@ -113,7 +111,11 @@ export const cloudPersister = firebasePersister({
           appleSignInLogs.value = `${appleSignInLogs.value}Signing in with Apple: ${credentials.signInMethod}\n`;
           return credentials;
         } catch (error) {
-          appleSignInLogs.value = `${appleSignInLogs.value}${JSON.stringify(error, null, 2)}\n`;
+          appleSignInLogs.value = `${appleSignInLogs.value}${JSON.stringify(
+            error,
+            null,
+            2,
+          )}\n`;
           return;
         }
       },
