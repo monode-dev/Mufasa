@@ -1,10 +1,9 @@
 import {
   mdiArrowUpLeft,
-  mdiCalculator,
-  mdiChevronLeft,
-  mdiChevronDown,
-  mdiArrowRight,
   mdiArrowUpRight,
+  mdiCalculator,
+  mdiChevronDown,
+  mdiChevronUp,
 } from "@mdi/js";
 import {
   Box,
@@ -36,7 +35,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
 
   const haveOpenedCalculatorByIcon = autoSavingProp<boolean>(
     `haveOpenedCalculatorByIcon`,
-    false
+    false,
   );
 
   return (
@@ -60,7 +59,7 @@ export function DeliveryCard(props: { delivery: Delivery }) {
           <Icon
             scale={1.25}
             onClick={() => (isExpanded.value = !isExpanded.value)}
-            iconPath={isExpanded.value ? mdiChevronDown : mdiChevronLeft}
+            iconPath={isExpanded.value ? mdiChevronUp : mdiChevronDown}
           />
         </Row>
       </Show>
@@ -80,12 +79,10 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         <Show when={!props.delivery.isCompleted}>
           <Icon
             stroke={theme.palette.primary}
-            onClick={() =>
-              {
-                haveOpenedCalculatorByIcon.value = true;
-                pushPage(CalculateFillDialog, { delivery: props.delivery })
-              }
-            }
+            onClick={() => {
+              haveOpenedCalculatorByIcon.value = true;
+              pushPage(CalculateFillDialog, { delivery: props.delivery });
+            }}
             iconPath={mdiCalculator}
           />
 
@@ -97,16 +94,25 @@ export function DeliveryCard(props: { delivery: Delivery }) {
         </Show>
       </Row>
 
-      <Show when={
-        !haveOpenedCalculatorByIcon.value &&
-        !props.delivery.isCompleted &&
-        props.delivery.subDeliveries.count > 0 &&
-        Delivery.currentUsersUpcomingDeliveries.indexOf(props.delivery) === 0
-      }>
-        <Row stroke={$theme.colors.hint} padBetween={0.75} overflowYSpills alignTopRight>
-          <Txt singleLine widthGrows alignCenterRight>Tank Fill Calculator</Txt>
+      <Show
+        when={
+          !haveOpenedCalculatorByIcon.value &&
+          !props.delivery.isCompleted &&
+          props.delivery.subDeliveries.count > 0 &&
+          Delivery.currentUsersUpcomingDeliveries.indexOf(props.delivery) === 0
+        }
+      >
+        <Row
+          stroke={$theme.colors.hint}
+          padBetween={0.75}
+          overflowYSpills
+          alignTopRight
+        >
+          <Txt singleLine widthGrows alignCenterRight>
+            Tank Fill Calculator
+          </Txt>
           <Box padRight={4.71} height={0.5} width={0.5} overflowYSpills>
-            <Icon scale={1.25} iconPath={mdiArrowUpRight}/>
+            <Icon scale={1.25} iconPath={mdiArrowUpRight} />
           </Box>
         </Row>
       </Show>
