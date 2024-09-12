@@ -52,8 +52,8 @@ export default function ClientSelector(props: {
   });
 
   const clientsAreFiltered = useFormula(() => filterString.value !== ``);
-  const { todaysClients: _todaysClients, tomorrowsClients: _tomorrowsClients } =
-    Client.getScheduledClients();
+  const { todaysClients: _todaysClients, tomorrowsClients: _tomorrowsClients } = Client.getScheduledClients();
+  console.log(_todaysClients, _tomorrowsClients);
   const upcomingClients = useFormula(
     () =>
       new Set(
