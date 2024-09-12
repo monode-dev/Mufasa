@@ -1,4 +1,4 @@
-# To Do
+## To Setup a New App
 
 - Firebase
   - src/assets/firebase-config.json
@@ -36,3 +36,12 @@
 - iOS Listing
   - src/assets/feature-graphic.png
   - src/assets/screenshots/
+
+## To Get iOS Screenshots:
+
+- Open src/assets/main.css
+- Uncomment the block of code labeled `/* Font size for screen shots */`
+- Open the app in a browser, and select "Dimensions: Responsive"
+- Set the zoom to 50%
+- Set the resolution to 621x1344 _This will result in a 1242x2688 screenshot, because chrome doubles the resolution._
+- Click the downward triangle in the top right corner and select either "Capture screenshot" or "Capture full size screenshot". They both seem to do the same thing

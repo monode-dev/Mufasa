@@ -14,19 +14,17 @@ import {
   DeleteOption,
   theme,
   DeleteDialog,
+  useProp,
 } from "miwi";
 import TankFields from "./TankFields";
 import { Client } from "@/Clients/Client";
 import { Tank } from "./Tank";
+import { Show } from "solid-js";
 
 export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
+  const warningMessage = useProp<string | null>(null);
   return (
-    <Card
-      outlineSize={1 / 8}
-      outlineColor={isTankValid(props.tank) ? undefined : $theme.colors.warning}
-      padBetween={0.75}
-      preventClickPropagation
-    >
+    <Card padBetween={0.75} preventClickPropagation>
       <Row widthGrows alignTopLeft padBetween={0.5}>
         {/* tankDisplayName (tank, amount Of Note Characters) */}
         <Txt widthGrows>
@@ -63,7 +61,11 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
         />
       </Label>
       <Column padBetween={0.5}>
-        <TankFields create tankGeometry={props.tank} />
+        <TankFields
+          create
+          tankGeometry={props.tank}
+          warningMessage={warningMessage}
+        />
         <Label label={`Notes`}>
           <Field
             hintText={`Add Notes`}
@@ -77,6 +79,12 @@ export function TankCard(props: Readonly<{ tank: Tank; client: Client }>) {
           />
         </Label>
       </Column>
+
+      <Show when={exists(warningMessage.value)}>
+        <Txt widthGrows stroke={$theme.colors.warning}>
+          {warningMessage.value}
+        </Txt>
+      </Show>
     </Card>
   );
 }
