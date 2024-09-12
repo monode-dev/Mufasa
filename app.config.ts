@@ -5,7 +5,7 @@ doFullCapacitorRebuild<typeof packageJson>({
   platform: process.argv[2] as `android` | `ios`,
   icon: {
     pathToAssetDirectory: `./src/assets`,
-    backgroundColor: `#4caf50`,
+    backgroundColor: `#ffffff`,
   },
   screenOrientations: [ScreenOrientation.portrait],
   iosMobileProvisionPath: `./src/assets/MobileProvision.mobileprovision`,
