@@ -55,6 +55,10 @@ export class Client extends mfs.Doc(`Client`) {
     typeof prop<[StringConstructor, null], WeekDay>
   > &
     WeekDay;
+
+  _shouldScheduleDeliveriesForThisClient = prop(Boolean, false, {
+    key: `shouldScheduleDeliveriesForThisClient`,
+  });
   shouldScheduleDeliveriesForThisClient = formula(
     () => this._shouldScheduleDeliveriesForThisClient,
     (shouldSchedule) => {
@@ -62,9 +66,6 @@ export class Client extends mfs.Doc(`Client`) {
       this.assignedTo = shouldSchedule ? (mfs.user.uid ?? null) : null;
     },
   );
-  _shouldScheduleDeliveriesForThisClient = prop(Boolean, false, {
-    key: `shouldScheduleDeliveriesForThisClient`,
-  });
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
   scheduledDeliveryStartDate = prop([Number, null], null);
   assignedTo = prop([String, null], null);

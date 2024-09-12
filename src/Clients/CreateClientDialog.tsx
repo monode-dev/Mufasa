@@ -47,7 +47,7 @@ function CreateClientDialog(props: {
   const weekday = useProp(WeekDay.none);
   const scheduledDeliveryStartDate = useProp<number | null>(null);
   const rateOffset = useProp<number | null>(null);
-  const shouldScheduleDeliveriesForThisClient = useProp(false);
+  const shouldScheduleDeliveriesForThisClient = useProp<boolean>(false);
   const assignedTo = useProp(``);
   // const tempClient = Client.create({
   //   name: "",
@@ -99,7 +99,7 @@ function CreateClientDialog(props: {
       address: address.value,
       notes: notes.value,
       rateOffset: rateOffset.value,
-      shouldScheduleDeliveriesForThisClient:
+      _shouldScheduleDeliveriesForThisClient:
         shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
@@ -144,8 +144,7 @@ function CreateClientDialog(props: {
       address: address.value,
       notes: notes.value,
       rateOffset: rateOffset.value,
-      shouldScheduleDeliveriesForThisClient:
-        shouldScheduleDeliveriesForThisClient.value,
+      _shouldScheduleDeliveriesForThisClient: shouldScheduleDeliveriesForThisClient.value,
       weeksBetweenScheduledDeliveries: weeksBetweenScheduledDeliveries.value,
       weekday: weekday.value,
       scheduledDeliveryStartDate: scheduledDeliveryStartDate.value,
@@ -172,7 +171,7 @@ function CreateClientDialog(props: {
         phoneNumber={phoneNumber}
         address={address}
         notes={notes}
-        create
+        create={true}
         rateOffset={rateOffset}
         shouldScheduleDeliveriesForThisClient={
           shouldScheduleDeliveriesForThisClient
