@@ -16,7 +16,7 @@ import {
   TankDimension,
   TankGeometry,
 } from "@/Calculator/ShapeUtils";
-import { For, onCleanup } from "solid-js";
+import { For, onCleanup, Show } from "solid-js";
 import ShapeSelector from "@/Calculator/ShapeSelector";
 
 const _dimensionHintText = `in.`;
