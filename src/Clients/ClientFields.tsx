@@ -76,17 +76,27 @@ export function ClientFields(props: {
   const possibleScheduleStartDates = useFormula(() => {
     if (!exists(props.weeksBetweenScheduledDeliveries.value)) return [];
     if (!exists(props.weekday.value)) return [];
-    const selectedDayOfWeek = getWeekDayAsJsDayOfWeek(props.weekday.value!);
+    
     const currentDayOfWeek = new Date().getDay();
-    const daysUntilStart = selectedDayOfWeek - currentDayOfWeek;
+    const selectedDayOfWeek = Object.values(WeekDay).indexOf(
+      Object.values(WeekDay).find((day) => day === props.weekday.value)!,
+    ) + 1;
+    let daysUntilStart = selectedDayOfWeek - currentDayOfWeek;
+    
+    if (daysUntilStart < 0) {
+      daysUntilStart += 7;
+    }
+    
     const start = new Date();
-    start.setDate(start.getDate() + daysUntilStart);
+    start.setDate(start.getDate() + daysUntilStart); 
+    
     const startDates = [];
     for (let i = 0; i < props.weeksBetweenScheduledDeliveries.value; i++) {
       const date = new Date(start);
-      date.setDate(date.getDate() + i * 7);
+      date.setDate(start.getDate() + i * 7);
       startDates.push(date);
     }
+    
     return startDates.map((date) => date.valueOf());
   });
   function getDeliveryDate(
@@ -110,7 +120,7 @@ export function ClientFields(props: {
 
     // Calculate the nth delivery date based on the number of weeks
     const deliveryStartDate = new Date(originDate);
-    deliveryStartDate.setDate(originDate.getDate() + weeks * 7);
+    deliveryStartDate.setDate(originDate.getDate() + (weeks -1) * 7);
     return deliveryStartDate;
   }
   function formatStartDate(posixTime: number) {
@@ -352,7 +362,13 @@ export function ClientFields(props: {
             >
               <For each={Array.from(Object.values(WeekDay)).filter(exists)}>
                 {(day) => (
-                  <HiddenOption onClick={() => (props.weekday.value = day)}>
+                  <HiddenOption onClick={() => {
+                    props.weekday.value = day;
+                    if(exists(props.weeksBetweenScheduledDeliveries.value) &&
+                    props.weeksBetweenScheduledDeliveries.value === 1){
+                      props.scheduledDeliveryStartDate.value = getDeliveryDate(props.weeksBetweenScheduledDeliveries.value, day, new Date()).valueOf();  
+                    }
+                  }}>
                     {day}
                   </HiddenOption>
                 )}
@@ -381,8 +397,9 @@ export function ClientFields(props: {
                 <For each={possibleScheduleStartDates.value}>
                   {(date) => (
                     <HiddenOption
-                      onClick={() =>
-                        (props.scheduledDeliveryStartDate.value = date)
+                      onClick={() =>{
+                          props.scheduledDeliveryStartDate.value = date;                    
+                        }
                       }
                     >
                       {formatStartDate(date)}
