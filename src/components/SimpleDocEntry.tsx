@@ -50,7 +50,7 @@ export function SimpleDocEntry(
               alignCenterLeft
               stroke={isEmpty.value ? theme.palette.warning : undefined}
             >
-              {isEmpty.value ? (props.unnamedText ?? `Unnamed!`) : name.value}
+              {isEmpty.value ? props.unnamedText ?? `Unnamed!` : name.value}
             </Txt>
             <HiddenOptions
               cancelOptions={{
