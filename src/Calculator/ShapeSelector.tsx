@@ -29,7 +29,7 @@ export default function ShapeSelector(
 
   const haveOpenedShapeInfoDialog = autoSavingProp<boolean>(
     `haveOpenedShapeInfoDialog`,
-    false
+    false,
   );
   return (
     <>
@@ -85,18 +85,29 @@ export default function ShapeSelector(
               </Row>
             )}
           </For>
-        </Selector>     
+        </Selector>
       </Label>
-      <Show when={!haveOpenedShapeInfoDialog.value}>
+      <Show
+        when={
+          !haveOpenedShapeInfoDialog.value && props.hideActionButtons !== true
+        }
+      >
         <Row stroke={$theme.colors.hint} padBetween={0.75}>
-          <Txt widthGrows alignCenterRight>See what to measure</Txt>
-          <Box scale={1.5} padBottom={0.5} padRight={0.71} height={0.5} width={0.5} overflowYSpills>
-            <Icon iconPath={mdiArrowUpRight}/>
+          <Txt widthGrows alignCenterRight>
+            See what to measure
+          </Txt>
+          <Box
+            scale={1.5}
+            padBottom={0.5}
+            padRight={0.71}
+            height={0.5}
+            width={0.5}
+            overflowYSpills
+          >
+            <Icon iconPath={mdiArrowUpRight} />
           </Box>
-          
         </Row>
       </Show>
     </>
-
   );
 }
