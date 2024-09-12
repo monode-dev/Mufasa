@@ -63,7 +63,7 @@ export class Client extends mfs.Doc(`Client`) {
     () => this._shouldScheduleDeliveriesForThisClient,
     (shouldSchedule) => {
       this._shouldScheduleDeliveriesForThisClient = shouldSchedule;
-      this.assignedTo = shouldSchedule ? (mfs.user.uid ?? null) : null;
+      this.assignedTo = shouldSchedule ? mfs.user.uid ?? null : null;
     },
   );
   weeksBetweenScheduledDeliveries = prop([Number, null], null);
@@ -73,8 +73,11 @@ export class Client extends mfs.Doc(`Client`) {
     const todaysClients: Client[] = [];
     const tomorrowsClients: Client[] = [];
     const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+    console.log("daysSinceEpoch:", daysSinceEpoch);
+
     Client.getAllDocs().forEach((client) => {
       if (!client.shouldScheduleDeliveriesForThisClient) return;
+
       const isAssignedToCurrentUser = client.assignedTo !== mfs.user.uid;
       const userIsOwnerAndClientIsUnassigned =
         mfs.user.workspace?.role === `owner` && !exists(client.assignedTo);
@@ -82,30 +85,100 @@ export class Client extends mfs.Doc(`Client`) {
       if (!exists(client.weeksBetweenScheduledDeliveries)) return;
       if (!exists(client.weekday)) return;
       if (!exists(client.scheduledDeliveryStartDate)) return;
+
+      console.log("Client:", client.clientId);
+      console.log(
+        "scheduledDeliveryStartDate:",
+        client.scheduledDeliveryStartDate,
+      );
+      console.log(
+        "weeksBetweenScheduledDeliveries:",
+        client.weeksBetweenScheduledDeliveries,
+      );
+      console.log("weekday:", client.weekday);
+
       const normalizedStartDate = new Date(client.scheduledDeliveryStartDate);
+      console.log("normalizedStartDate:", normalizedStartDate);
+      console.log(
+        "getWeekDayAsJsDayOfWeek(client.weekday):",
+        getWeekDayAsJsDayOfWeek(client.weekday),
+      );
       normalizedStartDate.setDate(
         normalizedStartDate.getDate() -
           normalizedStartDate.getDay() +
           getWeekDayAsJsDayOfWeek(client.weekday),
       );
+      console.log("normalizedStartDate:", normalizedStartDate);
+
       const daysFromEpochToStartDate = Math.floor(
         normalizedStartDate.getTime() / 86400000,
       );
+      console.log("daysFromEpochToStartDate:", daysFromEpochToStartDate);
+
       const daysBetweenStartAndToday =
         daysSinceEpoch - daysFromEpochToStartDate;
-      if (daysBetweenStartAndToday < 0) return;
+      console.log("daysBetweenStartAndToday:", daysBetweenStartAndToday);
+
       const daysBetweenStartAndTomorrow = daysBetweenStartAndToday + 1;
       const daysBetweenScheduledDeliveries =
         client.weeksBetweenScheduledDeliveries * 7;
-      if (daysBetweenStartAndToday % daysBetweenScheduledDeliveries === 0) {
+
+      if (
+        daysBetweenStartAndToday >= 0 &&
+        daysBetweenStartAndToday % daysBetweenScheduledDeliveries === 0
+      ) {
         todaysClients.push(client);
       }
-      if (daysBetweenStartAndTomorrow % daysBetweenScheduledDeliveries === 0) {
+      if (
+        daysBetweenStartAndTomorrow >= 0 &&
+        daysBetweenStartAndTomorrow % daysBetweenScheduledDeliveries === 0
+      ) {
         tomorrowsClients.push(client);
       }
     });
+
+    console.log("todaysClients:", todaysClients);
+    console.log("tomorrowsClients:", tomorrowsClients);
+
     return { todaysClients, tomorrowsClients };
   }
+  // static getScheduledClients() {
+  //   const todaysClients: Client[] = [];
+  //   const tomorrowsClients: Client[] = [];
+  //   const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+  //   Client.getAllDocs().forEach((client) => {
+  //     if (!client.shouldScheduleDeliveriesForThisClient) return;
+  //     const isAssignedToCurrentUser = client.assignedTo !== mfs.user.uid;
+  //     const userIsOwnerAndClientIsUnassigned =
+  //       mfs.user.workspace?.role === `owner` && !exists(client.assignedTo);
+  //     if (isAssignedToCurrentUser && userIsOwnerAndClientIsUnassigned) return;
+  //     if (!exists(client.weeksBetweenScheduledDeliveries)) return;
+  //     if (!exists(client.weekday)) return;
+  //     if (!exists(client.scheduledDeliveryStartDate)) return;
+  //     const normalizedStartDate = new Date(client.scheduledDeliveryStartDate);
+  //     normalizedStartDate.setDate(
+  //       normalizedStartDate.getDate() -
+  //         normalizedStartDate.getDay() +
+  //         getWeekDayAsJsDayOfWeek(client.weekday),
+  //     );
+  //     const daysFromEpochToStartDate = Math.floor(
+  //       normalizedStartDate.getTime() / 86400000,
+  //     );
+  //     const daysBetweenStartAndToday =
+  //       daysSinceEpoch - daysFromEpochToStartDate;
+  //     if (daysBetweenStartAndToday < 0) return;
+  //     const daysBetweenStartAndTomorrow = daysBetweenStartAndToday + 1;
+  //     const daysBetweenScheduledDeliveries =
+  //       client.weeksBetweenScheduledDeliveries * 7;
+  //     if (daysBetweenStartAndToday % daysBetweenScheduledDeliveries === 0) {
+  //       todaysClients.push(client);
+  //     }
+  //     if (daysBetweenStartAndTomorrow % daysBetweenScheduledDeliveries === 0) {
+  //       tomorrowsClients.push(client);
+  //     }
+  //   });
+  //   return { todaysClients, tomorrowsClients };
+  // }
   onDelete() {
     this.additionalPhoneNumbers.forEach((num) => num.deleteDoc());
     this.tanks.forEach((tank) => tank.deleteDoc());
@@ -138,5 +211,5 @@ export const WeekDay = {
 } as const;
 export function getWeekDayAsJsDayOfWeek(weekDay: Exclude<WeekDay, null>) {
   // JS dates start on sunday
-  return (Object.keys(WeekDay).indexOf(weekDay) + 1) % 7;
+  return (Object.values(WeekDay).indexOf(weekDay) + 1) % 7;
 }
