@@ -3,10 +3,12 @@ import {
   doWatch,
   EnterKeyHint,
   exists,
-  Label, mdColors,
+  Label,
+  mdColors,
   NumField,
   Prop,
-  useFormula, useProp,
+  useFormula,
+  useProp,
 } from "miwi";
 import {
   getDimensionLabel,
@@ -51,14 +53,14 @@ export default function TankFields(props: {
           props.tankGeometry.fullDepth &&
           props.tankGeometry.topDepth >= props.tankGeometry.fullDepth
         ) {
-          warning.value = "Top Depth must be less than Full Depth.";
+          warning.value = "Short Width must be less than Full Width.";
           return;
         } else if (
           props.tankGeometry.wideHeight &&
           props.tankGeometry.fullHeight &&
           props.tankGeometry.wideHeight >= props.tankGeometry.fullHeight
         ) {
-          warning.value = "Wide Height must be less than Full Height.";
+          warning.value = "Short Height must be less than Full Height.";
           return;
         }
         break;
@@ -77,17 +79,18 @@ export default function TankFields(props: {
   function enterKey(index: () => number): EnterKeyHint {
     if (!props.create) return `done`;
     const nextIndex = index().valueOf() + 1;
-    const needsData = dimensions.value.length > nextIndex
-      // if the next dimension is not set or is 0, we need data
-      ? (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
-      : false;
+    const needsData =
+      dimensions.value.length > nextIndex
+        ? // if the next dimension is not set or is 0, we need data
+          (props.tankGeometry[dimensions.value[nextIndex]] ?? 0) <= 0
+        : false;
     const key: EnterKeyHint = needsData ? `next` : `done`;
     // 1 based not 0 based
     enterHintRefs.value.set(index() + 1, key);
     return key;
   }
 
-  const fieldRefs: Prop<Map<number,HTMLDivElement>> = useProp(new Map());
+  const fieldRefs: Prop<Map<number, HTMLDivElement>> = useProp(new Map());
   // filled in enterKey() function
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
 
@@ -115,17 +118,17 @@ export default function TankFields(props: {
           const indexRef = useProp(index() + 1);
           return (
             <Label label={getDimensionLabel(dim)}>
-                <NumField
-                  negativesAreAllowed={false}
-                  hint={_dimensionHintText}
-                  value={useFormula(
-                    () => props.tankGeometry[dim],
-                    (val) => (props.tankGeometry[dim] = val),
-                  )}
-                  underlined
-                  stroke={mdColors.black}
-                  enterKeyHint={ useFormula(() => enterKey(index)).value }
-                />
+              <NumField
+                negativesAreAllowed={false}
+                hint={_dimensionHintText}
+                value={useFormula(
+                  () => props.tankGeometry[dim],
+                  (val) => (props.tankGeometry[dim] = val),
+                )}
+                underlined
+                stroke={mdColors.black}
+                enterKeyHint={useFormula(() => enterKey(index)).value}
+              />
             </Label>
           );
         }}

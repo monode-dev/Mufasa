@@ -1,5 +1,6 @@
 import {
   Box,
+  Card,
   Column,
   FloatSort,
   Icon,
@@ -8,7 +9,7 @@ import {
   SortableColumn,
   Txt,
 } from "miwi";
-import { mdiArrowUpLeft, mdiArrowUpRight, mdiMenu, mdiPlus } from "@mdi/js";
+import { mdiArrowUpRight, mdiMenu, mdiPlus } from "@mdi/js";
 import { SettingsPage } from "../settings/SettingsPage";
 import { mfs } from "../model/DataModel";
 import { SimplePage } from "../components/SimplePage";
@@ -23,16 +24,16 @@ import { DeliveryCard } from "./DeliveriesPage.tsx.folder/DeliveryCard";
 import { autoSavingProp } from "@/utils";
 
 export function DeliveriesPage() {
-  
-  const haveSortedUpcomingDeliveryCards = autoSavingProp<boolean>(
-    `haveSortedUpcomingDeliveryCards`,
-    false
-  );
-
   // Preload the other members
   if (mfs.user.workspace?.role === `owner`) {
     mfs.user.workspace.otherMembers;
   }
+
+  const haveSortedUpcomingDeliveryCards = autoSavingProp<boolean>(
+    `haveSortedUpcomingDeliveryCards`,
+    false,
+  );
+
   return (
     <SimplePage>
       <InlineAppBar
@@ -75,18 +76,16 @@ export function DeliveriesPage() {
         </Row>
         <Column padBetween={1}>
           <SortableColumn
-            onPickUp={() => haveSortedUpcomingDeliveryCards.value = true}
-            onSort={(props) =>
-              {            
-                FloatSort.moveItem({
-                  sortedList: Delivery.currentUsersUpcomingDeliveries,
-                  fromIndex: props.from,
-                  toIndex: props.to,
-                  getPos: (delivery) => delivery.sortPosition,
-                  setPos: (delivery, pos) => (delivery.sortPosition = pos),
-                })
-              }
-            }
+            onPickUp={() => (haveSortedUpcomingDeliveryCards.value = true)}
+            onSort={(props) => {
+              FloatSort.moveItem({
+                sortedList: Delivery.currentUsersUpcomingDeliveries,
+                fromIndex: props.from,
+                toIndex: props.to,
+                getPos: (delivery) => delivery.sortPosition,
+                setPos: (delivery, pos) => (delivery.sortPosition = pos),
+              });
+            }}
           >
             <For
               each={Delivery.currentUsersUpcomingDeliveries}
@@ -96,8 +95,8 @@ export function DeliveriesPage() {
             </For>
           </SortableColumn>
 
-            {/* Hint text for sorting upcoming delivery cards*/}
-            <Show when={!haveSortedUpcomingDeliveryCards.value}>
+          {/* Hint text for sorting upcoming delivery cards*/}
+          <Show when={!haveSortedUpcomingDeliveryCards.value}>
             <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
               <Txt>Tap and hold to sort</Txt>
               <Box scale={1.25} padBottom={0.5} width={1} height={1}>
