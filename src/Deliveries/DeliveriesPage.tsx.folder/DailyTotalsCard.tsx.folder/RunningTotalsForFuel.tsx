@@ -1,10 +1,22 @@
-import { mdiDotsVertical } from "@mdi/js";
-import { Column, Row, Txt, Icon, formatNumWithCommas, useFormula } from "miwi";
+import {
+  Column,
+  Row,
+  Txt,
+  formatNumWithCommas,
+  useFormula,
+  theme,
+  pushPage,
+} from "miwi";
 import { SubDelivery } from "../../Delivery";
-import { NONE_SELECTED, ONE_TIME } from "@/utils";
+import {
+  FuelInTruck,
+  LoadUnloadFuelDialog,
+} from "./RunningTotalsForFuel.tsx.folder/FuelInTruck";
+import { FuelType } from "@/model/DataModel";
+import { Show } from "solid-js";
 
 export type FuelTotals = {
-  fuelId: string | undefined;
+  fuelId: string;
   fuelName: string;
   upcoming: SubDelivery[];
   delivered: SubDelivery[];
@@ -15,6 +27,15 @@ export function compileAllFuelTotals(props: {
   completedSubDeliveriesSince3am: SubDelivery[];
 }): FuelTotals[] {
   const subDeliveriesByFuelId = new Map<string, FuelTotals>();
+  FuelType.sortedFuelTypes.forEach((fuelType) => {
+    const fuelId = `id-${fuelType.docId}`;
+    subDeliveriesByFuelId.set(fuelId, {
+      fuelId,
+      fuelName: fuelType.name ?? `Unknown Fuel`,
+      upcoming: [],
+      delivered: [],
+    });
+  });
 
   // Add each upcoming sub-delivery to the correct fuel
   props.upcomingSubDeliveries.forEach((sub) => {
@@ -30,18 +51,13 @@ export function compileAllFuelTotals(props: {
     fuelEntry.delivered.push(sub);
   });
 
-  return Array.from(subDeliveriesByFuelId.values());
+  return Array.from(subDeliveriesByFuelId.values()).filter(
+    (totals) => totals.upcoming.length > 0 || totals.delivered.length > 0,
+  );
 
   function ensureFuelInMap(sub: SubDelivery): FuelTotals | undefined {
     // Calculate the fuel ID in this context
-    const fuelId =
-      sub.actualFuelType !== NONE_SELECTED
-        ? sub.actualFuelType === ONE_TIME
-          ? sub.fuelSpecs.name
-            ? `ot-${sub.fuelSpecs.name}`
-            : undefined
-          : `id-${sub.actualFuelType.docId}`
-        : undefined;
+    const fuelId = FuelInTruck.getFuelId(sub);
     if (!fuelId) return;
 
     // Ensure the fuel is in the map
@@ -58,7 +74,10 @@ export function compileAllFuelTotals(props: {
   }
 }
 
-export function RunningTotalsForFuel(props: { fuelTotals: FuelTotals }) {
+export function RunningTotalsForFuel(props: {
+  fuelTotals: FuelTotals;
+  collapseUnlessImportant: boolean;
+}) {
   const upcomingGallons = useFormula(() =>
     props.fuelTotals.upcoming.reduce(
       (total, sub) => total + (sub.gallons ?? 0),
@@ -72,31 +91,66 @@ export function RunningTotalsForFuel(props: { fuelTotals: FuelTotals }) {
     ),
   );
   // TODO: Store this in a saved prop
-  const fuelAddedToTruckSince3am = useFormula(() => 0);
+  const thereIsFuelToDeliverButNoLoadRecords = useFormula(
+    () =>
+      upcomingGallons.value > 0 &&
+      FuelInTruck.getRecentLoadsForFuel(props.fuelTotals.fuelId).length === 0,
+  );
+  const fuelAddedToTruckSince3am = useFormula(() =>
+    FuelInTruck.getRecentLoadsForFuel(props.fuelTotals.fuelId).reduce(
+      (total, load) => total + load.loadAmount,
+      0,
+    ),
+  );
 
   return (
-    <Column padBetween={0}>
-      <Row>
-        <Txt singleLine widthGrows>{`${props.fuelTotals.fuelName}:`}</Txt>
-        {/* TODO: Add and remove fuel */}
-        <Icon iconPath={mdiDotsVertical} />
-      </Row>
-      <Txt singleLine widthGrows>{`${formatNumWithCommas(
-        deliveredGallons.value,
-        0,
-      )} gal. delivered`}</Txt>
-      <Txt singleLine widthGrows>
-        {`${formatNumWithCommas(
-          Math.max(fuelAddedToTruckSince3am.value - deliveredGallons.value, 0),
-          0,
-        )} gal. left in truck`}
-      </Txt>
-      <Txt singleLine widthGrows>
-        {`${formatNumWithCommas(
-          upcomingGallons.value,
-          0,
-        )} gal. left to deliver`}
-      </Txt>
-    </Column>
+    <Show
+      when={
+        !props.collapseUnlessImportant ||
+        thereIsFuelToDeliverButNoLoadRecords.value
+      }
+    >
+      <Column padBetween={0}>
+        <Row>
+          <Txt singleLine widthGrows>{`${props.fuelTotals.fuelName}:`}</Txt>
+          {/* TODO: Add and remove fuel */}
+          <Txt
+            stroke={theme.palette.primary}
+            onClick={() =>
+              pushPage(LoadUnloadFuelDialog, {
+                fuelId: props.fuelTotals.fuelId,
+                gallonsLeftToDeliver: upcomingGallons.value,
+                showUnloadOption: !thereIsFuelToDeliverButNoLoadRecords.value,
+              })
+            }
+          >
+            {thereIsFuelToDeliverButNoLoadRecords.value
+              ? `Record Fuel in Truck`
+              : `Load / Unload Fuel`}
+          </Txt>
+        </Row>
+        <Show when={!thereIsFuelToDeliverButNoLoadRecords.value}>
+          <Txt singleLine widthGrows>{`${formatNumWithCommas(
+            deliveredGallons.value,
+            0,
+          )} gal. delivered`}</Txt>
+          <Txt singleLine widthGrows>
+            {`${formatNumWithCommas(
+              Math.max(
+                fuelAddedToTruckSince3am.value - deliveredGallons.value,
+                0,
+              ),
+              0,
+            )} gal. left in truck`}
+          </Txt>
+          <Txt singleLine widthGrows>
+            {`${formatNumWithCommas(
+              upcomingGallons.value,
+              0,
+            )} gal. left to deliver`}
+          </Txt>
+        </Show>
+      </Column>
+    </Show>
   );
 }

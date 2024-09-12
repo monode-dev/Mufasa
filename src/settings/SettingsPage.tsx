@@ -33,6 +33,7 @@ import { InlineAppBar } from "@/components/InlineAppBar";
 import { FuelsPage } from "../Fuel/FuelsPage";
 import ClientsPage from "@/Clients/ClientsPage";
 import { CalculatorsPage } from "@/Calculator/CalculatorsPage";
+import { openEmailDraftToDevs } from "@/components/ContactDevsButton";
 
 export const developerModeEnabled = autoSavingProp<boolean>(
   `developerModeEnabled`,
@@ -152,11 +153,7 @@ export function SettingsPage() {
             hint
             widthGrows
             alignCenter
-            onClick={() =>
-              ((window as any).location = `mailto:${encodeURIComponent(
-                `info@tke.us`,
-              )}?Subject=${encodeURIComponent(`About Ninety Percent`)}`)
-            }
+            onClick={() => openEmailDraftToDevs()}
           >
             <span>
               Support <u>info@tke.us</u>
