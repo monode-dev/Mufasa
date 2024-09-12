@@ -11,7 +11,7 @@ import {
 } from "miwi";
 import { ConfirmationPopUp } from "../components/ConfirmationPopUp";
 import { Client } from "@/Clients/Client";
-import { mfs, store, premiumEnabled, FuelType } from "@/model/DataModel";
+import { mfs, /**store, */ premiumEnabled, FuelType } from "@/model/DataModel";
 import { PrivacyPolicyPage } from "@/settings/PrivacyPolicyPage";
 import { openTermsOfUse } from "@/settings/AccountSettingsPage";
 import { memberLimit } from "@/model/Team";
@@ -77,18 +77,26 @@ export function LimitText(props: {
       hint
       onClick={() => {
         if (premiumEnabled.value) {
-          (window as any).location =
-            `mailto:${encodeURIComponent(`info@tke.us`)}?Subject=${encodeURIComponent(`About Ninety Percent Limits`)}`;
+          (window as any).location = `mailto:${encodeURIComponent(
+            `info@tke.us`,
+          )}?Subject=${encodeURIComponent(`About Ninety Percent Limits`)}`;
         } else {
           if (mfs.user.workspace?.role === `owner`) {
-            store.products.premium.purchase();
+            // store.products.premium.purchase();
           } else {
             return;
           }
         }
       }}
     >
-      {`Warning, you've ${props.createPastTense ?? `created`} ${props.count} ${props.count === 1 ? props.labelSingular.toLowerCase() : props.labelPlural.toLowerCase()}. You can ${props.createPresentTense ?? `create`} ${Math.max(0, props.limit - props.count)} more. `}
+      {`Warning, you've ${props.createPastTense ?? `created`} ${props.count} ${
+        props.count === 1
+          ? props.labelSingular.toLowerCase()
+          : props.labelPlural.toLowerCase()
+      }. You can ${props.createPresentTense ?? `create`} ${Math.max(
+        0,
+        props.limit - props.count,
+      )} more. `}
       {premiumEnabled.value ? (
         <span>
           You might consider reaching out to{` `}
@@ -117,14 +125,14 @@ export function CurrentLimitText(props: {} & BoxProps) {
   );
 }
 
-const promisedLocalizedSubscriptionPrice =
-  store.products.premium.getLocalizedPrice();
+// const promisedLocalizedSubscriptionPrice =
+//   store.products.premium.getLocalizedPrice();
 export function SubscribePrompt() {
   const localizedSubscriptionPrice = doNow(() => {
     const localizedSubscriptionPrice = useProp<string | undefined>(undefined);
-    promisedLocalizedSubscriptionPrice.then((price) => {
-      localizedSubscriptionPrice.value = price;
-    });
+    // promisedLocalizedSubscriptionPrice.then((price) => {
+    //   localizedSubscriptionPrice.value = price;
+    // });
     return useFormula(() => localizedSubscriptionPrice.value);
   });
 
@@ -148,7 +156,7 @@ export function SubscribePrompt() {
         widthGrows
         alignCenterLeft
         onClick={async () => {
-          if (!premiumEnabled.value) await store.products.premium.purchase();
+          // if (!premiumEnabled.value) await store.products.premium.purchase();
         }}
       >
         Subscribe at {localizedSubscriptionPrice.value ?? `an unknown price`} /
@@ -174,7 +182,14 @@ export function SubscribePrompt() {
           Privacy Policy
         </Txt>
       </Row>
-      <Txt hint widthGrows alignCenterLeft onClick={store.restorePurchases}>
+      <Txt
+        hint
+        widthGrows
+        alignCenterLeft
+        onClick={() => {
+          // store.restorePurchases();
+        }}
+      >
         <span>
           Already subscribed{` `}
           <u>restore purchase</u>

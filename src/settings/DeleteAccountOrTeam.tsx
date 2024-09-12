@@ -10,7 +10,7 @@ import {
 } from "miwi";
 import { Switch, Match } from "solid-js";
 import { ExportingUi } from "./ExportData";
-import { mfs, store } from "@/model/DataModel";
+import { mfs /**store */ } from "@/model/DataModel";
 import { LoadingPage } from "@/onboarding/LoadingPage";
 
 export function deleteAccount() {
@@ -118,11 +118,11 @@ function DeleteAccountOrTeamPopup(props: { deleteType: `account` | `team` }) {
             </Button>
             <Button
               widthGrows
-              onClick={() =>
-                store.goToSubscriptionManagement().then(() => {
-                  step.value = Step.unsubscribing;
-                })
-              }
+              onClick={() => {
+                // store.goToSubscriptionManagement().then(() => {
+                //   step.value = Step.unsubscribing;
+                // })
+              }}
             >
               Unsubscribe
             </Button>
