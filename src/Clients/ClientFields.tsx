@@ -4,7 +4,6 @@ import {
   mdiIdentifier,
   mdiMapMarker,
   mdiPhone,
-  mdiPlusMinusVariant,
   mdiTextBox,
 } from "@mdi/js";
 import {
@@ -15,7 +14,6 @@ import {
   HiddenOption,
   Icon,
   Label,
-  NumField,
   Prop,
   Row,
   Selector,
@@ -273,7 +271,6 @@ export function ClientFields(props: {
         enterKeyHint={`enter`}
       />
       <RateOffsetField
-        iconPath={mdiPlusMinusVariant}
         rateOffset={props.rateOffset}
         enterKeyHit={enterKey(props.notes, rateOffsetIndex)}
       />
