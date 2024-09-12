@@ -14,7 +14,7 @@ import { capacitorPersister } from "mufasa/capacitor";
 import { solidPersister } from "mufasa/solid-js";
 import { cloudPersister } from "./CloudPersister";
 import { createLimitTrackers } from "./LimitUtils";
-import { miapStore } from "miap";
+// import { miapStore } from "miap";
 import { Capacitor } from "@capacitor/core";
 
 // SECTION: Mufasa
@@ -62,31 +62,34 @@ export const isSubscribing = useRoot(() =>
     return true;
   }),
 );
-export const store = miapStore({
-  getDeviceType: () => Capacitor.getPlatform() as any,
-  watchIapUserId: (watch) => {
-    doWatch(
-      () => {
-        watch(mfs.user.workspace?.id);
-      },
-      { on: [useFormula(() => mfs.user.workspace?.id)] },
-    );
-  },
-  apiKeys: {
-    ios: `appl_IXiiZhzdEIiqfJMBClcOYUfeTHg`,
-    android: `goog_qHEqPAbdsCMzFblmVncPsoiUcFy`,
-  },
-  products: {
-    premium: {
-      ios: "pro.monthly.07.16.2024",
-      android: "pro.monthly.07.16.2024",
-    },
-  },
-  devLog: devLog,
-  onPurchaseAttempt: () => (_lastPurchaseAttempt.value = Date.now()),
-  onPurchasePromptToggle: (isShowing) =>
-    (_isShowingSubscriptionPopup.value = isShowing),
-});
+// "@revenuecat/purchases-capacitor": "9.0.1",
+// "miap": "^0.0.9",
+// This was the old iosClientId: 341748622809-f1flufl1tvlj2p5iu9i2cf06gud7ubne.apps.googleusercontent.com
+// export const store = miapStore({
+//   getDeviceType: () => Capacitor.getPlatform() as any,
+//   watchIapUserId: (watch) => {
+//     doWatch(
+//       () => {
+//         watch(mfs.user.workspace?.id);
+//       },
+//       { on: [useFormula(() => mfs.user.workspace?.id)] },
+//     );
+//   },
+//   apiKeys: {
+//     ios: `appl_IXiiZhzdEIiqfJMBClcOYUfeTHg`,
+//     android: `goog_qHEqPAbdsCMzFblmVncPsoiUcFy`,
+//   },
+//   products: {
+//     premium: {
+//       ios: "pro.monthly.07.16.2024",
+//       android: "pro.monthly.07.16.2024",
+//     },
+//   },
+//   devLog: devLog,
+//   onPurchaseAttempt: () => (_lastPurchaseAttempt.value = Date.now()),
+//   onPurchasePromptToggle: (isShowing) =>
+//     (_isShowingSubscriptionPopup.value = isShowing),
+// });
 
 // SECTION: Data Model
 export class FuelType extends mfs.Doc(`FuelType`) {

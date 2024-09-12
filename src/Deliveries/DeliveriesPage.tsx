@@ -96,7 +96,12 @@ export function DeliveriesPage() {
           </SortableColumn>
 
           {/* Hint text for sorting upcoming delivery cards*/}
-          <Show when={!haveSortedUpcomingDeliveryCards.value}>
+          <Show
+            when={
+              !haveSortedUpcomingDeliveryCards.value &&
+              Delivery.currentUsersUpcomingDeliveries.length > 0
+            }
+          >
             <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
               <Txt>Tap and hold to sort</Txt>
               <Box scale={1.25} padBottom={0.5} width={1} height={1}>

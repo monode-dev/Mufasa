@@ -28,6 +28,7 @@ import { StartOrJoinTeamPage } from "./onboarding/StartOrJoinTeamPage";
 import { VerifyAccountPage } from "./onboarding/VerifyAccountPage";
 import { Network } from "@capacitor/network";
 import googleAuthConfig from "./assets/google-auth-config.json";
+import { Capacitor } from "@capacitor/core";
 
 (window as any).startTime = Date.now();
 
@@ -69,8 +70,12 @@ export function PageSwitch() {
   let previousWorkspaceId = mfs.user.workspace?.id;
   const nav = useNav();
   onMount(() => {
+    const isIos = Capacitor.getPlatform() === "ios";
     GoogleAuth.initialize({
-      clientId: googleAuthConfig.clientId,
+      clientId:
+        Capacitor.getPlatform() === "ios"
+          ? googleAuthConfig.iosClientId
+          : googleAuthConfig.clientId,
       scopes: ["profile", "email"],
       grantOfflineAccess: true,
     });
