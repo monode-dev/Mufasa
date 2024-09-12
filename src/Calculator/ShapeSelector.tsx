@@ -41,7 +41,20 @@ export default function ShapeSelector(
           getLabelForData={(shapeId: TankShapeId | null) => {
             if (!exists(shapeId)) return null;
             const tankShape = getTankShape(shapeId);
-            return tankShape.nameLong;
+            return (
+              <Row padBetween={0.5}>
+                <Box width={shapeIconSize} height={1}>
+                  <Box
+                    width={shapeIconSize}
+                    height={shapeIconSize}
+                    fill={getTankShape(shapeId)!.iconImage}
+                  />
+                </Box>
+                <Txt widthGrows singleLine>
+                  {tankShape.nameLong}
+                </Txt>
+              </Row>
+            );
           }}
           noOptionsText={"No Shapes"}
           cancelOptions={{

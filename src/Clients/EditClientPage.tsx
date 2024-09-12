@@ -1,8 +1,6 @@
 import { For, Show } from "solid-js";
 import { listTanks } from "@/AppData";
 import {
-  AppBar,
-  Body,
   Box,
   Column,
   FloatSort,
@@ -10,20 +8,16 @@ import {
   Row,
   SortableColumn,
   Txt,
-  mdColors,
   popPage,
   useFormula,
   pushPage,
-  useNav,
   exists,
   Card,
-  HiddenOptions,
-  DeleteOption,
   theme,
   doWatch,
   DeleteDialog,
 } from "miwi";
-import { mdiArrowUpRight, mdiCog, mdiDotsVertical, mdiPlus } from "@mdi/js";
+import { mdiArrowUpRight, mdiPlus, mdiTrashCanOutline } from "@mdi/js";
 import { ClientFields } from "./ClientFields";
 import { SettingsPage } from "@/settings/SettingsPage";
 import { TankCard } from "@/Tanks/TankCard";
@@ -54,23 +48,19 @@ export default function EditClientPage(props: { client: Client }) {
 
   const haveSortedTankCards = autoSavingProp<boolean>(
     `haveSortedTankCards`,
-    false
-  )
+    false,
+  );
 
   return (
     <SimplePage>
       <InlineAppBar
         name="Edit Client"
         right={
-          <HiddenOptions
-            cancelOptions={{
-              stroke: theme.palette.hint,
-            }}
-          >
-            <DeleteOption
-              onClick={() => openDeleteClientDialog(props.client)}
-            />
-          </HiddenOptions>
+          <Icon
+            iconPath={mdiTrashCanOutline}
+            stroke={theme.palette.error}
+            onClick={() => openDeleteClientDialog(props.client)}
+          />
         }
         padBottom={0.5}
       />
@@ -156,15 +146,14 @@ export default function EditClientPage(props: { client: Client }) {
           <SortableColumn
             onPickUp={() => (haveSortedTankCards.value = true)}
             onSort={(props) => {
-                FloatSort.moveItem({
-                  sortedList: sortedTanks.value,
-                  fromIndex: props.from,
-                  toIndex: props.to,
-                  getPos: (tank) => tank.sortPos!,
-                  setPos: (tank, pos) => (tank.sortPos = pos),
-                })
-              }
-            }
+              FloatSort.moveItem({
+                sortedList: sortedTanks.value,
+                fromIndex: props.from,
+                toIndex: props.to,
+                getPos: (tank) => tank.sortPos!,
+                setPos: (tank, pos) => (tank.sortPos = pos),
+              });
+            }}
           >
             <For
               each={sortedTanks.value}
