@@ -35,10 +35,14 @@ export const { devLogs, devLog } = doNow(() => {
 });
 
 // SECTION: Auto Saving Prop
+const autoSavingProps = new Map<string, any>();
 export function autoSavingProp<T extends number | boolean | string>(
   name: string,
   initValue: T | null,
 ): ReadonlyProp<T | null> & WriteonlyProp<T> {
+  if (autoSavingProps.has(name)) {
+    return autoSavingProps.get(name);
+  }
   const savedValue = createRoot(() => useProp<T | null>(null));
   const saveFileName = `${name}.json`;
   readFile(saveFileName).then((result) => {
@@ -49,6 +53,7 @@ export function autoSavingProp<T extends number | boolean | string>(
       }),
     );
   });
+  autoSavingProps.set(name, savedValue);
   return savedValue as any;
   async function readFile(path: string) {
     try {
