@@ -1,4 +1,4 @@
-import { mdiArrowUpRight, mdiPlus } from "@mdi/js";
+import { mdiArrowUpRight, mdiPlus, mdiTrashCanOutline } from "@mdi/js";
 import {
   Box,
   Card,
@@ -18,6 +18,8 @@ import {
   useProp,
   EnterKeyHint,
   DeleteDialog,
+  doWatch,
+  popPage,
 } from "miwi";
 import { For, Show } from "solid-js";
 import SubDeliveryCard from "./SubDeliveryCard";
@@ -39,6 +41,10 @@ export function openDeleteDeliveryDialog(delivery: Delivery) {
 }
 
 export function EditDeliveryPage(props: { delivery: Delivery }) {
+  doWatch(() => {
+    if (props.delivery.isDeleted) popPage();
+  });
+
   const relatedDeliveries = useFormula(() =>
     Delivery.completedDeliveries.filter(
       (delivery) =>
@@ -54,10 +60,10 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
   const enterHintRefs: Prop<Map<number, EnterKeyHint>> = useProp(new Map());
   // filled in LastEnterHint function
   const nextOverride: Prop<Map<number, Prop<number>>> = useProp(new Map());
-  
+
   const haveSortedSubdeliveryCards = autoSavingProp<boolean>(
     `haveSortedSubdeliveryCards`,
-    false
+    false,
   );
 
   return (
@@ -65,16 +71,11 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
       <InlineAppBar
         name="Edit Delivery"
         right={
-          <HiddenOptions
-            scale={1.125}
-            cancelOptions={{
-              stroke: theme.palette.hint,
-            }}
-          >
-            <DeleteOption
-              onClick={() => openDeleteDeliveryDialog(props.delivery)}
-            />
-          </HiddenOptions>
+          <Icon
+            iconPath={mdiTrashCanOutline}
+            stroke={theme.palette.error}
+            onClick={() => openDeleteDeliveryDialog(props.delivery)}
+          />
         }
         padBottom={0.5}
       />
@@ -111,7 +112,7 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
             fallback={<Txt hint>Tap + to add an individual delivery.</Txt>}
           >
             <SortableColumn
-              onPickUp={() => haveSortedSubdeliveryCards.value = true}
+              onPickUp={() => (haveSortedSubdeliveryCards.value = true)}
               shouldLog
               onSort={(sortProps) => {
                 FloatSort.moveItem({
@@ -120,10 +121,8 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
                   toIndex: sortProps.to,
                   getPos: (delivery) => delivery.sortPosition,
                   setPos: (delivery, pos) => (delivery.sortPosition = pos),
-                })
-              }
-
-              }
+                });
+              }}
             >
               <For each={props.delivery.sortedSubDeliveries}>
                 {(subDelivery, index) => {
@@ -150,7 +149,11 @@ export function EditDeliveryPage(props: { delivery: Delivery }) {
             </SortableColumn>
             {/* Hint text for sorting sub-delivery cards*/}
             <Show when={!haveSortedSubdeliveryCards.value}>
-              <Row stroke={$theme.colors.hint} padBetween={0.25} overflowYSpills>
+              <Row
+                stroke={$theme.colors.hint}
+                padBetween={0.25}
+                overflowYSpills
+              >
                 <Txt>Tap and hold to sort</Txt>
                 <Box scale={1.25} padBottom={0.5} width={1} height={1}>
                   <Icon iconPath={mdiArrowUpRight} />

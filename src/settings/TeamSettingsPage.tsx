@@ -7,6 +7,8 @@ import {
   useFormula,
   Column,
   theme,
+  HiddenOptions,
+  Row,
 } from "miwi";
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
@@ -76,6 +78,17 @@ export function TeamSettingsPage() {
             </Txt>
           }
         >
+          <Row widthGrows height={1} overflowYSpills>
+            <Txt singleLine widthGrows alignCenterLeft>
+              {emailIsValid(mfs.user.email) ? mfs.user.email : null}
+            </Txt>
+            <HiddenOptions
+              cancelOptions={{
+                stroke: theme.palette.hint,
+              }}
+            />
+          </Row>
+
           {/* SECTION: Team Members */}
           <For
             each={mfs.user?.workspace?.otherMembers}
