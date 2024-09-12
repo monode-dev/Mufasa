@@ -287,145 +287,149 @@ export function ClientFields(props: {
       />
 
       {/* SECTION: Schedule Deliveries */}
-      <Row alignTopLeft padBetween={0.25}>
-        <Box
-          width={1}
-          height={1}
-          outlineSize={1 / 8}
-          cornerRadius={1 / 7}
-          onClick={() => {
-            props.shouldScheduleDeliveriesForThisClient.value =
-              !props.shouldScheduleDeliveriesForThisClient.value;
-          }}
-          outlineColor={theme.palette.text}
-        >
-          <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
-            <Icon iconPath={mdiCheck} scale={0.8} stroke={theme.palette.text} />
-          </Show>
-        </Box>
-        <Txt widthGrows alignTopLeft>
-          Schedule deliveries
-        </Txt>
-      </Row>
-      <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
-        <Label label="Every">
-          <Selector
-            value={props.weeksBetweenScheduledDeliveries.value}
-            stroke={theme.palette.hint}
-            getLabelForData={() =>
-              !exists(props.weeksBetweenScheduledDeliveries.value)
-                ? null
-                : props.weeksBetweenScheduledDeliveries.value === 1
-                ? `week`
-                : `${props.weeksBetweenScheduledDeliveries.value} weeks`
-            }
-            isOpen={weekSelectorIsOpen}
-            hintText="Pick frequency"
-            cancelOptions={{
-              stroke: theme.palette.hint,
+      <Show when={!props.create}>
+        
+        <Row alignTopLeft padBetween={0.25}>
+          <Box
+            width={1}
+            height={1}
+            outlineSize={1 / 8}
+            cornerRadius={1 / 7}
+            onClick={() => {
+              props.shouldScheduleDeliveriesForThisClient.value =
+                !props.shouldScheduleDeliveriesForThisClient.value;
             }}
+            outlineColor={theme.palette.text}
           >
-            <For each={Array.from(Array(8).keys()).map((i) => i + 1)}>
-              {(numWeeks) => (
-                <HiddenOption
-                  onClick={() => {
-                    props.weeksBetweenScheduledDeliveries.value = numWeeks;
-                  }}
-                >
-                  {numWeeks === 1 ? `week` : `${numWeeks} weeks`}
-                </HiddenOption>
-              )}
-            </For>
-          </Selector>
-        </Label>
-        <Label label={`On`}>
-          <Selector
-            value={props.weekday.value}
-            getLabelForData={() => props.weekday.value}
-            hintText="Pick day of week"
-            isOpen={daySelectorIsOpen}
-            cancelOptions={{
-              stroke: theme.palette.hint,
-            }}
-          >
-            <For each={Array.from(Object.values(WeekDay)).filter(exists)}>
-              {(day) => (
-                <HiddenOption onClick={() => (props.weekday.value = day)}>
-                  {day}
-                </HiddenOption>
-              )}
-            </For>
-          </Selector>
-        </Label>
-        <Show
-          when={
-            exists(props.weeksBetweenScheduledDeliveries.value) &&
-            props.weeksBetweenScheduledDeliveries.value > 1 &&
-            exists(props.weekday.value)
-          }
-        >
-          <Label label="Starting on">
+            <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
+              <Icon iconPath={mdiCheck} scale={0.8} stroke={theme.palette.text} />
+            </Show>
+          </Box>
+          <Txt widthGrows alignTopLeft>
+            Schedule deliveries
+          </Txt>
+        </Row>
+        <Show when={props.shouldScheduleDeliveriesForThisClient.value}>
+          <Label label="Every">
             <Selector
-              value={props.scheduledDeliveryStartDate.value}
+              value={props.weeksBetweenScheduledDeliveries.value}
               stroke={theme.palette.hint}
-              getLabelForData={(startDate) =>
-                exists(startDate) ? formatStartDate(startDate) : null
+              getLabelForData={() =>
+                !exists(props.weeksBetweenScheduledDeliveries.value)
+                  ? null
+                  : props.weeksBetweenScheduledDeliveries.value === 1
+                  ? `week`
+                  : `${props.weeksBetweenScheduledDeliveries.value} weeks`
               }
-              hintText="Pick start date"
-              noOptionsText={"Select frequency and day of week first."}
-              isOpen={dateSelectorIsOpen}
-              cancelOptions={{ stroke: theme.palette.hint }}
+              isOpen={weekSelectorIsOpen}
+              hintText="Pick frequency"
+              cancelOptions={{
+                stroke: theme.palette.hint,
+              }}
             >
-              <For each={possibleScheduleStartDates.value}>
-                {(date) => (
+              <For each={Array.from(Array(8).keys()).map((i) => i + 1)}>
+                {(numWeeks) => (
                   <HiddenOption
-                    onClick={() =>
-                      (props.scheduledDeliveryStartDate.value = date)
-                    }
+                    onClick={() => {
+                      props.weeksBetweenScheduledDeliveries.value = numWeeks;
+                    }}
                   >
-                    {formatStartDate(date)}
+                    {numWeeks === 1 ? `week` : `${numWeeks} weeks`}
+                  </HiddenOption>
+                )}
+              </For>
+            </Selector>
+          </Label>
+          <Label label={`On`}>
+            <Selector
+              value={props.weekday.value}
+              getLabelForData={() => props.weekday.value}
+              hintText="Pick day of week"
+              isOpen={daySelectorIsOpen}
+              cancelOptions={{
+                stroke: theme.palette.hint,
+              }}
+            >
+              <For each={Array.from(Object.values(WeekDay)).filter(exists)}>
+                {(day) => (
+                  <HiddenOption onClick={() => (props.weekday.value = day)}>
+                    {day}
+                  </HiddenOption>
+                )}
+              </For>
+            </Selector>
+          </Label>
+          <Show
+            when={
+              exists(props.weeksBetweenScheduledDeliveries.value) &&
+              props.weeksBetweenScheduledDeliveries.value > 1 &&
+              exists(props.weekday.value)
+            }
+          >
+            <Label label="Starting on">
+              <Selector
+                value={props.scheduledDeliveryStartDate.value}
+                stroke={theme.palette.hint}
+                getLabelForData={(startDate) =>
+                  exists(startDate) ? formatStartDate(startDate) : null
+                }
+                hintText="Pick start date"
+                noOptionsText={"Select frequency and day of week first."}
+                isOpen={dateSelectorIsOpen}
+                cancelOptions={{ stroke: theme.palette.hint }}
+              >
+                <For each={possibleScheduleStartDates.value}>
+                  {(date) => (
+                    <HiddenOption
+                      onClick={() =>
+                        (props.scheduledDeliveryStartDate.value = date)
+                      }
+                    >
+                      {formatStartDate(date)}
+                    </HiddenOption>
+                  )}
+                </For>
+              </Selector>
+            </Label>
+          </Show>
+          <Label label="Driver">
+            <Selector
+              value={props.assignedTo.value}
+              getLabelForData={(assignedUid) =>
+                assignedUid === mfs.user.uid
+                  ? mfs.user.email
+                  : mfs.user.workspace?.otherMembers?.find(
+                      (member) => member.uid === assignedUid,
+                    )?.email ?? null
+              }
+              hintText="Assign to driver"
+              isOpen={teamMemberSelectorIsOpen}
+              cancelOptions={{
+                stroke: theme.palette.hint,
+              }}
+            >
+              {/* TODO: These should wrap, but that is not working in Selectors right now. */}
+              <HiddenOption
+                singleLine={false}
+                onClick={() => (props.assignedTo.value = mfs.user.uid!)}
+              >
+                {mfs.user.email}
+              </HiddenOption>
+              <For each={mfs.user.workspace?.otherMembers}>
+                {(member) => (
+                  <HiddenOption
+                    singleLine={false}
+                    onClick={() => (props.assignedTo.value = member.uid)}
+                  >
+                    {member.email}
                   </HiddenOption>
                 )}
               </For>
             </Selector>
           </Label>
         </Show>
-        <Label label="Driver">
-          <Selector
-            value={props.assignedTo.value}
-            getLabelForData={(assignedUid) =>
-              assignedUid === mfs.user.uid
-                ? mfs.user.email
-                : mfs.user.workspace?.otherMembers?.find(
-                    (member) => member.uid === assignedUid,
-                  )?.email ?? null
-            }
-            hintText="Assign to driver"
-            isOpen={teamMemberSelectorIsOpen}
-            cancelOptions={{
-              stroke: theme.palette.hint,
-            }}
-          >
-            {/* TODO: These should wrap, but that is not working in Selectors right now. */}
-            <HiddenOption
-              singleLine={false}
-              onClick={() => (props.assignedTo.value = mfs.user.uid!)}
-            >
-              {mfs.user.email}
-            </HiddenOption>
-            <For each={mfs.user.workspace?.otherMembers}>
-              {(member) => (
-                <HiddenOption
-                  singleLine={false}
-                  onClick={() => (props.assignedTo.value = member.uid)}
-                >
-                  {member.email}
-                </HiddenOption>
-              )}
-            </For>
-          </Selector>
-        </Label>
       </Show>
+
     </>
   );
 }
