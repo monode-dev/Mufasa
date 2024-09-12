@@ -33,6 +33,7 @@ import { Tank } from "@/Tanks/Tank";
 import { mdiPencil } from "@mdi/js";
 import { EditDeliveryPage } from "@/Deliveries/EditDeliveryPage";
 import { HorizontalDivider } from "@/components/HorizontalDivider";
+import { FuelSpillDialog } from "./FuelSpillDialog";
 
 const maxSafe = 90.0001;
 export function CalculateFillFields(props: { delivery?: Delivery }) {
@@ -516,6 +517,9 @@ export function CalculateFillFields(props: { delivery?: Delivery }) {
         color={sliderColor.value}
         step={1}
       />
+
+      <Txt widthGrows stroke={$theme.colors.primary} onClick={() => pushPage(FuelSpillDialog, null)}>Fuel Spill? Tap here.</Txt>
+      
       <Show when={showCalcTypeSelector.value}>
         {/* SECTION: Complete Delivery */}
         <Button

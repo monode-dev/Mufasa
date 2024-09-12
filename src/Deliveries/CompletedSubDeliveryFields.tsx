@@ -136,8 +136,8 @@ export function CompletedSubDeliveryFields(props: {
             ? `$${formatNumWithCommas(
                 props.baseRate.value,
                 3,
-              )} + $${formatNumWithCommas(
-                props.rateOffset.value ?? 0,
+              )} ${props.rateOffset?.value! < 0  ? `-` : `+`} $${formatNumWithCommas(
+                Math.abs(props.rateOffset.value!) ?? 0,
                 3,
               )} = $${formatNumWithCommas(effectiveRate.value, 3)}`
             : `---`}
