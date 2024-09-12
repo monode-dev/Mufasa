@@ -1,8 +1,8 @@
-import { Box, BoxProps, Column, exists, Page } from "miwi";
-import { JSX, Show } from "solid-js";
-import { UploadingIndicator } from "./UploadingIndicator";
-import { mfs, premiumEnabled } from "@/model/DataModel";
+import { BoxProps, Column, exists, Page } from "miwi";
+import { JSX } from "solid-js";
+import { premiumEnabled } from "@/model/DataModel";
 import { ContactDevsButton } from "./ContactDevsButton";
+// import { UploadingIndicator } from "./UploadingIndicator";
 
 export const pagePadding = 1.25;
 
@@ -22,11 +22,11 @@ export function SimplePage(
       </Column>
 
       {/* Upload Indicator */}
-      <Show when={mfs.isUploadingToCloud}>
+      {/* <Show when={mfs.}>
         <Box asWideAsParent asTallAsParent alignBottomLeft pad={pagePadding}>
           <UploadingIndicator />
         </Box>
-      </Show>
+      </Show> */}
 
       {/* Floating Elements */}
       <Column
