@@ -1,7 +1,6 @@
 @font-face {
   font-family: "Roboto";
-  src:
-    local("Roboto"),
+  src: local("Roboto"),
     url(./fonts/Roboto/Roboto-Regular.ttf) format("truetype");
 }
 
@@ -19,7 +18,7 @@ body {
   /* padding: env(safe-area-inset-top) 0 0 0; */
   padding: 0;
   box-sizing: border-box;
-  background-color: var(--primary-color);
+  background-color: #ffffff;
   min-height: 100vh;
   height: 100vh;
   max-height: 100vh;
