@@ -250,7 +250,7 @@ const _tankShapes: {
   truckBedTank: {
     nameLong: `L-Shaped`,
     nameShort: `L-Shaped`,
-    dimensions: [`length`, `topDepth`, `fullDepth`, `wideHeight`, `fullHeight`],
+    dimensions: [`length`, `fullDepth`, `topDepth`, `fullHeight`, `wideHeight`],
     iconImage: truckBedIcon,
     calcFilledVolume(tank, stickedInches) {
       for (const dimension of [
@@ -348,11 +348,11 @@ export function getDimensionLabel(dimension: TankDimension): string {
     case `length`:
       return `Length`;
     case `depth`:
-      return `Depth`;
+      return `Width`;
     case `fullDepth`:
-      return `Full Depth`;
+      return `Full Width`;
     case `topDepth`:
-      return `Top Depth`;
+      return `Short Width`;
     case `height`:
       return `Height`;
     case `fullHeight`:
@@ -360,7 +360,7 @@ export function getDimensionLabel(dimension: TankDimension): string {
     case `squareHeight`:
       return `Rect. Height`;
     case `wideHeight`:
-      return `Wide Height`;
+      return `Short Height`;
     case `diameter`:
       return `Diameter`;
   }
