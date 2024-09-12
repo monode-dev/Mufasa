@@ -73,7 +73,6 @@ export class Client extends mfs.Doc(`Client`) {
     const todaysClients: Client[] = [];
     const tomorrowsClients: Client[] = [];
     const daysSinceEpoch = Math.floor(Date.now() / 86400000);
-    console.log("daysSinceEpoch:", daysSinceEpoch);
 
     Client.getAllDocs().forEach((client) => {
       if (!client.shouldScheduleDeliveriesForThisClient) return;
@@ -86,38 +85,19 @@ export class Client extends mfs.Doc(`Client`) {
       if (!exists(client.weekday)) return;
       if (!exists(client.scheduledDeliveryStartDate)) return;
 
-      console.log("Client:", client.clientId);
-      console.log(
-        "scheduledDeliveryStartDate:",
-        client.scheduledDeliveryStartDate,
-      );
-      console.log(
-        "weeksBetweenScheduledDeliveries:",
-        client.weeksBetweenScheduledDeliveries,
-      );
-      console.log("weekday:", client.weekday);
-
       const normalizedStartDate = new Date(client.scheduledDeliveryStartDate);
-      console.log("normalizedStartDate:", normalizedStartDate);
-      console.log(
-        "getWeekDayAsJsDayOfWeek(client.weekday):",
-        getWeekDayAsJsDayOfWeek(client.weekday),
-      );
       normalizedStartDate.setDate(
         normalizedStartDate.getDate() -
           normalizedStartDate.getDay() +
           getWeekDayAsJsDayOfWeek(client.weekday),
       );
-      console.log("normalizedStartDate:", normalizedStartDate);
 
       const daysFromEpochToStartDate = Math.floor(
         normalizedStartDate.getTime() / 86400000,
       );
-      console.log("daysFromEpochToStartDate:", daysFromEpochToStartDate);
 
       const daysBetweenStartAndToday =
         daysSinceEpoch - daysFromEpochToStartDate;
-      console.log("daysBetweenStartAndToday:", daysBetweenStartAndToday);
 
       const daysBetweenStartAndTomorrow = daysBetweenStartAndToday + 1;
       const daysBetweenScheduledDeliveries =
@@ -136,9 +116,6 @@ export class Client extends mfs.Doc(`Client`) {
         tomorrowsClients.push(client);
       }
     });
-
-    console.log("todaysClients:", todaysClients);
-    console.log("tomorrowsClients:", tomorrowsClients);
 
     return { todaysClients, tomorrowsClients };
   }
