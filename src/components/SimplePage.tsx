@@ -1,7 +1,8 @@
-import { Box, BoxProps, Column, Page } from "miwi";
+import { Box, BoxProps, Column, exists, Page } from "miwi";
 import { JSX, Show } from "solid-js";
 import { UploadingIndicator } from "./UploadingIndicator";
-import { mfs } from "@/model/DataModel";
+import { mfs, premiumEnabled } from "@/model/DataModel";
+import { ContactDevsButton } from "./ContactDevsButton";
 
 export const pagePadding = 1.25;
 
@@ -9,6 +10,7 @@ export function SimplePage(
   props: {
     floating?: JSX.Element;
     floatBoxStyle?: BoxProps;
+    hideContactDevs?: boolean;
   } & BoxProps,
 ) {
   return (
@@ -35,7 +37,11 @@ export function SimplePage(
         zIndex={3}
         overrideProps={props.floatBoxStyle}
       >
-        {props.floating}
+        {exists(props.floating) ? (
+          props.floating
+        ) : premiumEnabled.value ? (
+          <ContactDevsButton />
+        ) : undefined}
       </Column>
     </Page>
   );

@@ -13,7 +13,7 @@ export function OnBoardingPage(props: {
   signatureStroke?: string;
 }) {
   return (
-    <SimplePage>
+    <SimplePage hideContactDevs>
       <Show
         when={!props.hideAppBar}
         fallback={
