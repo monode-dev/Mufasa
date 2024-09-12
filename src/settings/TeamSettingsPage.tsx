@@ -11,7 +11,7 @@ import {
 import { SimplePage } from "@/components/SimplePage";
 import { SimpleBody } from "@/components/SimpleBody";
 import { For, Show } from "solid-js";
-import { premiumEnabled, store, mfs } from "@/model/DataModel";
+import { premiumEnabled, mfs } from "@/model/DataModel";
 import { inviteTeamMember, memberLimit } from "@/model/Team";
 import { mdiAccountMultiplePlusOutline } from "@mdi/js";
 import { ConfirmationPopUp } from "@/components/ConfirmationPopUp";
