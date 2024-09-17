@@ -1,4 +1,9 @@
-import { prop, initializeMufasa, formula, Persistance } from "mufasa";
+import {
+  prop,
+  initializeMufasa,
+  formula,
+  Persistance,
+} from "@/mufasa/client/src/Mufasa";
 import {
   useProp,
   doWatch,
@@ -10,8 +15,8 @@ import {
 } from "miwi";
 import { autoSavingProp, devLog } from "@/utils";
 import { createRoot, untrack } from "solid-js";
-import { capacitorPersister } from "mufasa/capacitor";
-import { solidPersister } from "mufasa/solid-js";
+import { capacitorPersister } from "@/mufasa/client/src/Plugins/Capacitor";
+import { solidPersister } from "@/mufasa/client/src/Plugins/SolidJs";
 import { cloudPersister } from "./CloudPersister";
 import { createLimitTrackers } from "./LimitUtils";
 // import { miapStore } from "miap";

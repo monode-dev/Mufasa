@@ -1,6 +1,6 @@
 import { mfs, premiumEnabled, FuelType } from "@/model/DataModel";
 import { createLimitTrackers } from "@/model/LimitUtils";
-import { prop } from "mufasa";
+import { prop } from "@/mufasa/client/src/Mufasa";
 import {
   getDimensionLabel,
   getTankShape,
@@ -22,7 +22,7 @@ export class Tank extends mfs.Doc(`Tank`) {
   notes = prop(String, ``);
   fuelType = prop([FuelType, null], null);
   shape = prop([String, null], null) as
-    | (ReturnType<typeof prop<StringConstructor, ``>> & TankShapeId)
+    | (ReturnType<typeof prop<typeof String, ``>> & TankShapeId)
     | null;
   length = prop([Number, null], null);
   depth = prop([Number, null], null);
