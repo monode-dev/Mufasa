@@ -1,45 +1,12 @@
 {
   "cSpell.words": [
-    "devs",
     "firestore",
-    "funcs",
-    "intanceof",
-    "interactable",
-    "Miap",
-    "Millis",
+    "Insts",
     "miwi",
-    "Mosa",
+    "monode",
+    "mosa",
     "Mufasa",
-    "reactives",
-    "renamable",
-    "shajs",
-    "subscriptionsv",
-    "uncomplete",
-    "Uncompletion",
-    "Unsynced",
-    "uuidv",
-    "webp"
-  ],
-  "explorerExclude.showPicker": false,
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "vite.config.ts": false,
-    "tsconfig.json": false,
-    "README.md": false,
-    "index.html": false,
-    "codemagic.yaml": false,
-    "capacitor.config.json": false,
-    ".gitignore": false,
-    ".vscode": false,
-    "node_modules": false,
-    "package.json": false,
-    "global.d.ts": false
-  },
-  "explorerExclude.backup": {},
-  "hide-files.files": []
+    "solidjs",
+    "uuidv"
+  ]
 }
