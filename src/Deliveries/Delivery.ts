@@ -12,7 +12,7 @@ import {
   formatNumWithCommas,
 } from "@/utils";
 import { FloatSort, doNow, exists } from "miwi";
-import { prop, list, formula } from "mufasa";
+import { prop, list, formula } from "@/mufasa/client/src/Mufasa";
 import { withLimitConfirmation } from "@/model/LimitUi";
 import { calcEffectiveRate, calcSales } from "./CompletedSubDeliveryFields";
 
