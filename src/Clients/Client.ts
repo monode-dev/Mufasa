@@ -2,7 +2,7 @@ import { mfs, premiumEnabled } from "@/model/DataModel";
 import { createLimitTrackers } from "@/model/LimitUtils";
 import { Tank } from "@/Tanks/Tank";
 import { exists, FloatSort } from "miwi";
-import { prop, list, formula } from "mufasa";
+import { prop, list, formula } from "@/mufasa/client/src/Mufasa";
 
 export class Client extends mfs.Doc(`Client`) {
   static readonly limit = createLimitTrackers({

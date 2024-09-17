@@ -26,8 +26,6 @@ import { SubDelivery } from "./Delivery";
 import { mdiCheck, mdiUndo } from "@mdi/js";
 import { Client } from "@/Clients/Client";
 import { ConfirmSubDeliveryUncompletion } from "./ConfirmSubDeliveryUncompletion";
-import { Flag } from "mufasa/dist/Utils";
-import { OptionalPropFlag } from "mufasa/dist/Doc";
 
 export default function SubDeliveryCard(props: {
   subDelivery: SubDelivery;
@@ -84,13 +82,7 @@ export default function SubDeliveryCard(props: {
     });
   }
 
-  function midEnterHint(
-    num:
-      | (number & Flag<typeof OptionalPropFlag>)
-      | (null & Flag<typeof OptionalPropFlag>)
-      | number
-      | null,
-  ): EnterKeyHint {
+  function midEnterHint(num: number | null): EnterKeyHint {
     return (num ?? 0) <= 0 ? `next` : `done`;
   }
 
