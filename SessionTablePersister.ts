@@ -1,0 +1,117 @@
+import { batch } from "solid-js";
+import { DELETED_KEY, PrimVal, Session } from "./DocStore";
+import { isValid, logTime } from "./Utils";
+import type { MosaApi, Prop } from "mosa-js";
+
+const IS_VIRTUAL = Symbol("IS_VIRTUAL");
+
+/** This is a virtual store, meaning if you ask for data that doesn't
+ * exist we will create the data and return it. This allows the store
+ * to work even when data is delayed. */
+export function sessionTablePersister(
+  mosaApi: MosaApi,
+  tableTypeName: string,
+): Session.TablePersister {
+  const rootProp = <T>(initialValue: T) =>
+    mosaApi.useRoot(() => mosaApi.useProp(initialValue));
+  // TODO: We might be able to track signal disposal and discard currently unused signals.
+  const allDocIds = rootProp<string[]>([]);
+  const propSignals = {} as {
+    [docId: string]: {
+      [propName: string]: Prop<PrimVal> | undefined;
+    } & {
+      [IS_VIRTUAL]: Prop<boolean>;
+      [DELETED_KEY]?: Prop<boolean>;
+    };
+  };
+
+  return {
+    staticProp: rootProp,
+
+    batchUpdate(updates, newDocsAreOnlyVirtual, isInitialDiskLoad) {
+      batch(() => {
+        let haveAddedOrRemovedDocs = false;
+        if (isInitialDiskLoad) {
+          logTime(`Starting initial disk load for table: ${tableTypeName}`);
+        } else {
+          logTime(
+            `Starting batch update from firebase for table: ${tableTypeName}`,
+          );
+        }
+
+        // Apply all doc updates
+        Object.entries(updates).forEach(([docId, props]) => {
+          // Create an object for any new docs
+          if (!isValid(propSignals[docId])) {
+            propSignals[docId] = {
+              [IS_VIRTUAL]: rootProp(true),
+            };
+          }
+
+          // Flag docs that have just been added to the store.
+          if (!newDocsAreOnlyVirtual && propSignals[docId][IS_VIRTUAL].value) {
+            propSignals[docId][IS_VIRTUAL].value = false;
+            haveAddedOrRemovedDocs = true;
+          }
+
+          // Update props
+          Object.entries(props).forEach(([key, newValue]) => {
+            if (!isValid(propSignals[docId]?.[key])) {
+              propSignals[docId][key] = rootProp(newValue);
+            }
+            propSignals[docId][key]!.value = newValue;
+            haveAddedOrRemovedDocs ||= key === DELETED_KEY && newValue === true;
+          });
+        });
+
+        // If docs have been added or removed, then update the list of all docs.
+        if (haveAddedOrRemovedDocs) {
+          allDocIds.value = Object.keys(propSignals).filter(
+            (docId) =>
+              !propSignals[docId]?.[DELETED_KEY]?.value &&
+              !propSignals[docId]?.[IS_VIRTUAL].value,
+          );
+        }
+
+        if (isInitialDiskLoad) {
+          logTime(`Finished initial disk load for table: ${tableTypeName}`);
+        } else {
+          logTime(
+            `Finished batch update from firebase for table: ${tableTypeName}`,
+          );
+        }
+      });
+    },
+
+    getProp(docId, key, fallbackValue) {
+      if (!isValid(propSignals[docId])) {
+        propSignals[docId] = {
+          [IS_VIRTUAL]: rootProp(true),
+        };
+      }
+      if (!isValid(propSignals[docId]?.[key])) {
+        propSignals[docId][key] = mosaApi.useRoot(() =>
+          typeof fallbackValue === "function"
+            ? mosaApi.useFormula(fallbackValue)
+            : mosaApi.useProp(fallbackValue),
+        );
+      }
+      return propSignals[docId][key]!.value;
+    },
+
+    peekProp(docId, key) {
+      return propSignals[docId]?.[key]?.value;
+    },
+
+    getAllDocs() {
+      return allDocIds.value;
+    },
+
+    docExists(docId) {
+      return (
+        propSignals[docId]?.[IS_VIRTUAL].value === false &&
+        propSignals[docId]?.[DELETED_KEY]?.value !== true
+      );
+    },
+  };
+}
