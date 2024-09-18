@@ -244,6 +244,9 @@ export class Doc {
   static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
     return this._docStore.getHaveCompletedFirstSync();
   }
+  static getHaveLoadedFromDisk<T extends typeof Doc>(this: T): boolean {
+    return this._docStore.getHaveLoadedFromDisk();
+  }
 
   static _fromId<T extends typeof Doc>(
     this: T,
