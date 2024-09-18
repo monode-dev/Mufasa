@@ -430,6 +430,7 @@ export function createDocStore(config: DocStoreParams) {
   });
 
   // Pick up any changes that still need pushed.
+  let haveLoadedFromDisk = config.sessionTablePersister.staticProp(false);
   localDocs.loadedFromLocalStorage.then(() => {
     config.sessionTablePersister.batchUpdate(
       Object.entries(localDocs.data.docs)
@@ -444,6 +445,7 @@ export function createDocStore(config: DocStoreParams) {
       false,
       true,
     );
+    haveLoadedFromDisk.value = true;
   });
 
   const pushGlobalChange = createPersistedFunction(
@@ -514,6 +516,7 @@ export function createDocStore(config: DocStoreParams) {
       params.newDocsAreOnlyVirtual,
       false,
     );
+
     localDocs.loadedFromLocalStorage.then(() => {
       if (params.sourceStoreType !== Persistance.local) {
         localDocs.batchUpdate((data) => {
@@ -644,6 +647,10 @@ export function createDocStore(config: DocStoreParams) {
 
     getHaveCompletedFirstSync() {
       return haveCompletedFirstSync.value;
+    },
+
+    getHaveLoadedFromDisk() {
+      return haveLoadedFromDisk.value;
     },
 
     async export(path: string, shouldInclude?: (filePath: string) => boolean) {
