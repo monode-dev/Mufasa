@@ -140,8 +140,6 @@ export class Doc {
   /** Finds all `static myComputed = formula(() => ...)` and replaces them with getters
    * based on hidden `useRoot(useFormula(() => ...))` variables. */
   static initStaticFormulas<This extends typeof Doc>(this: This) {
-    console.log(`Initing static formulas for ${this.name}`);
-
     let currentClass: This | Function = this;
 
     // Traverse up the prototype chain to initialize static formulas for all classes
