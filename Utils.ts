@@ -2,15 +2,6 @@ export function doNow<T>(func: () => T): T {
   return func();
 }
 
-export const logTime = doNow(() => {
-  let lastLogTime = Date.now();
-  return (msg: string) => {
-    const now = Date.now();
-    console.log(msg, now - lastLogTime);
-    lastLogTime = now;
-  };
-})
-
 export type DeepPartial<T> = T extends object
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : T;

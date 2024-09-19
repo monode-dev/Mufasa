@@ -1,6 +1,6 @@
 import { batch } from "solid-js";
 import { DELETED_KEY, PrimVal, Session } from "./DocStore";
-import { isValid, logTime } from "./Utils";
+import { isValid } from "./Utils";
 import type { MosaApi, Prop } from "mosa-js";
 
 const IS_VIRTUAL = Symbol("IS_VIRTUAL");
@@ -31,13 +31,6 @@ export function sessionTablePersister(
     batchUpdate(updates, newDocsAreOnlyVirtual, isInitialDiskLoad) {
       batch(() => {
         let haveAddedOrRemovedDocs = false;
-        if (isInitialDiskLoad) {
-          logTime(`Starting initial disk load for table: ${tableTypeName}`);
-        } else {
-          logTime(
-            `Starting batch update from firebase for table: ${tableTypeName}`,
-          );
-        }
 
         // Apply all doc updates
         Object.entries(updates).forEach(([docId, props]) => {
@@ -70,14 +63,6 @@ export function sessionTablePersister(
             (docId) =>
               !propSignals[docId]?.[DELETED_KEY]?.value &&
               !propSignals[docId]?.[IS_VIRTUAL].value,
-          );
-        }
-
-        if (isInitialDiskLoad) {
-          logTime(`Finished initial disk load for table: ${tableTypeName}`);
-        } else {
-          logTime(
-            `Finished batch update from firebase for table: ${tableTypeName}`,
           );
         }
       });
