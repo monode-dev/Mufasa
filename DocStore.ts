@@ -234,14 +234,14 @@ export function initializeStoreBank(bankConfig: {
   const bankDirectory =
     bankConfig.devicePersister?.(`StoreBank`) ?? Device.mockDirectoryPersister;
   const deleteStoreInst = doNow(() => {
-    const storesBeingDeleted = new Map<string, DocStore | FileStore>();
-    const deleteStoreInst = createPersistedFunction(
+    const activeStoresToStop = new Map<string, DocStore | FileStore>();
+    const deleteDirectoryForStoreInst = createPersistedFunction(
       bankDirectory.jsonFile(`deleteStoreInst`),
       async (params: { docType: string; instId: string }) => {
         // If the store is still being used, stop it so we can delete it.
-        if (storesBeingDeleted.has(params.instId)) {
-          await storesBeingDeleted.get(params.instId)?.stop();
-          storesBeingDeleted.delete(params.instId);
+        if (activeStoresToStop.has(params.instId)) {
+          await activeStoresToStop.get(params.instId)?.stop();
+          activeStoresToStop.delete(params.instId);
         }
         // Delete the store from disk.
         await bankConfig
@@ -259,8 +259,8 @@ export function initializeStoreBank(bankConfig: {
       instId: string;
       store: DocStore | FileStore;
     }) => {
-      storesBeingDeleted.set(params.instId, params.store);
-      deleteStoreInst({
+      activeStoresToStop.set(params.instId, params.store);
+      deleteDirectoryForStoreInst({
         docType: params.docType,
         instId: params.instId,
       });
