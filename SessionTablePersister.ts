@@ -39,6 +39,9 @@ export function sessionTablePersister(
             propSignals[docId] = {
               [IS_VIRTUAL]: rootProp(true),
             };
+            if (newDocsAreOnlyVirtual) {
+              console.log("docId", docId, "is virtual", props);
+            }
           }
 
           // Flag docs that have just been added to the store.

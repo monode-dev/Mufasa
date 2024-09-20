@@ -13,6 +13,9 @@ import {
   Firestore,
   collection,
   doc,
+  orderBy,
+  startAfter,
+  startAt,
 } from "firebase/firestore";
 import { DocJson, Cloud } from "../DocStore";
 import {
@@ -38,6 +41,7 @@ import {
   UserInfo,
   Member,
 } from "../Workspace";
+import { exists } from "miwi";
 
 export function firebasePersister<T extends AuthProviders>(
   firebaseConfig: {
@@ -106,6 +110,7 @@ export function workspacePersister(
     setupWatcher: (batchUpdate, localJsonFilePersister) => {
       const metaData = localJsonFilePersister.load({
         lastChangeDatePosix: 0,
+        lastChangedDocId: null as string | null,
       });
       let shouldStop = false;
       let isProcessingSnapshot = false;
@@ -140,36 +145,92 @@ export function workspacePersister(
                     // TODO: Maybe there is some way to avoid already deleted docs.
                     ...firestoreConfig.queryConstraints,
                   ),
+                  orderBy(CHANGE_DATE_KEY, `asc`),
+                  orderBy(`__name__`, `asc`),
+                  ...(exists(metaData.data.lastChangedDocId)
+                    ? [
+                        startAt(
+                          metaData.data.lastChangeDatePosix,
+                          metaData.data.lastChangedDocId,
+                        ),
+                      ]
+                    : []),
                 ),
                 (snapshot) => {
                   isProcessingSnapshot = true;
                   const updates: {
                     [docId: string]: DocJson;
                   } = {};
-                  let latestChangeDate = metaData.data.lastChangeDatePosix;
+                  // console.log(
+                  //   `Processing snapshot ${
+                  //     snapshot.docChanges().length
+                  //   } docs changed: ${firestoreConfig.collectionRef.path}`,
+                  // );
+                  let latestChange = metaData.data;
                   snapshot.docChanges().forEach((change) => {
+                    const docData = change.doc.data();
+                    /** Change date is formatted like {seconds: ..., nanoseconds: ...}
+                     * We need to combine seconds and nano seconds to get the milliseconds since epoch. */
+                    const docChangeDatePosix =
+                      docData[CHANGE_DATE_KEY].seconds * 1_000 +
+                      docData[CHANGE_DATE_KEY].nanoseconds / 1_000_000;
+                    const isSubDelivery =
+                      firestoreConfig.collectionRef.path.includes("SubDeliver");
+                    if (isSubDelivery) {
+                      // console.log(docData);
+                    }
+
+                    // console.log(
+                    //   `${change.type}: ${change.doc.id} \n${JSON.stringify(
+                    //     docData,
+                    //     null,
+                    //     2,
+                    //   )}`,
+                    // );
                     // Skip removed documents. Documents should never be deleted only flagged.
                     if (change.type === "removed") {
                       console.warn(
                         `The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa is not currently configured to handle documents being removed.`,
-                        change.doc.data(),
+                        docData,
                       );
+                      return;
+                    }
+                    // The first one is usually a duplicate.
+                    if (
+                      docChangeDatePosix === latestChange.lastChangeDatePosix &&
+                      change.doc.id === metaData.data.lastChangedDocId
+                    ) {
                       return;
                     }
 
                     // Update doc store.
-                    updates[change.doc.id] = change.doc.data() as DocJson;
-                    latestChangeDate = Math.max(
-                      latestChangeDate,
-                      change.doc.data()[CHANGE_DATE_KEY].seconds * 1000,
-                    );
+                    updates[change.doc.id] = docData as DocJson;
+                    // We shouldn't need to to this comparison since the last document should be the most recent.
+                    // If this is not how it works, then our "startAfter" above will be in trouble.
+                    if (docChangeDatePosix > latestChange.lastChangeDatePosix) {
+                      latestChange = {
+                        lastChangeDatePosix: docChangeDatePosix,
+                        lastChangedDocId: change.doc.id,
+                      };
+                    }
                   });
                   batchUpdate(updates);
-                  if (latestChangeDate > metaData.data.lastChangeDatePosix) {
-                    metaData.batchUpdate(
-                      (data) =>
-                        (data.value.lastChangeDatePosix = latestChangeDate),
-                    );
+                  // console.log(
+                  //   `latestChange: ${JSON.stringify(
+                  //     latestChange,
+                  //     null,
+                  //     2,
+                  //   )}, metaData.data: ${JSON.stringify(
+                  //     metaData.data,
+                  //     null,
+                  //     2,
+                  //   )}`,
+                  // );
+                  if (
+                    latestChange.lastChangeDatePosix >
+                    metaData.data.lastChangeDatePosix
+                  ) {
+                    metaData.batchUpdate((data) => (data.value = latestChange));
                   }
                   isProcessingSnapshot = false;
                 },
@@ -200,6 +261,11 @@ export function workspacePersister(
       };
     },
     updateDoc: async (change: Cloud.DocChange) => {
+      console.log(
+        `Updating doc ${firestoreConfig.collectionRef.path}/${
+          change.docId
+        }:\n${JSON.stringify(change.props, null, 2)}`,
+      );
       const setOrUpdateDoc = change.isBeingCreatedOrDeleted
         ? setDoc
         : updateDoc;
