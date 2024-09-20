@@ -343,7 +343,7 @@ function createWorkspaceInterface(config: {
     },
     createJoinedInst(userMetadata: NonNullUserMetadata) {
       const entitlements = doNow(() => {
-        const entitlements = useProp<string[]>([]);
+        const entitlements = useProp<string[] | null>(null);
         let haveStartedWatching = false;
         let disposeWatcher: () => void = () => {};
         sessionPersister.onDispose(() => disposeWatcher());
