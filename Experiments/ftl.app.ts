@@ -9,6 +9,7 @@ const ftl = {
     function: (fn: (...args: any[]) => any) => fn,
   }),
   function: (fn: (...args: any[]) => any) => fn,
+  // The benefits of using a class probably out weight the downsides.
   schema: <
     Name extends string,
     PropSchemas extends {
