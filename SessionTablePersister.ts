@@ -1,4 +1,4 @@
-import { batch } from "solid-js";
+import { batch, untrack } from "solid-js";
 import { DELETED_KEY, PrimVal, Session } from "./DocStore";
 import { isValid } from "./Utils";
 import type { MosaApi, Prop } from "mosa-js";
@@ -85,6 +85,17 @@ export function sessionTablePersister(
         );
       }
       return propSignals[docId][key]!.value;
+    },
+
+    getDocJson(docId: string) {
+      return untrack(() => {
+        const doc = {} as Record<string, PrimVal>;
+        console.log(`allDocIds`, JSON.stringify(allDocIds.value));
+        for (const key in Object.keys(propSignals[docId])) {
+          doc[key] = propSignals[docId]?.[key]?.value ?? null;
+        }
+        return doc;
+      });
     },
 
     peekProp(docId, key) {

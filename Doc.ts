@@ -1,3 +1,4 @@
+import { batch, createEffect, createRoot } from "solid-js";
 import {
   PersistanceConfig,
   Persistance,
@@ -14,6 +15,7 @@ import {
   doNow,
   isValid,
 } from "./Utils";
+import { createMutable } from "solid-js/store";
 
 let defaultPersistanceConfig: PersistanceConfig;
 let _getStoreBank: () => StoreBank = (() => {}) as any;
@@ -43,7 +45,14 @@ export function initializeDocClass(config: {
     },
   };
 }
-const _allDocInstances = new Map<string, Doc>();
+// TODO: This is probably why all our docs are freaking out with null stuff.
+const _allDocInstances: {
+  [docType: string]:
+    | {
+        [docId: string]: DocInst | undefined;
+      }
+    | undefined;
+} = {};
 function _initializeInst<T extends Doc>(
   inst: T,
   overrideProps: { [jsKey: string | number]: PrimVal },
@@ -237,7 +246,26 @@ export class Doc {
   }
 
   static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
-    return this._docStore.getAllDocs().map(this._fromId.bind(this) as any);
+    if (!isValid(_allDocInstances[this.docType])) {
+      _allDocInstances[this.docType] = createRoot(() => createMutable({}));
+      const instances = _allDocInstances[this.docType]!;
+      createRoot(() =>
+        createEffect(() => {
+          batch(() => {
+            const docsToRemove = new Set(Object.keys(instances));
+            this._docStore.getAllDocs().forEach((docId) => {
+              docsToRemove.delete(docId);
+              if (isValid(instances[docId])) return;
+              instances[docId] = _initializeInst(new this(), {}, () => docId);
+            });
+            docsToRemove.forEach((docId) => {
+              delete instances[docId];
+            });
+          });
+        }),
+      );
+    }
+    return Object.values(_allDocInstances[this.docType]!) as InstanceType<T>[];
   }
   static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
     return this._docStore.getHaveCompletedFirstSync();
@@ -250,13 +278,7 @@ export class Doc {
     this: T,
     docId: string,
   ): InstanceType<T> {
-    if (!_allDocInstances.has(docId)) {
-      _allDocInstances.set(
-        docId,
-        _initializeInst(new this(), {}, () => docId),
-      );
-    }
-    return _allDocInstances.get(docId) as InstanceType<T>;
+    return _allDocInstances[this.docType]?.[docId] as InstanceType<T>;
   }
 
   static create<T extends typeof Doc>(

@@ -42,6 +42,7 @@ export namespace Session {
       newDocsAreOnlyVirtual: boolean,
       isInitialDiskLoad: boolean,
     ): void;
+    getDocJson(docId: string): DocJson;
     getProp(
       id: string,
       key: string,
@@ -54,6 +55,7 @@ export namespace Session {
   export const mockTablePersister: Session.TablePersister = {
     staticProp: <T>(initVal: T) => ({ value: initVal } as any),
     batchUpdate: () => {},
+    getDocJson: () => ({}),
     getProp: (_, __, v) => (typeof v === `function` ? v() : v),
     peekProp: () => undefined,
     getAllDocs: () => [],
@@ -644,6 +646,8 @@ export function createDocStore(config: DocStoreParams) {
     getProp: config.sessionTablePersister.getProp,
 
     getAllDocs: config.sessionTablePersister.getAllDocs,
+
+    getDocJson: config.sessionTablePersister.getDocJson,
 
     getHaveCompletedFirstSync() {
       return haveCompletedFirstSync.value;
