@@ -7,24 +7,19 @@ export { prop, formula } from "./Doc";
 export { list } from "./List";
 export type { ReadonlyList } from "./List";
 export { isValid } from "./Utils";
-export {
-  Cloud,
-  Device,
-  Session,
-  DELETED_KEY,
-  Persistance,
-} from "./DocStore";
-export type { 
+export { Cloud, Device, Session, DELETED_KEY, Persistance } from "./DocStore";
+export type {
   DocJson,
   PersistanceConfig,
   DocStore,
-  UpdateBatch,} from "./DocStore";
+  UpdateBatch,
+} from "./DocStore";
 export type { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace";
 
 // TODO: Implement database versioning.
 /** Set up Mufasa for your app.
  * ```ts
- * import { initializeMufasa } from "mufasa";
+ * import { initializeMufasa } from "@/mufasa/Mufasa";
  * import { solidPersister } from "mufasa/solid-js";
  * import { capacitorPersister } from "mufasa/capacitor";
  * import { firebasePersister } from "mufasa/firebase";
