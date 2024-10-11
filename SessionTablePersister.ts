@@ -10,7 +10,7 @@ const IS_VIRTUAL = Symbol("IS_VIRTUAL");
  * to work even when data is delayed. */
 export function sessionTablePersister(
   mosaApi: MosaApi,
-  tableTypeName: string,
+  tableTypeName: string | null,
 ): Session.TablePersister {
   const rootProp = <T>(initialValue: T) =>
     mosaApi.useRoot(() => mosaApi.useProp(initialValue));

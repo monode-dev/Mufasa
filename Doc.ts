@@ -46,13 +46,13 @@ export function initializeDocClass(config: {
   };
 }
 // TODO: This is probably why all our docs are freaking out with null stuff.
-const _allDocInstances: {
-  [docType: string]:
-    | {
-        [docId: string]: DocInst | undefined;
-      }
-    | undefined;
-} = {};
+const _allDocInstances = new Map<
+  string | null,
+  | {
+      [docId: string]: DocInst | undefined;
+    }
+  | undefined
+>();
 function _initializeInst<T extends Doc>(
   inst: T,
   overrideProps: { [jsKey: string | number]: PrimVal },
@@ -179,7 +179,7 @@ export class Doc {
   }
 
   /*** NOTE: This can be overridden to manually specify a type name. */
-  static get docType() {
+  static get docType(): string | null {
     return this.name;
   }
   get docType() {
@@ -218,13 +218,15 @@ export class Doc {
   static customize<This extends typeof Doc>(
     this: This,
     customizations: {
-      docType?: string;
+      docType?: string | null;
       docStoreConfig?: Partial<PersistanceConfig>;
     },
   ): This {
     return class extends (this as any) {
       static get docType() {
-        return customizations.docType ?? this.name;
+        return customizations.docType === undefined
+          ? this.name
+          : customizations.docType;
       }
 
       static getDocStoreConfig<This extends typeof Doc>(
@@ -246,9 +248,12 @@ export class Doc {
   }
 
   static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
-    if (!isValid(_allDocInstances[this.docType])) {
-      _allDocInstances[this.docType] = createRoot(() => createMutable({}));
-      const instances = _allDocInstances[this.docType]!;
+    if (!_allDocInstances.has(this.docType)) {
+      _allDocInstances.set(
+        this.docType,
+        createRoot(() => createMutable({})),
+      );
+      const instances = _allDocInstances.get(this.docType)!;
       createRoot(() =>
         createEffect(() => {
           batch(() => {
@@ -265,7 +270,9 @@ export class Doc {
         }),
       );
     }
-    return Object.values(_allDocInstances[this.docType]!) as InstanceType<T>[];
+    return Object.values(
+      _allDocInstances.get(this.docType)!,
+    ) as InstanceType<T>[];
   }
   static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
     return this._docStore.getHaveCompletedFirstSync();
@@ -278,7 +285,10 @@ export class Doc {
     this: T,
     docId: string,
   ): InstanceType<T> {
-    return _allDocInstances[this.docType]?.[docId] as InstanceType<T>;
+    if (this.docType === null) {
+      this.getAllDocs();
+    }
+    return _allDocInstances.get(this.docType)?.[docId] as InstanceType<T>;
   }
 
   static create<T extends typeof Doc>(
@@ -327,12 +337,19 @@ export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export type OptionalPropFlag = typeof OptionalPropFlag;
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 // TODO: Delete docs that depend on non-nullable docs.
-type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc;
+type PropClass =
+  | typeof Boolean
+  | typeof Number
+  | typeof String
+  | typeof Doc
+  | [typeof String];
 type PropType<T extends PropClass = PropClass> = T | [T, null];
-type PropInst = boolean | number | string | Doc | null;
+type PropInst = boolean | number | string | string[] | Doc | null;
 type PropValue<T extends PropType | PropInst = PropType | PropInst> =
-  T extends any[]
+  T extends [any, any]
     ? PropValue<T[number]>
+    : T extends [any]
+    ? PropValue<T[0]>[]
     : T extends typeof Doc
     ? InstanceType<T> | null
     : T extends typeof Boolean
@@ -370,11 +387,14 @@ export function prop<
       : OptionalPropFlag
     : OptionalPropFlag
 > {
-  const TypeClass: PropClass =
-    typeof firstParam === `function`
+  function getTypeClassFromFirstParam(
+    firstParam: PropType | PropValue,
+  ): PropClass {
+    return typeof firstParam === `function`
       ? firstParam
       : Array.isArray(firstParam)
-      ? firstParam[0]
+      ? // This return String instead of [String] for string lists, but that is good enough for now.
+        getTypeClassFromFirstParam(firstParam[0])
       : firstParam instanceof Doc
       ? Doc
       : typeof firstParam === `boolean`
@@ -382,6 +402,8 @@ export function prop<
       : typeof firstParam === `number`
       ? Number
       : String;
+  }
+  const TypeClass: PropClass = getTypeClassFromFirstParam(firstParam);
   const initValue: PropValue | undefined = [
     `boolean`,
     `number`,
@@ -390,7 +412,7 @@ export function prop<
     ? firstParam
     : (secondParam as any);
   const persistance: Persistance = options.persistance ?? Persistance.global;
-  if (isDocClass(TypeClass)) {
+  if (!Array.isArray(TypeClass) && isDocClass(TypeClass)) {
     return {
       [IsCustomProp]: true,
       isFullCustom: false,

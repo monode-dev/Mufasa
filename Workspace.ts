@@ -1,6 +1,7 @@
 import { Device, Session, Cloud } from "./DocStore";
 import { ReadonlyProp } from "mosa-js";
 import { isValid } from "./Utils";
+import { WorkspaceClass } from "./WorkspaceClass";
 
 // SECTION: Types
 export type UserInfo = {
@@ -63,16 +64,23 @@ export type CloudAuth<T extends SignInFuncs> = {
 export type SignInFuncs = {
   [key: string]: (...args: any) => Promise<any>;
 };
-export type User<T extends Cloud.Persister<any>> = ReturnType<
-  typeof initializeAuth<ReturnType<T[`getCloudAuth`]>[`signInFuncs`]>
+export type User<
+  T extends Cloud.Persister<any>,
+  W extends typeof WorkspaceClass,
+> = ReturnType<
+  typeof initializeAuth<ReturnType<T[`getCloudAuth`]>[`signInFuncs`], W>
 >[`value`];
-export function initializeAuth<T extends SignInFuncs>(config: {
+export function initializeAuth<
+  T extends SignInFuncs,
+  W extends typeof WorkspaceClass,
+>(config: {
   stage: string;
   sessionPersister: Session.Persister;
   directoryPersister: Device.DirectoryPersister;
   getCloudAuth: GetCloudAuth<T>;
+  workspaceClass: W | undefined;
 }): {
-  get value(): UserState<T>;
+  get value(): UserState<T, W>;
 } {
   const { useProp, useFormula, doNow, onDispose, useRoot } =
     config.sessionPersister;
@@ -166,6 +174,7 @@ export function initializeAuth<T extends SignInFuncs>(config: {
           directoryPersister: config.directoryPersister,
           sessionPersister: config.sessionPersister,
           stage: config.stage,
+          workspaceClass: config.workspaceClass,
         });
         return {
           uid: userInfo.uid,
@@ -208,8 +217,11 @@ export function initializeAuth<T extends SignInFuncs>(config: {
     ) as any;
   });
 }
-export type UserState<T extends SignInFuncs> = _Or<_UserStates<T>>;
-type _UserStates<T extends SignInFuncs> = {
+export type UserState<
+  T extends SignInFuncs,
+  W extends typeof WorkspaceClass,
+> = _Or<_UserStates<T, W>>;
+type _UserStates<T extends SignInFuncs, W extends typeof WorkspaceClass> = {
   pending: {
     isPending: true;
   };
@@ -221,7 +233,7 @@ type _UserStates<T extends SignInFuncs> = {
     uid: string;
     email: string | null;
     isSignedIn: true;
-    workspace: ReturnType<typeof createWorkspaceInterface>[`value`];
+    workspace: ReturnType<typeof createWorkspaceInterface<W>>[`value`];
     signOut: () => Promise<void>;
     isSigningOut: boolean;
   };
@@ -247,13 +259,14 @@ type _AllKeys<T extends { [key: string]: {} }> = {
 // };
 // type AJSKDFjsa = ksjdakf<_UserStates<{}>>[`signedIn`];
 
-function createWorkspaceInterface(config: {
+function createWorkspaceInterface<W extends typeof WorkspaceClass>(config: {
   uid: string;
   workspaceIntegration: WorkspaceIntegration;
   onDispose: (dispose: () => void) => void;
   directoryPersister: Device.DirectoryPersister;
   sessionPersister: Session.Persister;
   stage: string;
+  workspaceClass: W | undefined;
 }) {
   const { uid, workspaceIntegration, sessionPersister } = config;
   const { useProp, useFormula, doNow, exists, onDispose } = sessionPersister;
@@ -342,26 +355,26 @@ function createWorkspaceInterface(config: {
       },
     },
     createJoinedInst(userMetadata: NonNullUserMetadata) {
-      const entitlements = doNow(() => {
-        const entitlements = useProp<string[] | null>(null);
-        let haveStartedWatching = false;
-        let disposeWatcher: () => void = () => {};
-        sessionPersister.onDispose(() => disposeWatcher());
-        return {
-          get value() {
-            if (!haveStartedWatching) {
-              disposeWatcher = workspaceIntegration.watchEntitlements(
-                userMetadata.workspaceId,
-                (allEntitlements) => {
-                  entitlements.value = allEntitlements;
-                },
-              );
-              haveStartedWatching = true;
-            }
-            return entitlements.value;
-          },
-        };
-      });
+      // const entitlements = doNow(() => {
+      //   const entitlements = useProp<string[] | null>(null);
+      //   let haveStartedWatching = false;
+      //   let disposeWatcher: () => void = () => {};
+      //   sessionPersister.onDispose(() => disposeWatcher());
+      //   return {
+      //     get value() {
+      //       if (!haveStartedWatching) {
+      //         disposeWatcher = workspaceIntegration.watchEntitlements(
+      //           userMetadata.workspaceId,
+      //           (allEntitlements) => {
+      //             entitlements.value = allEntitlements;
+      //           },
+      //         );
+      //         haveStartedWatching = true;
+      //       }
+      //       return entitlements.value;
+      //     },
+      //   };
+      // });
       const otherMembers = doNow(() => {
         const otherMembers = useProp<Member[]>([]);
         let haveStartedWatching = false;
@@ -384,14 +397,20 @@ function createWorkspaceInterface(config: {
           },
         };
       });
+      const workspaceInst: InstanceType<W> = (
+        config.workspaceClass ?? WorkspaceClass
+      )._fromId(userMetadata.workspaceId) as any;
       const result = {
         haveJoined: true,
         id: userMetadata.workspaceId,
         get otherMembers() {
           return otherMembers.value;
         },
-        get workspaceEntitlements() {
-          return entitlements.value;
+        // get workspaceEntitlements() {
+        //   return entitlements.value;
+        // },
+        get workspaceInst() {
+          return workspaceInst;
         },
         get isLeaving() {
           return isLeavingWorkspace.value;
