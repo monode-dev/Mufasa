@@ -1,3 +1,4 @@
+import { batch } from "solid-js";
 import { initializeDocClass } from "./Doc";
 import { Session, Device, Cloud, initializeStoreBank } from "./DocStore";
 import { initializeSyncedFileClass } from "./File";
@@ -7,18 +8,13 @@ export { prop, formula } from "./Doc";
 export { list } from "./List";
 export type { ReadonlyList } from "./List";
 export { isValid } from "./Utils";
-export {
-  Cloud,
-  Device,
-  Session,
-  DELETED_KEY,
-  Persistance,
-} from "./DocStore";
-export type { 
+export { Cloud, Device, Session, DELETED_KEY, Persistance } from "./DocStore";
+export type {
   DocJson,
   PersistanceConfig,
   DocStore,
-  UpdateBatch,} from "./DocStore";
+  UpdateBatch,
+} from "./DocStore";
 export type { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace";
 
 // TODO: Implement database versioning.
@@ -89,16 +85,48 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       while (user.value.isPending || user.value.workspace?.isPending) {
         await new Promise((resolve) => setTimeout(resolve, 10));
       }
-      return mfsConfig.sessionPersister.useRoot(() =>
-        mfsConfig.sessionPersister.useFormula(() =>
-          isValid(user.value.uid) && isValid(user.value.workspace?.id)
-            ? {
-                userId: user.value.uid,
-                workspaceId: user.value.workspace.id,
-              }
-            : null,
-        ),
+      type WorkspaceSignature = { userId: string; workspaceId: string };
+      type WorkspaceSignatureWatcher = (sig: WorkspaceSignature | null) => void;
+      const workspaceSignatureWatchers: WorkspaceSignatureWatcher[] = [];
+      let lastWorkspaceSignature: WorkspaceSignature | null = null;
+      mfsConfig.sessionPersister.useRoot(() =>
+        mfsConfig.sessionPersister.doWatch(() => {
+          const newWorkspaceSignature =
+            isValid(user.value.uid) && isValid(user.value.workspace?.id)
+              ? {
+                  userId: user.value.uid,
+                  workspaceId: user.value.workspace.id,
+                }
+              : null;
+          if (
+            lastWorkspaceSignature?.userId === newWorkspaceSignature?.userId &&
+            lastWorkspaceSignature?.workspaceId ===
+              newWorkspaceSignature?.workspaceId
+          ) {
+            return;
+          }
+          lastWorkspaceSignature = newWorkspaceSignature;
+          batch(() =>
+            workspaceSignatureWatchers.forEach((watcher) =>
+              watcher(lastWorkspaceSignature),
+            ),
+          );
+        }),
       );
+      return (newWatcher: WorkspaceSignatureWatcher) => {
+        workspaceSignatureWatchers.push(newWatcher);
+        newWatcher(lastWorkspaceSignature);
+      };
+      // return mfsConfig.sessionPersister.useRoot(() =>
+      //   mfsConfig.sessionPersister.useFormula(() =>
+      //     isValid(user.value.uid) && isValid(user.value.workspace?.id)
+      //       ? {
+      //           userId: user.value.uid,
+      //           workspaceId: user.value.workspace.id,
+      //         }
+      //       : null,
+      //   ),
+      // );
     }),
   });
   const docSetup = initializeDocClass({

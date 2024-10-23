@@ -253,7 +253,9 @@ export class Doc {
         createEffect(() => {
           batch(() => {
             const docsToRemove = new Set(Object.keys(instances));
-            this._docStore.getAllDocs().forEach((docId) => {
+            const allDocs = this._docStore.getAllDocs();
+            console.log(`Updating all ${this.docType} docs: ${allDocs.length}`);
+            allDocs.forEach((docId) => {
               docsToRemove.delete(docId);
               if (isValid(instances[docId])) return;
               instances[docId] = _initializeInst(new this(), {}, () => docId);
