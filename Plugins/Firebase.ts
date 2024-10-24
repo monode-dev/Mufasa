@@ -41,7 +41,7 @@ import {
   UserInfo,
   Member,
 } from "../Workspace";
-import { exists } from "miwi";
+import { exists } from "@/miwi/src/miwi";
 
 export function firebasePersister<T extends AuthProviders>(
   firebaseConfig: {
