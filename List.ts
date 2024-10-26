@@ -1,7 +1,28 @@
+import {
+  createEffect,
+  createMemo,
+  createRoot,
+  getOwner,
+  mapArray,
+  runWithOwner,
+  untrack,
+} from "solid-js";
 import { CustomProp, DocClass, DocInst, IsCustomProp, prop } from "./Doc";
 import { PersistanceConfig } from "./DocStore";
+import { createMutable } from "solid-js/store";
+import { onDispose, exists } from "@/miwi/src/miwi";
 
 const relTables = new Map<DocClass, Map<string, DocClass>>();
+const docIndex = new Map<
+  string /** DocType */,
+  Map<
+    string /** propName */,
+    /** This should be a mutable store */
+    {
+      [parentId: string /** parentId /> prop value */]: string[];
+    } /** docIds in this list */
+  >
+>();
 
 type GetListFromTableConfig<
   OtherInst extends DocInst,
@@ -45,11 +66,49 @@ export function list<
         [IsCustomProp]: true,
         isFullCustom: true,
         init: (inst, key) => {
+          const otherDocType = OtherClass.docType;
+          if (!docIndex.has(otherDocType)) {
+            docIndex.set(otherDocType, new Map());
+          }
+          const otherDocTypeIndex = docIndex.get(otherDocType)!;
+          if (!otherDocTypeIndex.has(otherProp)) {
+            // Create the mutable
+            otherDocTypeIndex.set(
+              otherProp,
+              createRoot(() => createMutable({})),
+            );
+            const otherDocIdsByParentId = otherDocTypeIndex.get(otherProp)!;
+
+            // Watch for changes to the other props
+            createRoot(() => {
+              const mapped = mapArray(
+                () => OtherClass.getAllDocs(),
+                (otherInst) => {
+                  const parentId = (otherInst[otherProp] as DocInst).docId;
+                  if (!otherDocIdsByParentId[parentId]) {
+                    otherDocIdsByParentId[parentId] = [];
+                  }
+                  otherDocIdsByParentId[parentId].push(otherInst.docId);
+                  onDispose(() => {
+                    otherDocIdsByParentId[parentId] = otherDocIdsByParentId[
+                      parentId
+                    ].filter((docId) => docId !== otherInst.docId);
+                    if (otherDocIdsByParentId[parentId].length === 0) {
+                      delete otherDocIdsByParentId[parentId];
+                    }
+                  });
+                },
+              );
+              createEffect(() => mapped());
+            });
+          }
           const listInst = new List(
             () =>
-              OtherClass.getAllDocs().filter(
-                (other) => (other[otherProp] as DocInst)?.docId === inst.docId,
-              ),
+              docIndex
+                .get(otherDocType)
+                ?.get(otherProp)
+                ?.[inst.docId]?.map((docId) => OtherClass._fromId(docId))
+                ?.filter(exists) ?? [],
             () => {},
             () => {},
           );
@@ -131,6 +190,7 @@ function listProp(config: {
   } satisfies CustomProp;
 }
 export class List<T extends DocInst> {
+  // private readonly getArray: () => T[];
   [Symbol.iterator](): IterableIterator<T> {
     return this.getArray()[Symbol.iterator]();
   }

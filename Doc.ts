@@ -254,7 +254,6 @@ export class Doc {
           batch(() => {
             const docsToRemove = new Set(Object.keys(instances));
             const allDocs = this._docStore.getAllDocs();
-            console.log(`Updating all ${this.docType} docs: ${allDocs.length}`);
             allDocs.forEach((docId) => {
               docsToRemove.delete(docId);
               if (isValid(instances[docId])) return;
