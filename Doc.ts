@@ -39,25 +39,25 @@ export function initializeDocClass(config: {
   return {
     Doc(
       docType: string,
-      customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>,
+      customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>
     ) {
       return Doc.customize({ docType, ...(customizations ?? {}) });
     },
   };
 }
 // TODO: This is probably why all our docs are freaking out with null stuff.
-const _allDocInstances: {
-  [docType: string]:
-    | {
-        [docId: string]: DocInst | undefined;
-      }
-    | undefined;
-} = {};
+const _allDocInstances = new Map<
+  string | null,
+  | {
+      [docId: string]: DocInst | undefined;
+    }
+  | undefined
+>();
 function _initializeInst<T extends Doc>(
   inst: T,
   overrideProps: { [jsKey: string | number]: PrimVal },
   // We should try not making docId reactive, and then decide if that was the wrong idea.
-  getDocId: (initProps: PersistanceTaggedUpdateBatch[string]) => string,
+  getDocId: (initProps: PersistanceTaggedUpdateBatch[string]) => string
 ): T {
   // Create Instance
   const initProps: WritablePersistanceTaggedUpdateBatch[string] = {};
@@ -103,7 +103,7 @@ function _initializeInst<T extends Doc>(
           const storeValue: PrimVal = this._docStore.getProp(
             docId,
             mfsKey,
-            propConfig.getFallbackValue(),
+            propConfig.getFallbackValue()
           );
           return propConfig.fromPrim(storeValue);
         },
@@ -123,7 +123,7 @@ function _initializeInst<T extends Doc>(
                   },
                   {
                     overwriteGlobally: false,
-                  },
+                  }
                 );
               },
             }
@@ -179,14 +179,14 @@ export class Doc {
   }
 
   /*** NOTE: This can be overridden to manually specify a type name. */
-  static get docType() {
+  static get docType(): string | null {
     return this.name;
   }
   get docType() {
     return (this.constructor as typeof Doc).docType;
   }
   static getDocStoreConfig<This extends typeof Doc>(
-    this: This,
+    this: This
   ): PersistanceConfig {
     return defaultPersistanceConfig;
   }
@@ -203,10 +203,10 @@ export class Doc {
       onStoreInit: () => {
         const customProps = Object.values(new this()).filter(isCustomProp);
         const otherDocsToStartSyncing = new Set(
-          customProps.flatMap((prop) => prop.otherDocsToStartSyncing),
+          customProps.flatMap((prop) => prop.otherDocsToStartSyncing)
         );
         otherDocsToStartSyncing.forEach((docClass) =>
-          docClass.ensureSyncHasStarted(),
+          docClass.ensureSyncHasStarted()
         );
       },
     });
@@ -218,17 +218,19 @@ export class Doc {
   static customize<This extends typeof Doc>(
     this: This,
     customizations: {
-      docType?: string;
+      docType?: string | null;
       docStoreConfig?: Partial<PersistanceConfig>;
-    },
+    }
   ): This {
     return class extends (this as any) {
       static get docType() {
-        return customizations.docType ?? this.name;
+        return customizations.docType === undefined
+          ? this.name
+          : customizations.docType;
       }
 
       static getDocStoreConfig<This extends typeof Doc>(
-        this: This,
+        this: This
       ): PersistanceConfig {
         return {
           ...defaultPersistanceConfig!,
@@ -246,15 +248,21 @@ export class Doc {
   }
 
   static getAllDocs<T extends typeof Doc>(this: T): InstanceType<T>[] {
-    if (!isValid(_allDocInstances[this.docType])) {
-      _allDocInstances[this.docType] = createRoot(() => createMutable({}));
-      const instances = _allDocInstances[this.docType]!;
+    /** This is the wrong place to set up _allDocInstances. We were doing it here because I though getAllDocs()
+     * would always be called before any instances where accesesed, but this is only true for top level types
+     * like "Client"  other types like "Asset" might never have getAllDocs() called. Sometimes it is via
+     * LimitedDoc, but not always. */
+    if (!_allDocInstances.has(this.docType)) {
+      _allDocInstances.set(
+        this.docType,
+        createRoot(() => createMutable({}))
+      );
+      const instances = _allDocInstances.get(this.docType)!;
       createRoot(() =>
         createEffect(() => {
           batch(() => {
             const docsToRemove = new Set(Object.keys(instances));
-            const allDocs = this._docStore.getAllDocs();
-            allDocs.forEach((docId) => {
+            this._docStore.getAllDocs().forEach((docId) => {
               docsToRemove.delete(docId);
               if (isValid(instances[docId])) return;
               instances[docId] = _initializeInst(new this(), {}, () => docId);
@@ -263,10 +271,12 @@ export class Doc {
               delete instances[docId];
             });
           });
-        }),
+        })
       );
     }
-    return Object.values(_allDocInstances[this.docType]!) as InstanceType<T>[];
+    return Object.values(
+      _allDocInstances.get(this.docType)!
+    ) as InstanceType<T>[];
   }
   static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
     return this._docStore.getHaveCompletedFirstSync();
@@ -277,9 +287,12 @@ export class Doc {
 
   static _fromId<T extends typeof Doc>(
     this: T,
-    docId: string,
+    docId: string
   ): InstanceType<T> {
-    return _allDocInstances[this.docType]?.[docId] as InstanceType<T>;
+    if (this.docType === null) {
+      this.getAllDocs();
+    }
+    return _allDocInstances.get(this.docType)?.[docId] as InstanceType<T>;
   }
 
   static create<T extends typeof Doc>(
@@ -289,7 +302,7 @@ export class Doc {
     return _initializeInst(
       new this(),
       overrideProps[0] ?? {},
-      this._docStore.createDoc,
+      this._docStore.createDoc
     ) as any;
   }
 
@@ -328,12 +341,19 @@ export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export type OptionalPropFlag = typeof OptionalPropFlag;
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 // TODO: Delete docs that depend on non-nullable docs.
-type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc;
+type PropClass =
+  | typeof Boolean
+  | typeof Number
+  | typeof String
+  | typeof Doc
+  | [typeof String];
 type PropType<T extends PropClass = PropClass> = T | [T, null];
-type PropInst = boolean | number | string | Doc | null;
+type PropInst = boolean | number | string | string[] | Doc | null;
 type PropValue<T extends PropType | PropInst = PropType | PropInst> =
-  T extends any[]
+  T extends [any, any]
     ? PropValue<T[number]>
+    : T extends [any]
+    ? PropValue<T[0]>[]
     : T extends typeof Doc
     ? InstanceType<T> | null
     : T extends typeof Boolean
@@ -353,7 +373,7 @@ export function prop<
   FirstParam extends PropType | PropValue,
   SecondParam extends FirstParam extends PropType
     ? PropValue<FirstParam> | undefined
-    : never,
+    : never
 >(
   firstParam: FirstParam,
   secondParam?: SecondParam,
@@ -362,7 +382,7 @@ export function prop<
   options: {
     persistance?: Persistance;
     key?: string;
-  } = {},
+  } = {}
 ): Flagged<
   PropValue<FirstParam>,
   FirstParam extends PropType
@@ -371,11 +391,14 @@ export function prop<
       : OptionalPropFlag
     : OptionalPropFlag
 > {
-  const TypeClass: PropClass =
-    typeof firstParam === `function`
+  function getTypeClassFromFirstParam(
+    firstParam: PropType | PropValue
+  ): PropClass {
+    return typeof firstParam === `function`
       ? firstParam
       : Array.isArray(firstParam)
-      ? firstParam[0]
+      ? // This return String instead of [String] for string lists, but that is good enough for now.
+        getTypeClassFromFirstParam(firstParam[0])
       : firstParam instanceof Doc
       ? Doc
       : typeof firstParam === `boolean`
@@ -383,6 +406,8 @@ export function prop<
       : typeof firstParam === `number`
       ? Number
       : String;
+  }
+  const TypeClass: PropClass = getTypeClassFromFirstParam(firstParam);
   const initValue: PropValue | undefined = [
     `boolean`,
     `number`,
@@ -391,7 +416,7 @@ export function prop<
     ? firstParam
     : (secondParam as any);
   const persistance: Persistance = options.persistance ?? Persistance.global;
-  if (isDocClass(TypeClass)) {
+  if (!Array.isArray(TypeClass) && isDocClass(TypeClass)) {
     return {
       [IsCustomProp]: true,
       isFullCustom: false,
@@ -402,7 +427,7 @@ export function prop<
         if (prim === null) return null;
         if (typeof prim !== `string`) {
           console.error(
-            `Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`,
+            `Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`
           );
           return null;
         }
@@ -477,6 +502,6 @@ function isDocClass(possibleDocClass: {
 }): possibleDocClass is typeof Doc {
   return Object.prototype.isPrototypeOf.call(
     Doc.prototype,
-    possibleDocClass.prototype,
+    possibleDocClass.prototype
   );
 }

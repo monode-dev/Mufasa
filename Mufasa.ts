@@ -4,6 +4,7 @@ import { Session, Device, Cloud, initializeStoreBank } from "./DocStore";
 import { initializeSyncedFileClass } from "./File";
 import { doNow, isValid } from "./Utils";
 import { User, initializeAuth } from "./Workspace";
+import { WorkspaceClass } from "./WorkspaceClass";
 export { prop, formula } from "./Doc";
 export { list } from "./List";
 export type { ReadonlyList } from "./List";
@@ -16,11 +17,12 @@ export type {
   UpdateBatch,
 } from "./DocStore";
 export type { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace";
+export { WorkspaceClass as Workspace } from "./WorkspaceClass";
 
 // TODO: Implement database versioning.
 /** Set up Mufasa for your app.
  * ```ts
- * import { initializeMufasa } from "mufasa";
+ * import { initializeMufasa } from "@/mufasa/Mufasa";
  * import { solidPersister } from "mufasa/solid-js";
  * import { capacitorPersister } from "mufasa/capacitor";
  * import { firebasePersister } from "mufasa/firebase";
@@ -32,8 +34,12 @@ export type { WorkspaceIntegration, UserMetadata, UserInfo } from "./Workspace";
  * });
  * ```
  */
-export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
+export function initializeMufasa<
+  C extends Cloud.Persister<any>,
+  W extends typeof WorkspaceClass,
+>(mfsConfig: {
   stage?: string;
+  workspaceClass?: W;
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
   cloudPersister: C;
@@ -71,12 +77,13 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
       };
     },
   );
-  const user = initializeAuth<{}>({
+  const user = initializeAuth<{}, typeof WorkspaceClass>({
     stage: stage,
     sessionPersister: mfsConfig.sessionPersister,
     directoryPersister:
       mfsConfig.devicePersister?.(`Auth`) ?? Device.mockDirectoryPersister,
     getCloudAuth: mfsConfig.cloudPersister.getCloudAuth,
+    workspaceClass: mfsConfig.workspaceClass,
   });
   const storeBank = initializeStoreBank({
     stage: stage,
@@ -144,8 +151,8 @@ export function initializeMufasa<C extends Cloud.Persister<any>>(mfsConfig: {
   const fileSetup = initializeSyncedFileClass();
   return {
     Doc: docSetup.Doc,
-    get user(): User<C> {
-      return user.value;
+    get user(): User<C, W> {
+      return user.value as any;
     },
     File: fileSetup.File,
     get isUploadingToCloud() {
