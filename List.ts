@@ -84,7 +84,8 @@ export function list<
               const mapped = mapArray(
                 () => OtherClass.getAllDocs(),
                 (otherInst) => {
-                  const parentId = (otherInst[otherProp] as DocInst).docId;
+                  const parentId = (otherInst[otherProp] as DocInst)?.docId;
+                  if (!parentId) return;
                   if (!otherDocIdsByParentId[parentId]) {
                     otherDocIdsByParentId[parentId] = [];
                   }
