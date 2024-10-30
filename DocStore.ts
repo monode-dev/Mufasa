@@ -13,14 +13,14 @@ export const Persistance = {
   local: 1,
   global: 2,
 } as const;
-export type PrimVal = boolean | number | string | null;
+export type PrimVal = boolean | number | string | string[] | null;
 export type DocJson = {
   [key: string]: PrimVal;
 };
 export type WritableUpdateBatch = {
   [docId: string]: DocJson;
 };
-export type UpdateBatch = Device.ToReadonlyJson<WritableUpdateBatch>;
+export type UpdateBatch = WritableUpdateBatch;
 export type WritablePersistanceTaggedUpdateBatch = {
   [docId: string]: {
     [key: string]: {
@@ -29,8 +29,14 @@ export type WritablePersistanceTaggedUpdateBatch = {
     };
   };
 };
-export type PersistanceTaggedUpdateBatch =
-  Device.ToReadonlyJson<WritablePersistanceTaggedUpdateBatch>;
+export type PersistanceTaggedUpdateBatch = {
+  [docId: string]: {
+    [key: string]: {
+      value: PrimVal;
+      maxPersistance: Persistance;
+    };
+  };
+};
 
 // SECTION: Session Doc Persister Types
 export namespace Session {
@@ -142,7 +148,8 @@ export namespace Cloud {
   export type GetWorkspacePersister = (options: {
     stage: string | null;
     workspaceId: string;
-    docType: string;
+    /** Use "null" the root workspace document */
+    docType: string | null;
     // version: number;
   }) => Cloud.WorkspacePersister;
   export type WorkspacePersister = {
@@ -232,8 +239,8 @@ export function initializeStoreBank(bankConfig: {
     instId: string;
   };
   const managers = {
-    doc: new Map<string, StoreManager<"doc">>(),
-    file: new Map<string, StoreManager<"file">>(),
+    doc: new Map<string | null, StoreManager<"doc">>(),
+    file: new Map<string | null, StoreManager<"file">>(),
   };
   const bankDirectory =
     bankConfig.devicePersister?.(`StoreBank`) ?? Device.mockDirectoryPersister;
@@ -241,7 +248,7 @@ export function initializeStoreBank(bankConfig: {
     const activeStoresToStop = new Map<string, DocStore | FileStore>();
     const deleteDirectoryForStoreInst = createPersistedFunction(
       bankDirectory.jsonFile(`deleteStoreInst`),
-      async (params: { docType: string; instId: string }) => {
+      async (params: { docType: string | null; instId: string }) => {
         // If the store is still being used, stop it so we can delete it.
         if (activeStoresToStop.has(params.instId)) {
           await activeStoresToStop.get(params.instId)?.stop();
@@ -251,7 +258,7 @@ export function initializeStoreBank(bankConfig: {
         await bankConfig
           .devicePersister?.(
             getWorkspaceInstDirectory({
-              docType: params.docType,
+              docType: params.docType ?? `Prod_Workspaces`,
               workspaceInstId: params.instId,
             }),
           )
@@ -259,7 +266,7 @@ export function initializeStoreBank(bankConfig: {
       },
     );
     return (params: {
-      docType: string;
+      docType: string | null;
       instId: string;
       store: DocStore | FileStore;
     }) => {
@@ -273,7 +280,8 @@ export function initializeStoreBank(bankConfig: {
   return {
     getStore<T extends "doc" | "file">(params: {
       storeType: T;
-      docType: string;
+      /** Use "null" for the root workspace document */
+      docType: string | null;
       getStoreConfig: () => PersistanceConfig;
       onStoreInit?: (store: T extends "doc" ? DocStore : FileStore) => void;
     }): T extends "doc" ? DocStore : FileStore {
@@ -303,10 +311,12 @@ export function initializeStoreBank(bankConfig: {
       (watcher: (sig: WorkspaceSignature | null) => void) => void
     >;
     storeType: T;
-    docType: string;
+    /** Use "null" for the root workspace document */
+    docType: string | null;
     getStoreConfig: () => PersistanceConfig;
     deleteStoreInst: (params: {
-      docType: string;
+      /** Use "null" for the root workspace document */
+      docType: string | null;
       instId: string;
       store: DocStore | FileStore;
     }) => void;
@@ -327,7 +337,7 @@ export function initializeStoreBank(bankConfig: {
           isValid(persistance.devicePersister) && isValid(workspaceInstConfig)
             ? persistance.devicePersister(
                 getWorkspaceInstDirectory({
-                  docType: params.docType,
+                  docType: params.docType ?? `Prod_Workspaces`,
                   workspaceInstId: workspaceInstConfig.instId,
                 }),
               )
@@ -353,7 +363,7 @@ export function initializeStoreBank(bankConfig: {
     return doNow(() => {
       const store = useRoot(() => useProp(createStore(null)));
       const instConfigJson = persistance
-        .devicePersister?.(params.docType)
+        .devicePersister?.(params.docType ?? `Prod_Workspaces`)
         .jsonFile(`currentWorkspaceInstConfig.json`)
         .load<WorkspaceInstConfig | null>(null);
       // Load the last known workspace signature, and then watch for changes.

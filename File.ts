@@ -49,7 +49,9 @@ class File extends Doc {
   }
 
   static async createFromBase64String(base64String: string) {
-    return this._fromId(await this._fileStore.pushCreate({ base64String }));
+    const fileId = await this._fileStore.pushCreate({ base64String });
+    console.log(`fileId: ${fileId}`);
+    return this._fromId(fileId);
   }
 
   onDelete(): void {

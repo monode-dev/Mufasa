@@ -14,7 +14,7 @@ import { onDispose, exists } from "@/miwi/src/miwi";
 
 const relTables = new Map<DocClass, Map<string, DocClass>>();
 const docIndex = new Map<
-  string /** DocType */,
+  string | null /** DocType */,
   Map<
     string /** propName */,
     /** This should be a mutable store */

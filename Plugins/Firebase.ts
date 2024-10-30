@@ -14,8 +14,9 @@ import {
   collection,
   doc,
   orderBy,
-  startAfter,
+  // startAfter,
   startAt,
+  documentId,
 } from "firebase/firestore";
 import { DocJson, Cloud } from "../DocStore";
 import {
@@ -78,10 +79,17 @@ export function firebasePersister<T extends AuthProviders>(
           collectionRef: collection(
             firebaseConfig.firestore,
             `${setup.stage}-Workspaces`,
-            setup.workspaceId,
-            setup.docType,
+            // Null means get the root workspace document.
+            ...(setup.docType === null
+              ? []
+              : [setup.workspaceId, setup.docType]),
           ),
-          queryConstraints: [],
+          queryConstraints:
+            setup.docType === null
+              ? // If we are getting the root workspace document, then just get that one document.
+                [where(documentId(), "==", setup.workspaceId)]
+              : [],
+          watchChangeDateKey: setup.docType !== null,
         },
         refreshCustomClaims,
         isValid(firebaseConfig.firebaseStorage)
@@ -100,6 +108,7 @@ export function workspacePersister(
   firestoreConfig: {
     collectionRef: CollectionReference;
     queryConstraints: QueryFilterConstraint[];
+    watchChangeDateKey: boolean;
   },
   refreshCustomClaims: () => Promise<void>,
   getStorageRef?: (fileId: string) => StorageReference,
@@ -127,27 +136,34 @@ export function workspacePersister(
                 query(
                   firestoreConfig.collectionRef,
                   and(
-                    or(
-                      // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
-                      where(
-                        CHANGE_DATE_KEY,
-                        ">",
-                        new Date(
-                          Math.max(
-                            metaData.data.lastChangeDatePosix - 30000,
-                            0,
+                    ...(firestoreConfig.watchChangeDateKey
+                      ? [
+                          or(
+                            // TODO: If a docs CHANGE_DATE_KEY is changed then it is removed and re-added to this query.
+                            where(
+                              CHANGE_DATE_KEY,
+                              ">",
+                              new Date(
+                                Math.max(
+                                  metaData.data.lastChangeDatePosix - 30000,
+                                  0,
+                                ),
+                              ),
+                            ),
+                            where(CHANGE_DATE_KEY, "==", null),
+                            // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
                           ),
-                        ),
-                      ),
-                      where(CHANGE_DATE_KEY, "==", null),
-                      // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
-                    ),
+                        ]
+                      : []),
                     // TODO: Maybe there is some way to avoid already deleted docs.
                     ...firestoreConfig.queryConstraints,
                   ),
-                  orderBy(CHANGE_DATE_KEY, `asc`),
+                  ...(firestoreConfig.watchChangeDateKey
+                    ? [orderBy(CHANGE_DATE_KEY, `asc`)]
+                    : []),
                   orderBy(`__name__`, `asc`),
-                  ...(exists(metaData.data.lastChangedDocId)
+                  ...(exists(metaData.data.lastChangedDocId) &&
+                  firestoreConfig.watchChangeDateKey
                     ? [
                         startAt(
                           metaData.data.lastChangeDatePosix,
@@ -172,8 +188,8 @@ export function workspacePersister(
                     /** Change date is formatted like {seconds: ..., nanoseconds: ...}
                      * We need to combine seconds and nano seconds to get the milliseconds since epoch. */
                     const docChangeDatePosix =
-                      docData[CHANGE_DATE_KEY].seconds * 1_000 +
-                      docData[CHANGE_DATE_KEY].nanoseconds / 1_000_000;
+                      (docData[CHANGE_DATE_KEY]?.seconds ?? -1) * 1_000 +
+                      (docData[CHANGE_DATE_KEY]?.nanoseconds ?? -1) / 1_000_000;
                     const isSubDelivery =
                       firestoreConfig.collectionRef.path.includes("SubDeliver");
                     if (isSubDelivery) {
@@ -261,11 +277,11 @@ export function workspacePersister(
       };
     },
     updateDoc: async (change: Cloud.DocChange) => {
-      console.log(
-        `Updating doc ${firestoreConfig.collectionRef.path}/${
-          change.docId
-        }:\n${JSON.stringify(change.props, null, 2)}`,
-      );
+      // console.log(
+      //   `Updating doc ${firestoreConfig.collectionRef.path}/${
+      //     change.docId
+      //   }:\n${JSON.stringify(change.props, null, 2)}`,
+      // );
       const setOrUpdateDoc = change.isBeingCreatedOrDeleted
         ? setDoc
         : updateDoc;

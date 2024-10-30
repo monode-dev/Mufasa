@@ -10,7 +10,7 @@ const IS_VIRTUAL = Symbol("IS_VIRTUAL");
  * to work even when data is delayed. */
 export function sessionTablePersister(
   mosaApi: MosaApi,
-  tableTypeName: string,
+  tableTypeName: string | null,
 ): Session.TablePersister {
   const rootProp = <T>(initialValue: T) =>
     mosaApi.useRoot(() => mosaApi.useProp(initialValue));
@@ -55,7 +55,7 @@ export function sessionTablePersister(
             if (!isValid(propSignals[docId]?.[key])) {
               propSignals[docId][key] = rootProp(newValue);
             }
-            propSignals[docId][key]!.value = newValue;
+            propSignals[docId][key]!.value = newValue as any;
             haveAddedOrRemovedDocs ||= key === DELETED_KEY && newValue === true;
           });
         });
