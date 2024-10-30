@@ -55,7 +55,7 @@ export function sessionTablePersister(
             if (!isValid(propSignals[docId]?.[key])) {
               propSignals[docId][key] = rootProp(newValue);
             }
-            propSignals[docId][key]!.value = newValue;
+            propSignals[docId][key]!.value = newValue as any;
             haveAddedOrRemovedDocs ||= key === DELETED_KEY && newValue === true;
           });
         });
