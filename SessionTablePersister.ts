@@ -78,10 +78,12 @@ export function sessionTablePersister(
         };
       }
       if (!isValid(propSignals[docId]?.[key])) {
-        propSignals[docId][key] = mosaApi.useRoot(() =>
-          typeof fallbackValue === "function"
-            ? mosaApi.useFormula(fallbackValue)
-            : mosaApi.useProp(fallbackValue),
+        propSignals[docId][key] = untrack(() =>
+          mosaApi.useRoot(() =>
+            typeof fallbackValue === "function"
+              ? mosaApi.useFormula(fallbackValue)
+              : mosaApi.useProp(fallbackValue),
+          ),
         );
       }
       return propSignals[docId][key]!.value;
