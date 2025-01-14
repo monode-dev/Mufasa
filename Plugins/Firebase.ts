@@ -16,7 +16,7 @@ import {
   orderBy,
   // startAfter,
   startAt,
-  documentId,
+  documentId
 } from "firebase/firestore";
 import { DocJson, Cloud } from "../DocStore";
 import {
@@ -25,31 +25,20 @@ import {
   getBytes,
   StorageReference,
   ref as storageRef,
-  FirebaseStorage,
+  FirebaseStorage
 } from "firebase/storage";
 import { doNow, isValid } from "../Utils";
-import {
-  Auth,
-  OAuthCredential,
-  signInWithCredential,
-  UserCredential,
-} from "firebase/auth";
+import { Auth, OAuthCredential, signInWithCredential, UserCredential } from "firebase/auth";
 import { Functions, httpsCallable } from "firebase/functions";
-import {
-  CloudAuth,
-  UserMetadata,
-  WorkspaceIntegration,
-  UserInfo,
-  Member,
-} from "../Workspace";
-import { exists } from "@/miwi/src/miwi";
+import { CloudAuth, UserMetadata, WorkspaceIntegration, UserInfo, Member } from "../Workspace";
+import { exists } from "miwi";
 
 export function firebasePersister<T extends AuthProviders>(
   firebaseConfig: {
     firestore: Firestore;
     firebaseStorage?: FirebaseStorage;
     firebaseFunctions: Functions;
-  } & AuthParams<T>,
+  } & AuthParams<T>
 ) {
   const refreshCustomClaims = doNow(() => {
     let isRefreshing = false;
@@ -65,12 +54,9 @@ export function firebasePersister<T extends AuthProviders>(
       return firebaseAuthIntegration({
         ...firebaseConfig,
         stage: stage,
-        workspaceInvitesCollection: collection(
-          firebaseConfig.firestore,
-          `${stage}-WorkspaceInvites`,
-        ),
+        workspaceInvitesCollection: collection(firebaseConfig.firestore, `${stage}-WorkspaceInvites`),
         onAuthStateChanged,
-        refreshCustomClaims,
+        refreshCustomClaims
       });
     },
     getWorkspacePersister: (setup) =>
@@ -80,16 +66,14 @@ export function firebasePersister<T extends AuthProviders>(
             firebaseConfig.firestore,
             `${setup.stage}-Workspaces`,
             // Null means get the root workspace document.
-            ...(setup.docType === null
-              ? []
-              : [setup.workspaceId, setup.docType]),
+            ...(setup.docType === null ? [] : [setup.workspaceId, setup.docType])
           ),
           queryConstraints:
             setup.docType === null
               ? // If we are getting the root workspace document, then just get that one document.
                 [where(documentId(), "==", setup.workspaceId)]
               : [],
-          watchChangeDateKey: setup.docType !== null,
+          watchChangeDateKey: setup.docType !== null
         },
         refreshCustomClaims,
         isValid(firebaseConfig.firebaseStorage)
@@ -97,10 +81,10 @@ export function firebasePersister<T extends AuthProviders>(
               storageRef(
                 firebaseConfig.firebaseStorage!,
                 // TODO: Include DocType in the path.
-                `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`,
+                `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`
               )
-          : undefined,
-      ),
+          : undefined
+      )
   } satisfies Cloud.Persister<any>;
 }
 
@@ -111,7 +95,7 @@ export function workspacePersister(
     watchChangeDateKey: boolean;
   },
   refreshCustomClaims: () => Promise<void>,
-  getStorageRef?: (fileId: string) => StorageReference,
+  getStorageRef?: (fileId: string) => StorageReference
 ): Cloud.WorkspacePersister {
   const CHANGE_DATE_KEY = `mx_changeDate`;
   const useServerTimestamp = serverTimestamp();
@@ -119,7 +103,7 @@ export function workspacePersister(
     setupWatcher: (batchUpdate, localJsonFilePersister) => {
       const metaData = localJsonFilePersister.load({
         lastChangeDatePosix: 0,
-        lastChangedDocId: null as string | null,
+        lastChangedDocId: null as string | null
       });
       let shouldStop = false;
       let isProcessingSnapshot = false;
@@ -143,34 +127,21 @@ export function workspacePersister(
                             where(
                               CHANGE_DATE_KEY,
                               ">",
-                              new Date(
-                                Math.max(
-                                  metaData.data.lastChangeDatePosix - 30000,
-                                  0,
-                                ),
-                              ),
+                              new Date(Math.max(metaData.data.lastChangeDatePosix - 30000, 0))
                             ),
-                            where(CHANGE_DATE_KEY, "==", null),
+                            where(CHANGE_DATE_KEY, "==", null)
                             // where(CHANGE_DATE_KEY, "==", useServerTimestamp),
-                          ),
+                          )
                         ]
                       : []),
                     // TODO: Maybe there is some way to avoid already deleted docs.
-                    ...firestoreConfig.queryConstraints,
+                    ...firestoreConfig.queryConstraints
                   ),
-                  ...(firestoreConfig.watchChangeDateKey
-                    ? [orderBy(CHANGE_DATE_KEY, `asc`)]
-                    : []),
+                  ...(firestoreConfig.watchChangeDateKey ? [orderBy(CHANGE_DATE_KEY, `asc`)] : []),
                   orderBy(`__name__`, `asc`),
-                  ...(exists(metaData.data.lastChangedDocId) &&
-                  firestoreConfig.watchChangeDateKey
-                    ? [
-                        startAt(
-                          metaData.data.lastChangeDatePosix,
-                          metaData.data.lastChangedDocId,
-                        ),
-                      ]
-                    : []),
+                  ...(exists(metaData.data.lastChangedDocId) && firestoreConfig.watchChangeDateKey
+                    ? [startAt(metaData.data.lastChangeDatePosix, metaData.data.lastChangedDocId)]
+                    : [])
                 ),
                 (snapshot) => {
                   isProcessingSnapshot = true;
@@ -190,8 +161,7 @@ export function workspacePersister(
                     const docChangeDatePosix =
                       (docData[CHANGE_DATE_KEY]?.seconds ?? -1) * 1_000 +
                       (docData[CHANGE_DATE_KEY]?.nanoseconds ?? -1) / 1_000_000;
-                    const isSubDelivery =
-                      firestoreConfig.collectionRef.path.includes("SubDeliver");
+                    const isSubDelivery = firestoreConfig.collectionRef.path.includes("SubDeliver");
                     if (isSubDelivery) {
                       // console.log(docData);
                     }
@@ -207,7 +177,7 @@ export function workspacePersister(
                     if (change.type === "removed") {
                       console.warn(
                         `The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa is not currently configured to handle documents being removed.`,
-                        docData,
+                        docData
                       );
                       return;
                     }
@@ -226,7 +196,7 @@ export function workspacePersister(
                     if (docChangeDatePosix > latestChange.lastChangeDatePosix) {
                       latestChange = {
                         lastChangeDatePosix: docChangeDatePosix,
-                        lastChangedDocId: change.doc.id,
+                        lastChangedDocId: change.doc.id
                       };
                     }
                   });
@@ -242,10 +212,7 @@ export function workspacePersister(
                   //     2,
                   //   )}`,
                   // );
-                  if (
-                    latestChange.lastChangeDatePosix >
-                    metaData.data.lastChangeDatePosix
-                  ) {
+                  if (latestChange.lastChangeDatePosix > metaData.data.lastChangeDatePosix) {
                     metaData.batchUpdate((data) => (data.value = latestChange));
                   }
                   isProcessingSnapshot = false;
@@ -259,7 +226,7 @@ export function workspacePersister(
                   }
                   setTimeout(runWatcher, 500);
                   console.warn(`Encountered error: ${error}`);
-                },
+                }
               );
             }
           });
@@ -273,7 +240,7 @@ export function workspacePersister(
           while (isProcessingSnapshot) {
             await new Promise((resolve) => setTimeout(resolve, 10));
           }
-        },
+        }
       };
     },
     updateDoc: async (change: Cloud.DocChange) => {
@@ -282,16 +249,11 @@ export function workspacePersister(
       //     change.docId
       //   }:\n${JSON.stringify(change.props, null, 2)}`,
       // );
-      const setOrUpdateDoc = change.isBeingCreatedOrDeleted
-        ? setDoc
-        : updateDoc;
-      await setOrUpdateDoc(
-        docRef(firestoreConfig.collectionRef, change.docId),
-        {
-          ...change.props,
-          [CHANGE_DATE_KEY]: useServerTimestamp,
-        },
-      );
+      const setOrUpdateDoc = change.isBeingCreatedOrDeleted ? setDoc : updateDoc;
+      await setOrUpdateDoc(docRef(firestoreConfig.collectionRef, change.docId), {
+        ...change.props,
+        [CHANGE_DATE_KEY]: useServerTimestamp
+      });
     },
     ...(isValid(getStorageRef)
       ? {
@@ -299,29 +261,23 @@ export function workspacePersister(
             await uploadString(getStorageRef(fileId), base64String);
           },
           async downloadFile(fileId) {
-            const bytes = await getBytes(getStorageRef(fileId)).catch(
-              () => undefined,
-            );
+            const bytes = await getBytes(getStorageRef(fileId)).catch(() => undefined);
             if (!isValid(bytes)) return undefined;
             const base64String = new TextDecoder("utf-8").decode(bytes);
             return base64String;
           },
           async deleteFile(fileId) {
             await deleteObject(getStorageRef(fileId));
-          },
+          }
         }
-      : {}),
+      : {})
   };
 }
 
 // SECTION: Auth
 type AuthParams<T extends AuthProviders> = Omit<
   Parameters<typeof firebaseAuthIntegration<T>>[0],
-  | `onAuthStateChanged`
-  | `workspaceInvitesCollection`
-  | `stage`
-  | `firestore`
-  | `refreshCustomClaims`
+  `onAuthStateChanged` | `workspaceInvitesCollection` | `stage` | `firestore` | `refreshCustomClaims`
 >;
 type AuthProviders = {
   [key: string]: {
@@ -343,14 +299,8 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
   stage: string;
 }): CloudAuth<
   {
-    signUpWithEmail: (
-      email: string,
-      password: string,
-    ) => Promise<UserCredential>;
-    signInWithEmail: (
-      email: string,
-      password: string,
-    ) => Promise<UserCredential>;
+    signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+    signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
   } & {
     [Key in keyof T & string as `signInWith${Capitalize<Key>}`]: (
       ...params: Parameters<T[Key][`signIn`]>
@@ -365,21 +315,20 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
         ? {
             uid: user.uid,
             email: user.email,
-            emailVerified: user.emailVerified,
+            emailVerified: user.emailVerified
           }
-        : null,
+        : null
     );
     if (isValid(user) && !user?.emailVerified) {
       doNow(async () => {
         let stopListeningForThisUser = false;
-        disposePrevEmailVerificationListener = () =>
-          (stopListeningForThisUser = true);
+        disposePrevEmailVerificationListener = () => (stopListeningForThisUser = true);
         while (!stopListeningForThisUser) {
           if (user?.emailVerified) {
             config.onAuthStateChanged({
               uid: user.uid,
               email: user.email,
-              emailVerified: user.emailVerified,
+              emailVerified: user.emailVerified
             });
             stopListeningForThisUser = true;
           }
@@ -398,8 +347,8 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
         const credential = await value.signIn();
         if (!isValid(credential)) return;
         return await signInWithCredential(config.firebaseAuth, credential);
-      },
-    ]),
+      }
+    ])
   );
 
   return {
@@ -410,7 +359,7 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
       signInWithEmail: async (email: string, password: string) => {
         return await config.signInWithEmail(email, password);
       },
-      ...(altSignInMethods as any),
+      ...(altSignInMethods as any)
       // async signInWithGoogle() {
       //   if (!isValid(config.signInToGoogleFromPlatform)) return;
       //   const idToken = await config.signInToGoogleFromPlatform();
@@ -424,17 +373,11 @@ export function firebaseAuthIntegration<T extends AuthProviders>(config: {
       firebaseWorkspace({
         ...config,
         uid: uid,
-        userMetadataCollection: collection(
-          config.firestore,
-          `${config.stage}-UserMetadata`,
-        ),
-        workspacesCollection: collection(
-          config.firestore,
-          `${config.stage}-Workspaces`,
-        ),
+        userMetadataCollection: collection(config.firestore, `${config.stage}-UserMetadata`),
+        workspacesCollection: collection(config.firestore, `${config.stage}-Workspaces`),
         refreshCustomClaims: config.refreshCustomClaims,
-        signOut: signOut,
-      }),
+        signOut: signOut
+      })
   } satisfies CloudAuth<any>;
 
   async function signOut() {
@@ -492,7 +435,7 @@ export function firebaseWorkspace(config: {
             if (error.code === "permission-denied") {
               config.refreshCustomClaims().then(() => startOnSnapshot());
             }
-          },
+          }
         );
       };
       startOnSnapshot();
@@ -514,7 +457,7 @@ export function firebaseWorkspace(config: {
             if (error.code === "permission-denied") {
               config.refreshCustomClaims().then(() => startOnSnapshot());
             }
-          },
+          }
         );
       };
       startOnSnapshot();
@@ -529,18 +472,14 @@ export function firebaseWorkspace(config: {
       const startOnSnapshot = () => {
         if (shouldStop) return;
         disposeSnapShot = onSnapshot(
-          query(
-            config.userMetadataCollection,
-            where("workspaceId", "==", workspaceId),
-          ),
-          (snapshot) =>
-            onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
+          query(config.userMetadataCollection, where("workspaceId", "==", workspaceId)),
+          (snapshot) => onMembers(snapshot.docs.map((doc) => doc.data() as Member)),
           (error) => {
             console.warn(error);
             if (error.code === "permission-denied") {
               config.refreshCustomClaims().then(() => startOnSnapshot());
             }
-          },
+          }
         );
       };
       startOnSnapshot();
@@ -549,27 +488,16 @@ export function firebaseWorkspace(config: {
         disposeSnapShot();
       };
     },
-    async createWorkspaceInterface(params: {
-      inviteCode: string;
-      workspaceId: string;
-      validForDays: number;
-    }) {
-      return await setDoc(
-        docRef(config.workspaceInvitesCollection, params.inviteCode),
-        {
-          workspaceId: params.workspaceId,
-          validForDays: params.validForDays,
-          createdAt: serverTimestamp(),
-        },
-      );
+    async createWorkspaceInterface(params: { inviteCode: string; workspaceId: string; validForDays: number }) {
+      return await setDoc(docRef(config.workspaceInvitesCollection, params.inviteCode), {
+        workspaceId: params.workspaceId,
+        validForDays: params.validForDays,
+        createdAt: serverTimestamp()
+      });
     },
     async createWorkspace(params: { stage: string }) {
-      const result = (
-        await httpsCallable<{ stage: string }, void>(
-          config.firebaseFunctions,
-          "createWorkspace",
-        )(params)
-      ).data;
+      const result = (await httpsCallable<{ stage: string }, void>(config.firebaseFunctions, "createWorkspace")(params))
+        .data;
       try {
         await config.refreshCustomClaims();
       } catch (error) {
@@ -584,7 +512,7 @@ export function firebaseWorkspace(config: {
       const result = (
         await httpsCallable<{ inviteCode: string; stage: string }, void>(
           config.firebaseFunctions,
-          "joinWorkspace",
+          "joinWorkspace"
         )(params)
       ).data;
       try {
@@ -596,10 +524,7 @@ export function firebaseWorkspace(config: {
     },
     async leaveWorkspace(params: { stage: string } | undefined) {
       const result = (
-        await httpsCallable<{ stage: string } | undefined, void>(
-          config.firebaseFunctions,
-          "leaveWorkspace",
-        )(params)
+        await httpsCallable<{ stage: string } | undefined, void>(config.firebaseFunctions, "leaveWorkspace")(params)
       ).data;
       try {
         await config.refreshCustomClaims();
@@ -610,26 +535,15 @@ export function firebaseWorkspace(config: {
     },
     async removeMember(params: { uid: string; stage: string }) {
       return (
-        await httpsCallable<{ uid: string; stage: string }, void>(
-          config.firebaseFunctions,
-          "removeMember",
-        )(params)
+        await httpsCallable<{ uid: string; stage: string }, void>(config.firebaseFunctions, "removeMember")(params)
       ).data;
     },
     async deleteWorkspace(params: { stage: string }) {
-      return (
-        await httpsCallable<{ stage: string }, void>(
-          config.firebaseFunctions,
-          "deleteWorkspace",
-        )(params)
-      ).data;
+      return (await httpsCallable<{ stage: string }, void>(config.firebaseFunctions, "deleteWorkspace")(params)).data;
     },
     async deleteAccount(params: { stage: string }) {
-      await httpsCallable<{ stage: string }, void>(
-        config.firebaseFunctions,
-        "deleteAccount",
-      )(params);
+      await httpsCallable<{ stage: string }, void>(config.firebaseFunctions, "deleteAccount")(params);
       await config.signOut();
-    },
+    }
   };
 }

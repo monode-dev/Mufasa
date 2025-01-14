@@ -1,16 +1,8 @@
-import {
-  createEffect,
-  createMemo,
-  createRoot,
-  getOwner,
-  mapArray,
-  runWithOwner,
-  untrack,
-} from "solid-js";
+import { createEffect, createMemo, createRoot, getOwner, mapArray, runWithOwner, untrack } from "solid-js";
 import { CustomProp, DocClass, DocInst, IsCustomProp, prop } from "./Doc";
 import { PersistanceConfig } from "./DocStore";
 import { createMutable } from "solid-js/store";
-import { onDispose, exists } from "@/miwi/src/miwi";
+import { onDispose, exists } from "miwi";
 
 const relTables = new Map<DocClass, Map<string, DocClass>>();
 const docIndex = new Map<
@@ -24,10 +16,7 @@ const docIndex = new Map<
   >
 >();
 
-type GetListFromTableConfig<
-  OtherInst extends DocInst,
-  TableConfig,
-> = undefined extends TableConfig
+type GetListFromTableConfig<OtherInst extends DocInst, TableConfig> = undefined extends TableConfig
   ? List<OtherInst>
   : TableConfig extends PersistanceConfig
   ? List<OtherInst>
@@ -38,20 +27,12 @@ type GetListFromTableConfig<
   : List<OtherInst>;
 export function list<
   OtherClass extends DocClass,
-  TableConfig extends
-    | undefined
-    | PersistanceConfig
-    | (keyof InstanceType<OtherClass> & string),
->(
-  OtherClass: OtherClass,
-  tableConfig?: TableConfig,
-): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig> {
+  TableConfig extends undefined | PersistanceConfig | (keyof InstanceType<OtherClass> & string)
+>(OtherClass: OtherClass, tableConfig?: TableConfig): GetListFromTableConfig<InstanceType<OtherClass>, TableConfig> {
   if (typeof tableConfig === `string`) {
-    const otherProp: keyof InstanceType<OtherClass> & string =
-      tableConfig as any;
+    const otherProp: keyof InstanceType<OtherClass> & string = tableConfig as any;
     const emptyOtherInst = new OtherClass();
-    const otherPropIsNewList: boolean =
-      (emptyOtherInst as any)[otherProp].isNewList ?? false;
+    const otherPropIsNewList: boolean = (emptyOtherInst as any)[otherProp].isNewList ?? false;
     const docStoreConfig = (emptyOtherInst as any)[otherProp].docStoreConfig;
     if (otherPropIsNewList) {
       return listProp({
@@ -59,7 +40,7 @@ export function list<
         getSecondaryClass: (inst) => inst.constructor as any,
         gePrimaryProp: () => otherProp,
         docStoreConfig: docStoreConfig,
-        otherDocsToStartSyncing: [OtherClass],
+        otherDocsToStartSyncing: [OtherClass]
       }) as any;
     } else {
       return {
@@ -75,7 +56,7 @@ export function list<
             // Create the mutable
             otherDocTypeIndex.set(
               otherProp,
-              createRoot(() => createMutable({})),
+              createRoot(() => createMutable({}))
             );
             const otherDocIdsByParentId = otherDocTypeIndex.get(otherProp)!;
 
@@ -91,14 +72,14 @@ export function list<
                   }
                   otherDocIdsByParentId[parentId].push(otherInst.docId);
                   onDispose(() => {
-                    otherDocIdsByParentId[parentId] = otherDocIdsByParentId[
-                      parentId
-                    ].filter((docId) => docId !== otherInst.docId);
+                    otherDocIdsByParentId[parentId] = otherDocIdsByParentId[parentId].filter(
+                      (docId) => docId !== otherInst.docId
+                    );
                     if (otherDocIdsByParentId[parentId].length === 0) {
                       delete otherDocIdsByParentId[parentId];
                     }
                   });
-                },
+                }
               );
               createEffect(() => mapped());
             });
@@ -111,13 +92,13 @@ export function list<
                 ?.[inst.docId]?.map((docId) => OtherClass._fromId(docId))
                 ?.filter(exists) ?? [],
             () => {},
-            () => {},
+            () => {}
           );
           Object.defineProperty(inst, key, {
-            get: () => listInst,
+            get: () => listInst
           });
         },
-        otherDocsToStartSyncing: [OtherClass],
+        otherDocsToStartSyncing: [OtherClass]
       } satisfies CustomProp as any;
     }
   } else {
@@ -129,8 +110,8 @@ export function list<
         getSecondaryClass: () => OtherClass,
         gePrimaryProp: (thisProp) => thisProp,
         docStoreConfig: tableConfig ?? null,
-        otherDocsToStartSyncing: [OtherClass],
-      }),
+        otherDocsToStartSyncing: [OtherClass]
+      })
     } as any;
   }
 }
@@ -154,40 +135,33 @@ function listProp(config: {
           key,
           class extends PrimaryClass.RootClass.customize({
             docType: `${PrimaryClass.docType}_${key}`,
-            docStoreConfig: config.docStoreConfig ?? undefined,
+            docStoreConfig: config.docStoreConfig ?? undefined
           }) {
             primary = prop(PrimaryClass);
             secondary = prop(SecondaryClass);
-          },
+          }
         );
       }
       const RelTable = relTablesForThisType.get(key)!;
       const listInst = new List(
-        () =>
-          RelTable.getAllDocs().filter(
-            (rel) => (rel as any).primary.docId === inst.docId,
-          ),
+        () => RelTable.getAllDocs().filter((rel) => (rel as any).primary.docId === inst.docId),
         (value) => {
           RelTable.create({
             primary: inst,
-            secondary: value,
+            secondary: value
           });
         },
         (value) => {
           RelTable.getAllDocs()
-            .filter(
-              (rel) =>
-                (rel as any).primary.docId === inst.docId &&
-                (rel as any).secondary.docId === value.docId,
-            )
+            .filter((rel) => (rel as any).primary.docId === inst.docId && (rel as any).secondary.docId === value.docId)
             .forEach((rel) => rel.deleteDoc());
-        },
+        }
       );
       Object.defineProperty(inst, key, {
-        get: () => listInst,
+        get: () => listInst
       });
     },
-    otherDocsToStartSyncing: config.otherDocsToStartSyncing,
+    otherDocsToStartSyncing: config.otherDocsToStartSyncing
   } satisfies CustomProp;
 }
 export class List<T extends DocInst> {
@@ -210,7 +184,7 @@ export class List<T extends DocInst> {
   constructor(
     private readonly getArray: () => T[],
     public readonly add: (value: T) => void,
-    public readonly remove: (value: T) => void,
+    public readonly remove: (value: T) => void
   ) {}
 }
 export type ReadonlyList<T extends DocInst> = Omit<List<T>, `add` | `remove`>;
