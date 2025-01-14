@@ -143,15 +143,33 @@ export namespace Device {
 export namespace Cloud {
   export type Persister<T extends SignInFuncs> = {
     getCloudAuth: GetCloudAuth<T>;
-    getWorkspacePersister: GetWorkspacePersister;
+    // getWorkspacePersister: GetWorkspacePersister;
+    getCreateDocStorePersisterParams: GetCreateDocStorePersisterParams;
+    createDocStorePersister: CreateDocStorePersister;
   };
-  export type GetWorkspacePersister = (options: {
+  // export type GetWorkspacePersister = (options: {
+  //   stage: string | null;
+  //   workspaceId: string;
+  //   /** Use "null" the root workspace document */
+  //   docType: string | null;
+  //   // version: number;
+  // }) => Cloud.WorkspacePersister;
+  export type GetCreateDocStorePersisterParams = (config: {
     stage: string | null;
     workspaceId: string;
     /** Use "null" the root workspace document */
     docType: string | null;
     // version: number;
-  }) => Cloud.WorkspacePersister;
+  }) => CreateDocStorePersisterParams;
+  export type CreateDocStorePersisterParams = {
+    collectionPath: string[];
+    docId?: string;
+    fileStoragePath?: string[];
+    watchChangeDateKey: boolean;
+  };
+  export type CreateDocStorePersister = (
+    config: CreateDocStorePersisterParams,
+  ) => Cloud.WorkspacePersister;
   export type WorkspacePersister = {
     setupWatcher: (
       batchUpdate: (updates: UpdateBatch) => void,
@@ -198,7 +216,9 @@ export type PersisterSetup = {
 export type PersistanceConfig = {
   sessionPersister: Session.Persister;
   devicePersister?: Device.Persister;
-  getWorkspacePersister?: Cloud.GetWorkspacePersister;
+  // getWorkspacePersister?: Cloud.GetWorkspacePersister;
+  createWorkspacePersister: Cloud.CreateDocStorePersister;
+  getWorkspaceParams: Cloud.GetCreateDocStorePersisterParams;
   trackUpload: () => void;
   untrackUpload: () => void;
   trackDownload: () => void;
@@ -342,14 +362,26 @@ export function initializeStoreBank(bankConfig: {
                 }),
               )
             : Device.mockDirectoryPersister,
+        // cloudWorkspacePersister:
+        //   isValid(persistance.getWorkspacePersister) &&
+        //   isValid(workspaceInstConfig)
+        //     ? persistance.getWorkspacePersister({
+        //         stage: params.stage,
+        //         docType: params.docType,
+        //         workspaceId: workspaceInstConfig.workspaceId,
+        //       })
+        //     : Cloud.mockWorkspacePersister,
         cloudWorkspacePersister:
-          isValid(persistance.getWorkspacePersister) &&
-          isValid(workspaceInstConfig)
-            ? persistance.getWorkspacePersister({
-                stage: params.stage,
-                docType: params.docType,
-                workspaceId: workspaceInstConfig.workspaceId,
-              })
+          isValid(persistance.createWorkspacePersister) &&
+          isValid(workspaceInstConfig) &&
+          isValid(persistance.getWorkspaceParams)
+            ? persistance.createWorkspacePersister(
+                persistance.getWorkspaceParams({
+                  stage: params.stage,
+                  docType: params.docType,
+                  workspaceId: workspaceInstConfig.workspaceId,
+                }),
+              )
             : Cloud.mockWorkspacePersister,
         trackUpload: persistance.trackUpload,
         untrackUpload: persistance.untrackUpload,
