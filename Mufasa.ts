@@ -141,7 +141,11 @@ export function initializeMufasa<
     defaultPersistance: {
       sessionPersister: mfsConfig.sessionPersister,
       devicePersister: mfsConfig.devicePersister,
-      getWorkspacePersister: mfsConfig.cloudPersister.getWorkspacePersister,
+      // getWorkspacePersister: mfsConfig.cloudPersister.getWorkspacePersister,
+      getWorkspaceParams:
+        mfsConfig.cloudPersister.getCreateDocStorePersisterParams,
+      createWorkspacePersister:
+        mfsConfig.cloudPersister.createDocStorePersister,
       trackUpload,
       untrackUpload,
       trackDownload,

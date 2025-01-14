@@ -59,29 +59,62 @@ export function firebasePersister<T extends AuthProviders>(
         refreshCustomClaims
       });
     },
-    getWorkspacePersister: (setup) =>
+    // getWorkspacePersister: (setup) =>
+    //   workspacePersister(
+    //     {
+    //       collectionRef: collection(
+    //         firebaseConfig.firestore,
+    //         `${setup.stage}-Workspaces`,
+    //         // Null means get the root workspace document.
+    //         ...(setup.docType === null
+    //           ? []
+    //           : [setup.workspaceId, setup.docType]),
+    //       ),
+    //       queryConstraints:
+    //         setup.docType === null
+    //           ? // If we are getting the root workspace document, then just get that one document.
+    //             [where(documentId(), "==", setup.workspaceId)]
+    //           : [],
+    //       watchChangeDateKey: setup.docType !== null,
+    //     },
+    //     refreshCustomClaims,
+    //     isValid(firebaseConfig.firebaseStorage)
+    //       ? (fileId) =>
+    //           storageRef(
+    //             firebaseConfig.firebaseStorage!,
+    //             // TODO: Include DocType in the path.
+    //             `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`,
+    //           )
+    //       : undefined,
+    //   ),
+    getCreateDocStorePersisterParams: (setup) => ({
+      collectionPath: [
+        `${setup.stage}-Workspaces`,
+        ...(setup.docType === null ? [] : [setup.workspaceId, setup.docType])
+      ],
+      docId: setup.docType === null ? setup.workspaceId : undefined,
+      watchChangeDateKey: setup.docType !== null,
+      fileStoragePath: isValid(firebaseConfig.firebaseStorage)
+        ? [`${setup.stage}-Workspace-Files`, setup.workspaceId, ...(isValid(setup.docType) ? [setup.docType] : [])]
+        : undefined
+    }),
+    createDocStorePersister: (setup) =>
       workspacePersister(
         {
-          collectionRef: collection(
-            firebaseConfig.firestore,
-            `${setup.stage}-Workspaces`,
-            // Null means get the root workspace document.
-            ...(setup.docType === null ? [] : [setup.workspaceId, setup.docType])
-          ),
-          queryConstraints:
-            setup.docType === null
-              ? // If we are getting the root workspace document, then just get that one document.
-                [where(documentId(), "==", setup.workspaceId)]
-              : [],
-          watchChangeDateKey: setup.docType !== null
+          collectionRef: collection(firebaseConfig.firestore, setup.collectionPath.join(`/`)),
+          queryConstraints: isValid(setup.docId)
+            ? // If we are getting the root workspace document, then just get that one document.
+              [where(documentId(), "==", setup.docId)]
+            : [],
+          watchChangeDateKey: setup.watchChangeDateKey
         },
         refreshCustomClaims,
-        isValid(firebaseConfig.firebaseStorage)
+        isValid(firebaseConfig.firebaseStorage) && isValid(setup.fileStoragePath)
           ? (fileId) =>
               storageRef(
                 firebaseConfig.firebaseStorage!,
                 // TODO: Include DocType in the path.
-                `${setup.stage}-Workspace-Files/${setup.workspaceId}/${setup.docType}/${fileId}`
+                `${setup.fileStoragePath!.join(`/`)}/${fileId}`
               )
           : undefined
       )
