@@ -10,7 +10,7 @@ import {
 import { CustomProp, DocClass, DocInst, IsCustomProp, prop } from "./Doc";
 import { PersistanceConfig } from "./DocStore";
 import { createMutable } from "solid-js/store";
-import { onDispose, exists } from "@/miwi/src/miwi";
+import { onDispose, exists } from "miwi";
 
 const relTables = new Map<DocClass, Map<string, DocClass>>();
 const docIndex = new Map<
