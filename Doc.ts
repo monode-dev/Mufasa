@@ -5,11 +5,17 @@ import {
   PersistanceTaggedUpdateBatch,
   PrimVal,
   WritablePersistanceTaggedUpdateBatch,
-  StoreBank
+  StoreBank,
 } from "./DocStore";
-import { Flagged, PickFlagged, listObjEntries, StripFlag, doNow, isValid } from "./Utils";
+import {
+  Flagged,
+  PickFlagged,
+  listObjEntries,
+  StripFlag,
+  doNow,
+  isValid,
+} from "./Utils";
 import { createMutable } from "solid-js/store";
-import { mfs } from "@/Database";
 
 let defaultPersistanceConfig: PersistanceConfig;
 let _getStoreBank: () => StoreBank = (() => {}) as any;
@@ -21,16 +27,22 @@ export const untrackUpload = () => _untrackUpload();
 export type DocExports = ReturnType<typeof initializeDocClass>;
 export type DocClass = ReturnType<DocExports["Doc"]>;
 export type DocInst = InstanceType<DocClass>;
-export function initializeDocClass(config: { storeBank: StoreBank; defaultPersistance: PersistanceConfig }) {
+export function initializeDocClass(config: {
+  storeBank: StoreBank;
+  defaultPersistance: PersistanceConfig;
+}) {
   defaultPersistanceConfig = config.defaultPersistance;
   _getStoreBank = () => config.storeBank;
   _trackUpload = config.defaultPersistance.trackUpload;
   _untrackUpload = config.defaultPersistance.untrackUpload;
 
   return {
-    Doc(docType: string, customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>) {
+    Doc(
+      docType: string,
+      customizations?: Omit<Parameters<typeof Doc.customize>[0], `docType`>,
+    ) {
       return Doc.customize({ docType, ...(customizations ?? {}) });
-    }
+    },
   };
 }
 // TODO: This is probably why all our docs are freaking out with null stuff.
@@ -45,7 +57,7 @@ function _initializeInst<T extends Doc>(
   inst: T,
   overrideProps: { [jsKey: string | number]: PrimVal },
   // We should try not making docId reactive, and then decide if that was the wrong idea.
-  getDocId: (initProps: PersistanceTaggedUpdateBatch[string]) => string
+  getDocId: (initProps: PersistanceTaggedUpdateBatch[string]) => string,
 ): T {
   // Create Instance
   const initProps: WritablePersistanceTaggedUpdateBatch[string] = {};
@@ -67,7 +79,7 @@ function _initializeInst<T extends Doc>(
       const mfsKey = propConfig.overrideKey ?? jsKey;
       initProps[mfsKey] = {
         value: initValue,
-        maxPersistance: propConfig.persistance
+        maxPersistance: propConfig.persistance,
       };
     });
   });
@@ -77,7 +89,7 @@ function _initializeInst<T extends Doc>(
   Object.defineProperty(inst, "docId", {
     get: function () {
       return docId;
-    }
+    },
   });
 
   // Setup all custom props.
@@ -88,7 +100,11 @@ function _initializeInst<T extends Doc>(
     } else {
       Object.defineProperty(inst, jsKey, {
         get: function () {
-          const storeValue: PrimVal = this._docStore.getProp(docId, mfsKey, propConfig.getFallbackValue());
+          const storeValue: PrimVal = this._docStore.getProp(
+            docId,
+            mfsKey,
+            propConfig.getFallbackValue(),
+          );
           return propConfig.fromPrim(storeValue);
         },
         ...(isValid(propConfig.toPrim)
@@ -101,23 +117,23 @@ function _initializeInst<T extends Doc>(
                     [docId]: {
                       [mfsKey]: {
                         value: asPrim,
-                        maxPersistance: propConfig.persistance
-                      }
-                    }
+                        maxPersistance: propConfig.persistance,
+                      },
+                    },
                   },
                   {
-                    overwriteGlobally: false
-                  }
+                    overwriteGlobally: false,
+                  },
                 );
-              }
+              },
             }
           : isValid(propConfig.onSet)
           ? {
               set: function (value) {
                 propConfig.onSet!(value);
-              }
+              },
             }
-          : {})
+          : {}),
       });
     }
   });
@@ -139,16 +155,21 @@ export class Doc {
     while (currentClass !== Function.prototype) {
       Object.entries(currentClass).forEach(([key, propConfig]) => {
         const isFormula =
-          isCustomProp(propConfig) && !propConfig.isFullCustom && typeof propConfig?.getFallbackValue() === `function`;
+          isCustomProp(propConfig) &&
+          !propConfig.isFullCustom &&
+          typeof propConfig?.getFallbackValue() === `function`;
         if (!isFormula) return;
 
-        const { useRoot, useFormula } = defaultPersistanceConfig.sessionPersister;
-        const underlyingFormula = useRoot(() => useFormula(propConfig.getFallbackValue() as any));
+        const { useRoot, useFormula } =
+          defaultPersistanceConfig.sessionPersister;
+        const underlyingFormula = useRoot(() =>
+          useFormula(propConfig.getFallbackValue() as any),
+        );
 
         Object.defineProperty(currentClass, key, {
           get: function () {
             return underlyingFormula.value;
-          }
+          },
         });
       });
 
@@ -164,7 +185,9 @@ export class Doc {
   get docType() {
     return (this.constructor as typeof Doc).docType;
   }
-  static getDocStoreConfig<This extends typeof Doc>(this: This): PersistanceConfig {
+  static getDocStoreConfig<This extends typeof Doc>(
+    this: This,
+  ): PersistanceConfig {
     return defaultPersistanceConfig;
   }
   static ensureSyncHasStarted() {
@@ -179,9 +202,13 @@ export class Doc {
        * the first one is accessed we start syncing all the connected doc types too. */
       onStoreInit: () => {
         const customProps = Object.values(new this()).filter(isCustomProp);
-        const otherDocsToStartSyncing = new Set(customProps.flatMap((prop) => prop.otherDocsToStartSyncing));
-        otherDocsToStartSyncing.forEach((docClass) => docClass.ensureSyncHasStarted());
-      }
+        const otherDocsToStartSyncing = new Set(
+          customProps.flatMap((prop) => prop.otherDocsToStartSyncing),
+        );
+        otherDocsToStartSyncing.forEach((docClass) =>
+          docClass.ensureSyncHasStarted(),
+        );
+      },
     });
   }
   get _docStore() {
@@ -193,17 +220,21 @@ export class Doc {
     customizations: {
       docType?: string | null;
       docStoreConfig?: Partial<PersistanceConfig>;
-    }
+    },
   ): This {
     return class extends (this as any) {
       static get docType() {
-        return customizations.docType === undefined ? this.name : customizations.docType;
+        return customizations.docType === undefined
+          ? this.name
+          : customizations.docType;
       }
 
-      static getDocStoreConfig<This extends typeof Doc>(this: This): PersistanceConfig {
+      static getDocStoreConfig<This extends typeof Doc>(
+        this: This,
+      ): PersistanceConfig {
         return {
           ...defaultPersistanceConfig!,
-          ...customizations.docStoreConfig
+          ...customizations.docStoreConfig,
         };
       }
     } as any;
@@ -227,7 +258,7 @@ export class Doc {
     if (!_allDocInstances.has(this.docType)) {
       _allDocInstances.set(
         this.docType,
-        createRoot(() => createMutable({}))
+        createRoot(() => createMutable({})),
       );
       const instances = _allDocInstances.get(this.docType)!;
       createRoot(() =>
@@ -246,10 +277,12 @@ export class Doc {
             //   console.log(`DocType is null for ${JSON.stringify(Array.from(Object.keys(instances)), null, 2)}`);
             // }
           });
-        })
+        }),
       );
     }
-    return Object.values(_allDocInstances.get(this.docType)!) as InstanceType<T>[];
+    return Object.values(
+      _allDocInstances.get(this.docType)!,
+    ) as InstanceType<T>[];
   }
   static getHaveCompletedFirstSync<T extends typeof Doc>(this: T): boolean {
     return this._docStore.getHaveCompletedFirstSync();
@@ -258,7 +291,10 @@ export class Doc {
     return this._docStore.getHaveLoadedFromDisk();
   }
 
-  static _fromId<T extends typeof Doc>(this: T, docId: string): InstanceType<T> {
+  static _fromId<T extends typeof Doc>(
+    this: T,
+    docId: string,
+  ): InstanceType<T> {
     // if (this.docType === null) {
     //   console.log(`Need to call getAllDocs for Team.`);
     //   this.getAllDocs();
@@ -271,8 +307,15 @@ export class Doc {
     return _allDocInstances.get(this.docType)?.[docId] as InstanceType<T>;
   }
 
-  static create<T extends typeof Doc>(this: T, ...overrideProps: CreateParams<T>): InstanceType<T> {
-    return _initializeInst(new this(), overrideProps[0] ?? {}, this._docStore.createDoc) as any;
+  static create<T extends typeof Doc>(
+    this: T,
+    ...overrideProps: CreateParams<T>
+  ): InstanceType<T> {
+    return _initializeInst(
+      new this(),
+      overrideProps[0] ?? {},
+      this._docStore.createDoc,
+    ) as any;
   }
 
   static async export(path: string, shouldInclude?: (path: string) => boolean) {
@@ -310,10 +353,17 @@ export const RequiredPropFlag = Symbol(`RequiredPropFlag`);
 export type OptionalPropFlag = typeof OptionalPropFlag;
 export const OptionalPropFlag = Symbol(`OptionalPropFlag`);
 // TODO: Delete docs that depend on non-nullable docs.
-type PropClass = typeof Boolean | typeof Number | typeof String | typeof Doc | [typeof String];
+type PropClass =
+  | typeof Boolean
+  | typeof Number
+  | typeof String
+  | typeof Doc
+  | [typeof String];
 type PropType<T extends PropClass = PropClass> = T | [T, null];
 type PropInst = boolean | number | string | string[] | Doc | null;
-type PropValue<T extends PropType | PropInst | undefined = PropType | PropInst | undefined> = T extends [any, any]
+type PropValue<
+  T extends PropType | PropInst | undefined = PropType | PropInst | undefined,
+> = T extends [any, any]
   ? PropValue<T[number]>
   : T extends [any]
   ? PropValue<T[0]>[]
@@ -334,7 +384,9 @@ type PropValue<T extends PropType | PropInst | undefined = PropType | PropInst |
   : null;
 export function prop<
   FirstParam extends PropType | PropValue,
-  SecondParam extends FirstParam extends PropType ? PropValue<FirstParam> | undefined : never
+  SecondParam extends FirstParam extends PropType
+    ? PropValue<FirstParam> | undefined
+    : never,
 >(
   firstParam: FirstParam,
   secondParam?: SecondParam,
@@ -343,12 +395,18 @@ export function prop<
   options: {
     persistance?: Persistance;
     key?: string;
-  } = {}
+  } = {},
 ): Flagged<
   PropValue<FirstParam>,
-  FirstParam extends PropType ? (undefined extends SecondParam ? RequiredPropFlag : OptionalPropFlag) : OptionalPropFlag
+  FirstParam extends PropType
+    ? undefined extends SecondParam
+      ? RequiredPropFlag
+      : OptionalPropFlag
+    : OptionalPropFlag
 > {
-  function getTypeClassFromFirstParam(firstParam: PropType | PropValue): PropClass {
+  function getTypeClassFromFirstParam(
+    firstParam: PropType | PropValue,
+  ): PropClass {
     return typeof firstParam === `function`
       ? firstParam
       : Array.isArray(firstParam)
@@ -363,7 +421,11 @@ export function prop<
       : String;
   }
   const TypeClass: PropClass = getTypeClassFromFirstParam(firstParam);
-  const initValue: PropValue | undefined = [`boolean`, `number`, `string`].includes(typeof firstParam)
+  const initValue: PropValue | undefined = [
+    `boolean`,
+    `number`,
+    `string`,
+  ].includes(typeof firstParam)
     ? firstParam
     : (secondParam as any);
   const persistance: Persistance = options.persistance ?? Persistance.global;
@@ -371,22 +433,24 @@ export function prop<
     return {
       [IsCustomProp]: true,
       isFullCustom: false,
-      getInitValue: () => (initValue instanceof Doc ? initValue.docId : initValue),
+      getInitValue: () =>
+        initValue instanceof Doc ? initValue.docId : initValue,
       getFallbackValue: () => null,
       fromPrim: (prim) => {
         if (prim === null) return null;
         if (typeof prim !== `string`) {
           console.error(
-            `Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`
+            `Tried to read a doc prop of type ${TypeClass.docType} but got ${prim} instead of a docId string.`,
           );
           return null;
         }
         return TypeClass._fromId(prim);
       },
-      toPrim: (inst: InstanceType<typeof TypeClass> | null) => inst?.docId ?? null,
+      toPrim: (inst: InstanceType<typeof TypeClass> | null) =>
+        inst?.docId ?? null,
       persistance,
       otherDocsToStartSyncing: [TypeClass],
-      overrideKey: options.key
+      overrideKey: options.key,
     } satisfies CustomProp as any;
   } else {
     return {
@@ -398,7 +462,7 @@ export function prop<
       toPrim: (inst) => inst,
       persistance,
       otherDocsToStartSyncing: [],
-      overrideKey: options.key
+      overrideKey: options.key,
     } satisfies CustomProp as any;
   }
 }
@@ -411,7 +475,7 @@ export function formula<T>(compute: () => T, set?: (newVal: T) => void): T {
     fromPrim: (prim) => prim,
     onSet: set,
     persistance: Persistance.session,
-    otherDocsToStartSyncing: []
+    otherDocsToStartSyncing: [],
   } satisfies CustomProp as any;
 }
 export type IsCustomProp = typeof IsCustomProp;
@@ -446,6 +510,11 @@ export type CustomProp = {
 function isCustomProp(arg: any): arg is CustomProp {
   return arg?.[IsCustomProp] === true;
 }
-function isDocClass(possibleDocClass: { new (...args: any[]): any }): possibleDocClass is typeof Doc {
-  return Object.prototype.isPrototypeOf.call(Doc.prototype, possibleDocClass.prototype);
+function isDocClass(possibleDocClass: {
+  new (...args: any[]): any;
+}): possibleDocClass is typeof Doc {
+  return Object.prototype.isPrototypeOf.call(
+    Doc.prototype,
+    possibleDocClass.prototype,
+  );
 }
