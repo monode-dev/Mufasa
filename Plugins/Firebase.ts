@@ -208,10 +208,10 @@ export function workspacePersister(
                     // );
                     // Skip removed documents. Documents should never be deleted only flagged.
                     if (change.type === "removed") {
-                      console.warn(
-                        `The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa is not currently configured to handle documents being removed.`,
-                        docData
-                      );
+                      // console.warn(
+                      //   `The Firestore document "${firestoreConfig.collectionRef.path}/${change.doc.id}" was removed. Mufasa is not currently configured to handle documents being removed.`,
+                      //   docData
+                      // );
                       return;
                     }
                     // The first one is usually a duplicate.
